@@ -21,7 +21,7 @@
     .app-promo{display:flex;align-items:center;justify-content:center;gap:9px;padding:10px 12px;background:#132d20;color:#f2f5ef;border-bottom:1px solid #355b3e}.app-promo[hidden]{display:none}.app-promo-copy{font-size:13px;font-weight:700}.app-promo button{min-height:36px;padding:7px 12px;border:1px solid #6eaf79;border-radius:7px;color:#fff;background:#287442;font-weight:800}.app-promo .app-promo-share{border-color:#64776a;background:#24332a}.app-promo-close{width:34px;padding:4px!important;font-size:20px;line-height:1}.app-promo button:focus-visible{outline:2px solid #f7d978;outline-offset:2px}@media(max-width:600px){.app-promo{gap:7px;padding:9px 8px}.app-promo-copy{font-size:12px}.app-promo button{padding:7px 9px;font-size:12px}}@media(prefers-reduced-motion:reduce){.app-promo{scroll-behavior:auto}}
   </style>
   <style>
-    .battle-card{margin:6px 0;padding:8px 10px;overflow:hidden}
+    .battle-card{margin:4px 0;padding:6px 8px;overflow:hidden}
     .demo-running-battle{display:grid;gap:6px}
     .demo-running-matchup{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:8px}
     .demo-running-player{display:flex;align-items:center;gap:6px;min-width:0}
@@ -45,30 +45,30 @@
     #profileMoneySummary .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
     @media(max-width:700px){.profile-account-row{grid-template-columns:minmax(0,1fr)}}
     .battle-card-game{background:linear-gradient(90deg,#00a7d8,#35a85b,#e2a51b,#e35b48);background-clip:text;-webkit-background-clip:text;color:transparent;font-size:12px;font-weight:800}
-    .battle-players{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:6px;margin:10px 0 8px}
+    .battle-players{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:2px;margin:4px 0}
     .battle-players-waiting{grid-template-columns:minmax(0,1fr)}
-    .battle-player{display:flex;align-items:center;justify-content:space-between;gap:6px;min-width:0;text-align:left}
-    .battle-player-main{display:flex;align-items:center;gap:6px;min-width:0}
+    .battle-player{display:flex;align-items:center;justify-content:space-between;gap:3px;min-width:0;text-align:left}
+    .battle-player-main{display:flex;align-items:center;gap:4px;min-width:0}
     .battle-player-opponent{justify-content:flex-end}
-    .battle-avatar{display:grid;place-items:center;width:32px;height:32px;flex:none;margin:0;border:1px solid #567363;border-radius:50%;color:#eff8ef;background:linear-gradient(145deg,#344f43,#1a282d);font-size:14px;font-weight:900;object-fit:cover}
-    .battle-player-info{display:grid;min-width:0}
+    .battle-avatar{display:grid;place-items:center;width:22px;height:22px;flex:none;margin:0;border:1px solid #567363;border-radius:50%;color:#eff8ef;background:linear-gradient(145deg,#344f43,#1a282d);font-size:10px;font-weight:900;object-fit:cover}
+    .battle-player-info{display:grid;min-width:0;line-height:1.1}
     .battle-player-opponent .battle-avatar{border-color:#765953;background:linear-gradient(145deg,#66403c,#29252b)}
-    .battle-player-name{display:block;overflow-wrap:anywhere;font-weight:900;font-size:11px}
-    .battle-player-role{display:block;color:var(--muted);font-size:8px}
-    .battle-player-amount{display:inline-flex;align-items:center;justify-content:center;gap:2px;min-width:30px;padding:2px 4px;border-radius:999px;background:rgba(247,217,120,.1);border:1px solid rgba(247,217,120,.2);color:var(--gold);font-size:14px;font-weight:800;line-height:1;white-space:nowrap}
-    .battle-versus{padding:0 2px;color:transparent;background:linear-gradient(110deg,#ff746c 5%,#f5c84b 38%,#75dfa9 67%,#79a9ff 96%);background-clip:text;-webkit-background-clip:text;font-size:12px;font-weight:1000;line-height:1}
-    .battle-prizes{display:grid;grid-template-columns:96px minmax(0, 1fr) auto;align-items:center;gap:8px;margin:0 0 8px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:#101920}.battle-prizes.open-battle-prizes{grid-template-columns:1fr}.battle-prizes.open-battle-prizes .battle-prize-players{border-left:0}
-    .battle-prize{min-width:0;padding:0 4px;text-align:left;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;line-height:1.2}
-    .battle-prize small{display:block;color:var(--muted);font-size:9px;letter-spacing:.04em;text-transform:uppercase}
-    .battle-prize strong{display:block;margin-top:2px;color:var(--gold);font-size:15px;font-weight:900;line-height:1.1;font-variant-numeric:tabular-nums}
-    .battle-prize-players{margin:0;padding:0;border-left:1px solid var(--line);display:flex;align-items:center;gap:6px;min-width:0;background:transparent}
-    .battle-prize-players .battle-players{margin:0;flex:1 1 auto;width:100%;gap:4px}
+    .battle-player-name{display:block;overflow-wrap:anywhere;font-weight:900;font-size:10px;line-height:1.2}
+    .battle-player-role{display:block;color:var(--muted);font-size:7px;line-height:1.1}
+    .battle-player-amount{display:inline-flex;align-items:center;justify-content:center;gap:2px;min-width:46px;padding:2px 4px;border-radius:999px;background:rgba(247,217,120,.1);border:1px solid rgba(247,217,120,.2);color:var(--gold);font-size:10px;font-weight:800;line-height:1.2;white-space:nowrap}
+    .battle-versus{padding:0 1px;color:transparent;background:linear-gradient(110deg,#ff746c 5%,#f5c84b 38%,#75dfa9 67%,#79a9ff 96%);background-clip:text;-webkit-background-clip:text;font-size:10px;font-weight:1000;line-height:1}
+    .battle-prizes{display:grid;grid-template-columns:70px minmax(0, 1fr) auto;align-items:center;gap:4px;margin:0 0 8px;padding:5px 6px;border:1px solid var(--line);border-radius:8px;background:#101920}.battle-prizes.open-battle-prizes{grid-template-columns:1fr}.battle-prizes.open-battle-prizes .battle-prize-players{border-left:0}
+    .battle-prize{min-width:0;padding:0 2px;text-align:left;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;line-height:1.1}
+    .battle-prize small{display:block;color:var(--muted);font-size:7px;letter-spacing:.04em;text-transform:uppercase}
+    .battle-prize strong{display:block;margin-top:2px;color:var(--gold);font-size:12px;font-weight:900;line-height:1.1;font-variant-numeric:tabular-nums}
+    .battle-prize-players{margin:0;padding:0;border-left:1px solid var(--line);display:flex;align-items:center;gap:4px;min-width:0;background:transparent}
+    .battle-prize-players .battle-players{margin:0;flex:1 1 auto;width:100%;gap:2px}
     .battle-prize-players .battle-card-actions{margin-left:auto;justify-content:flex-end}
     .battle-player-opponent .battle-player-info{text-align:right}
     .battle-card-actions,.battle-room-actions{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap}
-    .battle-card-actions{justify-self:flex-end;min-width:110px;padding:0}
+    .battle-card-actions{justify-self:flex-end;min-width:72px;padding:0}
     .battle-card-actions > *{max-width:100%}
-    .battle-card-actions .btn,.battle-card-actions button,.battle-card-actions a{min-height:38px;padding:8px 12px;white-space:nowrap}
+    .battle-card-actions .btn,.battle-card-actions button,.battle-card-actions a{min-height:28px;padding:5px 8px;white-space:nowrap;font-size:11px}
     .battle-card-actions .row{justify-content:center}
     .game-support-banner{display:block;grid-column:1/-1;width:min(100%,480px);aspect-ratio:1774/887;margin:4px auto 0;overflow:hidden;border:1px solid var(--line);border-radius:10px;background:#17231b}
     .game-support-banner img{display:block;width:100%;height:100%;object-fit:cover}
@@ -90,9 +90,16 @@
     .history-value.credit{color:var(--green)}
     .history-value.debit{color:var(--red)}
     .battle-room-actions{margin-top:10px}
-    .battle-room-code-panel{display:grid;gap:8px;width:min(100%,480px)}
+    .battle-room-code-panel{display:grid;gap:6px;width:min(100%,480px)}
     .battle-room-code-panel>.field{width:100%;min-width:0;margin:0}
+    .battle-room-code-box{display:flex;align-items:center;gap:8px;padding:0 10px;border:1px solid var(--line);border-radius:8px;background:#141f1e;min-height:42px}
+    .battle-room-code-box input{flex:1 1 auto;border:0;background:transparent;padding:10px 0;color:var(--ink);font-weight:800;letter-spacing:.12em;text-align:center}
+    .battle-room-code-box input:focus{outline:none}
+    .battle-room-code-box .btn{min-height:30px;padding:6px 10px;font-size:12px}
+    .battle-room-code-label{display:block;color:var(--muted);font-size:10px;letter-spacing:.08em;text-transform:uppercase;text-align:center}
     .battle-room-code-buttons{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
+    .battle-inline-secondary-action{display:flex;justify-content:center;margin-top:6px}
+    .battle-inline-secondary-action .btn{min-height:28px;padding:6px 12px;font-size:12px}
     .theme-toggle{display:grid;place-items:center;flex:none;width:36px;height:36px;min-height:36px;margin:0;padding:0;border-radius:50%;font-size:17px;line-height:1}
     .battle-banner-row{position:relative;width:100%;aspect-ratio:1983/793;margin-bottom:12px;overflow:hidden;border-radius:8px;background:#101713;cursor:pointer}
     .battle-banner{display:block;width:100%;height:auto;max-height:none;object-fit:contain;border-radius:8px;background:#101713}
@@ -120,7 +127,7 @@
     @media(max-width:600px){#view-home>.panel:nth-child(2) .match-head{flex-direction:row;align-items:center}#view-home>.panel:nth-child(2) .match-head h2{margin:0}}
     @media(prefers-reduced-motion:reduce){.banner-live-dot,.banner-live-text,.nav-live-dot,.nav-live-text,.form-live-dot,.form-live-text,.game-live-dot,.game-live-text{animation:none}}
     .battle-room-actions .field{flex:1 1 150px;min-width:0;margin:0}
-    @media(max-width:600px){.battle-card{padding:8px 8px}.battle-players{gap:4px}.battle-avatar{width:26px;height:26px}.battle-player-name{font-size:10px}.battle-player-role{font-size:7px}.battle-player-amount{min-width:28px;padding:2px 4px;font-size:14px}.battle-versus{font-size:11px}.battle-prize-players{padding:6px 5px;gap:5px}.battle-prize-players .battle-player-name{font-size:10px;line-height:1.2}.battle-prize-players .battle-player-role{font-size:7px}.battle-prize{padding:6px 4px}.battle-prize small{font-size:8px;white-space:nowrap}.battle-prize strong{font-size:14px}.battle-card-actions{justify-content:flex-end}.battle-card-actions>*{max-width:100%}}
+    @media(max-width:600px){.battle-card{padding:6px 6px}.battle-players{gap:2px}.battle-avatar{width:22px;height:22px}.battle-player-name{font-size:9px}.battle-player-role{font-size:6px}.battle-player-amount{min-width:42px;padding:2px 4px;font-size:9px}.battle-versus{font-size:9px}.battle-prize-players{padding:5px 4px;gap:4px}.battle-prize-players .battle-player-name{font-size:9px;line-height:1.15}.battle-prize-players .battle-player-role{font-size:6px}.battle-prize{padding:4px 2px}.battle-prize small{font-size:7px;white-space:nowrap}.battle-prize strong{font-size:12px}.battle-card-actions{justify-content:flex-end;min-width:62px}.battle-card-actions>*{max-width:100%}}
   </style>
   <style id="dayPalette" disabled>
     :root{color-scheme:light;--ink:#1d2922;--muted:#68756d;--panel:#fff;--line:#e1e7e2;--gold:#765000;--green:#17643a;--red:#a53632}
@@ -557,10 +564,10 @@
           }
           actions+='</div>';
         }
-        if(m.roomCode&&(isCreator||isJoiner))actions+=`<button class="btn secondary small" data-match="${esc(m._id)}">Result / screenshot</button>`;
-        const roomCodePanel=m.roomCode&&(isCreator||isJoiner)?`<div class="battle-room-code-panel"><div class="field"><label for="runningCode-${esc(m._id)}">CODE LOCKED</label><input id="runningCode-${esc(m._id)}" value="${esc(m.roomCode)}" readonly></div><div class="battle-room-code-buttons">${!isCreator?`<button class="btn secondary small" data-running-copy="${esc(m._id)}" data-room-code="${esc(m.roomCode)}" data-copy-open-game="${m.gameType==='LUDO'?'LUDO':''}">Copy code</button>`:''}${m.gameType==='LUDO'?`<a class="btn secondary small ludo-app-button" data-open-ludo="true" href="${ludoKingOpenUrl()}">Open Ludo King App</a>`:''}</div></div>`:'';
+        const secondaryAction = m.roomCode && (isCreator || isJoiner) ? `<div class="battle-inline-secondary-action"><button class="btn secondary small" type="button" data-match="${esc(m._id)}">Result / screenshot</button></div>` : '';
+        const roomCodePanel=m.roomCode&&(isCreator||isJoiner)?`<div class="battle-room-code-panel"><div class="battle-room-code-box"><input id="runningCode-${esc(m._id)}" value="${esc(m.roomCode)}" readonly><button class="btn secondary small" type="button" data-running-copy="${esc(m._id)}" data-room-code="${esc(m.roomCode)}" data-copy-open-game="${m.gameType==='LUDO'?'LUDO':''}">Copy</button></div><label class="battle-room-code-label" for="runningCode-${esc(m._id)}">Code locked</label>${m.gameType==='LUDO'?`<div class="battle-room-code-buttons"><a class="btn secondary small ludo-app-button" data-open-ludo="true" href="${ludoKingOpenUrl()}">Open Ludo King App</a></div>`:''}</div>`:'';
         const prize=Number(m.amount)*2*0.95;
-        return `<article class="match battle-card"><div class="battle-card-top"><span class="status">${m.gameStartedAt?'Game chal raha hai':m.roomCodeSharedAt?'Room code locked · Ludo King mein kheliye':'Opponent joined · room code pending'}</span></div><div class="battle-prizes"><div class="battle-prize"><small>WIN</small><strong>₹${prize.toLocaleString('en-IN')}</strong></div><div class="battle-prize-players"><div class="battle-players">${battlePlayerMarkup(m.creator,'Creator',false,Number(m.amount))}<span class="battle-versus" aria-label="versus">VS</span>${battlePlayerMarkup(m.joiner,'Opponent',true,Number(m.amount))}</div></div>${actions?`<div class="battle-card-actions">${actions}</div>`:''}</div><div class="battle-room-actions">${roomCodePanel}</div></article>`
+        return `<article class="match battle-card"><div class="battle-card-top"><span class="status">${m.gameStartedAt?'Game chal raha hai':m.roomCodeSharedAt?'Room code locked · Ludo King mein kheliye':'Opponent joined · room code pending'}</span></div><div class="battle-prizes"><div class="battle-prize"><small>WIN</small><strong>₹${prize.toLocaleString('en-IN')}</strong></div><div class="battle-prize-players"><div class="battle-players">${battlePlayerMarkup(m.creator,'Creator',false,Number(m.amount))}<span class="battle-versus" aria-label="versus">VS</span>${battlePlayerMarkup(m.joiner,'Opponent',true,Number(m.amount))}</div></div>${actions?`<div class="battle-card-actions">${actions}</div>`:''}</div>${secondaryAction}<div class="battle-room-actions">${roomCodePanel}</div></article>`
       }).join(''):localDemoRunningBattles.length?'':'<p class="muted">Abhi koi running battle nahi hai.</p>';
       if(localDemoRunningBattles.length){
         const demoMarkup=localDemoRunningBattles.map(({name,avatar,opponent,opponentAvatar,amount})=>`<article class="match battle-card demo-running-battle"><div class="demo-running-matchup"><div class="demo-running-player"><img class="demo-running-avatar" src="${esc(avatar)}" alt="" loading="lazy"><strong class="demo-running-name">${esc(name)}</strong></div><span class="demo-running-vs">VS</span><div class="demo-running-player"><img class="demo-running-avatar" src="${esc(opponentAvatar)}" alt="" loading="lazy"><strong class="demo-running-name">${esc(opponent)}</strong></div></div><div class="demo-running-meta"><span class="demo-running-label">Sample · Entry ₹${amount.toLocaleString('en-IN')}</span><strong class="demo-running-amount">WIN ₹${(amount*2*0.95).toLocaleString('en-IN')}</strong></div></article>`).join('');
