@@ -17,7 +17,6 @@
       @media(max-width:600px){.game-launch{grid-template-columns:1fr}.game-tile{min-height:76px}}
     .nav{display:none!important}.bottom{position:fixed;z-index:6;right:auto;bottom:0;left:50%;display:grid;width:min(100%,520px);grid-template-columns:repeat(4,minmax(0,1fr));margin:0;padding:8px 10px max(8px,env(safe-area-inset-bottom));transform:translateX(-50%);border:1px solid var(--line);border-bottom:0;border-radius:12px 12px 0 0;background:#101720f5;backdrop-filter:blur(14px)}.bottom button{display:grid;place-items:center;gap:2px;min-height:54px;padding:5px;border:0;color:#c0cbc4;background:transparent;font-size:12px}.bottom button span{display:block;color:var(--gold);font-size:18px}.bottom button.active{color:var(--gold)}
     .trust-ticker{overflow:hidden;margin:0 0 14px;padding:9px 0;border:1px solid var(--line);border-radius:8px;color:#d9e6dd;background:#18232b}.trust-ticker-track{display:flex;width:max-content;animation:trust-ticker 32s linear infinite}.trust-ticker span{padding-right:48px;white-space:nowrap}.trust-ticker:hover .trust-ticker-track{animation-play-state:paused}@keyframes trust-ticker{to{transform:translateX(-50%)}}@media(prefers-reduced-motion:reduce){.trust-ticker-track{width:auto;animation:none}.trust-ticker span[aria-hidden="true"]{display:none}}
-    .announcement-strip{overflow:hidden;position:relative;padding:8px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:rgba(16,26,22,.85);color:#f7d978;text-align:center}.announcement-track{display:inline-flex;align-items:center;white-space:nowrap;min-width:100%;animation:announcement-scroll 18s linear infinite}.announcement-track span{display:inline-block;padding:0 34px;font-size:14px;font-weight:800;letter-spacing:.04em}.announcement-strip:hover .announcement-track{animation-play-state:paused}@keyframes announcement-scroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}@media(max-width:600px){.announcement-track span{font-size:12px;padding:0 24px}}@media(prefers-reduced-motion:reduce){.announcement-track{animation:none}} 
     .app-promo{display:flex;align-items:center;justify-content:center;gap:9px;padding:10px 12px;background:#132d20;color:#f2f5ef;border-bottom:1px solid #355b3e}.app-promo[hidden]{display:none}.app-promo-copy{font-size:13px;font-weight:700}.app-promo button{min-height:36px;padding:7px 12px;border:1px solid #6eaf79;border-radius:7px;color:#fff;background:#287442;font-weight:800}.app-promo .app-promo-share{border-color:#64776a;background:#24332a}.app-promo-close{width:34px;padding:4px!important;font-size:20px;line-height:1}.app-promo button:focus-visible{outline:2px solid #f7d978;outline-offset:2px}@media(max-width:600px){.app-promo{gap:7px;padding:9px 8px}.app-promo-copy{font-size:12px}.app-promo button{padding:7px 9px;font-size:12px}}@media(prefers-reduced-motion:reduce){.app-promo{scroll-behavior:auto}}
   </style>
   <style>
@@ -291,12 +290,6 @@
     <button type="button" class="app-promo-share" id="shareAppButton">Share</button>
     <button type="button" class="app-promo-close" id="closeAppPromo" aria-label="Close">×</button>
   </div>
-  <div class="announcement-strip" id="announcementStrip" hidden aria-live="polite">
-    <div class="announcement-track" id="announcementTrack">
-      <span>Welcome to khiladiadda24.com</span>
-      <span aria-hidden="true">Welcome to khiladiadda24.com</span>
-    </div>
-  </div>
   <main class="shell content"><div id="notice" class="notice" role="status" hidden></div>
       <section class="view" id="view-games"><div class="game-launch" id="gamePicker"><button class="game-tile game-tile-image" data-launch-game="LUDO" aria-label="Ludo Classic"><img src="/ludo-classic.png" alt="Ludo Classic"><span class="game-live-badge"><i class="game-live-dot" aria-hidden="true"></i><span class="game-live-text">LIVE</span></span></button><button class="game-tile game-tile-image" data-launch-game="SNAKE" aria-label="Snake Battle"><img src="/snake-battles-banner.png" alt="Snake Battle"><span class="game-live-badge"><i class="game-live-dot" aria-hidden="true"></i><span class="game-live-text">LIVE</span></span></button><a class="game-support-banner" href="/support.html" aria-label="WhatsApp and support"><img src="/whatsapp-support.png" alt="WhatsApp and Support"><span class="game-live-badge"><i class="game-live-dot" aria-hidden="true"></i><span class="game-live-text">LIVE</span></span></a></div><div id="gameBattleView" hidden><div class="match-head"><div><button class="btn secondary small" id="backToGames">← Games</button><h2 id="gameViewTitle"></h2></div><button id="gameRefreshOpen" class="btn secondary small" type="button">Refresh</button></div><div class="panel"><h2>Open battles</h2><div id="gameOpenMatches"></div></div><div class="panel"><h2>My running battles</h2><div id="gameRunningMatches"></div></div></div></section>
     <section class="view active" id="view-home"><div class="panel"><img class="battle-banner" src="/banner-ludo-snake.png" alt="Ludo and Snake Game"><p class="muted">Minimum ₹100. Multiples of ₹50.</p><form id="createForm"><div class="two"><div class="field"><label for="gameType">Game</label><select id="gameType"><option value="LUDO">Ludo Classic</option><option value="SNAKE">Snake</option></select></div><div class="field"><label for="entryAmount">Entry amount (₹)</label><input id="entryAmount" type="number" min="100" max="50000" step="50" value="100" placeholder="e.g. 250" required></div></div><button class="btn" type="submit">Set challenge</button></form></div><div class="panel"><div class="match-head"><button id="refreshOpen" class="btn secondary small">Refresh</button></div><p class="muted">Challenger, entry amount aur winning amount dekhein.</p><div id="openMatches"></div></div><div class="panel"><div id="runningMatches"></div></div></section>
@@ -311,23 +304,6 @@
     const token=localStorage.getItem('token');
     const storedUser=(()=>{try{return JSON.parse(localStorage.getItem('user')||'null')}catch{return null}})();
     let player=null, game='LUDO', battlesPollTimer, kycApproved=false;
-
-    async function loadAnnouncementText() {
-      const strip = document.getElementById('announcementStrip');
-      const track = document.getElementById('announcementTrack');
-      try {
-        const res = await fetch('/api/site-announcement', { cache: 'no-store' });
-        const data = await res.json();
-        const text = data?.text || 'Welcome to khiladiadda24.com';
-        track.innerHTML = `<span>${text}</span><span aria-hidden="true">${text}</span><span aria-hidden="true">${text}</span>`;
-        strip.hidden = false;
-      } catch {
-        track.innerHTML = '<span>Welcome to khiladiadda24.com</span><span aria-hidden="true">Welcome to khiladiadda24.com</span><span aria-hidden="true">Welcome to khiladiadda24.com</span>';
-        strip.hidden = false;
-      }
-    }
-
-    loadAnnouncementText();
 
     let appInstallPrompt = null;
     window.addEventListener('beforeinstallprompt', event => {
