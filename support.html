@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Support - KhiladiAdda24</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { min-height: 100vh; min-height: 100svh; margin: 0; padding: 16px; display: grid; place-items: center; background: radial-gradient(ellipse at top, #263b2d 0%, #101713 68%); color: #f2f5ef; font-family: "Trebuchet MS", Verdana, sans-serif; }
+    .wrap { width: min(100%, 480px); margin: auto; }
+    .card { width: 100%; padding: 20px; border: 1px solid #405b46; border-radius: 12px; background: linear-gradient(155deg, #1b2b20, #121a15); box-shadow: 0 16px 42px #0007; }
+    .support-art { display: block; width: min(100%, 320px); aspect-ratio: 1774 / 887; margin: 0 auto 20px; overflow: hidden; border: 1px solid #49654c; border-radius: 8px; object-fit: cover; }
+    h1, h2 { color: #f0c85b; }
+    h1 { margin: 0 0 16px; font-size: 24px; }
+    h2 { margin: 18px 0 8px; font-size: 18px; }
+    .info { margin: 12px 0; font-size: 16px; line-height: 1.5; overflow-wrap: anywhere; }
+    .contact-link { color: #e7f4e9; text-decoration: underline; text-underline-offset: 3px; }
+    .whatsapp-link { color: #7fe0a0; }
+    .help-copy { margin-top: 18px; padding-top: 4px; border-top: 1px solid #35483a; color: #bdcabe; font-size: 14px; line-height: 1.6; }
+    .help-copy p { margin: 8px 0; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; margin-top: 14px; padding: 10px 18px; border: 1px solid #438954; border-radius: 7px; color: #fff; background: #287442; font-weight: 800; text-decoration: none; }
+    .btn:focus-visible { outline: 2px solid #f0c85b; outline-offset: 2px; }
+    @media(max-width:420px) { body { padding: 12px; } .card { padding: 16px; } h1 { font-size: 22px; } .info { font-size: 15px; } }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <main class="card">
+      <img class="support-art" src="/whatsapp-support.png" alt="WhatsApp and Support">
+      <h1>KhiladiAdda24 Support</h1>
+      <div class="info">📞 Support Number: <a class="contact-link" id="supportPhoneLink">+91 79557295</a></div>
+      <div class="info">💬 WhatsApp: <a class="contact-link whatsapp-link" id="whatsappPhoneLink">+91 79557295</a></div>
+      <div class="info">⏰ Support: 24/7 Available</div>
+      <a class="btn" href="/index.html">Back to App</a>
+      <section class="help-copy">
+        <h2>Need Help?</h2>
+        <p>For login issues, deposit queries, withdrawal help, game disputes, and wallet support, contact us anytime.</p>
+        <p>We resolve urgent matters within working time and update users through wallet notifications and support messages.</p>
+      </section>
+    </main>
+  </div>
+  <script>
+    async function loadSupportContacts() {
+      try {
+        const response = await fetch('/api/site-support', { cache: 'no-store' });
+        if (!response.ok) return;
+        const data = await response.json();
+        const supportNumber = String(data.supportNumber || '').replace(/\D/g, '');
+        const whatsappNumber = String(data.whatsappNumber || '').replace(/\D/g, '');
+        const supportLink = document.getElementById('supportPhoneLink');
+        const whatsappLink = document.getElementById('whatsappPhoneLink');
+        supportLink.textContent = supportNumber ? `+91 ${supportNumber}` : 'Not configured';
+        whatsappLink.textContent = whatsappNumber ? `+91 ${whatsappNumber}` : 'Not configured';
+        if (/^[6-9]\d{9}$/.test(supportNumber)) supportLink.href = `tel:+91${supportNumber}`;
+        if (/^[6-9]\d{9}$/.test(whatsappNumber)) {
+          whatsappLink.href = `https://wa.me/91${whatsappNumber}`;
+          whatsappLink.target = '_blank';
+          whatsappLink.rel = 'noopener noreferrer';
+        }
+      } catch {}
+    }
+
+    loadSupportContacts();
+  </script>
+  <script src="/player-copy.js" defer></script>
+</body>
+</html>
