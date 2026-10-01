@@ -318,9 +318,6 @@ const upload = multer({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
-321 app.get("/", (req, res) => {
-322   res.sendFile("index.html", { root: __dirname });
-323 });
 app.get('/api/site-announcement', (req, res) => {
   res.json({ text: siteAnnouncementText.trim() || 'Welcome to khiladiadda24.com' });
 });
