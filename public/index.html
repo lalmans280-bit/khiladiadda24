@@ -251,6 +251,7 @@
   </style>
   <style id="mobileSizing">
     #topInstallAppButton{width:34px;height:34px;min-height:34px;flex:none;padding:0;border-color:#69744c;color:#f8dc83;background:#222b27;font-size:20px;line-height:1}
+    .game-launch{grid-template-columns:minmax(0,1fr)}
     @media(max-width:600px){.top-actions{gap:5px}}
     #view-home>.panel:nth-child(3){border-color:#5f7a9b;background:linear-gradient(125deg,#1b3b30 0%,#1e3a56 52%,#473049 100%);color:#f4f7f5}
     #view-home>.panel:nth-child(2) #openMatches .battle-prizes.open-battle-prizes{margin:0;padding:0;border:0;background:transparent;box-shadow:none}
@@ -261,7 +262,7 @@
     @media(max-width:600px){body{font-size:18px}.shell{padding-right:10px;padding-left:10px}.panel{padding:17px}.panel h2,.panel h3{font-size:23px}.panel p,.muted{font-size:15px}.field label{font-size:15px}.field input,.field select,.field textarea{font-size:17px}.btn{min-height:48px;font-size:16px}}
   </style>
   <style id="bottomPalette">
-    .bottom{background:linear-gradient(105deg,#10294d 0%,#17683d 52%,#b85f19 100%)}
+    .bottom{grid-template-columns:repeat(3,minmax(0,1fr));background:linear-gradient(105deg,#10294d 0%,#17683d 52%,#b85f19 100%)}
     .bottom button,.bottom button:nth-child(n){border-radius:8px;background:transparent}
     .bottom button>span:first-child,.bottom button .nav-label{color:#f5f7f4}
     .bottom button.active{background:#ffffff24;box-shadow:inset 0 -3px #ffbd59}
@@ -361,6 +362,11 @@
     if(matchSocket)matchSocket.on('wallet_updated',update=>{const userId=String(player?._id||storedUser?.id||'');if(userId&&String(update?.userId)===userId)loadWalletSummary().catch(()=>{})});
     window.matchSocket=matchSocket;
     const el=id=>document.getElementById(id);
+    const gamePicker=el('gamePicker'),gameBattleView=el('gameBattleView'),homeView=el('view-home');
+    homeView.append(gamePicker,gameBattleView);
+    el('view-games').remove();
+    document.querySelectorAll('[data-view="games"]').forEach(button=>button.remove());
+    el('backToGames').textContent='← Home';
     const topInstallButton=document.createElement('button');
     topInstallButton.id='topInstallAppButton';
     topInstallButton.className='icon top-install';
@@ -486,7 +492,7 @@
     async function api(url,options={}){const headers=new Headers(options.headers||{});headers.set('Authorization',`Bearer ${token}`);if(options.body&&!(options.body instanceof FormData))headers.set('Content-Type','application/json');const response=await fetch(url,{...options,headers});const data=await response.json().catch(()=>({}));if(response.status===401){localStorage.removeItem('token');localStorage.removeItem('user');location.replace(loginUrl());throw new Error('Session expire hua. Dobara login karein.')}if(!response.ok)throw new Error(data.error||'Request complete nahi hui.');return data}
     window.pendingEntryAmount=100;
     const showError=error=>{const message=error.message||'Kuch problem hui.';if(/balance|insufficient|recharge/i.test(message)){const required=Number(window.pendingEntryAmount)||100,balance=Number(player?.walletBalance??storedUser?.walletBalance??0),depositAmount=Math.max(100,required-balance);el('depositAmount').value=String(depositAmount);notify(`₹${required} entry ke liye balance kam hai. ₹${depositAmount} deposit karein.`,true);document.querySelector('.bottom [data-view="wallet"]')?.click();return}notify(message,true)};
-    function setView(name){const viewName=name==='battles'?'home':name;document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===`view-${viewName}`));document.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===viewName));el('menu').classList.remove('open');el('menuToggle').setAttribute('aria-expanded','false');clearInterval(battlesPollTimer);if(viewName==='wallet'||viewName==='profile')loadKyc().catch(showError);if(viewName==='home'){loadOpen().catch(showError);loadMine().catch(showError);battlesPollTimer=setInterval(()=>{if(el('view-home').classList.contains('active'))loadOpen().catch(showError)},5000)}if(viewName==='games'&&!el('gameBattleView').hidden){loadOpen().catch(showError);battlesPollTimer=setInterval(()=>{if(el('view-games').classList.contains('active')&&!el('gameBattleView').hidden)loadOpen().catch(showError)},5000)}if(viewName==='history')loadHistory().catch(showError)}
+    function setView(name){const viewName=name==='battles'||name==='games'?'home':name;document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===`view-${viewName}`));document.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===viewName));el('menu').classList.remove('open');el('menuToggle').setAttribute('aria-expanded','false');clearInterval(battlesPollTimer);if(viewName==='wallet'||viewName==='profile')loadKyc().catch(showError);if(viewName==='home'){loadOpen().catch(showError);loadMine().catch(showError);battlesPollTimer=setInterval(()=>{if(el('view-home').classList.contains('active'))loadOpen().catch(showError)},5000)}if(viewName==='games'&&!el('gameBattleView').hidden){loadOpen().catch(showError);battlesPollTimer=setInterval(()=>{if(el('view-games').classList.contains('active')&&!el('gameBattleView').hidden)loadOpen().catch(showError)},5000)}if(viewName==='history')loadHistory().catch(showError)}
     function renderPlayer(){const name=player?.username||storedUser?.username||'Player',phone=player?.phone||storedUser?.phone||'',balance=Number(player?.walletBalance||0),formatted=`₹ ${balance.toLocaleString('en-IN')}`;['headerBalance','walletBalance','profileBalance'].forEach(id=>el(id).textContent=formatted);el('profileName').textContent=name;el('profilePhone').textContent=phone;el('accountPhone').textContent=phone;el('profileReferralCode').textContent=player?.referralCode||'--';el('username').value=name;const image=player?.profileImage;el('avatar').src=image?(image.startsWith('uploads/')?`/api/profile/image/${encodeURIComponent(image.split('/').pop())}`:`/${image.split('/').map(encodeURIComponent).join('/')}`):'';el('avatar').onerror=()=>el('avatar').removeAttribute('src')}
     async function loadProfile(){const data=await api('/api/profile/me');player=data.user;renderPlayer()}
     async function loadWalletSummary(){const data=await api('/api/wallet/summary'),format=value=>`₹ ${Number(value||0).toLocaleString('en-IN')}`;el('profileTotalDeposits').textContent=format(data.totalDeposits);el('profilePaidWithdrawals').textContent=format(data.paidWithdrawals);el('profilePendingWithdrawals').textContent=format(data.pendingWithdrawals);el('profileTotalWinnings').textContent=format(data.totalWinnings);const withdrawableWinnings=el('withdrawableWinnings');if(withdrawableWinnings)withdrawableWinnings.textContent=`Withdrawable game winnings: ${format(data.availableWinnings)}. Deposits and bonuses cannot be withdrawn.`;el('profileMoneyUpdated').textContent=`Updated ${new Date().toLocaleTimeString('en-IN')}`}
