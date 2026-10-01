@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add Money - KhiladiAdda24.com</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 400px; margin: 20px auto; padding: 20px; border: 1px solid #ccc; border-radius: 8px; }
+    input, button { width: 100%; padding: 10px; margin: 8px 0; box-sizing: border-box; }
+    button { background: #28a745; color: white; border: none; font-weight: bold; cursor: pointer; border-radius: 4px; }
+    img { max-width: 220px; display: block; margin: 15px auto; }
+  </style>
+</head>
+<body>
+  <h2>Add Money - KhiladiAdda24</h2>
+  <input type="number" id="amt" placeholder="Amount (e.g. ₹100)">
+  <button onclick="getQR()">QR Code Show Karein</button>
+
+  <img id="qrImg" style="display:none;" />
+
+  <hr>
+  <h4>Payment ke baad Details Dalein:</h4>
+  <input type="text" id="utr" placeholder="12 Digit UTR / Ref Number">
+  <input type="file" id="ss" accept="image/*">
+  <button onclick="submitDeposit()" style="background:#007bff;">Deposit Submit</button>
+
+  <script>
+    const user = JSON.parse(localStorage.getItem('user'));
+
+    async function getQR() {
+      const amt = document.getElementById('amt').value;
+      const res = await fetch(`/api/wallet/generate-qr?amount=${amt}`);
+      const data = await res.json();
+      const img = document.getElementById('qrImg');
+      img.src = data.qrImage;
+      img.style.display = 'block';
+    }
+
+    async function submitDeposit() {
+      const amt = document.getElementById('amt').value;
+      const utr = document.getElementById('utr').value;
+      const ss = document.getElementById('ss').files[0];
+
+      const formData = new FormData();
+      formData.append('userId', user.id);
+      formData.append('amount', amt);
+      formData.append('utrNumber', utr);
+      if(ss) formData.append('screenshot', ss);
+
+      const res = await fetch('/api/wallet/submit-deposit', {
+        method: 'POST',
+        body: formData
+      });
+      const data = await res.json();
+      if(res.ok) {
+        alert(data.message);
+        window.location.href = '/index.html';
+      } else {
+        alert(data.error);
+      }
+    }
+  </script>
+  <script src="/player-copy.js" defer></script>
+</body>
+</html>
