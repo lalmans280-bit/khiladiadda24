@@ -490,7 +490,7 @@
     let sampleRunningBattles=createSampleRunningBattles();
     const gameSamplePanel=document.createElement('div');
     gameSamplePanel.className='panel sample-running-panel';
-    gameSamplePanel.innerHTML='<p class="sample-running-notice">Sample</p><div id="sampleRunningMatches" class="sample-running-list"></div>';
+    gameSamplePanel.innerHTML='<p class="sample-running-notice">Live Match</p><div id="sampleRunningMatches" class="sample-running-list"></div>';
     el('runningMatches').after(gameSamplePanel);
     const mySamplePanel=gameSamplePanel.cloneNode(true);
     mySamplePanel.querySelector('#sampleRunningMatches').id='mySampleRunningMatches';
