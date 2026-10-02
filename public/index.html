@@ -524,7 +524,7 @@
     let sampleRunningBattles=createSampleRunningBattles(demoBattlePairs.map(({player})=>player.name));
     const demoBattlesList=document.createElement('div');
     demoBattlesList.className='demo-battles-list';
-    const demoBattlesHeader='<div class="demo-battles-header"><strong>SAMPLE PLAYERS</strong></div>';
+    const demoBattlesHeader='<div class="demo-battles-header"><strong>RUNNING BATTLES</strong></div>';
     function renderDemoBattles(){
       demoBattlesList.innerHTML=demoBattlePairs.map(({player,amount,gameType})=>`<article class="match battle-card demo-battle-card"><div class="battle-prizes open-battle-prizes"><div class="battle-prize-players"><div class="battle-players battle-players-waiting">${battlePlayerMarkup({username:player.name,profileImage:player.avatar.replace(/^\//,'')},'Challenger',false,amount,gameType==='SNAKE'?'Snake Battle':'Ludo Classic')}</div></div><div class="battle-card-actions"><button class="btn green small" type="button" disabled aria-disabled="true">PLAY</button></div></div></article>`).join('');
     }
