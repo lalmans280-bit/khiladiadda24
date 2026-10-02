@@ -637,10 +637,10 @@
       const matchPlayerId=participant=>String(participant?._id||participant?.id||participant||'');
       const myRunningMatches=runningMatches.filter(match=>match.viewerIsParticipant===true);
       const gameRunningList=el('gameRunningMatches');
-      myRunningBattlesPanel.hidden=myRunningMatches.length===0;
-      if(gameRunningList)gameRunningList.innerHTML=myRunningMatches.length?myRunningMatches.map(match=>matchCard({...match,status:'RUNNING'},true)).join(''):'';
       const runningList=el('runningMatches');
-      if(runningList.contains(document.activeElement)&&document.activeElement.matches('[data-running-room-code]'))return;
+      if((runningList.contains(document.activeElement)||gameRunningList.contains(document.activeElement))&&document.activeElement.matches('[data-running-room-code]'))return;
+      myRunningBattlesPanel.hidden=myRunningMatches.length===0;
+      gameRunningList.replaceChildren();
       runningList.innerHTML=runningMatches.length?runningMatches.map(m=>{
         const isParticipant=typeof m.viewerIsParticipant==='boolean'?m.viewerIsParticipant:[m.creator,m.joiner].some(participant=>matchPlayerId(participant)===currentPlayerId);
         const isCreator=typeof m.viewerIsCreator==='boolean'?m.viewerIsCreator:matchPlayerId(m.creator)===currentPlayerId;
@@ -669,6 +669,10 @@
         if(!runningMatches[index]?.gameStartedAt)return;
         const status=card.querySelector('.battle-card-top .status');
         if(status){status.textContent='LIVE · Game chal raha hai';status.classList.add('live-match-status')}
+      });
+      const runningCards=[...runningList.children];
+      runningMatches.forEach((match,index)=>{
+        if(match.viewerIsParticipant===true&&runningCards[index])gameRunningList.append(runningCards[index]);
       });
     }
     async function loadMine(){const container=el('myMatches');if(!container)return;const data=await api('/api/matches/mine'),matches=data.matches||[];container.innerHTML=matches.length?matches.map(m=>matchCard(m,true)).join(''):'<p class="muted">Abhi koi active battle nahi hai.</p>'}
