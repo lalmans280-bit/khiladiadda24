@@ -524,7 +524,7 @@
     let sampleRunningBattles=createSampleRunningBattles(demoBattlePairs.map(({player})=>player.name));
     const demoBattlesList=document.createElement('div');
     demoBattlesList.className='demo-battles-list';
-    const demoBattlesHeader='<div class="demo-battles-header"><strong>RUNNING BATTLES</strong></div>';
+    const demoBattlesHeader='<div class="demo-battles-header"><strong>OPEN BATTLES</strong></div>';
     function renderDemoBattles(){
       demoBattlesList.innerHTML=demoBattlePairs.map(({player,amount,gameType})=>`<article class="match battle-card demo-battle-card"><div class="battle-prizes open-battle-prizes"><div class="battle-prize-players"><div class="battle-players battle-players-waiting">${battlePlayerMarkup({username:player.name,profileImage:player.avatar.replace(/^\//,'')},'Challenger',false,amount,gameType==='SNAKE'?'Snake Battle':'Ludo Classic')}</div></div><div class="battle-card-actions"><button class="btn green small" type="button" disabled aria-disabled="true">PLAY</button></div></div></article>`).join('');
     }
@@ -661,6 +661,8 @@
               : `<button class="btn green small" data-running-start="${esc(m._id)}" title="Start room code setup">START</button>`;
           }
           actions+='</div>';
+        }else if(isJoiner&&!m.roomCode&&!m.gameStartedAt){
+          actions=`<div class="row"><button class="btn danger small" data-running-cancel="${esc(m._id)}" data-room-code-shared="0">Cancel</button></div>`;
         }
         const secondaryAction = m.roomCode && (isCreator || isJoiner) ? `<div class="battle-inline-secondary-action"><button class="btn secondary small" type="button" data-match="${esc(m._id)}">Result / screenshot</button>${m.gameType==='LUDO'?`<a class="btn secondary small ludo-app-button" data-open-ludo="true" href="${ludoKingOpenUrl()}">Open Ludo King App</a>`:''}</div>` : '';
         const roomCodePanel=m.roomCode&&(isCreator||isJoiner)?`<div class="battle-room-code-panel"><div class="battle-room-code-box"><input id="runningCode-${esc(m._id)}" value="${esc(m.roomCode)}" readonly><button class="btn secondary small" type="button" data-running-copy="${esc(m._id)}" data-room-code="${esc(m.roomCode)}" data-copy-open-game="${m.gameType==='LUDO'?'LUDO':''}">Copy</button><span class="battle-room-code-label">Locked</span></div></div>`:'';
