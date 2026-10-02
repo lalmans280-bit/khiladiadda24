@@ -43,7 +43,7 @@
 </head>
 <body>
   <div class="box">
-    <div class="login-logo-frame"><img class="login-logo" src="app-icon-192.png" alt="KhiladiAdda24 logo"></div>
+    <div class="login-logo-frame"><img class="login-logo" src="/logo.png" alt="KhiladiAdda24 logo"></div>
     <h1>KhiladiAdda24</h1>
     <p class="brand-tagline">PLAY &amp; WIN REAL CASH</p>
     <p class="form-hint" id="formHint" hidden></p>
@@ -228,6 +228,17 @@
       const logo = document.querySelector('.login-logo');
       const favicon = document.querySelector('link[rel="icon"]');
       const appleIcon = document.querySelector('link[rel="apple-touch-icon"]');
+      if (logo) {
+        const fallbackLogos = ['/logo.png', '/logo.svg'];
+        logo.onerror = () => {
+          while (fallbackLogos.length) {
+            const fallback = fallbackLogos.shift();
+            if (new URL(fallback, location.href).href === logo.src) continue;
+            logo.src = fallback;
+            return;
+          }
+        };
+      }
       if (logo && branding.brandLogoUrl) logo.src = branding.brandLogoUrl;
       if (favicon && branding.appIcon192Url) favicon.href = branding.appIcon192Url;
       if (appleIcon && branding.appIcon192Url) appleIcon.href = branding.appIcon192Url;
