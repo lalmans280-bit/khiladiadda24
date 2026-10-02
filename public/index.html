@@ -533,6 +533,8 @@
     const mySamplePanel=gameSamplePanel.cloneNode(true);
     mySamplePanel.querySelector('#sampleRunningMatches').id='mySampleRunningMatches';
     el('gameRunningMatches').closest('.panel').after(mySamplePanel);
+    const myRunningBattlesPanel=el('gameRunningMatches').closest('.panel');
+    homeView.insertBefore(myRunningBattlesPanel,runningBattlesHeading);
     const themeButton=document.createElement('button');
     themeButton.id='themeToggle';
     themeButton.type='button';
@@ -627,14 +629,17 @@
       renderDemoBattles();
       el('openMatches').innerHTML=homeOpenMarkup.replaceAll('<p class="muted">Abhi koi open battle nahi hai.</p>', '')+demoBattlesHeader+demoBattlesList.innerHTML;
       if(el('gameOpenMatches'))el('gameOpenMatches').innerHTML=openMarkup+demoBattlesHeader+demoBattlesList.innerHTML;
-      const currentPlayerId=String(player?._id||storedUser?.id||'');
-      const myRunningMatches=runningMatches.filter(match=>[match.creator,match.joiner].some(participant=>String(participant?._id||participant||'')===currentPlayerId));
+      const currentPlayerId=String(player?._id||storedUser?._id||storedUser?.id||'');
+      const matchPlayerId=participant=>String(participant?._id||participant?.id||participant||'');
+      const myRunningMatches=runningMatches.filter(match=>[match.creator,match.joiner].some(participant=>matchPlayerId(participant)===currentPlayerId));
       const gameRunningList=el('gameRunningMatches');
-      if(gameRunningList)gameRunningList.innerHTML=myRunningMatches.length?myRunningMatches.map(match=>matchCard({...match,status:'RUNNING'},true)).join(''):'';
+      if(gameRunningList)gameRunningList.innerHTML=myRunningMatches.length?myRunningMatches.map(match=>matchCard({...match,status:'RUNNING'},true)).join(''):'<p class="muted">Aapka koi running battle nahi hai.</p>';
       const runningList=el('runningMatches');
       if(runningList.contains(document.activeElement)&&document.activeElement.matches('[data-running-room-code]'))return;
       runningList.innerHTML=runningMatches.length?runningMatches.map(m=>{
-        const isParticipant=m.viewerIsParticipant===true,isCreator=m.viewerIsCreator===true,isJoiner=isParticipant&&!isCreator;
+        const isParticipant=typeof m.viewerIsParticipant==='boolean'?m.viewerIsParticipant:[m.creator,m.joiner].some(participant=>matchPlayerId(participant)===currentPlayerId);
+        const isCreator=typeof m.viewerIsCreator==='boolean'?m.viewerIsCreator:matchPlayerId(m.creator)===currentPlayerId;
+        const isJoiner=isParticipant&&!isCreator;
         let actions='';
         if(isCreator&&!m.gameStartedAt){
           actions=`<div class="row"><button class="btn danger small" data-running-cancel="${esc(m._id)}" data-room-code-shared="${m.roomCode?'1':'0'}">Cancel</button>`;
