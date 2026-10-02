@@ -131,7 +131,7 @@
     @keyframes live-dot-pulse{50%{opacity:.4;transform:scale(.8)}}
     @keyframes live-text-pulse{50%{opacity:.55}}
     @media(max-width:600px){.battle-banner-row{margin-bottom:8px}.banner-live{top:6px;right:6px;padding:3px 6px;font-size:10px}#createForm .two{grid-template-columns:repeat(2,minmax(0,1fr));gap:0}.form-live-indicator{justify-self:center}}
-    @media(max-width:600px){#view-home>.panel:nth-child(2) .match-head{flex-direction:row;align-items:center}#view-home>.panel:nth-child(2) .match-head h2{margin:0}}
+    @media(max-width:600px){#view-home>.home-open-battles-panel .match-head{flex-direction:row;align-items:center}#view-home>.home-open-battles-panel .match-head h2{margin:0}}
     @media(prefers-reduced-motion:reduce){.banner-live-dot,.banner-live-text,.nav-live-dot,.nav-live-text,.form-live-dot,.form-live-text,.game-live-dot,.game-live-text{animation:none}}
     .battle-room-actions .field{flex:1 1 150px;min-width:0;margin:0}
     @media(max-width:600px){.battle-card{padding:6px 6px}.battle-players{gap:2px}.battle-avatar{width:22px;height:22px}.battle-player-name{font-size:9px}.battle-player-role{font-size:6px}.battle-player-amount{min-width:42px;padding:2px 4px;font-size:9px}.battle-versus{font-size:9px}.battle-prize-players{padding:3px 2px;gap:3px}.battle-prize-players .battle-player-name{font-size:9px;line-height:1.15}.battle-prize-players .battle-player-role{font-size:6px}.battle-prize{padding:3px 0}.battle-prize small{font-size:7px;white-space:nowrap}.battle-prize strong{font-size:11px}.battle-card-actions{justify-content:flex-end;min-width:62px}.battle-card-actions>*{max-width:100%}.battle-prizes:not(.open-battle-prizes){grid-template-columns:52px minmax(0,1fr) auto;gap:2px;padding:4px 4px}.battle-prizes.open-battle-prizes{grid-template-columns:minmax(0,1fr) auto}.battle-prizes.open-battle-prizes .battle-player-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.battle-prizes.open-battle-prizes .battle-player-amount{font-size:11px}.battle-prizes:not(.open-battle-prizes) .battle-player-amount{min-width:42px;padding:2px 4px;font-size:10px}}
@@ -241,38 +241,38 @@
     #view-home>.panel:first-child .muted{color:#c9d8e8}
     #view-home>.panel:first-child .field label{color:#e0eaf4}
     #view-home>.panel:first-child .btn{border-color:#2e8050;background:#287442;color:#fff}
-    #view-home>.panel:nth-child(2){border-color:#a9601d;background:#482a16;color:#fff1df}
-    #view-home>.panel:nth-child(2) h2{display:inline-block;padding:7px 11px;border-radius:6px;color:#fff;background:#b96217}
-    #view-home>.panel:nth-child(2) .muted{color:#f1d7b9}
-    #view-home>.panel:nth-child(2) .game-filter{border-color:#c37a35;background:#633915;color:#fff0dc}
-    #view-home>.panel:nth-child(2) .battle-card{border-color:#b46b2e;background:#38200f;color:#fff4e4}
-    #view-home>.panel:nth-child(2) .battle-prizes{border-color:#9f5f29;background:#29180d}
-    #view-home>.panel:nth-child(2) .battle-prize small{color:#e8c8a1}
-    #view-home>.panel:nth-child(2) .battle-prize strong{color:#ffd17b}
-    #view-home>.panel:nth-child(2) .battle-card .status{color:#fff1d7;background:#754316}
-    #view-home>.panel:nth-child(2) .battle-card .btn:not(.danger){border-color:#cd8138;background:#874711;color:#fff4e5}
-    #view-home>.panel:nth-child(2) .battle-card .btn.danger{border-color:#ac514c;background:#642d29;color:#fff0ed}
-    #view-home>.panel:nth-child(2) .game-filter.active{border-color:#8fd0a0;background:#34834b;color:#fff;box-shadow:0 0 0 2px #8fd0a055}
-    #view-home>.panel:nth-child(3){border-color:#28784a;background:#123a28;color:#e9f6ec}
-    #view-home>.panel:nth-child(3)>h2{display:inline-block;padding:7px 11px;border-radius:6px;color:#fff;background:#17683d}
-    #view-home>.panel:nth-child(3) .muted{color:#c6e4ce}
-    #view-home>.panel:nth-child(3) .battle-card{border-color:#338554;background:#102f20;color:#eff9f1}
-    #view-home>.panel:nth-child(3) .battle-prizes{border-color:#34764b;background:#0c2519}
-    #view-home>.panel:nth-child(3) .battle-prize small{color:#bbd8c3}
-    #view-home>.panel:nth-child(3) .battle-prize strong{color:#a5e2b2}
-    #view-home>.panel:nth-child(3) .battle-card .status{color:#d9f4df;background:#1b5732}
-    #view-home>.panel:nth-child(3) .battle-card .btn:not(.danger){border-color:#398656;background:#23683b;color:#f0fff3}
-    #view-home>.panel:nth-child(3) .battle-card .btn.danger{border-color:#ac514c;background:#642d29;color:#fff0ed}
+    #view-home>.home-open-battles-panel{border-color:#a9601d;background:#482a16;color:#fff1df}
+    #view-home>.home-open-battles-panel h2{display:inline-block;padding:7px 11px;border-radius:6px;color:#fff;background:#b96217}
+    #view-home>.home-open-battles-panel .muted{color:#f1d7b9}
+    #view-home>.home-open-battles-panel .game-filter{border-color:#c37a35;background:#633915;color:#fff0dc}
+    #view-home>.home-open-battles-panel .battle-card{border-color:#b46b2e;background:#38200f;color:#fff4e4}
+    #view-home>.home-open-battles-panel .battle-prizes{border-color:#9f5f29;background:#29180d}
+    #view-home>.home-open-battles-panel .battle-prize small{color:#e8c8a1}
+    #view-home>.home-open-battles-panel .battle-prize strong{color:#ffd17b}
+    #view-home>.home-open-battles-panel .battle-card .status{color:#fff1d7;background:#754316}
+    #view-home>.home-open-battles-panel .battle-card .btn:not(.danger){border-color:#cd8138;background:#874711;color:#fff4e5}
+    #view-home>.home-open-battles-panel .battle-card .btn.danger{border-color:#ac514c;background:#642d29;color:#fff0ed}
+    #view-home>.home-open-battles-panel .game-filter.active{border-color:#8fd0a0;background:#34834b;color:#fff;box-shadow:0 0 0 2px #8fd0a055}
+    #view-home>.home-running-battles-panel{border-color:#28784a;background:#123a28;color:#e9f6ec}
+    #view-home>.home-running-battles-panel>h2{display:inline-block;padding:7px 11px;border-radius:6px;color:#fff;background:#17683d}
+    #view-home>.home-running-battles-panel .muted{color:#c6e4ce}
+    #view-home>.home-running-battles-panel .battle-card{border-color:#338554;background:#102f20;color:#eff9f1}
+    #view-home>.home-running-battles-panel .battle-prizes{border-color:#34764b;background:#0c2519}
+    #view-home>.home-running-battles-panel .battle-prize small{color:#bbd8c3}
+    #view-home>.home-running-battles-panel .battle-prize strong{color:#a5e2b2}
+    #view-home>.home-running-battles-panel .battle-card .status{color:#d9f4df;background:#1b5732}
+    #view-home>.home-running-battles-panel .battle-card .btn:not(.danger){border-color:#398656;background:#23683b;color:#f0fff3}
+    #view-home>.home-running-battles-panel .battle-card .btn.danger{border-color:#ac514c;background:#642d29;color:#fff0ed}
   </style>
   <style id="mobileSizing">
     #topInstallAppButton{width:34px;height:34px;min-height:34px;flex:none;padding:0;border-color:#69744c;color:#f8dc83;background:#222b27;font-size:20px;line-height:1}
     #gamePicker.game-launch{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
     #gamePicker .game-tile-image{width:min(100%,220px)}
     @media(max-width:600px){.top-actions{gap:5px}}
-    #view-home>.panel:nth-child(3){border-color:#5f7a9b;background:linear-gradient(125deg,#1b3b30 0%,#1e3a56 52%,#473049 100%);color:#f4f7f5}
-    #view-home>.panel:nth-child(2) #openMatches .battle-prizes.open-battle-prizes{margin:0;padding:0;border:0;background:transparent;box-shadow:none}
-    #view-home>.panel:nth-child(2),#view-home>.panel:nth-child(3){padding:0;border:0;background:transparent;box-shadow:none}
-    #view-home>.panel:nth-child(2) .match-head h2,#view-home>.panel:nth-child(3)>h2{display:block;margin:0;padding:0;border:0;border-radius:0;color:inherit;background:transparent;font-size:16px;line-height:1.2}
+    #view-home>.home-running-battles-panel{border-color:#5f7a9b;background:linear-gradient(125deg,#1b3b30 0%,#1e3a56 52%,#473049 100%);color:#f4f7f5}
+    #view-home>.home-open-battles-panel #openMatches .battle-prizes.open-battle-prizes{margin:0;padding:0;border:0;background:transparent;box-shadow:none}
+    #view-home>.home-open-battles-panel,#view-home>.home-running-battles-panel{padding:0;border:0;background:transparent;box-shadow:none}
+    #view-home>.home-open-battles-panel .match-head h2,#view-home>.home-running-battles-panel>h2{display:block;margin:0;padding:0;border:0;border-radius:0;color:inherit;background:transparent;font-size:16px;line-height:1.2}
     html[data-theme="night"] .battle-prizes.open-battle-prizes .battle-player-amount{font-size:14px}
     @media(max-width:600px){.battle-prizes.open-battle-prizes .battle-player-name{font-size:10px}html[data-theme="night"] .battle-prizes.open-battle-prizes .battle-player-amount{font-size:12px}html[data-theme="day"] .battle-prizes.open-battle-prizes .battle-player-amount{font-size:12px}}
     @media(max-width:600px){body{font-size:18px}.shell{padding-right:10px;padding-left:10px}.panel{padding:17px}.panel h2,.panel h3{font-size:23px}.panel p,.muted{font-size:15px}.field label{font-size:15px}.field input,.field select,.field textarea{font-size:17px}.btn{min-height:48px;font-size:16px}}
@@ -285,8 +285,8 @@
     .bottom button.active>span:first-child,.bottom button.active .nav-label{color:#fff}
   </style>
   <style id="ludoAppButtonPalette">
-    .ludo-app-button,#view-home>.panel:nth-child(2) .battle-card .btn.ludo-app-button,#view-home>.panel:nth-child(3) .battle-card .btn.ludo-app-button{border-color:#991f1f;background:#c62828;color:#fff}
-    .ludo-app-button:hover,#view-home>.panel:nth-child(2) .battle-card .btn.ludo-app-button:hover,#view-home>.panel:nth-child(3) .battle-card .btn.ludo-app-button:hover{border-color:#7f1d1d;background:#a91f1f;color:#fff}
+    .ludo-app-button,#view-home>.home-open-battles-panel .battle-card .btn.ludo-app-button,#view-home>.home-running-battles-panel .battle-card .btn.ludo-app-button{border-color:#991f1f;background:#c62828;color:#fff}
+    .ludo-app-button:hover,#view-home>.home-open-battles-panel .battle-card .btn.ludo-app-button:hover,#view-home>.home-running-battles-panel .battle-card .btn.ludo-app-button:hover{border-color:#7f1d1d;background:#a91f1f;color:#fff}
   </style>
   <style id="walletActionButtonPalette">
     #view-wallet #withdrawForm>button[type="submit"],#view-wallet #qrForm>button[type="submit"]{border-color:#991b1b;background:#dc2626;color:#fff}
@@ -538,7 +538,10 @@
     myRunningBattlesPanel.classList.remove('panel');
     myRunningBattlesPanel.classList.add('my-running-battles-section');
     const openBattlesPanel=el('openMatches').closest('.panel');
-    openBattlesPanel.insertBefore(myRunningBattlesPanel,openBattlesPanel.firstChild);
+    openBattlesPanel.classList.add('home-open-battles-panel');
+    const allRunningBattlesPanel=el('runningMatches').closest('.panel');
+    allRunningBattlesPanel.classList.add('home-running-battles-panel');
+    homeView.insertBefore(myRunningBattlesPanel,openBattlesPanel);
     const themeButton=document.createElement('button');
     themeButton.id='themeToggle';
     themeButton.type='button';
