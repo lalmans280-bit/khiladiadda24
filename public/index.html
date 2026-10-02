@@ -7,8 +7,9 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <link rel="manifest" href="/manifest.webmanifest">
-  <link rel="icon" href="app-icon-192.png" type="image/png" sizes="192x192">
+  <link rel="manifest" href="/api/site-manifest">
+  <link rel="icon" href="/app-icon-192.png" type="image/png" sizes="192x192">
+  <link rel="apple-touch-icon" href="/app-icon-192.png">
   <title>KhiladiAdda24 | Ludo & Snake Battles</title>
   <style>
     :root{color-scheme:dark;--ink:#f2f5ef;--muted:#a8b2b0;--panel:#18232b;--line:#33423f;--gold:#f4c84b;--green:#71d6a1;--red:#f07b72}
@@ -315,6 +316,15 @@
   </main>
   <nav class="bottom"><button class="active" data-view="home"><span>⌂</span><span class="nav-label" data-i18n-key="bottomHome">Home</span></button><button data-view="games"><span>⚔</span><span class="nav-label" data-i18n-key="bottomGames">Games <small class="nav-live" aria-label="Live"><i class="nav-live-dot" aria-hidden="true"></i><span class="nav-live-text">LIVE</span></small></span></button><button data-view="wallet"><span>₹</span><span class="nav-label" data-i18n-key="bottomWallet">Wallet</span></button><button data-view="profile"><span>●</span><span class="nav-label" data-i18n-key="bottomProfile">Profile</span></button></nav>
   <script src="/i18n.js"></script>
+  <script>
+    fetch('/api/site-branding', { cache: 'no-store' })
+      .then(response => response.ok ? response.json() : null)
+      .then(branding => {
+        if (!branding?.appIcon192Url) return;
+        document.querySelectorAll('link[rel="icon"],link[rel="apple-touch-icon"]').forEach(icon => { icon.href = branding.appIcon192Url; });
+      })
+      .catch(() => {});
+  </script>
   <script src="/socket.io/socket.io.js"></script>
   <script>
     const token=localStorage.getItem('token');
