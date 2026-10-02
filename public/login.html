@@ -3,6 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#101713">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="manifest" href="/api/site-manifest">
+  <link rel="icon" href="/app-icon-192.png" type="image/png" sizes="192x192">
+  <link rel="apple-touch-icon" href="/app-icon-192.png">
   <title>Login - KhiladiAdda24.com</title>
   <style>
     :root { color-scheme: dark; --panel: #19231d; --line: #35483a; --ink: #f3f4ed; --muted: #b4c0b6; --gold: #e7b83f; --error: #ffb4a9; }
@@ -36,7 +43,7 @@
 </head>
 <body>
   <div class="box">
-    <div class="login-logo-frame"><img class="login-logo" src="/logo.png" alt="KhiladiAdda24 logo"></div>
+    <div class="login-logo-frame"><img class="login-logo" src="app-icon-192.png" alt="KhiladiAdda24 logo"></div>
     <h1>KhiladiAdda24</h1>
     <p class="brand-tagline">PLAY &amp; WIN REAL CASH</p>
     <p class="form-hint" id="formHint" hidden></p>
@@ -215,6 +222,18 @@
       document.getElementById('phone').focus();
     });
   </script>
+  <script>
+    fetch('/api/site-branding').then(response => response.ok ? response.json() : null).then(branding => {
+      if (!branding) return;
+      const logo = document.querySelector('.login-logo');
+      const favicon = document.querySelector('link[rel="icon"]');
+      const appleIcon = document.querySelector('link[rel="apple-touch-icon"]');
+      if (logo && branding.brandLogoUrl) logo.src = branding.brandLogoUrl;
+      if (favicon && branding.appIcon192Url) favicon.href = branding.appIcon192Url;
+      if (appleIcon && branding.appIcon192Url) appleIcon.href = branding.appIcon192Url;
+    }).catch(() => {});
+  </script>
+  <script src="/i18n.js"></script>
   <script src="/player-copy.js" defer></script>
 </body>
 </html>
