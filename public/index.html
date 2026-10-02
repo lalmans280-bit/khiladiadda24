@@ -29,6 +29,15 @@
   </style>
   <style>
     .battle-card{margin:4px 0;padding:6px 8px;overflow:hidden}
+    .sample-running-panel{margin-top:12px}
+    .sample-running-panel h2{margin:0 0 4px;font-size:16px;font-weight:900}
+    .sample-running-notice{margin:0 0 10px;color:var(--ink);font-size:12px;font-weight:900}
+    .sample-running-list{display:grid;gap:6px}
+    .demo-battles-header{display:flex;align-items:center;gap:6px;margin:5px 0 2px;font-size:16px;font-weight:900;line-height:1.2}
+    .demo-battles-list{display:grid;gap:6px}
+    .demo-battle-card{margin:0 0 1px;padding:6px 8px}
+    .sample-running-battle{display:grid;gap:6px;margin:0;padding:7px 9px}
+    .sample-running-battle .battle-prizes{margin-bottom:0}
     .entry-amount-control{position:relative}
     .entry-amount-control input{padding-right:74px!important}
     .entry-amount-control .btn{position:absolute;top:50%;right:5px;min-height:32px;padding:4px 10px;transform:translateY(-50%)}
@@ -483,6 +492,47 @@
     runningBattlesHeading.textContent='Running Battles';
     runningBattlesHeading.style.fontWeight='900';
     el('runningMatches').before(runningBattlesHeading);
+    const samplePlayerNames=['Aarav Sharma','Vivaan Verma','Aditya Singh','Arjun Patel','Ishaan Gupta','Rohan Yadav','Kabir Mehta','Reyansh Kumar','Advika Joshi','Sai Prasad','Ananya Sharma','Diya Patel','Aadhya Verma','Saanvi Gupta','Myra Singh','Kiara Nair','Isha Reddy','Pari Shah','Meera Iyer','Avni Das','Kunal Mishra','Dev Malhotra','Yash Thakur','Omkar Pawar','Manav Jain','Harsh Agarwal','Nikhil Rao','Rahul Sinha','Siddharth Bose','Varun Kapoor','Priya Menon','Kavya Kulkarni','Neha Choudhary','Riya Banerjee','Tara Bhat','Sneha Desai','Pooja Bansal','Nandini Pillai','Anika Roy','Sanjana Kulkarni'];
+    const sampleEntryAmounts=[100,150,200,250,300,350,400,450,500,600,700,800,900,1000,1250,1500,2000,2500,3000,5000];
+    const sampleAvatarPaths=['/1.png','/2.png','/3.png','/4.png','/5.png'];
+    function createSampleRunningBattles(excludedNames=[]){
+      const shuffledSamplePlayers=samplePlayerNames.filter(name=>!excludedNames.includes(name));
+      const shuffledSampleAmounts=[...sampleEntryAmounts];
+      for(let index=shuffledSamplePlayers.length-1;index>0;index-=1){const swapIndex=Math.floor(Math.random()*(index+1));[shuffledSamplePlayers[index],shuffledSamplePlayers[swapIndex]]=[shuffledSamplePlayers[swapIndex],shuffledSamplePlayers[index]]}
+      for(let index=shuffledSampleAmounts.length-1;index>0;index-=1){const swapIndex=Math.floor(Math.random()*(index+1));[shuffledSampleAmounts[index],shuffledSampleAmounts[swapIndex]]=[shuffledSampleAmounts[swapIndex],shuffledSampleAmounts[index]]}
+      return Array.from({length:Math.floor(shuffledSamplePlayers.length/2)},(_,matchIndex)=>{
+        const [name,opponent]=shuffledSamplePlayers.slice(matchIndex*2,matchIndex*2+2);
+        return {
+          name,
+          avatar:sampleAvatarPaths[matchIndex%sampleAvatarPaths.length],
+          opponent,
+          opponentAvatar:sampleAvatarPaths[(matchIndex+1)%sampleAvatarPaths.length],
+          amount:shuffledSampleAmounts[matchIndex]
+        };
+      });
+    }
+    function createDemoBattlePairs(){
+      const demoNames=[...samplePlayerNames];
+      const demoAmounts=[...sampleEntryAmounts];
+      for(let index=demoNames.length-1;index>0;index-=1){const swapIndex=Math.floor(Math.random()*(index+1));[demoNames[index],demoNames[swapIndex]]=[demoNames[swapIndex],demoNames[index]]}
+      for(let index=demoAmounts.length-1;index>0;index-=1){const swapIndex=Math.floor(Math.random()*(index+1));[demoAmounts[index],demoAmounts[swapIndex]]=[demoAmounts[swapIndex],demoAmounts[index]]}
+      return Array.from({length:10},(_,index)=>({player:{name:demoNames[index],avatar:sampleAvatarPaths[index%sampleAvatarPaths.length]},amount:demoAmounts[index],gameType:index%2===0?'LUDO':'SNAKE'}));
+    }
+    let demoBattlePairs=createDemoBattlePairs();
+    let sampleRunningBattles=createSampleRunningBattles(demoBattlePairs.map(({player})=>player.name));
+    const demoBattlesList=document.createElement('div');
+    demoBattlesList.className='demo-battles-list';
+    const demoBattlesHeader='<div class="demo-battles-header"><strong>SAMPLE PLAYERS</strong></div>';
+    function renderDemoBattles(){
+      demoBattlesList.innerHTML=demoBattlePairs.map(({player,amount,gameType})=>`<article class="match battle-card demo-battle-card"><div class="battle-prizes open-battle-prizes"><div class="battle-prize-players"><div class="battle-players battle-players-waiting">${battlePlayerMarkup({username:player.name,profileImage:player.avatar.replace(/^\//,'')},'Challenger',false,amount,gameType==='SNAKE'?'Snake Battle':'Ludo Classic')}</div></div><div class="battle-card-actions"><button class="btn green small" type="button" disabled aria-disabled="true">PLAY</button></div></div></article>`).join('');
+    }
+    const gameSamplePanel=document.createElement('div');
+    gameSamplePanel.className='panel sample-running-panel';
+    gameSamplePanel.innerHTML='<p class="sample-running-notice">Running Battles</p><div id="sampleRunningMatches" class="sample-running-list"></div>';
+    el('runningMatches').after(gameSamplePanel);
+    const mySamplePanel=gameSamplePanel.cloneNode(true);
+    mySamplePanel.querySelector('#sampleRunningMatches').id='mySampleRunningMatches';
+    el('gameRunningMatches').closest('.panel').after(mySamplePanel);
     const themeButton=document.createElement('button');
     themeButton.id='themeToggle';
     themeButton.type='button';
@@ -565,6 +615,7 @@
     function syncGameSelection(gameType){game=gameType==='SNAKE'?'SNAKE':'LUDO';el('gameType').value=game;document.querySelectorAll('.game-filter').forEach(button=>button.classList.toggle('active',button.dataset.game===game));if(el('gameViewTitle'))el('gameViewTitle').textContent=''}
     syncGameSelection(game);
     function battlePlayerMarkup(user,role,opponent=false,amount='',gameLabel=''){const username=nameOf(user),profileImage=String(user?.profileImage||'').trim(),imageUrl=profileImage.startsWith('uploads/')?`/api/profile/image/${encodeURIComponent(profileImage.slice('uploads/'.length))}`:profileImage?`/${profileImage.split('/').map(encodeURIComponent).join('/')}`:'',initial=String(username).trim().charAt(0).toUpperCase()||'?';const avatar=imageUrl?`<img class="battle-avatar" src="${esc(imageUrl)}" alt="">`:`<span class="battle-avatar">${esc(initial)}</span>`;const amountMarkup=amount?`<span class="battle-player-amount">₹${Number(amount).toLocaleString('en-IN')}</span>`:'';const gameTag=gameLabel?`<span class="battle-player-game-tag">${esc(gameLabel)}</span>`:'';return `<div class="battle-player${opponent?' battle-player-opponent':''}"><div class="battle-player-main">${avatar}<span class="battle-player-info"><strong class="battle-player-name">${esc(username)}</strong><small class="battle-player-role">${esc(role)}</small>${gameTag}</span></div>${amountMarkup}</div>`}
+    renderDemoBattles();
     function gameTypeLabel(gameType){return gameType==='SNAKE'?'Snake battle':'Ludo Classic';}
     function matchCard(m,mine=false){const entry=Number(m.amount),prize=entry*2*0.95,playerId=String(player?._id||storedUser?.id||''),isOwnOpen=m.status==='OPEN'&&String(m.creator?._id||m.creator)===playerId;const action=isOwnOpen?`<button class="btn danger small" data-cancel-match="${esc(m._id)}">Cancel</button>`:`<button class="btn ${mine?'secondary':'green'} small" data-${mine?'match':'join'}="${esc(m._id)}">${mine?'Details':'PLAY'}</button>`;const status=m.status==='PENDING_RESULT'?'Result review':m.status==='PENDING_CANCELLATION'?'Cancel review':m.status;const gameLabel=gameTypeLabel(m.gameType||game);const playersMarkup=m.joiner?`<div class="battle-players">${battlePlayerMarkup(m.creator,mine?'Creator':'Challenger',false,entry,gameLabel)}<span class="battle-versus" aria-label="versus">VS</span>${battlePlayerMarkup(m.joiner,'Opponent',true,entry)}</div>`:`<div class="battle-players battle-players-waiting">${battlePlayerMarkup(m.creator,mine?'Creator':'Challenger',false,entry,gameLabel)}</div>`;const statusMarkup=m.status==='OPEN'?'':`<div class="battle-card-top"><span class="status ${['PENDING_RESULT','PENDING_CANCELLATION'].includes(m.status)?'pending':''}">${esc(status)}</span></div>`;const prizeMarkup=m.status==='OPEN'?'':`<div class="battle-prize"><small>WIN</small><strong>₹${prize.toLocaleString('en-IN')}</strong></div>`;const prizeClass=m.status==='OPEN'?' open-battle-prizes':'';return `<article class="match battle-card">${statusMarkup}<div class="battle-prizes${prizeClass}">${prizeMarkup}<div class="battle-prize-players">${playersMarkup}</div><div class="battle-card-actions">${action}</div></div></article>`}
     async function loadOpen(){
@@ -573,8 +624,9 @@
       const runningMatches=Array.isArray(runningData)?runningData:runningData.matches||[];
       const openMarkup=openMatches.length?openMatches.map(m=>matchCard(m)).join(''):'<p class="muted">Is game ke liye abhi open challenge nahi hai.</p>';
       const homeOpenMarkup=['LUDO','SNAKE'].map(gameType=>{const gameMatches=openMatches.filter(match=>match.gameType===gameType);return gameMatches.map(match=>matchCard(match)).join('')}).join('');
-      el('openMatches').innerHTML=homeOpenMarkup.replaceAll('<p class="muted">Abhi koi open battle nahi hai.</p>', '');
-      if(el('gameOpenMatches'))el('gameOpenMatches').innerHTML=openMarkup;
+      renderDemoBattles();
+      el('openMatches').innerHTML=homeOpenMarkup.replaceAll('<p class="muted">Abhi koi open battle nahi hai.</p>', '')+demoBattlesHeader+demoBattlesList.innerHTML;
+      if(el('gameOpenMatches'))el('gameOpenMatches').innerHTML=openMarkup+demoBattlesHeader+demoBattlesList.innerHTML;
       const currentPlayerId=String(player?._id||storedUser?.id||'');
       const myRunningMatches=runningMatches.filter(match=>[match.creator,match.joiner].some(participant=>String(participant?._id||participant||'')===currentPlayerId));
       const gameRunningList=el('gameRunningMatches');
@@ -650,7 +702,7 @@
     }
     window.openMatchPage=(id,stage,showResult=false)=>{const url=new URL('/index.html',location.origin);url.searchParams.set('matchId',id);if(stage)url.searchParams.set('stage',stage);if(showResult)url.searchParams.set('showResult','1');history.pushState({matchId:id},'',url);window.openMatch(id).catch(showError)};
     window.matchApp={api,el,notify,esc,nameOf,setView,refresh,getPlayer:()=>player,getUser:()=>storedUser};
-    refresh().catch(showError);setInterval(()=>{if(el('view-profile').classList.contains('active'))loadWalletSummary().catch(showError)},30000);const initialMatchId=new URLSearchParams(location.search).get('matchId');if(initialMatchId)window.openMatch(initialMatchId).catch(showError);
+    refresh().catch(showError);setInterval(refreshSamplePlayers,10*1000);setInterval(()=>{if(el('view-profile').classList.contains('active'))loadWalletSummary().catch(showError)},30000);const initialMatchId=new URLSearchParams(location.search).get('matchId');if(initialMatchId)window.openMatch(initialMatchId).catch(showError);
   </script>
     <script src="/match-flow.js?v=20260929-reason-required-roomcode-cancel"></script>
     <script src="/wallet-flow.js?v=20260929-winnings-only-withdrawal"></script>
