@@ -318,6 +318,170 @@ const upload = multer({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
+
+function brandingImageUrl(settings, key, fallback) {
+  const storedPath = settings?.[key];
+  if (!storedPath) return fallback;
+  const asset = {
+    brandLogoPath: 'logo',
+    appIcon192Path: 'app-icon-192',
+    appIcon512Path: 'app-icon-512',
+    homeBannerPath: 'home-banner',
+    ludoBannerPath: 'ludo-banner',
+    snakeBannerPath: 'snake-banner',
+    supportBannerPath: 'support-banner'
+  }[key];
+  return `/api/site-branding/image/${asset}?v=${encodeURIComponent(storedPath)}`;
+}
+
+function siteBrandingPayload(settings) {
+  return {
+    brandLogoUrl: brandingImageUrl(settings, 'brandLogoPath', '/logo.png'),
+    appIcon192Url: brandingImageUrl(settings, 'appIcon192Path', '/app-icon-192.png'),
+    appIcon512Url: brandingImageUrl(settings, 'appIcon512Path', '/app-icon-512.png'),
+    homeBannerUrl: brandingImageUrl(settings, 'homeBannerPath', '/banner-ludo-snake.png'),
+    ludoBannerUrl: brandingImageUrl(settings, 'ludoBannerPath', '/ludo-classic.png'),
+    snakeBannerUrl: brandingImageUrl(settings, 'snakeBannerPath', '/snake-battles-banner.png'),
+    supportBannerUrl: brandingImageUrl(settings, 'supportBannerPath', '/whatsapp-support.png')
+  };
+}
+
+function defaultSiteManifest() {
+  return {
+    name: 'KhiladiAdda24',
+    short_name: 'KhiladiAdda24',
+    description: 'Ludo & Snake real-money battle platform',
+    id: '/index.html',
+    start_url: '/index.html',
+    scope: '/',
+    display: 'standalone',
+    display_override: ['window-controls-overlay', 'standalone'],
+    background_color: '#101713',
+    theme_color: '#101713',
+    orientation: 'portrait',
+    icons: [
+      { src: '/app-icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
+      { src: '/app-icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any maskable' }
+    ]
+  };
+}
+
+async function readSiteBranding() {
+  if (mongoose.connection.readyState !== 1) return null;
+  return SiteSettings.findById('support-contact').select('brandLogoPath appIcon192Path appIcon512Path homeBannerPath ludoBannerPath snakeBannerPath supportBannerPath').lean();
+}
+
+app.get('/api/site-branding', async (req, res) => {
+  try {
+    res.set('Cache-Control', 'no-cache');
+    res.json(siteBrandingPayload(await readSiteBranding()));
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/admin/branding', requireAdmin, async (req, res) => {
+  if (mongoose.connection.readyState !== 1) return res.status(503).json({ error: mongoUnavailableMessage() });
+  try {
+    res.json(siteBrandingPayload(await readSiteBranding()));
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/site-branding/image/:asset', async (req, res) => {
+  const imageSettings = {
+    logo: ['brandLogoPath', '/logo.png'],
+    'app-icon-192': ['appIcon192Path', '/app-icon-192.png'],
+    'app-icon-512': ['appIcon512Path', '/app-icon-512.png'],
+    'home-banner': ['homeBannerPath', '/banner-ludo-snake.png'],
+    'ludo-banner': ['ludoBannerPath', '/ludo-classic.png'],
+    'snake-banner': ['snakeBannerPath', '/snake-battles-banner.png'],
+    'support-banner': ['supportBannerPath', '/whatsapp-support.png']
+  }[req.params.asset];
+  if (!imageSettings) return res.status(404).end();
+  try {
+    const settings = await readSiteBranding();
+    const storedPath = settings?.[imageSettings[0]];
+    if (!storedPath) return res.redirect(imageSettings[1]);
+    const filePath = path.join(uploadDirectory, path.basename(storedPath));
+    if (!fs.existsSync(filePath)) return res.redirect(imageSettings[1]);
+    res.set('Cache-Control', 'public, max-age=31536000, immutable');
+    res.sendFile(filePath);
+  } catch (err) {
+    res.status(500).end();
+  }
+});
+
+app.get('/api/site-manifest', async (req, res) => {
+  try {
+    const settings = await readSiteBranding();
+    const manifest = {
+      ...defaultSiteManifest(),
+      icons: [
+        { src: brandingImageUrl(settings, 'appIcon192Path', '/app-icon-192.png'), sizes: '192x192', type: 'image/png', purpose: 'any' },
+        { src: brandingImageUrl(settings, 'appIcon512Path', '/app-icon-512.png'), sizes: '512x512', type: 'image/png', purpose: 'any maskable' }
+      ]
+    };
+    res.set('Content-Type', 'application/manifest+json');
+    res.set('Cache-Control', 'no-cache');
+    res.json(manifest);
+  } catch (err) {
+    res.set('Content-Type', 'application/manifest+json');
+    res.set('Cache-Control', 'no-cache');
+    res.json(defaultSiteManifest());
+  }
+});
+
+app.post('/api/admin/branding', requireAdmin, (req, res, next) => {
+  if (mongoose.connection.readyState !== 1) return res.status(503).json({ error: mongoUnavailableMessage() });
+  next();
+}, upload.fields([
+  { name: 'brandLogo', maxCount: 1 },
+  { name: 'appIcon192', maxCount: 1 },
+  { name: 'appIcon512', maxCount: 1 },
+  { name: 'homeBanner', maxCount: 1 },
+  { name: 'ludoBanner', maxCount: 1 },
+  { name: 'snakeBanner', maxCount: 1 },
+  { name: 'supportBanner', maxCount: 1 }
+]), async (req, res) => {
+  const files = req.files || {};
+  const selectedFiles = Object.values(files).flat();
+  if (!selectedFiles.length) return res.status(400).json({ error: 'Kam se kam ek PNG image select karein.' });
+  const pngSignature = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
+  for (const [fieldName, fieldFiles] of Object.entries(files)) {
+    for (const file of fieldFiles) {
+      const header = await fs.promises.readFile(file.path).then(buffer => buffer.subarray(0, 24));
+      const expectedSize = { appIcon192: 192, appIcon512: 512 }[fieldName];
+      const invalidPng = file.mimetype !== 'image/png' || !header.subarray(0, 8).equals(pngSignature);
+      const invalidDimensions = expectedSize && (header.length < 24 || header.readUInt32BE(16) !== expectedSize || header.readUInt32BE(20) !== expectedSize);
+      if (invalidPng || invalidDimensions) {
+      await Promise.all(selectedFiles.map(item => fs.promises.unlink(item.path).catch(() => {})));
+        const message = invalidDimensions ? `App icon ${expectedSize}x${expectedSize}px PNG hona chahiye.` : 'Sirf valid PNG images upload karein.';
+        return res.status(400).json({ error: message });
+      }
+    }
+  }
+  const updates = {};
+  if (files.brandLogo?.[0]) updates.brandLogoPath = files.brandLogo[0].filename;
+  if (files.appIcon192?.[0]) updates.appIcon192Path = files.appIcon192[0].filename;
+  if (files.appIcon512?.[0]) updates.appIcon512Path = files.appIcon512[0].filename;
+  if (files.homeBanner?.[0]) updates.homeBannerPath = files.homeBanner[0].filename;
+  if (files.ludoBanner?.[0]) updates.ludoBannerPath = files.ludoBanner[0].filename;
+  if (files.snakeBanner?.[0]) updates.snakeBannerPath = files.snakeBanner[0].filename;
+  if (files.supportBanner?.[0]) updates.supportBannerPath = files.supportBanner[0].filename;
+  try {
+    const settings = await SiteSettings.findByIdAndUpdate(
+      'support-contact',
+      { $set: updates },
+      { new: true, upsert: true, runValidators: true, setDefaultsOnInsert: true }
+    ).select('brandLogoPath appIcon192Path appIcon512Path homeBannerPath ludoBannerPath snakeBannerPath supportBannerPath').lean();
+    res.json({ message: 'Logo aur app icons save ho gaye.', ...siteBrandingPayload(settings) });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 app.get('/api/site-announcement', (req, res) => {
   res.json({ text: siteAnnouncementText.trim() || 'Welcome to khiladiadda24.com' });
 });
