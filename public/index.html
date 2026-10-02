@@ -28,8 +28,8 @@
   <style>
     .battle-card{margin:4px 0;padding:6px 8px;overflow:hidden}
     .sample-running-panel{margin-top:12px}
-    .sample-running-panel h2{margin:0 0 4px;font-size:16px}
-    .sample-running-notice{margin:0 0 10px;color:var(--muted);font-size:12px}
+    .sample-running-panel h2{margin:0 0 4px;font-size:16px;font-weight:900}
+    .sample-running-notice{margin:0 0 10px;color:var(--ink);font-size:12px;font-weight:900}
     .sample-running-list{display:grid;gap:6px}
     .sample-running-battle{display:grid;gap:6px;margin:0;padding:7px 9px}
     .sample-running-battle .battle-prizes{margin-bottom:0}
@@ -131,9 +131,9 @@
     @media(max-width:600px){.battle-card{padding:6px 6px}.battle-players{gap:2px}.battle-avatar{width:22px;height:22px}.battle-player-name{font-size:9px}.battle-player-role{font-size:6px}.battle-player-amount{min-width:42px;padding:2px 4px;font-size:9px}.battle-versus{font-size:9px}.battle-prize-players{padding:3px 2px;gap:3px}.battle-prize-players .battle-player-name{font-size:9px;line-height:1.15}.battle-prize-players .battle-player-role{font-size:6px}.battle-prize{padding:3px 0}.battle-prize small{font-size:7px;white-space:nowrap}.battle-prize strong{font-size:11px}.battle-card-actions{justify-content:flex-end;min-width:62px}.battle-card-actions>*{max-width:100%}.battle-prizes:not(.open-battle-prizes){grid-template-columns:52px minmax(0,1fr) auto;gap:2px;padding:4px 4px}.battle-prizes.open-battle-prizes{grid-template-columns:minmax(0,1fr) auto}.battle-prizes.open-battle-prizes .battle-player-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.battle-prizes.open-battle-prizes .battle-player-amount{font-size:11px}.battle-prizes:not(.open-battle-prizes) .battle-player-amount{min-width:42px;padding:2px 4px;font-size:10px}}
   </style>
   <style>
-    .battle-prizes.running-battle-prizes{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"players prize" "actions actions";gap:6px 10px}
-    .running-battle-prizes>.battle-prize{grid-area:prize;align-items:flex-end;text-align:right}
-    .running-battle-prizes>.battle-prize-players{grid-area:players;min-width:0;border-left:0}
+    .battle-prizes.running-battle-prizes{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"players prize" "actions actions";gap:6px 10px;border:none;background:transparent;padding:0;margin:0}
+    .running-battle-prizes>.battle-prize{grid-area:prize;align-items:flex-end;text-align:right;padding:0}
+    .running-battle-prizes>.battle-prize-players{grid-area:players;min-width:0;border-left:0;padding:0;background:transparent}
     .running-battle-prizes>.battle-card-actions{grid-area:actions;justify-self:end;min-width:0}
     @media(max-width:600px){.top-inner{gap:6px}.top-inner>#menuToggle{width:38px;height:38px}.brand .brand-name{font-size:17px}.brand .brand-main{gap:3px;font-size:8px}.brand .brand-tagline{font-size:7px;letter-spacing:.8px}.top-inner>.top-actions{gap:3px}}
   </style>
@@ -470,6 +470,7 @@
     el('refreshOpen').before(openBattlesHeading);
     const runningBattlesHeading=document.createElement('h2');
     runningBattlesHeading.textContent='Running Battles';
+    runningBattlesHeading.style.fontWeight='900';
     el('runningMatches').before(runningBattlesHeading);
     const samplePlayerNames=['Aarav Sharma','Vivaan Verma','Aditya Singh','Arjun Patel','Ishaan Gupta','Rohan Yadav','Kabir Mehta','Reyansh Kumar','Advika Joshi','Sai Prasad','Ananya Sharma','Diya Patel','Aadhya Verma','Saanvi Gupta','Myra Singh','Kiara Nair','Isha Reddy','Pari Shah','Meera Iyer','Avni Das','Kunal Mishra','Dev Malhotra','Yash Thakur','Omkar Pawar','Manav Jain','Harsh Agarwal','Nikhil Rao','Rahul Sinha','Siddharth Bose','Varun Kapoor','Priya Menon','Kavya Kulkarni','Neha Choudhary','Riya Banerjee','Tara Bhat','Sneha Desai','Pooja Bansal','Nandini Pillai','Anika Roy','Sanjana Kulkarni'];
     const sampleEntryAmounts=[100,150,200,250,300,350,400,450,500,600,700,800,900,1000,1250,1500,2000,2500,3000,5000];
