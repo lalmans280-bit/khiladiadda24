@@ -634,7 +634,7 @@
       const runningList=el('runningMatches');
       if(runningList.contains(document.activeElement)&&document.activeElement.matches('[data-running-room-code]'))return;
       runningList.innerHTML=runningMatches.length?runningMatches.map(m=>{
-        const playerId=String(player?._id||storedUser?.id||''),isCreator=String(m.creator?._id||m.creator)===playerId,isJoiner=String(m.joiner?._id||m.joiner)===playerId,isParticipant=isCreator||isJoiner;
+        const isParticipant=m.viewerIsParticipant===true,isCreator=m.viewerIsCreator===true,isJoiner=isParticipant&&!isCreator;
         let actions='';
         if(isCreator&&!m.gameStartedAt){
           actions=`<div class="row"><button class="btn danger small" data-running-cancel="${esc(m._id)}" data-room-code-shared="${m.roomCode?'1':'0'}">Cancel</button>`;
