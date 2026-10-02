@@ -98,6 +98,7 @@
     .battle-room-code-panel{display:grid;gap:6px;width:min(100%,480px)}
     .battle-room-code-panel>.field{width:100%;min-width:0;margin:0}
     .battle-room-code-box{display:grid;position:relative;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:4px;width:100%;min-width:0;padding:0 4px;border:1px solid var(--line);border-radius:8px;background:#141f1e;min-height:42px}
+    .battle-room-code-box.creator-room-code-box{grid-template-columns:minmax(0,1fr) auto}
     .battle-room-code-box input{grid-column:1;justify-self:start;width:10ch;min-width:0;border:0;background:transparent;padding:8px 0;color:var(--ink);font-weight:800;letter-spacing:.04em;text-align:center;font-variant-numeric:tabular-nums}
     .battle-room-code-box input:focus{outline:none}
     .battle-room-code-box .btn{flex:none;min-height:28px;padding:5px 7px;font-size:11px}
@@ -533,6 +534,11 @@
     const mySamplePanel=gameSamplePanel.cloneNode(true);
     mySamplePanel.querySelector('#sampleRunningMatches').id='mySampleRunningMatches';
     el('gameRunningMatches').closest('.panel').after(mySamplePanel);
+    const myRunningBattlesPanel=el('gameRunningMatches').closest('.panel');
+    myRunningBattlesPanel.classList.remove('panel');
+    myRunningBattlesPanel.classList.add('my-running-battles-section');
+    const openBattlesPanel=el('openMatches').closest('.panel');
+    openBattlesPanel.insertBefore(myRunningBattlesPanel,openBattlesPanel.firstChild);
     const themeButton=document.createElement('button');
     themeButton.id='themeToggle';
     themeButton.type='button';
@@ -629,8 +635,9 @@
       if(el('gameOpenMatches'))el('gameOpenMatches').innerHTML=openMarkup+demoBattlesHeader+demoBattlesList.innerHTML;
       const currentPlayerId=String(player?._id||storedUser?._id||storedUser?.id||'');
       const matchPlayerId=participant=>String(participant?._id||participant?.id||participant||'');
-      const myRunningMatches=runningMatches.filter(match=>[match.creator,match.joiner].some(participant=>matchPlayerId(participant)===currentPlayerId));
+      const myRunningMatches=runningMatches.filter(match=>match.viewerIsParticipant===true);
       const gameRunningList=el('gameRunningMatches');
+      myRunningBattlesPanel.hidden=myRunningMatches.length===0;
       if(gameRunningList)gameRunningList.innerHTML=myRunningMatches.length?myRunningMatches.map(match=>matchCard({...match,status:'RUNNING'},true)).join(''):'';
       const runningList=el('runningMatches');
       if(runningList.contains(document.activeElement)&&document.activeElement.matches('[data-running-room-code]'))return;
@@ -699,7 +706,7 @@
     el('kycForm').addEventListener('submit',async event=>{event.preventDefault();const form=event.currentTarget,number=form.elements.aadhaarNumber.value.replace(/\s/g,'');if(!/^\d{12}$/.test(number))return notify('12 digit Aadhaar number dalein.',true);const body=new FormData(form);body.set('aadhaarNumber',number);try{const data=await api('/api/kyc/submit',{method:'POST',body});form.reset();notify(data.message);await loadKyc()}catch(error){showError(error)}});
     el('profileForm').addEventListener('submit',async event=>{event.preventDefault();try{const data=await api('/api/profile/update',{method:'POST',body:new FormData(event.currentTarget)});player=data.user;renderPlayer();notify(data.message)}catch(error){showError(error)}});
     async function openMatch(id){const m=await api(`/api/matches/${encodeURIComponent(id)}`),mine=String(player?._id||storedUser?.id||'');const creatorId=String(m.creator?._id||m.creator),joinerId=String(m.joiner?._id||m.joiner),isCreator=creatorId===mine,me=isCreator?m.creator:m.joiner,opponent=isCreator?m.joiner:m.creator;const reasons=[['OPPONENT_NOT_JOINED','Opponent joined nahi hua'],['ROOM_CODE_NOT_SHARED','Room code share nahi hua'],['OPPONENT_NOT_RESPONDING','Opponent reply nahi kar raha'],['WRONG_ROOM_CODE','Galat room code'],['TECHNICAL_ISSUE','Technical issue'],['OTHER','Other']];const running=m.status==='RUNNING';el('matchDetails').innerHTML=`<h2>${m.gameType==='SNAKE'?'🐍 Snake':'🎲 Ludo King'} battle · ${esc(m.status)}</h2><div class="grid"><div class="stat"><small>Entry</small><strong>₹${Number(m.amount).toLocaleString('en-IN')}</strong></div><div class="stat"><small>Creator</small><strong>${esc(nameOf(m.creator))}</strong></div><div class="stat"><small>Opponent</small><strong>${esc(nameOf(m.joiner))}</strong></div></div>${m.status==='OPEN'?'<p class="notice warning">Opponent join karte hi match automatically start hoga.</p>':''}${running?`<div class="panel"><h3>Room code</h3>${m.roomCode?`<p class="notice">Code: <strong id="roomCodeText">${esc(m.roomCode)}</strong> <button id="copyRoom" class="btn secondary small">Copy</button></p>`:'<p class="muted">Battle creator room code share karega.</p>'}${isCreator&&!m.roomCode?'<form id="roomForm"><div class="field"><label for="roomCode">4-8 digit room code</label><input id="roomCode" inputmode="numeric" pattern="[0-9]{4,8}" minlength="4" maxlength="8" required></div><button class="btn" type="submit">Room code share karein</button></form>':''}</div>${m.roomCode?`<div class="panel"><h3>Game result</h3><p class="muted">Winner aur screenshot admin verification ke liye bhejein.</p><form id="resultForm"><div class="field"><label for="winner">Winner</label><select id="winner" name="winnerId"><option value="${esc(String(me?._id||me))}">Me: ${esc(nameOf(me))}</option><option value="${esc(String(opponent?._id||opponent))}">Opponent: ${esc(nameOf(opponent))}</option></select></div><div class="field"><label for="resultShot">Result screenshot</label><input id="resultShot" name="screenshot" type="file" accept="image/jpeg,image/png,image/webp" required></div><button class="btn green" type="submit">Result review ke liye bhejein</button></form></div>`:''}`:''}${m.status==='PENDING_RESULT'?'<p class="notice warning">Result admin review mein hai.</p>':''}${['OPEN','RUNNING'].includes(m.status)?`<div class="panel"><h3>Cancel battle</h3><form id="cancelForm"><div class="field"><label for="reason">Cancel reason</label><select id="reason">${reasons.map(([v,l])=>`<option value="${v}">${l}</option>`).join('')}</select></div><button class="btn danger" type="submit">Cancel and refund</button></form></div>`:''}`;setView('match');
-      const roomCopy=el('copyRoom');if(roomCopy&&m.gameType==='LUDO')roomCopy.textContent='Copy & Open Ludo King';
+      const roomCopy=el('copyRoom');if(isCreator&&roomCopy)roomCopy.remove();if(roomCopy&&m.gameType==='LUDO')roomCopy.textContent='Copy & Open Ludo King';
       const room=el('roomForm');if(room)room.addEventListener('submit',async event=>{event.preventDefault();try{const data=await api('/api/matches/set-room-code',{method:'POST',body:JSON.stringify({matchId:id,roomCode:el('roomCode').value})});notify(data.message);await openMatch(id)}catch(error){showError(error)}});
       if(roomCopy)roomCopy.addEventListener('click',async()=>{if(m.gameType==='LUDO'){navigator.clipboard.writeText(m.roomCode).then(()=>notify('Room code copy ho gaya.')).catch(()=>notify(`Room code: ${m.roomCode}`));window.openLudoKingApp();return}try{await navigator.clipboard.writeText(m.roomCode);notify('Room code copy ho gaya.')}catch{notify(`Room code: ${m.roomCode}`)}});
       if(m.gameType==='LUDO'&&m.roomCode){const roomPanel=el('roomCodeText')?.closest('.panel');if(roomPanel){const openLudo=document.createElement('a');openLudo.className='btn green';openLudo.href=ludoKingOpenUrl();openLudo.textContent='Open Ludo King';openLudo.dataset.openLudo='true';roomPanel.append(openLudo)}}
