@@ -638,7 +638,10 @@
       if(el('gameOpenMatches'))el('gameOpenMatches').innerHTML=openMarkup+demoBattlesHeader+demoBattlesList.innerHTML;
       const currentPlayerId=String(player?._id||storedUser?._id||storedUser?.id||'');
       const matchPlayerId=participant=>String(participant?._id||participant?.id||participant||'');
-      const myRunningMatches=runningMatches.filter(match=>match.viewerIsParticipant===true);
+      const myRunningMatches=runningMatches.filter(match=>typeof match.viewerIsParticipant==='boolean'
+        ? match.viewerIsParticipant
+        : [match.creator,match.joiner].some(participant=>matchPlayerId(participant)===currentPlayerId));
+      const myRunningMatchIds=new Set(myRunningMatches.map(match=>String(match._id)));
       const gameRunningList=el('gameRunningMatches');
       const runningList=el('runningMatches');
       if((runningList.contains(document.activeElement)||gameRunningList.contains(document.activeElement))&&document.activeElement.matches('[data-running-room-code]'))return;
@@ -675,7 +678,7 @@
       });
       const runningCards=[...runningList.children];
       runningMatches.forEach((match,index)=>{
-        if(match.viewerIsParticipant===true&&runningCards[index])gameRunningList.append(runningCards[index]);
+        if(myRunningMatchIds.has(String(match._id))&&runningCards[index])gameRunningList.append(runningCards[index]);
       });
     }
     async function loadMine(){const container=el('myMatches');if(!container)return;const data=await api('/api/matches/mine'),matches=data.matches||[];container.innerHTML=matches.length?matches.map(m=>matchCard(m,true)).join(''):'<p class="muted">Abhi koi active battle nahi hai.</p>'}
