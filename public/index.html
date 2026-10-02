@@ -8,8 +8,11 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link rel="manifest" href="/api/site-manifest">
+  <link rel="icon" href="/app-icon.svg" type="image/svg+xml">
+  <link rel="shortcut icon" href="/app-icon.svg" type="image/svg+xml">
   <link rel="icon" href="/app-icon-192.png" type="image/png" sizes="192x192">
   <link rel="apple-touch-icon" href="/app-icon-192.png">
+  <link rel="mask-icon" href="/app-icon.svg" color="#f4c84b">
   <title>KhiladiAdda24 | Ludo & Snake Battles</title>
   <style>
     :root{color-scheme:dark;--ink:#f2f5ef;--muted:#a8b2b0;--panel:#18232b;--line:#33423f;--gold:#f4c84b;--green:#71d6a1;--red:#f07b72}
@@ -524,9 +527,10 @@
     let sampleRunningBattles=createSampleRunningBattles(demoBattlePairs.map(({player})=>player.name));
     const demoBattlesList=document.createElement('div');
     demoBattlesList.className='demo-battles-list';
-    const demoBattlesHeader='<div class="demo-battles-header"><strong>OPEN BATTLES</strong></div>';
+    const demoBattlesHeader='<div class="demo-battles-header"><strong>OPEN</strong></div>';
     function renderDemoBattles(){
-      demoBattlesList.innerHTML=demoBattlePairs.map(({player,amount,gameType})=>`<article class="match battle-card demo-battle-card"><div class="battle-prizes open-battle-prizes"><div class="battle-prize-players"><div class="battle-players battle-players-waiting">${battlePlayerMarkup({username:player.name,profileImage:player.avatar.replace(/^\//,'')},'Challenger',false,amount,gameType==='SNAKE'?'Snake Battle':'Ludo Classic')}</div></div><div class="battle-card-actions"><button class="btn green small" type="button" disabled aria-disabled="true">PLAY</button></div></div></article>`).join('');
+      const showDemoCards = !window.__REAL_OPEN_BATTLES_AVAILABLE;
+      demoBattlesList.innerHTML = showDemoCards ? demoBattlePairs.map(({player,amount,gameType})=>`<article class="match battle-card demo-battle-card"><div class="battle-prizes open-battle-prizes"><div class="battle-prize-players"><div class="battle-players battle-players-waiting">${battlePlayerMarkup({username:player.name,profileImage:player.avatar.replace(/^\//,'')},'Challenger',false,amount,gameType==='SNAKE'?'Snake Battle':'Ludo Classic')}</div></div><div class="battle-card-actions"><button class="btn green small" type="button" disabled aria-disabled="true">PLAY</button></div></div></article>`).join('') : '';
     }
     const gameSamplePanel=document.createElement('div');
     gameSamplePanel.className='panel sample-running-panel';
@@ -632,11 +636,14 @@
       const [openData,runningData]=await Promise.all([api('/api/matches/open?gameType=ALL'),api('/api/matches/running?gameType=ALL')]);
       const openMatches=Array.isArray(openData)?openData:openData.matches||[];
       const runningMatches=Array.isArray(runningData)?runningData:runningData.matches||[];
-      const openMarkup=openMatches.length?openMatches.map(m=>matchCard(m)).join(''):'<p class="muted">Is game ke liye abhi open challenge nahi hai.</p>';
+      const hasRealOpenMatches = openMatches.length > 0;
+      window.__REAL_OPEN_BATTLES_AVAILABLE = hasRealOpenMatches;
+      const openMarkup=hasRealOpenMatches?openMatches.map(m=>matchCard(m)).join(''):'<p class="muted">Is game ke liye abhi open challenge nahi hai.</p>';
       const homeOpenMarkup=['LUDO','SNAKE'].map(gameType=>{const gameMatches=openMatches.filter(match=>match.gameType===gameType);return gameMatches.map(match=>matchCard(match)).join('')}).join('');
       renderDemoBattles();
-      el('openMatches').innerHTML=homeOpenMarkup.replaceAll('<p class="muted">Abhi koi open battle nahi hai.</p>', '')+demoBattlesHeader+demoBattlesList.innerHTML;
-      if(el('gameOpenMatches'))el('gameOpenMatches').innerHTML=openMarkup+demoBattlesHeader+demoBattlesList.innerHTML;
+      const fallbackDemoMarkup = hasRealOpenMatches ? '' : demoBattlesHeader + demoBattlesList.innerHTML;
+      el('openMatches').innerHTML = homeOpenMarkup.replaceAll('<p class="muted">Abhi koi open battle nahi hai.</p>', '') + fallbackDemoMarkup;
+      if(el('gameOpenMatches'))el('gameOpenMatches').innerHTML = openMarkup + fallbackDemoMarkup;
       const currentPlayerId=String(player?._id||storedUser?._id||storedUser?.id||'');
       const matchPlayerId=participant=>String(participant?._id||participant?.id||participant||'');
       const myRunningMatches=runningMatches.filter(match=>typeof match.viewerIsParticipant==='boolean'
