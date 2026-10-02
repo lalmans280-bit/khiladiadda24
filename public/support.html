@@ -19,6 +19,10 @@
     .help-copy { margin-top: 18px; padding-top: 4px; border-top: 1px solid #35483a; color: #bdcabe; font-size: 14px; line-height: 1.6; }
     .help-copy p { margin: 8px 0; }
     .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; margin-top: 14px; padding: 10px 18px; border: 1px solid #438954; border-radius: 7px; color: #fff; background: #287442; font-weight: 800; text-decoration: none; }
+    .support-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+    .support-actions .btn { margin-top: 14px; }
+    .support-actions .share-btn { border-color: #52685a; background: #26352b; }
+    .support-actions button { font: inherit; cursor: pointer; }
     .btn:focus-visible { outline: 2px solid #f0c85b; outline-offset: 2px; }
     @media(max-width:420px) { body { padding: 12px; } .card { padding: 16px; } h1 { font-size: 22px; } .info { font-size: 15px; } }
   </style>
@@ -31,7 +35,7 @@
       <div class="info">📞 Support Number: <a class="contact-link" id="supportPhoneLink">+91 79557295</a></div>
       <div class="info">💬 WhatsApp: <a class="contact-link whatsapp-link" id="whatsappPhoneLink">+91 79557295</a></div>
       <div class="info">⏰ Support: 24/7 Available</div>
-      <a class="btn" href="/index.html">Back to App</a>
+      <div class="support-actions"><a class="btn" href="/index.html">Back to App</a><button class="btn share-btn" id="shareWebsite" type="button">Website share karein</button></div>
       <section class="help-copy">
         <h2>Need Help?</h2>
         <p>For login issues, deposit queries, withdrawal help, game disputes, and wallet support, contact us anytime.</p>
@@ -60,8 +64,46 @@
       } catch {}
     }
 
+    async function loadSupportBranding() {
+      try {
+        const response = await fetch('/api/site-branding', { cache: 'no-store' });
+        if (!response.ok) return;
+        const branding = await response.json();
+        if (branding.supportBannerUrl) document.querySelector('.support-art').src = branding.supportBannerUrl;
+      } catch {}
+    }
+
+    document.getElementById('shareWebsite').addEventListener('click', async () => {
+      const appUrl = `${location.origin}/index.html`;
+      try {
+        if (navigator.share) {
+          await navigator.share({ title: 'KhiladiAdda24', text: 'KhiladiAdda24 website dekhein', url: appUrl });
+          return;
+        }
+        if (navigator.clipboard?.writeText) {
+          await navigator.clipboard.writeText(appUrl);
+        } else {
+          const field = document.createElement('textarea');
+          field.value = appUrl;
+          field.setAttribute('readonly', '');
+          field.style.position = 'fixed';
+          field.style.opacity = '0';
+          document.body.append(field);
+          field.select();
+          const copied = document.execCommand('copy');
+          field.remove();
+          if (!copied) throw new Error('Copy unavailable');
+        }
+        alert('Website link copy ho gaya. Ab share karein.');
+      } catch (error) {
+        if (error.name !== 'AbortError') alert(`Website link: ${appUrl}`);
+      }
+    });
+
     loadSupportContacts();
+    loadSupportBranding();
   </script>
+  <script src="/i18n.js"></script>
   <script src="/player-copy.js" defer></script>
 </body>
 </html>
