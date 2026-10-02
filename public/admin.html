@@ -487,7 +487,8 @@
     });
     const openBattlesHeading=document.createElement('h2');
     openBattlesHeading.className='home-open-header-title';
-    openBattlesHeading.textContent='OPEN Battles';
+    openBattlesHeading.hidden=true;
+    openBattlesHeading.textContent='';
     const homeMatchHeader=el('refreshOpen').closest('.match-head');
     if(homeMatchHeader)homeMatchHeader.classList.add('home-open-header');
     el('refreshOpen').before(openBattlesHeading);
