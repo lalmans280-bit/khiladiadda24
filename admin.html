@@ -3,6 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#101713">
+  <link rel="icon" href="/app-icon.svg" type="image/svg+xml">
+  <link rel="shortcut icon" href="/app-icon.svg" type="image/svg+xml">
+  <link rel="icon" href="/app-icon-192.png" type="image/png" sizes="192x192">
+  <link rel="apple-touch-icon" href="/app-icon-192.png">
   <title>KhiladiAdda24.com Admin Panel</title>
   <style>
     body { font-family: Arial, sans-serif; margin: 0; padding-bottom: 82px; background: #fff; color: #e5e7eb; }
@@ -31,6 +36,7 @@
     .muted { color: #94a3b8; font-size: 13px; }
     .match-proof-preview { display: block; width: 140px; max-height: 100px; object-fit: contain; border: 1px solid rgba(255,255,255,0.16); border-radius: 6px; background: #0f172a; }
     .payout-qr-preview { display: block; width: 110px; max-height: 110px; object-fit: contain; border: 1px solid rgba(255,255,255,0.16); border-radius: 6px; background: white; }
+    .branding-preview { display: block; width: 88px; height: 88px; margin: 8px 0; object-fit: contain; border: 1px solid rgba(255,255,255,0.16); border-radius: 8px; background: #0f172a; }
     .notifications { border-left: 4px solid #fbbf24; }
     .notifications h3 { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
     .notice-list { display: flex; flex-wrap: wrap; gap: 10px 20px; margin: 0; padding: 0; list-style: none; }
@@ -134,6 +140,52 @@
         <button id="saveSupportNumbersBtn" type="button">Save contact numbers</button>
       </div>
       <p id="supportNumbersStatus" class="muted">Loading...</p>
+    </div>
+
+    <div class="card">
+      <h3>Site Logo &amp; App Icons</h3>
+      <p class="muted">PNG images upload karke logo, app icon, game banners aur support graphic badlein. App icons ki dimensions exact rakhein.</p>
+      <div class="form-grid">
+        <div>
+          <label for="brandLogoFile">Login logo PNG</label>
+          <img id="brandLogoPreview" class="branding-preview" alt="Current top logo preview" hidden>
+          <input id="brandLogoFile" type="file" accept="image/png,.png">
+        </div>
+        <div>
+          <label for="appIcon192File">App icon PNG (192 x 192)</label>
+          <img id="appIcon192Preview" class="branding-preview" alt="Current 192 pixel app icon preview" hidden>
+          <input id="appIcon192File" type="file" accept="image/png,.png">
+        </div>
+        <div>
+          <label for="appIcon512File">App icon PNG (512 x 512)</label>
+          <img id="appIcon512Preview" class="branding-preview" alt="Current 512 pixel app icon preview" hidden>
+          <input id="appIcon512File" type="file" accept="image/png,.png">
+        </div>
+        <div>
+          <label for="homeBannerFile">Home battle banner PNG</label>
+          <img id="homeBannerPreview" class="branding-preview" alt="Current home banner preview" hidden>
+          <input id="homeBannerFile" type="file" accept="image/png,.png">
+        </div>
+        <div>
+          <label for="ludoBannerFile">Ludo card PNG</label>
+          <img id="ludoBannerPreview" class="branding-preview" alt="Current Ludo card preview" hidden>
+          <input id="ludoBannerFile" type="file" accept="image/png,.png">
+        </div>
+        <div>
+          <label for="snakeBannerFile">Snake card PNG</label>
+          <img id="snakeBannerPreview" class="branding-preview" alt="Current Snake card preview" hidden>
+          <input id="snakeBannerFile" type="file" accept="image/png,.png">
+        </div>
+        <div>
+          <label for="supportBannerFile">Support banner PNG</label>
+          <img id="supportBannerPreview" class="branding-preview" alt="Current support banner preview" hidden>
+          <input id="supportBannerFile" type="file" accept="image/png,.png">
+        </div>
+      </div>
+      <div class="toolbar" style="margin-top: 12px;">
+        <button id="saveBrandingBtn" type="button">Save selected images</button>
+      </div>
+      <p id="brandingStatus" class="muted">Loading current images...</p>
     </div>
 
     <div class="card">
@@ -286,16 +338,31 @@
   </dialog>
 
   <script>
+    const legacyAdminSession = (() => {
+      try {
+        const legacyUser = JSON.parse(localStorage.getItem('user') || 'null');
+        const legacyToken = localStorage.getItem('token');
+        return legacyUser?.role === 'admin' && legacyToken ? { user: legacyUser, token: legacyToken } : null;
+      } catch {
+        return null;
+      }
+    })();
+    if (!localStorage.getItem('adminUser') && legacyAdminSession) {
+      localStorage.setItem('adminUser', JSON.stringify(legacyAdminSession.user));
+      localStorage.setItem('adminToken', legacyAdminSession.token);
+      localStorage.removeItem('user');
+      localStorage.removeItem('token');
+    }
     const user = (() => {
-      try { return JSON.parse(localStorage.getItem('user') || '{}'); }
+      try { return JSON.parse(localStorage.getItem('adminUser') || '{}'); }
       catch { return null; }
     })();
-    if (!user || user.role !== 'admin') {
+    if (!user || user.role !== 'admin' || !localStorage.getItem('adminToken')) {
       alert('Admin login required');
       window.location.href = '/login.html?admin=1';
     }
 
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('adminToken');
     const authHeaders = { 'Authorization': `Bearer ${token}` };
     let adminPreviewUrls = [];
     let allPlayers = [];
@@ -307,8 +374,8 @@
     });
 
     function adminLogout() {
-      localStorage.removeItem('user');
-      localStorage.removeItem('token');
+      localStorage.removeItem('adminUser');
+      localStorage.removeItem('adminToken');
       window.location.href = '/login.html?admin=1';
     }
 
@@ -607,6 +674,81 @@
         status.textContent = data.message || 'Support and WhatsApp numbers saved.';
       } catch (error) {
         status.textContent = error.message || 'Contact numbers save nahi ho sake.';
+      }
+    }
+
+    async function loadBranding() {
+      const status = document.getElementById('brandingStatus');
+      try {
+        const res = await adminFetch('/api/admin/branding');
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Logo aur app icons load nahi hue.');
+        [['brandLogoPreview', data.brandLogoUrl], ['appIcon192Preview', data.appIcon192Url], ['appIcon512Preview', data.appIcon512Url], ['homeBannerPreview', data.homeBannerUrl], ['ludoBannerPreview', data.ludoBannerUrl], ['snakeBannerPreview', data.snakeBannerUrl], ['supportBannerPreview', data.supportBannerUrl]].forEach(([id, url]) => {
+          const preview = document.getElementById(id);
+          preview.src = url;
+          preview.hidden = false;
+        });
+        status.textContent = 'Current logo and app icons loaded.';
+      } catch (error) {
+        status.textContent = error.message || 'Logo aur app icons load nahi hue.';
+      }
+    }
+
+    async function saveBranding() {
+      const fields = [
+        ['brandLogoFile', 'brandLogo', null],
+        ['appIcon192File', 'appIcon192', 192],
+        ['appIcon512File', 'appIcon512', 512],
+        ['homeBannerFile', 'homeBanner', null],
+        ['ludoBannerFile', 'ludoBanner', null],
+        ['snakeBannerFile', 'snakeBanner', null],
+        ['supportBannerFile', 'supportBanner', null]
+      ];
+      const formData = new FormData();
+      let selectedCount = 0;
+      const status = document.getElementById('brandingStatus');
+      for (const [inputId, fieldName, expectedSize] of fields) {
+        const file = document.getElementById(inputId).files[0];
+        if (!file) continue;
+        if (file.type !== 'image/png' || !file.name.toLowerCase().endsWith('.png')) {
+          status.textContent = 'Sirf PNG image select karein.';
+          return;
+        }
+        if (expectedSize) {
+          try {
+            const image = await createImageBitmap(file);
+            const validSize = image.width === expectedSize && image.height === expectedSize;
+            image.close();
+            if (!validSize) {
+              status.textContent = `${inputId.includes('192') ? '192' : '512'} x ${expectedSize}px PNG select karein.`;
+              return;
+            }
+          } catch {
+            status.textContent = 'PNG image read nahi ho paayi.';
+            return;
+          }
+        }
+        formData.append(fieldName, file);
+        selectedCount += 1;
+      }
+      if (!selectedCount) {
+        status.textContent = 'Kam se kam ek PNG image select karein.';
+        return;
+      }
+      status.textContent = 'Images upload ho rahi hain...';
+      try {
+        const res = await adminFetch('/api/admin/branding', { method: 'POST', body: formData });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Images save nahi hui.');
+        fields.forEach(([inputId]) => { document.getElementById(inputId).value = ''; });
+        [['brandLogoPreview', data.brandLogoUrl], ['appIcon192Preview', data.appIcon192Url], ['appIcon512Preview', data.appIcon512Url], ['homeBannerPreview', data.homeBannerUrl], ['ludoBannerPreview', data.ludoBannerUrl], ['snakeBannerPreview', data.snakeBannerUrl], ['supportBannerPreview', data.supportBannerUrl]].forEach(([id, url]) => {
+          const preview = document.getElementById(id);
+          preview.src = url;
+          preview.hidden = false;
+        });
+        status.textContent = data.message || 'Logo aur app icons save ho gaye.';
+      } catch (error) {
+        status.textContent = error.message || 'Images save nahi hui.';
       }
     }
 
@@ -1075,10 +1217,12 @@
     document.getElementById('adminNewPlayersButton').addEventListener('click', () => setPlayerListMode('NEW', true));
 
     document.getElementById('saveSupportNumbersBtn').addEventListener('click', saveSupportNumbers);
+    document.getElementById('saveBrandingBtn').addEventListener('click', saveBranding);
     document.getElementById('saveDepositUpiIdBtn').addEventListener('click', saveDepositUpiId);
     document.getElementById('addPlayerCopyRowBtn').addEventListener('click', () => addPlayerCopyRow());
     document.getElementById('savePlayerCopyBtn').addEventListener('click', savePlayerCopy);
     loadSupportNumbers();
+    loadBranding();
     loadDepositUpiId();
     loadPlayerCopy();
     loadData();
@@ -1086,5 +1230,6 @@
     loadHistory();
     setInterval(loadData, 30000);
   </script>
+  <script src="/i18n.js"></script>
 </body>
 </html>
