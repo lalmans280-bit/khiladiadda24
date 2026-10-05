@@ -487,7 +487,10 @@
               <td>₹${d.amount}</td>
               <td><b>${d.utrNumber}</b></td>
               <td><a href="/api/admin/uploads/${encodeURIComponent((d.screenshot || '').split('/').pop())}" target="_blank">Screenshot</a></td>
-              <td><button onclick="approveDep('${d._id}')">Approve Balance</button></td>
+              <td>
+                <button onclick="approveDep('${d._id}')">Approve Balance</button>
+                <button class="danger" onclick="cancelDep('${d._id}')">Cancel</button>
+              </td>
             </tr>
           `;
         });
@@ -1058,13 +1061,28 @@
     }
 
     async function approveDep(id) {
-      await adminFetch('/api/admin/approve-deposit', {
+      const res = await adminFetch('/api/admin/approve-deposit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ depositId: id })
       });
-      alert('Approved');
-      location.reload();
+      const data = await res.json();
+      alert(data.message || data.error || 'Approved');
+      if (res.ok) location.reload();
+    }
+
+    async function cancelDep(id) {
+      if (!confirm('Is this deposit request cancel/reject karna chahte ho?')) return;
+      const rejectionReason = prompt('Cancel reason likhein (optional):', 'Deposit request cancel ki gayi.');
+      if (rejectionReason === null) return;
+      const res = await adminFetch('/api/admin/cancel-deposit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ depositId: id, rejectionReason: rejectionReason || 'Deposit request cancel ki gayi.' })
+      });
+      const data = await res.json();
+      alert(data.message || data.error || 'Deposit cancelled');
+      if (res.ok) location.reload();
     }
 
     async function resolveMatchDecision(matchId, prefix = '') {
