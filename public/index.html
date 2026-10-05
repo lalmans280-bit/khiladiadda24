@@ -40,8 +40,9 @@
     .demo-battles-list{display:grid;gap:6px}
     .demo-battle-card{margin:0 0 1px;padding:6px 8px}
     .demo-wait-status{flex-basis:100%;color:var(--muted);font-size:11px;font-weight:700;text-align:right}
-    .open-list-box{width:100%;margin-top:10px;padding:12px;border:1px solid #333;border-radius:10px;background:#000;color:#fff;box-shadow:0 8px 24px #0003}
-    .open-list-box .demo-battles-header{color:#fff}
+    .open-list-box{margin-top:10px;padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--panel);box-shadow:0 8px 24px #0003}
+    .demo-open-list-box{width:100%;margin-top:10px;padding:12px;border:1px solid #333;border-radius:10px;background:#000;color:#fff;box-shadow:0 8px 24px #0003}
+    .demo-open-list-box .demo-battles-header{margin-top:0;color:#fff}
     .sample-running-battle{display:grid;gap:6px;margin:0;padding:7px 9px}
     .sample-running-battle .battle-prizes{margin-bottom:0}
     .entry-amount-control{position:relative}
@@ -675,7 +676,7 @@
       const openMarkup=openMatches.map(m=>matchCard(m)).join('');
       renderDemoBattles();
       const fallbackDemoMarkup = demoBattlesHeader + demoBattlesList.innerHTML;
-      const allOpenBattlesMarkup = `<div class="open-list-box">${openMarkup}${fallbackDemoMarkup}</div>`;
+      const allOpenBattlesMarkup = `<div class="open-list-box">${openMarkup}<div class="demo-open-list-box">${fallbackDemoMarkup}</div></div>`;
       el('openMatches').innerHTML = allOpenBattlesMarkup;
       if(el('gameOpenMatches'))el('gameOpenMatches').innerHTML = allOpenBattlesMarkup;
       const currentPlayerId=String(player?._id||storedUser?._id||storedUser?.id||'');
