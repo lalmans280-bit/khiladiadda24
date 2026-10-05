@@ -764,15 +764,26 @@
       if(demoPlay){
         const playerName=demoPlay.dataset.demoPlay;
         if(demoBattleWaitStartedAt.has(playerName))return;
+        demoPlay.disabled=true;
         const requiredAmount=Number(demoPlay.dataset.demoAmount);
-        const walletBalance=Number(player?.walletBalance??storedUser?.walletBalance??0);
-        if(walletBalance<requiredAmount){
-          const depositAmount=Math.max(100,requiredAmount-walletBalance);
-          window.pendingEntryAmount=requiredAmount;
-          el('depositAmount').value=String(depositAmount);
-          notify(`₹${requiredAmount} entry ke liye wallet balance kam hai. ₹${depositAmount} recharge karein.`,true);
-          setView('wallet');
+        try{
+          const profile=await api('/api/profile/me');
+          player=profile.user;
+          renderPlayer();
+          const walletBalance=Number(player.walletBalance||0);
+          if(walletBalance<requiredAmount){
+            const depositAmount=Math.max(100,requiredAmount-walletBalance);
+            window.pendingEntryAmount=requiredAmount;
+            el('depositAmount').value=String(depositAmount);
+            notify(`₹${requiredAmount} entry ke liye wallet balance kam hai. ₹${depositAmount} recharge karein.`,true);
+            setView('wallet');
+            return;
+          }
+        }catch(error){
+          showError(error);
           return;
+        }finally{
+          demoPlay.disabled=false;
         }
         demoBattleWaitStartedAt.set(playerName,Date.now());
         demoPlay.disabled=true;
