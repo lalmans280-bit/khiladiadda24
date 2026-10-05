@@ -115,22 +115,15 @@
   </script>
 </head>
 <body>
-  <header class="topbar"><div class="top-inner"><button class="icon" id="menuToggle" aria-label="Menu" aria-expanded="false">☰</button><a class="brand" href="#home"><span class="brand-content"><strong class="brand-name">KhiladiAdda24</strong><span class="brand-main"><span>PLAY</span><span>·</span><span>BATTLE</span><span class="brand-win">WIN</span></span><small class="brand-tagline">OPEN 24/7 WITHDRAW</small></span></a><div class="top-actions"><div class="lang-toggle" aria-label="Language selector"><button class="lang-btn active" type="button" data-lang-toggle="hi">HI</button><button class="lang-btn" type="button" data-lang-toggle="en">EN</button></div><span class="balance" id="headerBalance">₹ --</span></div></div><div class="menu" id="menu"><button data-view="profile" data-i18n-key="menuProfile">👤 My profile</button><button data-view="home" data-i18n-key="menuHome">🏆 Win cash</button><button data-view="wallet" data-i18n-key="menuWallet">👛 My wallet</button><button data-view="history" data-i18n-key="menuHistory">📜 History</button><button data-menu-action="referral" data-i18n-key="menuReferral">🎁 Refer and earn</button><button data-menu-action="notifications" data-i18n-key="menuNotifications">🔔 Notification</button><a href="/support.html" data-i18n-key="supportLink">🛟 Support</a><a href="/policy.html" data-i18n-key="policyLink">📄 All policies</a><button class="menu-logout" id="logout" data-i18n-key="logout">🚪 Logout</button></div><nav class="nav"><button class="active" data-view="home" data-i18n-key="navHome">Home</button><button data-view="games" data-i18n-key="navGames">Games</button><button data-view="wallet" data-i18n-key="navWallet">Wallet</button><button data-view="profile" data-i18n-key="navProfile">Profile</button></nav></header>
-  <div class="app-promo" id="appPromo" hidden role="region" aria-label="Mobile app options">
-    <span class="app-promo-copy">KhiladiAdda24 mobile app</span>
-    <button type="button" id="installAppButton">Install App</button>
-    <button type="button" class="app-promo-share" id="shareAppButton">Share</button>
-    <button type="button" class="app-promo-close" id="closeAppPromo" aria-label="Close">×</button>
-  </div>
+  <header class="topbar"><div class="top-inner"><button class="icon" id="menuToggle" aria-label="Menu" aria-expanded="false">☰</button><a class="brand" href="#home"><span class="brand-content"><strong class="brand-name">KhiladiAdda24</strong><span class="brand-main"><span>PLAY</span><span>·</span><span>BATTLE</span><span class="brand-win">WIN</span></span><small class="brand-tagline">OPEN 24/7 WITHDRAW</small></span></a><div class="top-actions"><div class="lang-toggle" aria-label="Language selector"><button class="lang-btn active" type="button" data-lang-toggle="hi">HI</button><button class="lang-btn" type="button" data-lang-toggle="en">EN</button></div><span class="balance" id="headerBalance">₹ --</span></div></div><div class="menu" id="menu"><button data-view="profile" data-i18n-key="menuProfile">👤 My profile</button><button data-view="home" data-i18n-key="menuHome">🏆 Win cash</button><button data-view="wallet" data-i18n-key="menuWallet">👛 My wallet</button><button data-view="history" data-i18n-key="menuHistory">📜 History</button><button data-menu-action="referral" data-i18n-key="menuReferral">🎁 Refer and earn</button><button data-menu-action="notifications" data-i18n-key="menuNotifications">🔔 Notification</button><a href="/support.html" data-i18n-key="supportLink">🛟 Support</a><a href="/policy.html" data-i18n-key="policyLink">📄 All policies</a><button class="menu-logout" id="logout" data-i18n-key="logout">🚪 Logout</button></div><nav class="nav"><button class="active" data-view="home" data-i18n-key="navHome">Home</button><button data-view="wallet" data-i18n-key="navWallet">Wallet</button><button data-view="profile" data-i18n-key="navProfile">Profile</button></nav></header>
   <main class="shell content"><div id="notice" class="notice" role="status" hidden></div>
-      <section class="view" id="view-games"><div class="game-launch" id="gamePicker"><button class="game-tile game-tile-image" data-launch-game="LUDO" aria-label="Ludo Classic"><img src="/ludo-classic.png" alt="Ludo Classic"><span class="game-live-badge"><i class="game-live-dot" aria-hidden="true"></i><span class="game-live-text">LIVE</span></span></button><button class="game-tile game-tile-image" data-launch-game="SNAKE" aria-label="Snake Battle"><img src="/snake-battles-banner.png" alt="Snake Battle"><span class="game-live-badge"><i class="game-live-dot" aria-hidden="true"></i><span class="game-live-text">LIVE</span></span></button><a class="game-support-banner" href="/support.html" aria-label="WhatsApp and support"><img src="/whatsapp-support.png" alt="WhatsApp and Support"><span class="game-live-badge"><i class="game-live-dot" aria-hidden="true"></i><span class="game-live-text">LIVE</span></span></a></div><div id="gameBattleView" hidden><div class="match-head"><div><button class="btn secondary small" id="backToGames">← Games</button><h2 id="gameViewTitle"></h2></div><button id="gameRefreshOpen" class="btn secondary small" type="button">Refresh</button></div><div class="panel"><h2>Open battles</h2><div id="gameOpenMatches"></div></div><div class="panel"><h2>My running battles</h2><div id="gameRunningMatches"></div></div></div></section>
     <section class="view active" id="view-home"><div class="panel"><img class="battle-banner" src="/banner-ludo-snake.png" alt="Ludo and Snake Game"><p class="muted">Minimum ₹100. Multiples of ₹50.</p><form id="createForm"><div class="two"><div class="field"><label for="gameType">Game</label><select id="gameType"><option value="LUDO">Ludo Classic</option><option value="SNAKE">Snake</option></select></div><div class="field"><label for="entryAmount">Entry amount (₹)</label><input id="entryAmount" type="number" min="100" max="50000" step="50" value="100" placeholder="e.g. 250" required></div></div><button class="btn" type="submit">Set challenge</button></form></div><div class="panel"><div class="match-head"><button id="refreshOpen" class="btn secondary small">Refresh</button></div><p class="muted">Challenger, entry amount aur winning amount dekhein.</p><div id="openMatches"></div></div><div class="panel"><div id="runningMatches"></div></div></section>
     <section class="view" id="view-wallet"><div class="grid"><div class="stat"><small>Available balance</small><strong id="walletBalance">₹ --</strong></div><div class="stat"><small>Aadhaar KYC</small><strong id="kycStatus">Loading</strong><p class="muted" id="kycMessage">Withdraw ke liye KYC approval zaroori hai.</p></div></div><div class="two"><div class="panel"><h2>Wallet deposit</h2><p class="muted">Minimum ₹100. QR se payment ke baad UTR aur screenshot bhejein; admin approval par amount credit hoga.</p><form id="qrForm"><div class="field"><label for="depositAmount">Deposit amount (₹)</label><input id="depositAmount" type="number" min="100" max="1000000" value="100" required></div><button class="btn" type="submit">UPI QR banayein</button></form><div id="qrArea"></div><form id="depositForm" hidden><div class="field"><label for="utr">UTR / reference number</label><input id="utr" name="utrNumber" minlength="12" maxlength="22" required></div><div class="field"><label for="proof">Payment screenshot</label><input id="proof" name="screenshot" type="file" accept="image/jpeg,image/png,image/webp" required></div><button class="btn green" type="submit">Deposit request bhejein</button></form></div><div class="panel"><h2>Withdraw</h2><p class="muted">Minimum ₹500. Aadhaar KYC approve hone ke baad hi request bhej sakte hain.</p><form id="withdrawForm"><div class="field"><label for="withdrawAmount">Amount (₹)</label><input id="withdrawAmount" name="amount" type="number" min="500" step="1" value="500" required></div><div class="field"><label for="upiId">Aapka UPI ID</label><input id="upiId" name="upiId" placeholder="name@bank" required></div><button class="btn" type="submit">Withdrawal request bhejein</button></form></div></div><div class="panel"><h2>Aadhaar KYC</h2><p class="muted">Aadhaar number aur card image admin verification ke liye upload karein. OTP ya PIN kabhi share na karein.</p><form id="kycForm"><div class="two"><div class="field"><label for="aadhaarNumber">Aadhaar number</label><input id="aadhaarNumber" name="aadhaarNumber" type="password" inputmode="numeric" autocomplete="off" minlength="12" maxlength="12" pattern="[0-9]{12}" required></div><div class="field"><label for="aadhaarImage">Aadhaar card image</label><input id="aadhaarImage" name="aadhaarImage" type="file" accept="image/jpeg,image/png,image/webp" required></div></div><button class="btn secondary" type="submit">KYC review ke liye bhejein</button></form></div></section>
     <section class="view" id="view-profile"><div class="panel"><h2>Player profile</h2><div class="person"><img id="avatar" class="avatar" alt="Player profile"><div><strong id="profileName">--</strong><div class="muted" id="profilePhone">--</div></div></div><form id="profileForm"><div class="field"><label for="username">Player name</label><input id="username" name="username" minlength="2" maxlength="40" required></div><div class="field"><label for="profileImage">Profile image</label><input id="profileImage" name="profileImage" type="file" accept="image/jpeg,image/png,image/webp"></div><button class="btn" type="submit">Profile save karein</button></form></div><div class="panel"><h2>Account details</h2><p>Mobile: <strong id="accountPhone">--</strong></p><p>Balance: <strong id="profileBalance">--</strong></p><p>Your referral ID: <strong id="profileReferralCode">--</strong></p><button class="btn secondary small" id="copyReferral">📋 Referral ID copy karein</button><button class="btn danger small" id="logoutProfile">Logout</button></div></section>
     <section class="view" id="view-history"><div class="panel"><div class="match-head"><div><h2>Account history</h2><p class="muted">Game, deposit aur withdrawal ki latest activity.</p></div><button class="btn secondary small" id="refreshHistory">Refresh</button></div><div id="matchHistory" class="history-list" aria-live="polite"></div></div></section>
     <section class="view" id="view-match"><div class="panel"><button class="btn secondary small" data-view="battles">← Battles par wapas</button><div id="matchDetails"></div></div></section>
   </main>
-  <nav class="bottom"><button class="active" data-view="home"><span>⌂</span><span class="nav-label" data-i18n-key="bottomHome">Home</span></button><button data-view="games"><span>⚔</span><span class="nav-label" data-i18n-key="bottomGames">Games <small class="nav-live" aria-label="Live"><i class="nav-live-dot" aria-hidden="true"></i><span class="nav-live-text">LIVE</span></small></span></button><button data-view="wallet"><span>₹</span><span class="nav-label" data-i18n-key="bottomWallet">Wallet</span></button><button data-view="profile"><span>●</span><span class="nav-label" data-i18n-key="bottomProfile">Profile</span></button></nav>
+  <nav class="bottom"><button class="active" data-view="home"><span>⌂</span><span class="nav-label" data-i18n-key="bottomHome">Home</span></button><button data-view="wallet"><span>₹</span><span class="nav-label" data-i18n-key="bottomWallet">Wallet</span></button><button data-view="profile"><span>●</span><span class="nav-label" data-i18n-key="bottomProfile">Profile</span></button></nav>
   <script src="/i18n.js"></script>
   <script>
     fetch('/api/site-branding', { cache: 'no-store' })
@@ -147,84 +140,12 @@
     const storedUser=(()=>{try{return JSON.parse(localStorage.getItem('user')||'null')}catch{return null}})();
     let player=null, game='LUDO', battlesPollTimer, kycApproved=false;
 
-    let appInstallPrompt = null;
-    window.addEventListener('beforeinstallprompt', event => {
-      event.preventDefault();
-      appInstallPrompt = event;
-    });
-
-    const appPromo = document.getElementById('appPromo');
-    let appPromoTimer;
-    try {
-      if (token && sessionStorage.getItem('showAppPromoAfterLogin') === 'yes' && window.matchMedia('(max-width: 700px)').matches) {
-        sessionStorage.removeItem('showAppPromoAfterLogin');
-        appPromo.hidden = false;
-        appPromoTimer = setTimeout(() => { appPromo.hidden = true; }, 15000);
-      }
-    } catch {}
-
-    document.getElementById('closeAppPromo').addEventListener('click', () => {
-      clearTimeout(appPromoTimer);
-      appPromo.hidden = true;
-    });
-    async function promptAppInstall() {
-      if (!window.isSecureContext) {
-        alert('App install ke liye website HTTPS par khuli honi chahiye.');
-        return;
-      }
-      if (window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true) {
-        alert('KhiladiAdda24 app pehle se installed hai.');
-        return;
-      }
-      if (!appInstallPrompt) {
-        const isAppleMobile = /iphone|ipad|ipod/i.test(navigator.userAgent);
-        alert(isAppleMobile
-          ? 'Safari ke Share button par tap karke “Add to Home Screen” chunein.'
-          : 'Chrome ke menu (⋮) se “Install app” ya “Add to Home screen” chunein.');
-        return;
-      }
-      appInstallPrompt.prompt();
-      await appInstallPrompt.userChoice;
-      appInstallPrompt = null;
-    }
-    window.addEventListener('appinstalled', () => { appInstallPrompt = null; });
-    async function shareWebsiteLink() {
-      const appUrl = `${location.origin}/index.html`;
-      try {
-        if (navigator.share) {
-          await navigator.share({ title: 'KhiladiAdda24', text: 'KhiladiAdda24 website dekhein', url: appUrl });
-          return;
-        }
-        if (navigator.clipboard?.writeText) {
-          await navigator.clipboard.writeText(appUrl);
-        } else {
-          const field = document.createElement('textarea');
-          field.value = appUrl;
-          field.setAttribute('readonly', '');
-          field.style.position = 'fixed';
-          field.style.opacity = '0';
-          document.body.append(field);
-          field.select();
-          const copied = document.execCommand('copy');
-          field.remove();
-          if (!copied) throw new Error('Copy unavailable');
-        }
-        alert('Website link copy ho gaya. Ab share karein.');
-      } catch (error) {
-        if (error.name !== 'AbortError') alert(`Website link: ${appUrl}`);
-      }
-    }
-    document.getElementById('installAppButton').addEventListener('click', promptAppInstall);
-    document.getElementById('shareAppButton').addEventListener('click', shareWebsiteLink);
-
     if ('serviceWorker' in navigator) navigator.serviceWorker.register('/service-worker.js').catch(() => {});
     fetch('/api/site-branding').then(response=>response.ok?response.json():null).then(branding=>{
       if(!branding)return;
       const assets=[
         ['link[rel="icon"]',branding.appIcon192Url,'href'],
-        ['.battle-banner',branding.homeBannerUrl],
-        ['[data-launch-game="LUDO"] img',branding.ludoBannerUrl],
-        ['[data-launch-game="SNAKE"] img',branding.snakeBannerUrl]
+        ['.battle-banner',branding.homeBannerUrl]
       ];
       assets.forEach(([selector,url,attribute='src'])=>{
         const element=document.querySelector(selector);
@@ -240,20 +161,6 @@
     if(matchSocket)matchSocket.on('wallet_updated',update=>{const userId=String(player?._id||storedUser?.id||'');if(userId&&String(update?.userId)===userId)loadWalletSummary().catch(()=>{})});
     window.matchSocket=matchSocket;
     const el=id=>document.getElementById(id);
-    const gamePicker=el('gamePicker'),gameBattleView=el('gameBattleView'),homeView=el('view-home');
-    homeView.append(gamePicker,gameBattleView);
-    el('view-games').remove();
-    document.querySelectorAll('[data-view="games"]').forEach(button=>button.remove());
-    el('backToGames').textContent='← Home';
-    const topInstallButton=document.createElement('button');
-    topInstallButton.id='topInstallAppButton';
-    topInstallButton.className='icon top-install';
-    topInstallButton.type='button';
-    topInstallButton.textContent='↓';
-    topInstallButton.title='Install app';
-    topInstallButton.setAttribute('aria-label','Install app');
-    el('headerBalance').before(topInstallButton);
-    topInstallButton.addEventListener('click',promptAppInstall);
     const esc=value=>String(value??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
     const loginUrl=()=>`/login.html?next=${encodeURIComponent(location.pathname+location.search+location.hash)}`;
     if(!token||!storedUser)location.replace(loginUrl());
@@ -262,7 +169,7 @@
     async function api(url,options={}){const headers=new Headers(options.headers||{});headers.set('Authorization',`Bearer ${token}`);if(options.body&&!(options.body instanceof FormData))headers.set('Content-Type','application/json');const response=await fetch(url,{...options,headers});const data=await response.json().catch(()=>({}));if(response.status===401){localStorage.removeItem('token');localStorage.removeItem('user');location.replace(loginUrl());throw new Error('Session expire hua. Dobara login karein.')}if(!response.ok)throw new Error(data.error||'Request complete nahi hui.');return data}
     window.pendingEntryAmount=100;
     const showError=error=>{const message=error.message||'Kuch problem hui.';if(/balance|insufficient|recharge/i.test(message)){const required=Number(window.pendingEntryAmount)||100,balance=Number(player?.walletBalance??storedUser?.walletBalance??0),depositAmount=Math.max(100,required-balance);el('depositAmount').value=String(depositAmount);notify(`₹${required} entry ke liye balance kam hai. ₹${depositAmount} deposit karein.`,true);document.querySelector('.bottom [data-view="wallet"]')?.click();return}notify(message,true)};
-    function setView(name){const viewName=name==='battles'||name==='games'?'home':name;document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===`view-${viewName}`));document.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===viewName));el('menu').classList.remove('open');el('menuToggle').setAttribute('aria-expanded','false');clearInterval(battlesPollTimer);if(viewName==='wallet'||viewName==='profile')loadKyc().catch(showError);if(viewName==='home'){loadOpen().catch(showError);loadMine().catch(showError);battlesPollTimer=setInterval(()=>{if(el('view-home').classList.contains('active'))loadOpen().catch(showError)},5000)}if(viewName==='games'&&!el('gameBattleView').hidden){loadOpen().catch(showError);battlesPollTimer=setInterval(()=>{if(el('view-games').classList.contains('active')&&!el('gameBattleView').hidden)loadOpen().catch(showError)},5000)}if(viewName==='history')loadHistory().catch(showError)}
+    function setView(name){const viewName=name==='battles'||name==='games'?'home':name;document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===`view-${viewName}`));document.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===viewName));el('menu').classList.remove('open');el('menuToggle').setAttribute('aria-expanded','false');clearInterval(battlesPollTimer);if(viewName==='wallet'||viewName==='profile')loadKyc().catch(showError);if(viewName==='home'){loadOpen().catch(showError);loadMine().catch(showError);battlesPollTimer=setInterval(()=>{if(el('view-home').classList.contains('active'))loadOpen().catch(showError)},5000)}if(viewName==='history')loadHistory().catch(showError)}
     function renderPlayer(){const name=player?.username||storedUser?.username||'Player',phone=player?.phone||storedUser?.phone||'',balance=Number(player?.walletBalance||0),formatted=`₹ ${balance.toLocaleString('en-IN')}`;['headerBalance','walletBalance','profileBalance'].forEach(id=>el(id).textContent=formatted);el('profileName').textContent=name;el('profilePhone').textContent=phone;el('accountPhone').textContent=phone;el('profileReferralCode').textContent=player?.referralCode||'--';el('username').value=name;const image=player?.profileImage;el('avatar').src=image?(image.startsWith('uploads/')?`/api/profile/image/${encodeURIComponent(image.split('/').pop())}`:`/${image.split('/').map(encodeURIComponent).join('/')}`):'';el('avatar').onerror=()=>el('avatar').removeAttribute('src')}
     async function loadProfile(){const data=await api('/api/profile/me');player=data.user;renderPlayer()}
     async function loadWalletSummary(){const data=await api('/api/wallet/summary'),format=value=>`₹ ${Number(value||0).toLocaleString('en-IN')}`;el('profileTotalDeposits').textContent=format(data.totalDeposits);el('profilePaidWithdrawals').textContent=format(data.paidWithdrawals);el('profilePendingWithdrawals').textContent=format(data.pendingWithdrawals);el('profileTotalWinnings').textContent=format(data.totalWinnings);const withdrawableWinnings=el('withdrawableWinnings');if(withdrawableWinnings)withdrawableWinnings.textContent=`Withdrawable game winnings: ${format(data.availableWinnings)}. Deposits and bonuses cannot be withdrawn.`;el('profileMoneyUpdated').textContent=`Updated ${new Date().toLocaleTimeString('en-IN')}`}
@@ -352,13 +259,13 @@
     function historyRowMarkup(item){const at=new Date(item.at),time=Number.isNaN(at.getTime())?'Time unavailable':at.toLocaleString('en-IN',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});const statusLabels={PENDING:'Pending',APPROVED:'Approved',REJECTED:'Rejected',PAID:'Paid',OPEN:'Waiting for player',RUNNING:'In progress',PENDING_RESULT:'Result under review',PENDING_CANCELLATION:'Cancellation review',COMPLETED:'Completed',CANCELLED:'Cancelled'};let title='',status=statusLabels[item.status]||item.status,value=`₹${Number(item.amount||0).toLocaleString('en-IN')}`,kind='';if(item.type==='DEPOSIT'){title='Deposit';kind='↓';if(item.status==='APPROVED'){value=`+${value}`;status='Credited'}}else if(item.type==='WITHDRAWAL'){title='Withdrawal';kind='↑';if(['PENDING','PAID'].includes(item.status)){value=`-${value}`;kind='↑'}if(item.status==='PAID')status='Paid'}else{const gameName=item.gameType==='SNAKE'?'Snake Battle':'Ludo';title=item.result?`${gameName} · ${item.result==='WIN'?'Win':'Loss'}`:`${gameName} · ${status}`;kind=item.gameType==='SNAKE'?'S':'L';if(item.status==='PENDING_RESULT'&&item.result)status='Result under review';if(item.status==='COMPLETED'&&item.result==='WIN'){value=`+₹${(Number(item.amount||0)*1.8).toLocaleString('en-IN')}`;status='Won';kind='+'}else if(item.status==='COMPLETED'&&item.result==='LOSS'){value=`-₹${Number(item.amount||0).toLocaleString('en-IN')}`;status='Lost';kind='−'}else value=`Entry ₹${Number(item.amount||0).toLocaleString('en-IN')}`}const valueClass=item.type==='DEPOSIT'&&item.status==='APPROVED'||item.type==='GAME'&&item.status==='COMPLETED'&&item.result==='WIN'?'credit':item.type==='WITHDRAWAL'&&item.status!=='REJECTED'||item.type==='GAME'&&item.status==='COMPLETED'&&item.result==='LOSS'?'debit':'';return `<div class="history-row"><div class="history-entry-main"><span class="history-mark" aria-hidden="true">${esc(kind)}</span><span class="history-copy"><strong class="history-title">${esc(title)}</strong><small class="history-meta">${esc(status)} · ${esc(time)}</small></span></div><div class="history-entry-side"><strong class="history-value ${valueClass}">${esc(value)}</strong></div></div>`}
     async function loadHistory(){const data=await api('/api/wallet/history'),items=data.history||[];el('matchHistory').innerHTML=items.length?items.map(historyRowMarkup).join(''):'<p class="muted">Abhi koi history nahi hai.</p>'}
     async function refresh(){await Promise.all([loadProfile(),loadKyc(),loadMine(),loadWalletSummary()]);if(el('view-home').classList.contains('active'))await loadOpen();}
-    document.addEventListener('click',async event=>{const action=event.target.closest('[data-menu-action]');if(action){el('menu').classList.remove('open');if(action.dataset.menuAction==='referral'){await shareWebsiteLink();return}notify('Abhi koi nayi notification nahi hai.');return}const view=event.target.closest('[data-view]');if(view){event.preventDefault();return setView(view.dataset.view)}const filter=event.target.closest('[data-game]');if(filter){game=filter.dataset.game;document.querySelectorAll('.game-filter').forEach(b=>b.classList.toggle('active',b===filter));return loadOpen().catch(showError)}const join=event.target.closest('[data-join]');if(join){join.disabled=true;try{const data=await api('/api/matches/join',{method:'POST',body:JSON.stringify({matchId:join.dataset.join})});window.openMatchPage(data.match._id,'wait')}catch(error){notify(error.message||'Battle join nahi ho saki.',true);join.disabled=false}return}const detail=event.target.closest('[data-match]');if(detail)window.openMatchPage(detail.dataset.match,'details')});
+    document.addEventListener('click',async event=>{const action=event.target.closest('[data-menu-action]');if(action){el('menu').classList.remove('open');if(action.dataset.menuAction==='referral'){return notify('Referral link abhi unavailable hai.')}notify('Abhi koi nayi notification nahi hai.');return}const view=event.target.closest('[data-view]');if(view){event.preventDefault();return setView(view.dataset.view)}const filter=event.target.closest('[data-game]');if(filter){game=filter.dataset.game;document.querySelectorAll('.game-filter').forEach(b=>b.classList.toggle('active',b===filter));return loadOpen().catch(showError)}const join=event.target.closest('[data-join]');if(join){join.disabled=true;try{const data=await api('/api/matches/join',{method:'POST',body:JSON.stringify({matchId:join.dataset.join})});window.openMatchPage(data.match._id,'wait')}catch(error){notify(error.message||'Battle join nahi ho saki.',true);join.disabled=false}return}const detail=event.target.closest('[data-match]');if(detail)window.openMatchPage(detail.dataset.match,'details')});
     document.addEventListener('click',async event=>{const cancel=event.target.closest('[data-cancel-match]');if(!cancel)return;cancel.disabled=true;try{const matchId=cancel.dataset.cancelMatch,result=await api('/api/matches/cancel',{method:'POST',body:JSON.stringify({matchId})});notify(result.message);await refresh();window.openMatchPage(matchId,'details')}catch(error){showError(error);cancel.disabled=false}});
     document.addEventListener('click',async event=>{const start=event.target.closest('[data-running-start]');if(!start)return;start.disabled=true;try{await api('/api/matches/start-setup',{method:'POST',body:JSON.stringify({matchId:start.dataset.runningStart})});await loadOpen()}catch(error){showError(error);start.disabled=false}});
     document.addEventListener('click',async event=>{const copy=event.target.closest('[data-running-copy]');if(!copy)return;const code=copy.dataset.roomCode;let copied=false;try{if(navigator.clipboard?.writeText){await navigator.clipboard.writeText(code);copied=true}}catch{}if(!copied){const field=document.createElement('textarea');field.value=code;field.setAttribute('readonly','');field.style.position='fixed';field.style.opacity='0';document.body.append(field);field.select();copied=document.execCommand('copy');field.remove()}notify(copied?'Room code copy ho gaya.':`Room code: ${code}`,!copied)});
     document.addEventListener('submit',async event=>{const form=event.target.closest('[data-running-room-share]');if(!form)return;event.preventDefault();const code=form.querySelector('[data-running-room-code]').value.trim(),matchId=form.dataset.runningRoomShare;if(!/^[0-9]{4,8}$/.test(code))return notify('4-8 digit room code enter karein.',true);try{await api('/api/matches/set-room-code',{method:'POST',body:JSON.stringify({matchId,roomCode:code})});notify('Room code share ho gaya.');document.activeElement.blur();await loadOpen()}catch(error){notify(error.message,true)}});
     document.addEventListener('click',async event=>{const cancel=event.target.closest('[data-running-cancel]');if(!cancel)return;const roomCodeShared=cancel.dataset.roomCodeShared==='1',matchId=cancel.dataset.runningCancel,body={matchId};if(roomCodeShared){const reasons=[['1','Galat room code','WRONG_ROOM_CODE'],['2','Opponent respond nahi kar raha','OPPONENT_NOT_RESPONDING'],['3','Technical issue','TECHNICAL_ISSUE'],['4','Other','OTHER']],choice=prompt(`Cancel reason chunein:\n${reasons.map(([number,label])=>`${number}. ${label}`).join('\n')}`);if(choice===null)return;const reason=reasons.find(([number])=>number===choice.trim());if(!reason)return notify('Cancel reason list se number select karein.',true);body.reason=reason[2]}cancel.disabled=true;try{const result=await api('/api/matches/cancel',{method:'POST',body:JSON.stringify(body)});notify(result.message);await refresh();window.openMatchPage(matchId,'details')}catch(error){showError(error);cancel.disabled=false}});
-    el('gameType').addEventListener('change',()=>{syncGameSelection(el('gameType').value);loadOpen().catch(showError)});document.querySelectorAll('.game-filter').forEach(button=>button.addEventListener('click',()=>syncGameSelection(button.dataset.game)));document.querySelectorAll('[data-launch-game]').forEach(button=>button.addEventListener('click',()=>{syncGameSelection(button.dataset.launchGame);el('gamePicker').hidden=true;el('gameBattleView').hidden=false;setView('games')}));el('backToGames').addEventListener('click',()=>{el('gameBattleView').hidden=true;el('gamePicker').hidden=false;setView('games')});el('gameRefreshOpen').addEventListener('click',()=>location.reload());
+    el('gameType').addEventListener('change',()=>{syncGameSelection(el('gameType').value);loadOpen().catch(showError)});document.querySelectorAll('.game-filter').forEach(button=>button.addEventListener('click',()=>syncGameSelection(button.dataset.game)));
     el('menuToggle').addEventListener('click',()=>{el('menu').classList.toggle('open');el('menuToggle').setAttribute('aria-expanded',el('menu').classList.contains('open'))});el('refreshHistory').addEventListener('click',()=>location.reload());
     el('copyReferral').addEventListener('click',async()=>{const code=player?.referralCode;if(!code)return notify('Referral ID abhi load nahi hui.',true);try{await navigator.clipboard.writeText(code);notify('Referral ID copy ho gayi.')}catch{notify(`Aapki Referral ID: ${code}`)}});
     function logout(){localStorage.removeItem('token');localStorage.removeItem('user');location.replace('/login.html')}el('logout').addEventListener('click',logout);el('logoutProfile').addEventListener('click',logout);el('refreshMatches')?.addEventListener('click',()=>location.reload());el('refreshOpen').addEventListener('click',()=>location.reload());
