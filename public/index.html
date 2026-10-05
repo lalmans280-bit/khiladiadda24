@@ -573,7 +573,9 @@
     const openBattlesPanel=el('openMatches').closest('.panel');
     openBattlesPanel.classList.add('home-open-battles-panel');
     const allRunningBattlesPanel=el('runningMatches').closest('.panel');
-    allRunningBattlesPanel.classList.add('home-running-battles-panel');
+    allRunningBattlesPanel.before(el('runningMatches'));
+    allRunningBattlesPanel.after(gameSamplePanel);
+    allRunningBattlesPanel.remove();
     homeView.insertBefore(myRunningBattlesPanel,openBattlesPanel);
     const themeButton=document.createElement('button');
     themeButton.id='themeToggle';
