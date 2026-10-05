@@ -898,7 +898,7 @@
               ? `91${phoneDigits}`
               : '';
         const phoneCell = whatsappPhone
-          ? `<a href="https://wa.me/${whatsappPhone}" target="_blank" rel="noopener noreferrer">${escapeHtml(u.phone)}</a>`
+          ? `<a href="https://api.whatsapp.com/send?phone=${whatsappPhone}" target="_blank" rel="noopener noreferrer">${escapeHtml(u.phone)}</a>`
           : escapeHtml(u.phone);
         table.innerHTML += `<tr><td>${index + 1}</td><td><button type="button" class="player-name-link" onclick="openPlayerHistory('${u._id}')">${escapeHtml(u.username)}</button></td><td>${phoneCell}</td><td>₹${Number(u.walletBalance || 0).toLocaleString('en-IN')}</td><td>${new Date(u.createdAt).toLocaleString()}</td><td>${blocked ? 'Blocked' : 'Active'}</td><td>${adminLabel}</td><td><button class="secondary" onclick="openPlayerEditor('${u._id}')">Edit profile</button> <button class="${blocked ? 'unblock-button' : 'block-button'}" onclick="setPlayerBlocked('${u._id}', ${!blocked})">${blocked ? 'Unblock' : 'Block'}</button> ${adminAction}</td></tr>`;
       });
