@@ -18,137 +18,6 @@
     :root{color-scheme:dark;--ink:#f2f5ef;--muted:#a8b2b0;--panel:#18232b;--line:#33423f;--gold:#f4c84b;--green:#71d6a1;--red:#f07b72}
     *{box-sizing:border-box}body{margin:0;min-height:100vh;color:var(--ink);font:15px/1.5 "Trebuchet MS",Verdana,sans-serif;background:radial-gradient(ellipse at 90% 0,#283f35 0,transparent 38%),linear-gradient(145deg,#101720,#111d25 60%,#182923)}button,input,select{font:inherit}button{cursor:pointer}button:disabled{opacity:.55;cursor:wait}a{color:inherit;text-decoration:none}.shell{max-width:1120px;margin:auto;padding:0 18px 90px}.topbar{position:sticky;top:0;z-index:5;background:#101720ed;border-bottom:1px solid var(--line);backdrop-filter:blur(14px)}.top-inner{max-width:1120px;margin:auto;min-height:68px;padding:10px 18px;display:flex;align-items:center;justify-content:space-between;gap:14px}.brand{font-size:22px;font-weight:900;color:var(--gold);line-height:1}.brand-content{display:flex;flex-direction:column;align-items:flex-start;gap:3px}.brand-name{font-size:22px;line-height:1.05}.brand-main{display:flex;align-items:baseline;gap:6px;flex-wrap:wrap;font-size:9px}.brand-main span{display:inline-block}.brand-win{color:#ffde7a}.brand small{display:block;margin-top:0;color:#b0c6bd;font-size:9px;letter-spacing:2px}.brand .brand-tagline{display:inline-block;margin-top:0;color:#e9f1e8;font-size:9px;letter-spacing:1.2px;font-weight:900;text-transform:uppercase;line-height:1.1}.top-actions{display:flex;align-items:center;gap:10px}.lang-toggle{display:flex;align-items:center;gap:4px;padding:4px;border:1px solid var(--line);border-radius:999px;background:#1b282e}.lang-btn{min-width:36px;padding:6px 8px;border:0;border-radius:999px;background:transparent;color:var(--ink);font-size:11px;font-weight:800;cursor:pointer}.lang-btn.active{background:var(--gold);color:#172018}.balance{padding:8px 13px;border:1px solid #69744c;border-radius:999px;color:#f8dc83;background:#222b27;font-weight:800;white-space:nowrap}.icon{width:42px;height:42px;border:1px solid var(--line);border-radius:10px;color:var(--ink);background:#1b282e;font-size:21px}.menu{display:none;position:absolute;right:18px;top:62px;width:220px;padding:8px;background:#172329;border:1px solid var(--line);border-radius:10px;box-shadow:0 15px 36px #0008}.menu.open{display:grid}.menu button{padding:11px;border:0;border-radius:7px;text-align:left;color:var(--ink);background:transparent}.menu button:hover{background:#273831}.nav{max-width:1120px;margin:auto;padding:0 18px 10px;display:flex;gap:7px;overflow:auto}.nav button{padding:8px 13px;border:1px solid transparent;border-radius:8px;color:#c4cfca;background:transparent;white-space:nowrap}.nav button.active,.nav button:hover{border-color:#69744c;color:var(--gold);background:#222b27}.content{padding-top:20px}.view{display:none}.view.active{display:block}.hero{padding:26px clamp(20px,5vw,46px);border:1px solid #566849;border-radius:14px;background:linear-gradient(115deg,#273b31,#273546 65%,#3b3b28)}.hero h1{max-width:650px;margin:0 0 10px;color:#ffda68;font-size:clamp(27px,5vw,38px);line-height:1.15}.hero p{max-width:650px;margin:0 0 15px;color:#d2ddd5}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin:16px 0}.stat,.panel,.match{min-width:0;border:1px solid var(--line);border-radius:10px;background:#18232b}.stat{padding:16px}.stat small,.muted{color:var(--muted)}.stat strong{display:block;margin-top:5px;color:#f5d46b;font-size:23px;overflow-wrap:anywhere}.panel{padding:18px;margin-top:15px}.panel h2,.panel h3{margin:0 0 10px}.panel p{margin:6px 0}.row{display:flex;align-items:center;gap:9px;flex-wrap:wrap}.btn{min-height:40px;padding:9px 14px;border:1px solid #e3b842;border-radius:8px;background:var(--gold);color:#222718;font-weight:800}.btn.secondary{border-color:#52656a;background:#293842;color:#e9f2ed}.btn.green{border-color:var(--green);background:var(--green);color:#13261b}.btn.danger{border-color:#8b4943;background:#4c2828;color:#ffe0dc}.btn.small{min-height:34px;padding:6px 10px;font-size:13px}.field{margin:11px 0}.field label{display:block;margin-bottom:5px;color:#cad4ce;font-size:13px}.field input,.field select{width:100%;min-height:43px;padding:10px 12px;border:1px solid #40524f;border-radius:8px;outline:0;color:var(--ink);background:#101920}.field input:focus,.field select:focus{border-color:var(--gold)}.field input[type=file]{padding:8px}.two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.match{padding:14px;margin-top:10px}.match-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}.match h3{margin:7px 0 2px}.amount{color:var(--gold);font-size:20px;font-weight:900;white-space:nowrap}.status{display:inline-flex;padding:4px 9px;border-radius:6px;background:#25382f;color:#a9edc5;font-size:12px;font-weight:800}.status.pending{background:#3e3723;color:#ffdb78}.notice{margin:12px 0;padding:11px 13px;border:1px solid #466a5a;border-radius:8px;color:#c6f5d8;background:#1c342d}.notice.error{border-color:#784743;color:#ffd1cc;background:#392625}.notice.warning{border-color:#66572b;color:#f5dfa0;background:#282517}.qr{display:block;width:min(230px,100%);margin:12px 0;padding:9px;border-radius:8px;background:#fff}.person{display:flex;align-items:center;gap:12px;margin:12px 0}.avatar{width:68px;height:68px;border:2px solid #c4aa4c;border-radius:50%;object-fit:cover;background:#273832}.bottom{display:none}[hidden]{display:none!important}
     @media(max-width:600px){.shell{padding:0 12px 84px}.top-inner{padding:9px 12px}.brand{font-size:19px}.balance{padding:7px 9px;font-size:12px}.nav{display:none}.two{grid-template-columns:1fr}.panel{padding:15px}.match-head{flex-direction:column}.match-head>div:last-child{display:flex;align-items:center;gap:10px}.bottom{position:fixed;z-index:4;right:0;bottom:0;left:0;display:grid;grid-template-columns:repeat(4,1fr);padding-bottom:env(safe-area-inset-bottom);border-top:1px solid var(--line);background:#101720f5}.bottom button{padding:8px 3px 10px;border:0;color:#c0cbc4;background:transparent;font-size:11px}.bottom button span{display:block;color:var(--gold);font-size:18px}}
-  .match-head.home-open-header{display:grid;grid-template-columns:minmax(0,1fr) 68px 68px;align-items:center;gap:8px;margin-bottom:8px}.match-head.home-open-header>h2{display:inline-flex;align-items:center;justify-content:flex-start;min-height:32px;margin:0;padding:0;border:0;border-radius:0;background:transparent;color:var(--gold);font-size:12px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;line-height:1.2;white-space:nowrap;justify-self:start}.home-open-header .lang-toggle{display:flex;align-items:center;justify-self:center;width:68px;height:32px;gap:0;padding:2px;border-radius:7px}.home-open-header .lang-btn{flex:1;min-width:0;height:26px;padding:3px 2px;border-radius:5px;font-size:10px}.match-head.home-open-header>.btn.secondary.small{width:68px;min-height:32px;padding:6px 4px;font-size:11px;font-weight:800;justify-self:end}
-    .brand{display:flex;align-items:center;gap:9px}.top-inner>#menuToggle{flex:none}
-    .menu{width:250px;max-height:calc(100vh - 82px);overflow:auto}.menu button,.menu a{display:block;padding:11px;border:0;border-radius:7px;text-align:left;color:var(--ink);background:transparent}.menu a:hover,.menu button:hover{background:#273831}.menu .menu-logout{margin-top:5px;border-top:1px solid var(--line);border-radius:0 0 7px 7px;color:var(--red)}
-    .battle-card-game-tag{display:inline-flex;align-items:center;justify-content:center;gap:5px;padding:0;margin:0;color:var(--gold);font-size:8px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap}
-    .battle-player .battle-player-info{display:flex;align-items:center;gap:6px;flex-wrap:wrap}.battle-player-game-tag{display:inline-flex;align-items:center;justify-content:center;margin-left:6px;padding:2px 5px;border-radius:999px;background:rgba(255,189,89,.12);border:1px solid rgba(255,189,89,.25);color:var(--gold);font-size:7px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap}
-    .open-battle-group{display:grid;gap:8px;margin:8px 0 12px}.open-battle-group-label{display:flex;align-items:center;justify-content:center;padding:2px 0 4px;color:var(--gold);font-size:11px;font-weight:900;letter-spacing:.12em;text-transform:uppercase}
-      .cash-banner{display:flex;align-items:center;gap:10px;margin-bottom:14px;padding:12px 15px;border:1px solid #69744c;border-radius:10px;background:#222b27;color:#f8dc83;font-weight:800}.game-launch{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-bottom:18px}.game-tile{display:flex;align-items:center;gap:13px;min-height:88px;padding:15px;border:1px solid var(--line);border-radius:12px;text-align:left;color:var(--ink);background:#18232b}.game-tile:hover{border-color:var(--gold);background:#222b27}.game-mark{display:grid;place-items:center;width:52px;height:52px;flex:none;border-radius:10px;background:#304336;font-size:30px}.game-tile strong{display:block;color:var(--gold);font-size:17px}.game-tile small{display:block;color:var(--muted)}.timer{font-size:24px;font-weight:900;color:var(--gold)}.confirm-state{display:flex;flex-wrap:wrap;gap:8px}.confirm-state span{padding:6px 10px;border:1px solid var(--line);border-radius:8px}.confirm-state .ready{border-color:var(--green);color:var(--green)}
-      @media(max-width:600px){.game-launch{grid-template-columns:1fr}.game-tile{min-height:76px}}
-    .nav{display:none!important}.bottom{position:fixed;z-index:6;right:auto;bottom:0;left:50%;display:grid;width:min(100%,520px);grid-template-columns:repeat(4,minmax(0,1fr));margin:0;padding:8px 10px max(8px,env(safe-area-inset-bottom));transform:translateX(-50%);border:1px solid var(--line);border-bottom:0;border-radius:12px 12px 0 0;background:#101720f5;backdrop-filter:blur(14px)}.bottom button{display:grid;place-items:center;gap:2px;min-height:54px;padding:5px;border:0;color:#c0cbc4;background:transparent;font-size:12px}.bottom button span{display:block;color:var(--gold);font-size:18px}.bottom button.active{color:var(--gold)}
-    .trust-ticker{overflow:hidden;margin:0 0 14px;padding:9px 0;border:1px solid var(--line);border-radius:8px;color:#d9e6dd;background:#18232b}.trust-ticker-track{display:flex;width:max-content;animation:trust-ticker 32s linear infinite}.trust-ticker span{padding-right:48px;white-space:nowrap}.trust-ticker:hover .trust-ticker-track{animation-play-state:paused}@keyframes trust-ticker{to{transform:translateX(-50%)}}@media(prefers-reduced-motion:reduce){.trust-ticker-track{width:auto;animation:none}.trust-ticker span[aria-hidden="true"]{display:none}}
-    .app-promo{display:flex;align-items:center;justify-content:center;gap:9px;padding:10px 12px;background:#132d20;color:#f2f5ef;border-bottom:1px solid #355b3e}.app-promo[hidden]{display:none}.app-promo-copy{font-size:13px;font-weight:700}.app-promo button{min-height:36px;padding:7px 12px;border:1px solid #6eaf79;border-radius:7px;color:#fff;background:#287442;font-weight:800}.app-promo .app-promo-share{border-color:#64776a;background:#24332a}.app-promo-close{width:34px;padding:4px!important;font-size:20px;line-height:1}.app-promo button:focus-visible{outline:2px solid #f7d978;outline-offset:2px}@media(max-width:600px){.app-promo{gap:7px;padding:9px 8px}.app-promo-copy{font-size:12px}.app-promo button{padding:7px 9px;font-size:12px}}@media(prefers-reduced-motion:reduce){.app-promo{scroll-behavior:auto}}
-  </style>
-  <style>
-    .battle-card{margin:4px 0;padding:6px 8px;overflow:hidden}
-    .sample-running-panel{margin-top:12px}
-    .sample-running-panel h2{margin:0 0 4px;font-size:16px;font-weight:900}
-    .sample-running-notice{margin:0 0 10px;color:var(--ink);font-size:12px;font-weight:900}
-    .sample-running-list{display:grid;gap:6px}
-    .demo-battles-header{display:flex;align-items:center;gap:6px;margin:5px 0 2px;font-size:16px;font-weight:900;line-height:1.2}
-    .demo-battles-list{display:grid;gap:6px}
-    .demo-battle-card{margin:0 0 1px;padding:6px 8px}
-    .sample-running-battle{display:grid;gap:6px;margin:0;padding:7px 9px}
-    .sample-running-battle .battle-prizes{margin-bottom:0}
-    .entry-amount-control{position:relative}
-    .entry-amount-control input{padding-right:74px!important}
-    .entry-amount-control .btn{position:absolute;top:50%;right:5px;min-height:32px;padding:4px 10px;transform:translateY(-50%)}
-    .entry-amount-control .btn[aria-pressed="true"]{border-color:var(--green);color:var(--green)}
-    .battle-card-top{display:flex;align-items:center;justify-content:space-between;gap:6px}
-    .live-match-status{display:inline-flex;align-items:center;gap:6px;color:#ef6666!important}
-    .live-match-status::before{content:"";width:7px;height:7px;flex:none;border-radius:50%;background:#ef4444;box-shadow:0 0 7px #ef444477;animation:live-dot-pulse 1.5s ease-in-out infinite}
-    .profile-account-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:start;gap:14px}
-    .profile-account-row>.panel{min-width:0;margin:0}
-    #profileMoneySummary .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-    @media(max-width:700px){.profile-account-row{grid-template-columns:minmax(0,1fr)}}
-    .battle-card-game{background:linear-gradient(90deg,#00a7d8,#35a85b,#e2a51b,#e35b48);background-clip:text;-webkit-background-clip:text;color:transparent;font-size:12px;font-weight:800}
-    .battle-players{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:2px;margin:4px 0}
-    .battle-players-waiting{grid-template-columns:minmax(0,1fr)}
-    .battle-player{display:flex;align-items:center;justify-content:space-between;gap:3px;min-width:0;text-align:left}
-    .battle-player-main{display:flex;align-items:center;gap:4px;min-width:0}
-    .battle-player-opponent{justify-content:flex-end}
-    .battle-avatar{display:grid;place-items:center;width:22px;height:22px;flex:none;margin:0;border:1px solid #567363;border-radius:50%;color:#eff8ef;background:linear-gradient(145deg,#344f43,#1a282d);font-size:10px;font-weight:900;object-fit:cover}
-    .battle-player-info{display:grid;min-width:0;line-height:1.1}
-    .battle-player-opponent .battle-avatar{border-color:#765953;background:linear-gradient(145deg,#66403c,#29252b)}
-    .battle-player-name{display:block;overflow-wrap:anywhere;font-weight:900;font-size:10px;line-height:1.2}
-    .battle-player-role{display:block;color:var(--muted);font-size:7px;line-height:1.1}
-    .battle-player-amount{display:inline-flex;align-items:center;justify-content:center;gap:2px;min-width:46px;padding:2px 4px;border-radius:999px;background:rgba(247,217,120,.1);border:1px solid rgba(247,217,120,.2);color:var(--gold);font-size:10px;font-weight:800;line-height:1.2;white-space:nowrap}
-    .battle-versus{padding:0 1px;color:transparent;background:linear-gradient(110deg,#ff746c 5%,#f5c84b 38%,#75dfa9 67%,#79a9ff 96%);background-clip:text;-webkit-background-clip:text;font-size:10px;font-weight:1000;line-height:1}
-    .battle-prizes{display:grid;grid-template-columns:58px minmax(0, 1fr) auto;align-items:center;gap:3px;margin:0 0 8px;padding:5px 5px;border:1px solid var(--line);border-radius:8px;background:#101920}.battle-prizes.open-battle-prizes{grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;min-height:82px;padding:10px 12px}.battle-prizes.open-battle-prizes .battle-prize-players{grid-column:1;border-left:0;min-width:0;display:flex;align-items:center;min-height:58px}.battle-prizes.open-battle-prizes .battle-card-actions{grid-column:2;grid-row:1;min-width:0;justify-self:end;align-self:center}.battle-prizes.open-battle-prizes .battle-player-main,.battle-prizes.open-battle-prizes .battle-player-info,.battle-prizes.open-battle-prizes .battle-player-name,.battle-prizes.open-battle-prizes .battle-player-amount{border:0;background:transparent;box-shadow:none}.battle-prizes.open-battle-prizes .battle-avatar{border-color:transparent;background:transparent}.battle-prizes.open-battle-prizes .battle-player-name{font-size:12px}.battle-prizes.open-battle-prizes .battle-player-amount{min-width:0;padding:0 2px;font-size:13px}.battle-prizes:not(.open-battle-prizes) .battle-player-amount{min-width:46px;padding:2px 4px;border:1px solid rgba(247,217,120,.2);background:rgba(247,217,120,.1);font-size:11px}
-#view-home > .home-open-battles-panel #openMatches,#view-home > .home-open-battles-panel #gameOpenMatches{display:grid;gap:8px}
-#view-home > .home-open-battles-panel .battle-card{margin:0;padding:0}
-#view-home > .home-open-battles-panel .battle-card,#view-home > .home-open-battles-panel .battle-prizes.open-battle-prizes{min-height:92px;box-sizing:border-box}
-    .battle-prize{min-width:0;padding:0 1px;text-align:left;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;line-height:1.1}
-    .battle-prize small{display:block;color:var(--muted);font-size:7px;letter-spacing:.04em;text-transform:uppercase}
-    .battle-prize strong{display:block;margin-top:2px;color:var(--gold);font-size:12px;font-weight:900;line-height:1.1;font-variant-numeric:tabular-nums}
-    .battle-prize-players{margin:0;padding:0;border-left:1px solid var(--line);display:flex;align-items:center;gap:4px;min-width:0;background:transparent}
-    .battle-prize-players .battle-players{margin:0;flex:1 1 auto;width:100%;min-width:0;gap:2px}
-    .battle-prize-players .battle-card-actions{margin-left:auto;justify-content:flex-end}
-    .battle-player-opponent .battle-player-info{text-align:right}
-    .battle-card-actions,.battle-room-actions{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap}
-    .battle-card-actions{justify-self:flex-end;min-width:72px;padding:0}
-    .battle-card-actions > *{max-width:100%}
-    .battle-card-actions .btn,.battle-card-actions button,.battle-card-actions a{min-height:28px;padding:5px 8px;white-space:nowrap;font-size:11px}
-    .battle-card-actions .row{justify-content:center}
-    .game-support-banner{display:block;grid-column:1/-1;width:min(100%,480px);aspect-ratio:1774/887;margin:4px auto 0;overflow:hidden;border:1px solid var(--line);border-radius:10px;background:#17231b}
-    .game-support-banner img{display:block;width:100%;height:100%;object-fit:cover}
-    .game-tile-image,.game-support-banner{position:relative}
-    .game-tile-image{display:block;width:min(100%,320px);justify-self:center;min-height:0;aspect-ratio:1774/887;padding:0;overflow:hidden}
-    .game-tile-image img{display:block;width:100%;height:100%;object-fit:cover}
-    .game-live-badge{position:absolute;bottom:8px;left:8px;z-index:1;display:inline-flex;align-items:center;gap:5px;padding:4px 7px;border:1px solid #ef444477;border-radius:999px;color:#ff7474;background:#111713ed;font:800 10px/1 Arial,sans-serif}
-    .game-live-dot{width:7px;height:7px;flex:none;border-radius:50%;background:#ef4444;box-shadow:0 0 7px #ef444477;animation:live-dot-pulse 1.5s ease-in-out infinite}
-    .game-live-text{animation:live-text-pulse 1.8s ease-in-out infinite}
-    .history-list{display:grid}
-    .history-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 2px;border-bottom:1px solid var(--line)}
-    .history-entry-main{display:flex;align-items:center;gap:10px;min-width:0}
-    .history-mark{display:grid;place-items:center;width:36px;height:36px;flex:none;border:1px solid var(--line);border-radius:50%;color:var(--gold);background:#182820;font-size:16px;font-weight:900}
-    .history-copy{display:grid;min-width:0}
-    .history-title{overflow-wrap:anywhere;font-size:14px;font-weight:800}
-    .history-meta{color:var(--muted);font-size:12px}
-    .history-entry-side{flex:none;text-align:right}
-    .history-value{display:block;font-size:14px;font-weight:900;font-variant-numeric:tabular-nums}
-    .history-value.credit{color:var(--green)}
-    .history-value.debit{color:var(--red)}
-    .battle-room-actions{margin-top:10px}
-    .battle-room-code-panel{display:grid;gap:6px;width:min(100%,480px)}
-    .battle-room-code-panel>.field{width:100%;min-width:0;margin:0}
-    .battle-room-code-box{display:grid;position:relative;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:4px;width:100%;min-width:0;padding:0 4px;border:1px solid var(--line);border-radius:8px;background:#141f1e;min-height:42px}
-    .battle-room-code-box.creator-room-code-box{grid-template-columns:minmax(0,1fr) auto}
-    .battle-room-code-box input{grid-column:1;justify-self:start;width:10ch;min-width:0;border:0;background:transparent;padding:8px 0;color:var(--ink);font-weight:800;letter-spacing:.04em;text-align:center;font-variant-numeric:tabular-nums}
-    .battle-room-code-box input:focus{outline:none}
-    .battle-room-code-box .btn{flex:none;min-height:28px;padding:5px 7px;font-size:11px}
-    .battle-room-code-label{grid-column:2;grid-row:1;display:inline-flex;align-items:center;justify-content:center;color:var(--muted);font-size:8px;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap}
-    .battle-room-code-box>.btn{grid-column:3;grid-row:1;justify-self:end}
-    .battle-room-code-buttons{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
-    .battle-inline-secondary-action{display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:nowrap;margin-top:6px}
-    .battle-inline-secondary-action .btn{min-height:26px;padding:5px 7px;font-size:10px;white-space:nowrap}
-    .theme-toggle{display:grid;place-items:center;flex:none;width:36px;height:36px;min-height:36px;margin:0;padding:0;border-radius:50%;font-size:17px;line-height:1}
-    .battle-banner-row{position:relative;width:100%;aspect-ratio:1983/793;margin-bottom:12px;overflow:hidden;border-radius:8px;background:#101713;cursor:pointer}
-    .battle-banner{display:block;width:100%;height:auto;max-height:none;object-fit:contain;border-radius:8px;background:#101713}
-    #view-home > .panel:first-child{padding:0;overflow:hidden;margin-top:0}
-    #view-home > .panel:first-child .battle-banner{margin:0;border-radius:10px 10px 0 0}
-    #view-home > .panel:first-child > .muted{margin:10px 10px 8px;padding:0}
-    #view-home > .panel:first-child #createForm{padding:0 10px 10px;margin:0}
-    #view-home > .panel:first-child #createForm .two{margin:0}
-    #view-home > .panel:first-child #createForm .field{margin:0}
-    #view-home > .panel:first-child #createForm button[type="submit"]{margin-top:10px}
-    .banner-live{position:absolute;top:9px;right:10px;z-index:1;display:flex;align-items:center;gap:7px;padding:4px 7px;border-radius:6px;color:#ef6666;background:#101713c9;font-size:12px;font-weight:800}
-    .banner-live-dot{width:8px;height:8px;flex:none;border-radius:50%;background:#ef4444;box-shadow:0 0 8px #ef444477;animation:live-dot-pulse 1.5s ease-in-out infinite}
-    .banner-live-text{animation:live-text-pulse 1.8s ease-in-out infinite}
-    #createForm .two{grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:10px}
-    .form-live-indicator{display:flex;align-items:center;gap:5px;white-space:nowrap;color:#ef6666;font-size:10px;font-weight:800}
-    .form-live-dot{width:7px;height:7px;flex:none;border-radius:50%;background:#ef4444;box-shadow:0 0 7px #ef444477;animation:live-dot-pulse 1.5s ease-in-out infinite}
-    .form-live-text{animation:live-text-pulse 1.8s ease-in-out infinite}
-    .bottom button .nav-label{display:inline-flex;align-items:center;gap:4px;color:inherit}
-    .bottom button .nav-live{display:inline-flex;align-items:center;gap:3px;color:#ef6666;font-size:8px;font-weight:800;line-height:1}
-    .bottom button .nav-live-dot{width:5px;height:5px;flex:none;border-radius:50%;background:#ef4444;animation:live-dot-pulse 1.5s ease-in-out infinite}
-    .bottom button .nav-live-text{animation:live-text-pulse 1.8s ease-in-out infinite}
-    @keyframes live-dot-pulse{50%{opacity:.4;transform:scale(.8)}}
-    @keyframes live-text-pulse{50%{opacity:.55}}
-    @media(max-width:600px){.battle-banner-row{margin-bottom:8px}.banner-live{top:6px;right:6px;padding:3px 6px;font-size:10px}#createForm .two{grid-template-columns:repeat(2,minmax(0,1fr));gap:0}.form-live-indicator{justify-self:center}}
-    @media(max-width:600px){#view-home>.home-open-battles-panel .match-head{flex-direction:row;align-items:center}#view-home>.home-open-battles-panel .match-head h2{margin:0}}
-    @media(prefers-reduced-motion:reduce){.banner-live-dot,.banner-live-text,.nav-live-dot,.nav-live-text,.form-live-dot,.form-live-text,.game-live-dot,.game-live-text{animation:none}}
-    .battle-room-actions .field{flex:1 1 150px;min-width:0;margin:0}
-    @media(max-width:600px){.battle-card{padding:6px 6px}.battle-players{gap:2px}.battle-avatar{width:22px;height:22px}.battle-player-name{font-size:9px}.battle-player-role{font-size:6px}.battle-player-amount{min-width:42px;padding:2px 4px;font-size:9px}.battle-versus{font-size:9px}.battle-prize-players{padding:3px 2px;gap:3px}.battle-prize-players .battle-player-name{font-size:9px;line-height:1.15}.battle-prize-players .battle-player-role{font-size:6px}.battle-prize{padding:3px 0}.battle-prize small{font-size:7px;white-space:nowrap}.battle-prize strong{font-size:11px}.battle-card-actions{justify-content:flex-end;min-width:62px}.battle-card-actions>*{max-width:100%}.battle-prizes:not(.open-battle-prizes){grid-template-columns:52px minmax(0,1fr) auto;gap:2px;padding:4px 4px}.battle-prizes.open-battle-prizes{grid-template-columns:minmax(0,1fr) auto}.battle-prizes.open-battle-prizes .battle-player-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.battle-prizes.open-battle-prizes .battle-player-amount{font-size:11px}.battle-prizes:not(.open-battle-prizes) .battle-player-amount{min-width:42px;padding:2px 4px;font-size:10px}}
-  </style>
-  <style>
-    .my-running-battles-section>h2{display:block;margin:0;padding:0;border:0;border-radius:0;color:inherit;background:transparent;font-size:16px;font-weight:900;line-height:1.2}
-    .battle-prizes.running-battle-prizes{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"players prize" "actions actions";gap:6px 10px;border:none;background:transparent;padding:0;margin:0}
-    .running-battle-prizes>.battle-prize{grid-area:prize;align-items:flex-end;text-align:right;padding:0}
-    .running-battle-prizes>.battle-prize-players{grid-area:players;min-width:0;border-left:0;padding:0;background:transparent}
-    .running-battle-prizes>.battle-card-actions{grid-area:actions;justify-self:end;min-width:0}
-    @media(max-width:600px){.top-inner{gap:6px}.top-inner>#menuToggle{width:38px;height:38px}.brand .brand-name{font-size:17px}.brand .brand-main{gap:3px;font-size:8px}.brand .brand-tagline{font-size:7px;letter-spacing:.8px}.top-inner>.top-actions{gap:3px}}
   </style>
   <style id="dayPalette" disabled>
     :root{color-scheme:light;--ink:#1d2922;--muted:#68756d;--panel:#fff;--line:#e1e7e2;--gold:#765000;--green:#17643a;--red:#a53632}
@@ -236,76 +105,12 @@
     .bottom{border-color:#35483a;background:#111a15f5;box-shadow:0 -3px 16px #0006}.bottom button{color:#c3d0c6}.bottom button span,.bottom button.active{color:#9be0ad}
     @media(max-width:600px){body{font-size:16px}.panel h2,.panel h3{font-size:21px}.battle-player-name{font-size:15px}.battle-prize strong{font-size:14px}}
   </style>
-  <style id="accentPalette">
-    .topbar{background:#10294d;border-bottom-color:#d9771b}
-    .brand{color:#ffbd59}.brand small{color:#d7e4f2}
-    .topbar .icon{border-color:#37577f;color:#fff;background:#18385f}
-    .topbar .balance{border-color:#b96c22;color:#ffe4ad;background:#593619}
-    .menu{border-color:#36557d;background:#142b4e}.menu button,.menu a{color:#eef4fa}
-    .bottom{border-color:#28784a;background:#103b2b}.bottom button{color:#e5f3e9}.bottom button span{color:#a9dfb6}.bottom button.active{border-radius:8px;color:#fff;background:#b85f19}.bottom button.active span{color:#fff}
-    #view-home>.panel:first-child{border-color:#36557d;background:#172a46;color:#eef4fa}
-    #view-home>.panel:first-child h2{display:inline-block;padding:7px 11px;border-radius:6px;color:#fff;background:#244e7f}
-    #view-home>.panel:first-child .muted{color:#c9d8e8}
-    #view-home>.panel:first-child .field label{color:#e0eaf4}
-    #view-home>.panel:first-child .btn{border-color:#2e8050;background:#287442;color:#fff}
-    #view-home>.home-open-battles-panel{border-color:#a9601d;background:#482a16;color:#fff1df}
-    #view-home>.home-open-battles-panel h2{display:inline-block;padding:7px 11px;border-radius:6px;color:#fff;background:#b96217}
-    #view-home>.home-open-battles-panel .muted{color:#f1d7b9}
-    #view-home>.home-open-battles-panel .game-filter{border-color:#c37a35;background:#633915;color:#fff0dc}
-    #view-home>.home-open-battles-panel .battle-card{border-color:#b46b2e;background:#38200f;color:#fff4e4}
-    #view-home>.home-open-battles-panel .battle-prizes{border-color:#9f5f29;background:#29180d}
-    #view-home>.home-open-battles-panel .battle-prize small{color:#e8c8a1}
-    #view-home>.home-open-battles-panel .battle-prize strong{color:#ffd17b}
-    #view-home>.home-open-battles-panel .battle-card .status{color:#fff1d7;background:#754316}
-    #view-home>.home-open-battles-panel .battle-card .btn:not(.danger){border-color:#cd8138;background:#874711;color:#fff4e5}
-    #view-home>.home-open-battles-panel .battle-card .btn.danger{border-color:#ac514c;background:#642d29;color:#fff0ed}
-    #view-home>.home-open-battles-panel .game-filter.active{border-color:#8fd0a0;background:#34834b;color:#fff;box-shadow:0 0 0 2px #8fd0a055}
-    #view-home>.home-running-battles-panel{border-color:#28784a;background:#123a28;color:#e9f6ec}
-    #view-home>.home-running-battles-panel>h2{display:inline-block;padding:7px 11px;border-radius:6px;color:#fff;background:#17683d}
-    #view-home>.home-running-battles-panel .muted{color:#c6e4ce}
-    #view-home>.home-running-battles-panel .battle-card{border-color:#338554;background:#102f20;color:#eff9f1}
-    #view-home>.home-running-battles-panel .battle-prizes{border-color:#34764b;background:#0c2519}
-    #view-home>.home-running-battles-panel .battle-prize small{color:#bbd8c3}
-    #view-home>.home-running-battles-panel .battle-prize strong{color:#a5e2b2}
-    #view-home>.home-running-battles-panel .battle-card .status{color:#d9f4df;background:#1b5732}
-    #view-home>.home-running-battles-panel .battle-card .btn:not(.danger){border-color:#398656;background:#23683b;color:#f0fff3}
-    #view-home>.home-running-battles-panel .battle-card .btn.danger{border-color:#ac514c;background:#642d29;color:#fff0ed}
-  </style>
-  <style id="mobileSizing">
-    #topInstallAppButton{width:34px;height:34px;min-height:34px;flex:none;padding:0;border-color:#69744c;color:#f8dc83;background:#222b27;font-size:20px;line-height:1}
-    #gamePicker.game-launch{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
-    #gamePicker .game-tile-image{width:min(100%,220px)}
-    @media(max-width:600px){.top-actions{gap:5px}}
-    #view-home>.home-running-battles-panel{border-color:#5f7a9b;background:linear-gradient(125deg,#1b3b30 0%,#1e3a56 52%,#473049 100%);color:#f4f7f5}
-    #view-home>.home-open-battles-panel #openMatches .battle-prizes.open-battle-prizes{margin:0;padding:0;border:0;background:transparent;box-shadow:none}
-    #view-home>.home-open-battles-panel,#view-home>.home-running-battles-panel{padding:0;border:0;background:transparent;box-shadow:none}
-    #view-home>.home-open-battles-panel .match-head h2,#view-home>.home-running-battles-panel>h2{display:block;margin:0;padding:0;border:0;border-radius:0;color:inherit;background:transparent;font-size:16px;line-height:1.2}
-    html[data-theme="night"] .battle-prizes.open-battle-prizes .battle-player-amount{font-size:14px}
-    @media(max-width:600px){.battle-prizes.open-battle-prizes .battle-player-name{font-size:10px}html[data-theme="night"] .battle-prizes.open-battle-prizes .battle-player-amount{font-size:12px}html[data-theme="day"] .battle-prizes.open-battle-prizes .battle-player-amount{font-size:12px}}
-    @media(max-width:600px){body{font-size:18px}.shell{padding-right:10px;padding-left:10px}.panel{padding:17px}.panel h2,.panel h3{font-size:23px}.panel p,.muted{font-size:15px}.field label{font-size:15px}.field input,.field select,.field textarea{font-size:17px}.btn{min-height:48px;font-size:16px}}
-  </style>
-  <style id="bottomPalette">
-    .bottom{grid-template-columns:repeat(3,minmax(0,1fr));background:linear-gradient(105deg,#10294d 0%,#17683d 52%,#b85f19 100%)}
-    .bottom button,.bottom button:nth-child(n){border-radius:8px;background:transparent}
-    .bottom button>span:first-child,.bottom button .nav-label{color:#f5f7f4}
-    .bottom button.active{background:#ffffff24;box-shadow:inset 0 -3px #ffbd59}
-    .bottom button.active>span:first-child,.bottom button.active .nav-label{color:#fff}
-  </style>
-  <style id="ludoAppButtonPalette">
-    .ludo-app-button,#view-home>.home-open-battles-panel .battle-card .btn.ludo-app-button,#view-home>.home-running-battles-panel .battle-card .btn.ludo-app-button{border-color:#991f1f;background:#c62828;color:#fff}
-    .ludo-app-button:hover,#view-home>.home-open-battles-panel .battle-card .btn.ludo-app-button:hover,#view-home>.home-running-battles-panel .battle-card .btn.ludo-app-button:hover{border-color:#7f1d1d;background:#a91f1f;color:#fff}
-  </style>
-  <style id="walletActionButtonPalette">
-    #view-wallet #withdrawForm>button[type="submit"],#view-wallet #qrForm>button[type="submit"]{border-color:#991b1b;background:#dc2626;color:#fff}
-    #view-wallet #withdrawForm>button[type="submit"]:hover:not(:disabled),#view-wallet #qrForm>button[type="submit"]:hover:not(:disabled){border-color:#7f1d1d;background:#b91c1c;color:#fff}
-  </style>
   <script>
     try {
       const savedTheme = localStorage.getItem('appTheme') === 'day' ? 'day' : 'night';
       document.documentElement.dataset.theme = savedTheme;
       document.getElementById('dayPalette').disabled = savedTheme !== 'day';
       document.getElementById('nightPalette').disabled = savedTheme !== 'night';
-      document.getElementById('accentPalette').disabled = savedTheme !== 'night';
     } catch {}
   </script>
 </head>
@@ -449,108 +254,6 @@
     topInstallButton.setAttribute('aria-label','Install app');
     el('headerBalance').before(topInstallButton);
     topInstallButton.addEventListener('click',promptAppInstall);
-    const profileShareButton=document.createElement('button');
-    profileShareButton.type='button';
-    profileShareButton.className='btn secondary small';
-    profileShareButton.textContent='Website share karein';
-    profileShareButton.addEventListener('click',shareWebsiteLink);
-    el('copyReferral').after(profileShareButton);
-    const createChallengeButton=el('createForm').querySelector('button[type="submit"]');
-    if(createChallengeButton)createChallengeButton.hidden=true;
-    if(el('openMatches').previousElementSibling?.textContent.trim()==='Challenger, entry amount aur winning amount dekhein.')el('openMatches').previousElementSibling.remove();
-    const entryAmountInput=el('entryAmount');
-    const entryAmountControl=document.createElement('div');
-    entryAmountControl.className='entry-amount-control';
-    entryAmountInput.before(entryAmountControl);
-    entryAmountControl.append(entryAmountInput);
-    const setEntryAmountButton=document.createElement('button');
-    setEntryAmountButton.id='setEntryAmount';
-    setEntryAmountButton.className='btn secondary small';
-    setEntryAmountButton.type='button';
-    setEntryAmountButton.textContent='SET';
-    setEntryAmountButton.setAttribute('aria-pressed','false');
-    entryAmountControl.append(setEntryAmountButton);
-    let confirmedEntryAmount=null;
-    entryAmountInput.addEventListener('input',()=>{confirmedEntryAmount=null;setEntryAmountButton.setAttribute('aria-pressed','false')});
-    setEntryAmountButton.addEventListener('click',()=>{
-      const amount=Number(entryAmountInput.value);
-      if(!Number.isInteger(amount)||amount<100||amount>50000||(amount-100)%50!==0)return notify('₹100 se ₹50,000 ke beech ₹50 ke multiples mein amount dalein.',true);
-      confirmedEntryAmount=amount;
-      window.pendingEntryAmount=amount;
-      setEntryAmountButton.setAttribute('aria-pressed','true');
-      setEntryAmountButton.disabled=true;
-      notify(`₹${amount} entry ka Open Battle ban raha hai...`);
-      el('createForm').requestSubmit();
-    });
-    el('createForm').addEventListener('submit',event=>{
-      if(confirmedEntryAmount===Number(entryAmountInput.value))return;
-      event.preventDefault();
-      event.stopImmediatePropagation();
-      notify('Pehle valid entry amount par SET dabayein.',true);
-    });
-    const openBattlesHeading=document.createElement('h2');
-    openBattlesHeading.className='home-open-header-title';
-    openBattlesHeading.hidden=true;
-    openBattlesHeading.textContent='';
-    const homeMatchHeader=el('refreshOpen').closest('.match-head');
-    if(homeMatchHeader)homeMatchHeader.classList.add('home-open-header');
-    el('refreshOpen').before(openBattlesHeading);
-    const languageToggle=document.querySelector('.top-inner .lang-toggle');
-    if(languageToggle&&homeMatchHeader)homeMatchHeader.insertBefore(languageToggle,el('refreshOpen'));
-    const runningBattlesHeading=document.createElement('h2');
-    runningBattlesHeading.textContent='Running Battles';
-    runningBattlesHeading.style.fontWeight='900';
-    el('runningMatches').before(runningBattlesHeading);
-    const myRunningBattlesPanel=el('gameRunningMatches').closest('.panel');
-    myRunningBattlesPanel.classList.remove('panel');
-    myRunningBattlesPanel.classList.add('my-running-battles-section');
-    const openBattlesPanel=el('openMatches').closest('.panel');
-    openBattlesPanel.classList.add('home-open-battles-panel');
-    const allRunningBattlesPanel=el('runningMatches').closest('.panel');
-    allRunningBattlesPanel.classList.add('home-running-battles-panel');
-    homeView.insertBefore(myRunningBattlesPanel,openBattlesPanel);
-    const themeButton=document.createElement('button');
-    themeButton.id='themeToggle';
-    themeButton.type='button';
-    themeButton.className='icon theme-toggle';
-    themeButton.setAttribute('aria-pressed',String(document.documentElement.dataset.theme==='night'));
-    const updateThemeButton=()=>{
-      const isNight=document.documentElement.dataset.theme==='night';
-      themeButton.textContent=isNight?'☾':'☀';
-      themeButton.title=isNight?'Day mode':'Bedtime mode';
-      themeButton.setAttribute('aria-label',isNight?'Switch to day mode':'Switch to bedtime mode');
-      themeButton.setAttribute('aria-pressed',String(isNight));
-    };
-    updateThemeButton();
-    el('headerBalance').before(themeButton);
-    themeButton.addEventListener('click',()=>{
-      const nextTheme=document.documentElement.dataset.theme==='night'?'day':'night';
-      document.documentElement.dataset.theme=nextTheme;
-      document.getElementById('dayPalette').disabled=nextTheme!=='day';
-      document.getElementById('nightPalette').disabled=nextTheme!=='night';
-      document.getElementById('accentPalette').disabled=nextTheme!=='night';
-      document.querySelector('meta[name="theme-color"]').content=nextTheme==='night'?'#101713':'#ffffff';
-      try{localStorage.setItem('appTheme',nextTheme)}catch{}
-      updateThemeButton();
-    });
-    const battleBanner=document.querySelector('.battle-banner');
-    if(battleBanner){const bannerRow=document.createElement('div'),liveStatus=document.createElement('span'),liveDot=document.createElement('span'),liveText=document.createElement('span');bannerRow.className='battle-banner-row';bannerRow.setAttribute('role','button');bannerRow.setAttribute('tabindex','0');bannerRow.setAttribute('aria-label','Open Ludo battles');liveStatus.className='banner-live';liveStatus.setAttribute('role','status');liveStatus.setAttribute('aria-label','Live');liveDot.className='banner-live-dot';liveDot.setAttribute('aria-hidden','true');liveText.className='banner-live-text';liveText.textContent='LIVE';liveStatus.append(liveDot,liveText);const openBannerGame=()=>{syncGameSelection('LUDO');el('gamePicker').hidden=true;el('gameBattleView').hidden=false;setView('games')};bannerRow.addEventListener('click',openBannerGame);bannerRow.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();openBannerGame()}});battleBanner.before(bannerRow);bannerRow.append(battleBanner,liveStatus)}
-    const kycPanel=el('kycForm').closest('.panel');
-    const profileKycStatus=document.createElement('p');
-    profileKycStatus.className='muted';
-    profileKycStatus.id='profileKycStatus';
-    kycPanel.insertBefore(profileKycStatus,el('kycForm'));
-    el('view-profile').append(kycPanel);
-    const profileMoneySummary=document.createElement('div');
-    profileMoneySummary.className='panel';
-    profileMoneySummary.id='profileMoneySummary';
-    profileMoneySummary.innerHTML='<h2>My money summary</h2><div class="grid"><div class="stat"><small>Total deposited · approved</small><strong id="profileTotalDeposits">₹ --</strong></div><div class="stat"><small>Withdrawals · paid</small><strong id="profilePaidWithdrawals">₹ --</strong></div><div class="stat"><small>Withdrawals · pending</small><strong id="profilePendingWithdrawals">₹ --</strong></div><div class="stat"><small>Winning amount credited</small><strong id="profileTotalWinnings">₹ --</strong></div></div><p id="profileMoneyUpdated" class="muted">Hisab load ho raha hai...</p>';
-    el('view-profile').insertBefore(profileMoneySummary,kycPanel);
-    const profileAccountRow=document.createElement('div');
-    profileAccountRow.className='profile-account-row';
-    const accountDetailsPanel=el('profileBalance').closest('.panel');
-    el('view-profile').insertBefore(profileAccountRow,accountDetailsPanel);
-    profileAccountRow.append(accountDetailsPanel,profileMoneySummary);
     const esc=value=>String(value??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
     const loginUrl=()=>`/login.html?next=${encodeURIComponent(location.pathname+location.search+location.hash)}`;
     if(!token||!storedUser)location.replace(loginUrl());
@@ -580,7 +283,6 @@
       el('kycStatus').textContent = labels[status] || status;
       el('kycStatus').style.color = kycApproved ? 'var(--green)' : status === 'REJECTED' ? 'var(--red)' : 'var(--gold)';
       el('kycMessage').textContent = withdrawalMessage;
-      profileKycStatus.textContent = `Status: ${labels[status] || status}. ${withdrawalMessage}`;
       el('kycForm').hidden = kycApproved;
       if (!kycApproved && el('view-wallet').classList.contains('active')) notify(withdrawalMessage, true);
     }
@@ -609,6 +311,7 @@
       const myRunningMatchIds=new Set(myRunningMatches.map(match=>String(match._id)));
       const gameRunningList=el('gameRunningMatches');
       const runningList=el('runningMatches');
+      const myRunningBattlesPanel=el('gameRunningMatches').closest('.panel');
       if((runningList.contains(document.activeElement)||gameRunningList.contains(document.activeElement))&&document.activeElement.matches('[data-running-room-code]'))return;
       myRunningBattlesPanel.hidden=myRunningMatches.length===0;
       gameRunningList.replaceChildren();
@@ -661,18 +364,14 @@
     function logout(){localStorage.removeItem('token');localStorage.removeItem('user');location.replace('/login.html')}el('logout').addEventListener('click',logout);el('logoutProfile').addEventListener('click',logout);el('refreshMatches')?.addEventListener('click',()=>location.reload());el('refreshOpen').addEventListener('click',()=>location.reload());
     el('createForm').addEventListener('submit',async event=>{
       event.preventDefault();
-      const amount=Number(entryAmountInput.value);
-      if(!Number.isInteger(amount)||amount<100||amount>50000||(amount-100)%50!==0){notify('₹100 se ₹50,000 ke beech ₹50 ke multiples mein amount dalein.',true);setEntryAmountButton.disabled=false;return}
+      const amount=Number(el('entryAmount').value);
+      if(!Number.isInteger(amount)||amount<100||amount>50000||(amount-100)%50!==0){notify('₹100 se ₹50,000 ke beech ₹50 ke multiples mein amount dalein.',true);return}
       try{
         const data=await api('/api/matches/create',{method:'POST',body:JSON.stringify({amount,gameType:el('gameType').value})});
         notify(data.message||'Challenge create ho gaya.');
         setView('home');
         await loadOpen();
-      }catch(error){showError(error)}finally{
-        confirmedEntryAmount=null;
-        setEntryAmountButton.setAttribute('aria-pressed','false');
-        setEntryAmountButton.disabled=false;
-      }
+      }catch(error){showError(error)}
     });
     el('qrForm').addEventListener('submit',async event=>{event.preventDefault();const amount=Number(el('depositAmount').value);if(!Number.isInteger(amount)||amount<100)return notify('Deposit minimum ₹100 hai.',true);try{const data=await api(`/api/wallet/generate-qr?amount=${encodeURIComponent(amount)}`);el('qrArea').dataset.upiUrl=data.upiUrl||'';el('qrArea').innerHTML=`<img class="qr" src="${data.qrImage}" alt="UPI payment QR"><p class="muted">UPI app se pay karein ya QR download karke scan karein. Balance approval ke baad credit hoga.</p>`;el('depositForm').hidden=false;el('depositForm').dataset.amount=amount;notify('Payment options ready hain.')}catch(error){showError(error)}});
     el('depositForm').addEventListener('submit',async event=>{event.preventDefault();const form=event.currentTarget,body=new FormData(form);body.set('amount',form.dataset.amount);try{const data=await api('/api/wallet/submit-deposit',{method:'POST',body});form.reset();form.hidden=true;el('qrArea').replaceChildren();notify(data.message)}catch(error){showError(error)}});
