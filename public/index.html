@@ -710,6 +710,17 @@
         const prize=Number(m.amount)*2*0.95;
         return `<article class="match battle-card">${statusMarkup}<div class="battle-prizes running-battle-prizes"><div class="battle-prize"><small>WIN</small><strong>₹${prize.toLocaleString('en-IN')}</strong></div><div class="battle-prize-players"><div class="battle-players">${battlePlayerMarkup(m.creator,'Creator',false,Number(m.amount))}<span class="battle-versus" aria-label="versus">VS</span>${battlePlayerMarkup(m.joiner,'Opponent',true,Number(m.amount))}</div></div>${actions?`<div class="battle-card-actions">${actions}</div>`:''}</div>${secondaryAction}<div class="battle-room-actions">${roomCodePanel}</div></article>`
       }).join(''):'';
+      runningList.querySelectorAll('[data-running-result]').forEach(button=>button.addEventListener('click',async()=>{
+        button.disabled=true;
+        button.textContent='Opening...';
+        try{
+          await window.openMatchPage(button.dataset.runningResult,'details');
+          const resultForm=el('resultForm');
+          if(resultForm)resultForm.scrollIntoView({behavior:'smooth',block:'center'});
+          else notify('Is match ke current status mein screenshot submit karne ka option available nahi hai.',true);
+        }catch(error){showError(error)}
+        finally{button.disabled=false;button.textContent='Result / screenshot'}
+      }));
       const sampleMarkup=sampleRunningBattles.map(({name,avatar,opponent,opponentAvatar,amount})=>`<article class="match battle-card sample-running-battle"><div class="battle-prizes running-battle-prizes"><div class="battle-prize"><small>WIN</small><strong>₹${(amount*2*0.95).toLocaleString('en-IN')}</strong></div><div class="battle-prize-players"><div class="battle-players">${battlePlayerMarkup({username:name,profileImage:avatar.replace(/^\//,'')},'Creator',false,amount)}<span class="battle-versus" aria-label="versus">VS</span>${battlePlayerMarkup({username:opponent,profileImage:opponentAvatar.replace(/^\//,'')},'Opponent',true,amount)}</div></div></div></article>`).join('');
       el('sampleRunningMatches').innerHTML=sampleMarkup;
       el('mySampleRunningMatches').innerHTML=sampleMarkup;
@@ -741,14 +752,6 @@
       if(view){event.preventDefault();return setView(view.dataset.view)}
       const filter=event.target.closest('[data-game]');
       if(filter){game=filter.dataset.game;document.querySelectorAll('.game-filter').forEach(button=>button.classList.toggle('active',button===filter));return loadOpen().catch(showError)}
-      const runningResult=event.target.closest('[data-running-result]');
-      if(runningResult){
-        runningResult.disabled=true;
-        runningResult.textContent='Opening...';
-        try{await window.openMatchPage(runningResult.dataset.runningResult,'details')}
-        catch(error){showError(error);runningResult.disabled=false;runningResult.textContent='Result / screenshot'}
-        return;
-      }
       const demoCancel=event.target.closest('[data-demo-cancel]');
       if(demoCancel){
         cancelDemoWait(demoCancel.dataset.demoCancel,demoCancel.closest('.demo-battle-card'));
