@@ -535,20 +535,35 @@
     function renderDemoBattles(){
       demoBattlesList.innerHTML = demoBattlePairs.map(({player,amount,gameType})=>{
         const waiting=demoBattleWaitStartedAt.has(player.name);
-        const elapsed=waiting?Math.floor((Date.now()-demoBattleWaitStartedAt.get(player.name))/1000):0;
-        const timer=`${String(Math.floor(elapsed/60)).padStart(2,'0')}:${String(elapsed%60).padStart(2,'0')}`;
-        return `<article class="match battle-card demo-battle-card"><div class="battle-prizes open-battle-prizes"><div class="battle-prize-players"><div class="battle-players battle-players-waiting">${battlePlayerMarkup({username:player.name,profileImage:player.avatar.replace(/^\//,'')},'Challenger',false,amount,gameType==='SNAKE'?'Snake Battle':'Ludo Classic')}</div></div><div class="battle-card-actions"><button class="btn green small" type="button" data-demo-play="${esc(player.name)}"${waiting?' disabled aria-disabled="true"':''}>${waiting?'WAITING':'PLAY'}</button>${waiting?`<span class="demo-wait-status">Room code ka wait • <span data-demo-wait-timer="${esc(player.name)}">${timer}</span></span>`:''}</div></div></article>`;
+        const remaining=waiting?Math.max(0,Math.ceil((demoBattleWaitStartedAt.get(player.name)+60000-Date.now())/1000)):60;
+        const timer=`${String(Math.floor(remaining/60)).padStart(2,'0')}:${String(remaining%60).padStart(2,'0')}`;
+        return `<article class="match battle-card demo-battle-card"><div class="battle-prizes open-battle-prizes"><div class="battle-prize-players"><div class="battle-players battle-players-waiting">${battlePlayerMarkup({username:player.name,profileImage:player.avatar.replace(/^\//,'')},'Challenger',false,amount,gameType==='SNAKE'?'Snake Battle':'Ludo Classic')}</div></div><div class="battle-card-actions"><button class="btn green small" type="button" data-demo-play="${esc(player.name)}" data-demo-amount="${amount}"${waiting?' disabled aria-disabled="true"':''}>${waiting?'WAITING':'PLAY'}</button>${waiting?`<span class="demo-wait-status">Room code ka wait • <span data-demo-wait-timer="${esc(player.name)}">${timer}</span></span><button class="btn danger small" type="button" data-demo-cancel="${esc(player.name)}">CANCEL</button>`:''}</div></div></article>`;
       }).join('');
+    }
+    function cancelDemoWait(playerName,card){
+      demoBattleWaitStartedAt.delete(playerName);
+      const playButton=card.querySelector('[data-demo-play]');
+      if(!playButton)return;
+      playButton.disabled=false;
+      playButton.removeAttribute('aria-disabled');
+      playButton.textContent='PLAY';
+      card.querySelector('.demo-wait-status')?.remove();
+      card.querySelector('[data-demo-cancel]')?.remove();
     }
     setInterval(()=>{
       document.querySelectorAll('[data-demo-wait-timer]').forEach(timer=>{
-        const elapsed=Math.floor((Date.now()-demoBattleWaitStartedAt.get(timer.dataset.demoWaitTimer))/1000);
-        timer.textContent=`${String(Math.floor(elapsed/60)).padStart(2,'0')}:${String(elapsed%60).padStart(2,'0')}`;
+        const playerName=timer.dataset.demoWaitTimer;
+        const startedAt=demoBattleWaitStartedAt.get(playerName);
+        if(startedAt===undefined)return;
+        const remaining=Math.ceil((startedAt+60000-Date.now())/1000);
+        if(remaining<=0){cancelDemoWait(playerName,timer.closest('.demo-battle-card'));return}
+        timer.textContent=`${String(Math.floor(remaining/60)).padStart(2,'0')}:${String(remaining%60).padStart(2,'0')}`;
       });
     },1000);
     const gameSamplePanel=document.createElement('div');
     gameSamplePanel.className='panel sample-running-panel';
     gameSamplePanel.innerHTML='<p class="sample-running-notice">Running Battles</p><div id="sampleRunningMatches" class="sample-running-list"></div>';
+    el('runningMatches').after(gameSamplePanel);
     const mySamplePanel=gameSamplePanel.cloneNode(true);
     mySamplePanel.querySelector('#sampleRunningMatches').id='mySampleRunningMatches';
     el('gameRunningMatches').closest('.panel').after(mySamplePanel);
@@ -691,6 +706,7 @@
         return `<article class="match battle-card">${statusMarkup}<div class="battle-prizes running-battle-prizes"><div class="battle-prize"><small>WIN</small><strong>₹${prize.toLocaleString('en-IN')}</strong></div><div class="battle-prize-players"><div class="battle-players">${battlePlayerMarkup(m.creator,'Creator',false,Number(m.amount))}<span class="battle-versus" aria-label="versus">VS</span>${battlePlayerMarkup(m.joiner,'Opponent',true,Number(m.amount))}</div></div>${actions?`<div class="battle-card-actions">${actions}</div>`:''}</div>${secondaryAction}<div class="battle-room-actions">${roomCodePanel}</div></article>`
       }).join(''):'';
       const sampleMarkup=sampleRunningBattles.map(({name,avatar,opponent,opponentAvatar,amount})=>`<article class="match battle-card sample-running-battle"><div class="battle-prizes running-battle-prizes"><div class="battle-prize"><small>WIN</small><strong>₹${(amount*2*0.95).toLocaleString('en-IN')}</strong></div><div class="battle-prize-players"><div class="battle-players">${battlePlayerMarkup({username:name,profileImage:avatar.replace(/^\//,'')},'Creator',false,amount)}<span class="battle-versus" aria-label="versus">VS</span>${battlePlayerMarkup({username:opponent,profileImage:opponentAvatar.replace(/^\//,'')},'Opponent',true,amount)}</div></div></div></article>`).join('');
+      el('sampleRunningMatches').innerHTML=sampleMarkup;
       el('mySampleRunningMatches').innerHTML=sampleMarkup;
       runningList.querySelectorAll('a[href^="intent://"]').forEach(link=>{link.href=ludoKingOpenUrl()});
       runningList.querySelectorAll('.battle-card').forEach((card,index)=>{
@@ -705,8 +721,9 @@
     }
     async function loadMine(){const container=el('myMatches');if(!container)return;const data=await api('/api/matches/mine'),matches=data.matches||[];container.innerHTML=matches.length?matches.map(m=>matchCard(m,true)).join(''):'<p class="muted">Abhi koi active battle nahi hai.</p>'}
     function refreshSamplePlayers(){
-      if(!el('mySampleRunningMatches')||window.__REAL_OPEN_BATTLES_AVAILABLE)return;
+      if(!el('sampleRunningMatches')||!el('mySampleRunningMatches')||window.__REAL_OPEN_BATTLES_AVAILABLE)return;
       const sampleMarkup=sampleRunningBattles.map(({name,avatar,opponent,opponentAvatar,amount})=>`<article class="match battle-card sample-running-battle"><div class="battle-prizes running-battle-prizes"><div class="battle-prize"><small>WIN</small><strong>₹${(amount*2*0.95).toLocaleString('en-IN')}</strong></div><div class="battle-prize-players"><div class="battle-players">${battlePlayerMarkup({username:name,profileImage:avatar.replace(/^\//,'')},'Creator',false,amount)}<span class="battle-versus" aria-label="versus">VS</span>${battlePlayerMarkup({username:opponent,profileImage:opponentAvatar.replace(/^\//,'')},'Opponent',true,amount)}</div></div></div></article>`).join('');
+      el('sampleRunningMatches').innerHTML=sampleMarkup;
       el('mySampleRunningMatches').innerHTML=sampleMarkup;
     }
     function historyRowMarkup(item){const at=new Date(item.at),time=Number.isNaN(at.getTime())?'Time unavailable':at.toLocaleString('en-IN',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});const statusLabels={PENDING:'Pending',APPROVED:'Approved',REJECTED:'Rejected',PAID:'Paid',OPEN:'Waiting for player',RUNNING:'In progress',PENDING_RESULT:'Result under review',PENDING_CANCELLATION:'Cancellation review',COMPLETED:'Completed',CANCELLED:'Cancelled'};let title='',status=statusLabels[item.status]||item.status,value=`₹${Number(item.amount||0).toLocaleString('en-IN')}`,kind='';if(item.type==='DEPOSIT'){title='Deposit';kind='↓';if(item.status==='APPROVED'){value=`+${value}`;status='Credited'}}else if(item.type==='WITHDRAWAL'){title='Withdrawal';kind='↑';if(['PENDING','PAID'].includes(item.status)){value=`-${value}`;kind='↑'}if(item.status==='PAID')status='Paid'}else{const gameName=item.gameType==='SNAKE'?'Snake Battle':'Ludo';title=item.result?`${gameName} • ${item.result==='WIN'?'Win':'Loss'}`:`${gameName} • ${status}`;kind=item.gameType==='SNAKE'?'S':'L';if(item.status==='PENDING_RESULT'&&item.result)status='Result under review';if(item.status==='COMPLETED'&&item.result==='WIN'){value=`+₹${(Number(item.amount||0)*1.8).toLocaleString('en-IN')}`;status='Won';kind='+'}else if(item.status==='COMPLETED'&&item.result==='LOSS'){value=`-₹${Number(item.amount||0).toLocaleString('en-IN')}`;status='Lost';kind='−'}else value=`Entry ₹${Number(item.amount||0).toLocaleString('en-IN')}`}const valueClass=item.type==='DEPOSIT'&&item.status==='APPROVED'||item.type==='GAME'&&item.status==='COMPLETED'&&item.result==='WIN'?'credit':item.type==='WITHDRAWAL'&&item.status!=='REJECTED'||item.type==='GAME'&&item.status==='COMPLETED'&&item.result==='LOSS'?'debit':'';return `<div class="history-row"><div class="history-entry-main"><span class="history-mark" aria-hidden="true">${esc(kind)}</span><span class="history-copy"><strong class="history-title">${esc(title)}</strong><small class="history-meta">${esc(status)} • ${esc(time)}</small></span></div><div class="history-entry-side"><strong class="history-value ${valueClass}">${esc(value)}</strong></div></div>`}
@@ -719,17 +736,39 @@
       if(view){event.preventDefault();return setView(view.dataset.view)}
       const filter=event.target.closest('[data-game]');
       if(filter){game=filter.dataset.game;document.querySelectorAll('.game-filter').forEach(button=>button.classList.toggle('active',button===filter));return loadOpen().catch(showError)}
+      const demoCancel=event.target.closest('[data-demo-cancel]');
+      if(demoCancel){
+        cancelDemoWait(demoCancel.dataset.demoCancel,demoCancel.closest('.demo-battle-card'));
+        return;
+      }
       const demoPlay=event.target.closest('[data-demo-play]');
       if(demoPlay){
         const playerName=demoPlay.dataset.demoPlay;
-        if(!demoBattleWaitStartedAt.has(playerName))demoBattleWaitStartedAt.set(playerName,Date.now());
+        if(demoBattleWaitStartedAt.has(playerName))return;
+        const requiredAmount=Number(demoPlay.dataset.demoAmount);
+        const walletBalance=Number(player?.walletBalance??storedUser?.walletBalance??0);
+        if(walletBalance<requiredAmount){
+          const depositAmount=Math.max(100,requiredAmount-walletBalance);
+          window.pendingEntryAmount=requiredAmount;
+          el('depositAmount').value=String(depositAmount);
+          notify(`₹${requiredAmount} entry ke liye wallet balance kam hai. ₹${depositAmount} recharge karein.`,true);
+          setView('wallet');
+          return;
+        }
+        demoBattleWaitStartedAt.set(playerName,Date.now());
         demoPlay.disabled=true;
         demoPlay.setAttribute('aria-disabled','true');
         demoPlay.textContent='WAITING';
         const elapsed=document.createElement('span');
         elapsed.className='demo-wait-status';
-        elapsed.innerHTML=`Room code ka wait • <span data-demo-wait-timer="${esc(playerName)}">00:00</span>`;
+        elapsed.innerHTML=`Room code ka wait • <span data-demo-wait-timer="${esc(playerName)}">01:00</span>`;
         demoPlay.after(elapsed);
+        const cancelButton=document.createElement('button');
+        cancelButton.className='btn danger small';
+        cancelButton.type='button';
+        cancelButton.dataset.demoCancel=playerName;
+        cancelButton.textContent='CANCEL';
+        elapsed.after(cancelButton);
         return;
       }
       const join=event.target.closest('[data-join]');
