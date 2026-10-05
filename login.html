@@ -3,6 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#101713">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="manifest" href="/api/site-manifest">
+  <link rel="icon" href="/app-icon.svg" type="image/svg+xml">
+  <link rel="shortcut icon" href="/app-icon.svg" type="image/svg+xml">
+  <link rel="icon" href="/app-icon-192.png" type="image/png" sizes="192x192">
+  <link rel="apple-touch-icon" href="/app-icon-192.png">
+  <link rel="mask-icon" href="/app-icon.svg" color="#f4c84b">
   <title>Login - KhiladiAdda24.com</title>
   <style>
     :root { color-scheme: dark; --panel: #19231d; --line: #35483a; --ink: #f3f4ed; --muted: #b4c0b6; --gold: #e7b83f; --error: #ffb4a9; }
@@ -187,11 +197,33 @@
           body: JSON.stringify({ phone, otp, loginMode, referralCode: document.getElementById('referralCode').value.trim().toUpperCase() })
         });
         const data = await readResponse(res);
-        localStorage.setItem('user', JSON.stringify(data.user));
-        localStorage.setItem('token', data.token);
-        if (data.user && data.user.role === 'admin') {
+
+        if (!data.user || !data.token) {
+          throw new Error('Login response mein account details nahi mili. Dobara try karein.');
+        }
+        const finalUser = { ...data.user, role: data.user.role === 'admin' ? 'admin' : 'user' };
+
+        if (loginMode === 'admin' && finalUser.role !== 'admin') {
+          throw new Error('Admin account not authorized for this login mode.');
+        }
+
+        if (finalUser.role === 'admin') {
+          localStorage.setItem('adminUser', JSON.stringify(finalUser));
+          localStorage.setItem('adminToken', data.token);
+          const previousUser = (() => {
+            try { return JSON.parse(localStorage.getItem('user') || 'null'); }
+            catch { return null; }
+          })();
+          if (previousUser?.role === 'admin') {
+            localStorage.removeItem('user');
+            localStorage.removeItem('token');
+          }
           window.location.href = '/admin.html';
         } else {
+          localStorage.removeItem('adminUser');
+          localStorage.removeItem('adminToken');
+          localStorage.setItem('user', JSON.stringify(finalUser));
+          localStorage.setItem('token', data.token);
           try { sessionStorage.setItem('showAppPromoAfterLogin', 'yes'); } catch {}
           window.location.href = playerDestination();
         }
@@ -215,6 +247,29 @@
       document.getElementById('phone').focus();
     });
   </script>
+  <script>
+    fetch('/api/site-branding').then(response => response.ok ? response.json() : null).then(branding => {
+      if (!branding) return;
+      const logo = document.querySelector('.login-logo');
+      const favicon = document.querySelector('link[rel="icon"]');
+      const appleIcon = document.querySelector('link[rel="apple-touch-icon"]');
+      if (logo) {
+        const fallbackLogos = ['/logo.png', '/logo.svg'];
+        logo.onerror = () => {
+          while (fallbackLogos.length) {
+            const fallback = fallbackLogos.shift();
+            if (new URL(fallback, location.href).href === logo.src) continue;
+            logo.src = fallback;
+            return;
+          }
+        };
+      }
+      if (logo && branding.brandLogoUrl) logo.src = branding.brandLogoUrl;
+      if (favicon && branding.appIcon192Url) favicon.href = branding.appIcon192Url;
+      if (appleIcon && branding.appIcon192Url) appleIcon.href = branding.appIcon192Url;
+    }).catch(() => {});
+  </script>
+  <script src="/i18n.js"></script>
   <script src="/player-copy.js" defer></script>
 </body>
 </html>
