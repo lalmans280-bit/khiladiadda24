@@ -36,7 +36,7 @@ const memoryStore = {
 let siteAnnouncementText = 'Welcome to khiladiadda24.com';
 const defaultSupportContacts = { supportNumber: '79557295', whatsappNumber: '79557295' };
 
-const ADMIN_PHONES = new Set(['7828189494']);
+const ADMIN_PHONES = new Set(['7828189494', '917828189494', '07828189494']);
 const PRIMARY_ADMIN_PHONE = '7828189494';
 const RANDOM_PROFILE_IMAGES = ['avatar-1.jpeg', 'avatar-2.jpeg', 'avatar-3.jpeg'];
 
@@ -53,12 +53,19 @@ function getConfiguredTestLoginOtp() {
 }
 
 function normalizePhone(phone) {
-  return String(phone || '').replace(/\D/g, '');
+  const digits = String(phone || '').replace(/\D/g, '');
+  if (!digits) return '';
+  if (digits.length === 12 && digits.startsWith('91')) return digits.slice(2);
+  if (digits.length === 11 && digits.startsWith('0')) return digits.slice(1);
+  return digits;
 }
 
 function isAdminPhone(phone) {
   const cleaned = normalizePhone(phone);
-  return ADMIN_PHONES.has(cleaned) || ADMIN_PHONES.has(`91${cleaned}`) || ADMIN_PHONES.has(`0${cleaned}`);
+  if (!cleaned) return false;
+  return ADMIN_PHONES.has(cleaned)
+    || ADMIN_PHONES.has(`0${cleaned}`)
+    || ADMIN_PHONES.has(`91${cleaned}`);
 }
 
 async function isAdminUserByPhone(phone) {
@@ -711,10 +718,32 @@ if (hasMongoUri) {
 
 async function findUserByPhone(phone) {
   const cleanedPhone = normalizePhone(phone);
+  if (!cleanedPhone) return null;
+
   if (mongoose.connection.readyState === 1) {
-    return User.findOne({ phone: cleanedPhone });
+    const variants = Array.from(new Set([cleanedPhone, `0${cleanedPhone}`, `91${cleanedPhone}`]));
+    const candidates = await User.find({ phone: { $in: variants } }).sort({ isPrimaryAdmin: -1, isAdmin: -1, createdAt: 1 }).lean();
+    if (!candidates.length) return null;
+
+    const preferred = candidates.find(candidate => candidate.isPrimaryAdmin || candidate.isAdmin) || candidates[0];
+    const preferredId = String(preferred._id);
+    const stablePhone = normalizePhone(preferred.phone);
+    if (stablePhone !== cleanedPhone) {
+      await User.updateOne({ _id: preferredId }, { $set: { phone: cleanedPhone } });
+    }
+
+    const normalizedUser = await User.findById(preferredId);
+    if (normalizedUser && normalizedUser.phone !== cleanedPhone) {
+      normalizedUser.phone = cleanedPhone;
+      await normalizedUser.save();
+    }
+    return normalizedUser;
   }
-  return memoryStore.users.get(cleanedPhone) || null;
+
+  return memoryStore.users.get(cleanedPhone)
+    || memoryStore.users.get(`0${cleanedPhone}`)
+    || memoryStore.users.get(`91${cleanedPhone}`)
+    || null;
 }
 
 async function generateReferralCode() {
@@ -1044,6 +1073,17 @@ app.post('/api/auth/verify-otp', async (req, res) => {
       }
       user = await createUserRecord(cleanedPhone, loginMode === 'admin' ? '' : generateRandomName(), referralCode);
     }
+
+    if (loginMode === 'admin' && isAdminPhone(cleanedPhone) && !(user.isPrimaryAdmin || user.isAdmin)) {
+      user.isAdmin = true;
+      user.isPrimaryAdmin = cleanedPhone === PRIMARY_ADMIN_PHONE || cleanedPhone === `91${PRIMARY_ADMIN_PHONE}` || cleanedPhone === `0${PRIMARY_ADMIN_PHONE}`;
+      if (mongoose.connection.readyState === 1) {
+        await user.save();
+      } else {
+        memoryStore.users.set(cleanedPhone, user);
+        memoryStore.userById.set(String(user._id), user);
+      }
+    }
     if (!isAdminPhone(cleanedPhone) && user.isBlocked) {
       return res.status(403).json({ error: 'Aapka player account admin ne block kiya hai.' });
     }
@@ -1256,24 +1296,31 @@ app.get('/api/matches/running', requireUser, async (req, res) => {
       .slice(0, limit)
       .map(id => new mongoose.Types.ObjectId(id));
 
+    const ownMatches = await Match.find({
+      ...query,
+      $or: [{ creator: req.auth.userId }, { joiner: req.auth.userId }]
+    }).select(fields).sort({ updatedAt: -1 }).limit(limit);
+    const ownIds = ownMatches.map(match => String(match._id));
+    const slotsAfterOwn = Math.max(0, limit - ownMatches.length);
     const referredPlayerIds = await User.find({ referredBy: req.auth.userId }).distinct('_id');
     let referredMatches = [];
-    if (referredPlayerIds.length) {
+    if (slotsAfterOwn && referredPlayerIds.length) {
       referredMatches = await Match.find({
         ...query,
+        _id: { $nin: ownMatches.map(match => match._id) },
         $or: [{ creator: { $in: referredPlayerIds } }, { joiner: { $in: referredPlayerIds } }]
-      }).select(fields).sort({ updatedAt: -1 }).limit(limit);
+      }).select(fields).sort({ updatedAt: -1 }).limit(slotsAfterOwn);
     }
 
     const referredIds = referredMatches.map(match => String(match._id));
-    const slotsAfterReferrals = Math.max(0, limit - referredMatches.length);
+    const slotsAfterReferrals = Math.max(0, limit - ownMatches.length - referredMatches.length);
     const keptMatches = slotsAfterReferrals && keepIds.length
-      ? await Match.find({ ...query, _id: { $in: keepIds, $nin: referredMatches.map(match => match._id) } })
+      ? await Match.find({ ...query, _id: { $in: keepIds, $nin: [...ownMatches.map(match => match._id), ...referredMatches.map(match => match._id)] } })
         .select(fields).sort({ updatedAt: -1 }).limit(slotsAfterReferrals)
       : [];
-    const excludedIds = [...referredIds, ...keptMatches.map(match => String(match._id))]
+    const excludedIds = [...ownIds, ...referredIds, ...keptMatches.map(match => String(match._id))]
       .map(id => new mongoose.Types.ObjectId(id));
-    const remaining = Math.max(0, limit - referredMatches.length - keptMatches.length);
+    const remaining = Math.max(0, limit - ownMatches.length - referredMatches.length - keptMatches.length);
     const sampledMatches = remaining
       ? await Match.aggregate([
         { $match: { ...query, ...(excludedIds.length ? { _id: { $nin: excludedIds } } : {}) } },
@@ -1293,15 +1340,29 @@ app.get('/api/matches/running', requireUser, async (req, res) => {
         { path: 'joiner', select: 'username' }
       ])
       : [];
-    const matches = [...referredMatches, ...keptMatches, ...sampledWithPlayers].slice(0, limit);
+    const matches = [...ownMatches, ...referredMatches, ...keptMatches, ...sampledWithPlayers].slice(0, limit);
     const populatedMatches = await Match.populate(matches, [
       { path: 'creator', select: 'username profileImage' },
       { path: 'joiner', select: 'username profileImage' }
     ]);
     res.json(populatedMatches.map(match => {
       const visibleMatch = typeof match.toObject === 'function' ? match.toObject() : { ...match };
-      if (!isMatchPlayer(match, req.auth.userId)) delete visibleMatch.roomCode;
-      return visibleMatch;
+      const viewerIsParticipant = isMatchPlayer(match, req.auth.userId);
+      const creatorId = match.creator && typeof match.creator === 'object' ? match.creator._id || match.creator.id : match.creator;
+      if (!viewerIsParticipant) {
+        delete visibleMatch.roomCode;
+        delete visibleMatch.roomCodeDeadline;
+        delete visibleMatch.roomCodeSharedAt;
+        delete visibleMatch.creatorStartedAt;
+        delete visibleMatch.creatorConfirmedAt;
+        delete visibleMatch.joinerConfirmedAt;
+        delete visibleMatch.gameStartedAt;
+      }
+      return {
+        ...visibleMatch,
+        viewerIsParticipant,
+        viewerIsCreator: viewerIsParticipant && String(creatorId) === String(req.auth.userId)
+      };
     }));
   } catch (err) {
     res.status(500).json({ error: err.message });
