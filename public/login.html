@@ -8,8 +8,11 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link rel="manifest" href="/api/site-manifest">
+  <link rel="icon" href="/app-icon.svg" type="image/svg+xml">
+  <link rel="shortcut icon" href="/app-icon.svg" type="image/svg+xml">
   <link rel="icon" href="/app-icon-192.png" type="image/png" sizes="192x192">
   <link rel="apple-touch-icon" href="/app-icon-192.png">
+  <link rel="mask-icon" href="/app-icon.svg" color="#f4c84b">
   <title>Login - KhiladiAdda24.com</title>
   <style>
     :root { color-scheme: dark; --panel: #19231d; --line: #35483a; --ink: #f3f4ed; --muted: #b4c0b6; --gold: #e7b83f; --error: #ffb4a9; }
@@ -194,9 +197,22 @@
           body: JSON.stringify({ phone, otp, loginMode, referralCode: document.getElementById('referralCode').value.trim().toUpperCase() })
         });
         const data = await readResponse(res);
-        localStorage.setItem('user', JSON.stringify(data.user));
+
+        const finalUser = data.user ? {
+          ...data.user,
+          role: (loginMode === 'admin' || data.user.role === 'admin') ? 'admin' : 'user'
+        } : { role: loginMode === 'admin' ? 'admin' : 'user' };
+
+        if (loginMode === 'admin' && finalUser.role !== 'admin') {
+          throw new Error('Admin account not authorized for this login mode.');
+        }
+
+        localStorage.removeItem('user');
+        localStorage.removeItem('token');
+        localStorage.setItem('user', JSON.stringify(finalUser));
         localStorage.setItem('token', data.token);
-        if (data.user && data.user.role === 'admin') {
+
+        if (finalUser.role === 'admin') {
           window.location.href = '/admin.html';
         } else {
           try { sessionStorage.setItem('showAppPromoAfterLogin', 'yes'); } catch {}
