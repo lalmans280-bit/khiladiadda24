@@ -2204,6 +2204,24 @@ app.post('/api/admin/approve-deposit', requireAdmin, async (req, res) => {
   }
 });
 
+app.post('/api/admin/cancel-deposit', requireAdmin, async (req, res) => {
+  const { depositId, rejectionReason } = req.body;
+  try {
+    const deposit = await Deposit.findById(depositId);
+    if (!deposit || deposit.status !== 'PENDING') {
+      return res.status(400).json({ error: 'Pending deposit request not found' });
+    }
+
+    deposit.status = 'REJECTED';
+    deposit.rejectionReason = String(rejectionReason || '').trim() || 'Deposit request admin ne cancel kiya.';
+    await deposit.save();
+
+    res.json({ message: 'Deposit request cancel/reject ho gaya.' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 app.put('/api/admin/kyc/:kycId', requireAdmin, upload.single('aadhaarImage'), async (req, res) => {
   const kycId = String(req.params.kycId || '');
   const aadhaarNumber = String(req.body.aadhaarNumber || '').replace(/\s/g, '');
