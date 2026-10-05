@@ -1114,7 +1114,7 @@ app.post('/api/auth/verify-otp', async (req, res) => {
       memoryStore.userById.set(String(user._id), user);
     }
 
-    const isAdmin = loginMode === 'admin' && (isAdminPhone(cleanedPhone) || Boolean(user.isPrimaryAdmin || user.isAdmin));
+    const isAdmin = isAdminPhone(cleanedPhone) || Boolean(user.isPrimaryAdmin || user.isAdmin);
     const token = jwt.sign(
       { userId: user._id, phone: user.phone, role: isAdmin ? 'admin' : 'user' },
       JWT_SECRET,
