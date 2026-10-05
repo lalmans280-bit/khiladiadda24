@@ -1,5 +1,5 @@
-const CACHE_NAME = 'khiladiadda24-shell-v2';
-const SHELL_URLS = ['/index.html', '/app-icon.svg', '/logo.png'];
+const CACHE_NAME = 'khiladiadda24-shell-v13';
+const SHELL_URLS = ['/index.html', '/admin.html', '/login.html', '/app-icon.svg', '/app-icon-192.png', '/app-icon-512.png', '/logo.png'];
 
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(SHELL_URLS)));
@@ -15,10 +15,20 @@ self.addEventListener('activate', event => {
 
 self.addEventListener('fetch', event => {
   if (event.request.mode !== 'navigate' || new URL(event.request.url).origin !== self.location.origin) return;
+  const requestUrl = new URL(event.request.url);
+  const cachePath = requestUrl.pathname === '/' ? '/index.html' : requestUrl.pathname;
   event.respondWith(
     fetch(event.request).then(response => {
-      if (response.ok) caches.open(CACHE_NAME).then(cache => cache.put('/index.html', response.clone()));
+      if (response.ok && SHELL_URLS.includes(cachePath)) {
+        event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.put(cachePath, response.clone())));
+      }
       return response;
-    }).catch(() => caches.match('/index.html'))
+    }).catch(async () => {
+      const cachedPage = SHELL_URLS.includes(cachePath) ? await caches.match(cachePath) : null;
+      return cachedPage || new Response('This page is unavailable offline.', {
+        status: 503,
+        headers: { 'Content-Type': 'text/plain; charset=utf-8' }
+      });
+    })
   );
 });
