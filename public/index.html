@@ -39,6 +39,7 @@
     .demo-battles-header{display:flex;align-items:center;gap:6px;margin:5px 0 2px;font-size:16px;font-weight:900;line-height:1.2}
     .demo-battles-list{display:grid;gap:6px}
     .demo-battle-card{margin:0 0 1px;padding:6px 8px}
+    .demo-wait-status{flex-basis:100%;color:var(--muted);font-size:11px;font-weight:700;text-align:right}
     .open-list-box{margin-top:10px;padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--panel);box-shadow:0 8px 24px #0003}
     .sample-running-battle{display:grid;gap:6px;margin:0;padding:7px 9px}
     .sample-running-battle .battle-prizes{margin-bottom:0}
@@ -499,10 +500,6 @@
     el('refreshOpen').before(openBattlesHeading);
     const languageToggle=document.querySelector('.top-inner .lang-toggle');
     if(languageToggle&&homeMatchHeader)homeMatchHeader.insertBefore(languageToggle,el('refreshOpen'));
-    const runningBattlesHeading=document.createElement('h2');
-    runningBattlesHeading.textContent='Running Battles';
-    runningBattlesHeading.style.fontWeight='900';
-    el('runningMatches').before(runningBattlesHeading);
     const samplePlayerNames=['Aarav Sharma','Vivaan Verma','Aditya Singh','Arjun Patel','Ishaan Gupta','Rohan Yadav','Kabir Mehta','Reyansh Kumar','Advika Joshi','Sai Prasad','Ananya Sharma','Diya Patel','Aadhya Verma','Saanvi Gupta','Myra Singh','Kiara Nair','Isha Reddy','Pari Shah','Meera Iyer','Avni Das','Kunal Mishra','Dev Malhotra','Yash Thakur','Omkar Pawar','Manav Jain','Harsh Agarwal','Nikhil Rao','Rahul Sinha','Siddharth Bose','Varun Kapoor','Priya Menon','Kavya Kulkarni','Neha Choudhary','Riya Banerjee','Tara Bhat','Sneha Desai','Pooja Bansal','Nandini Pillai','Anika Roy','Sanjana Kulkarni'];
     const sampleEntryAmounts=[100,150,200,250,300,350,400,450,500,600,700,800,900,1000,1250,1500,2000,2500,3000,5000];
     const sampleAvatarPaths=['/1.png','/2.png','/3.png','/4.png','/5.png'];
@@ -530,13 +527,25 @@
       return Array.from({length:10},(_,index)=>({player:{name:demoNames[index],avatar:sampleAvatarPaths[index%sampleAvatarPaths.length]},amount:demoAmounts[index],gameType:index%2===0?'LUDO':'SNAKE'}));
     }
     let demoBattlePairs=createDemoBattlePairs();
+    const demoBattleWaitStartedAt=new Map();
     let sampleRunningBattles=createSampleRunningBattles(demoBattlePairs.map(({player})=>player.name));
     const demoBattlesList=document.createElement('div');
     demoBattlesList.className='demo-battles-list';
     const demoBattlesHeader='<div class="demo-battles-header"><strong>OPEN</strong></div>';
     function renderDemoBattles(){
-      demoBattlesList.innerHTML = demoBattlePairs.map(({player,amount,gameType})=>`<article class="match battle-card demo-battle-card"><div class="battle-prizes open-battle-prizes"><div class="battle-prize-players"><div class="battle-players battle-players-waiting">${battlePlayerMarkup({username:player.name,profileImage:player.avatar.replace(/^\//,'')},'Challenger',false,amount,gameType==='SNAKE'?'Snake Battle':'Ludo Classic')}</div></div><div class="battle-card-actions"><button class="btn green small" type="button" disabled aria-disabled="true">PLAY</button></div></div></article>`).join('');
+      demoBattlesList.innerHTML = demoBattlePairs.map(({player,amount,gameType})=>{
+        const waiting=demoBattleWaitStartedAt.has(player.name);
+        const elapsed=waiting?Math.floor((Date.now()-demoBattleWaitStartedAt.get(player.name))/1000):0;
+        const timer=`${String(Math.floor(elapsed/60)).padStart(2,'0')}:${String(elapsed%60).padStart(2,'0')}`;
+        return `<article class="match battle-card demo-battle-card"><div class="battle-prizes open-battle-prizes"><div class="battle-prize-players"><div class="battle-players battle-players-waiting">${battlePlayerMarkup({username:player.name,profileImage:player.avatar.replace(/^\//,'')},'Challenger',false,amount,gameType==='SNAKE'?'Snake Battle':'Ludo Classic')}</div></div><div class="battle-card-actions"><button class="btn green small" type="button" data-demo-play="${esc(player.name)}"${waiting?' disabled aria-disabled="true"':''}>${waiting?'WAITING':'PLAY'}</button>${waiting?`<span class="demo-wait-status">Room code ka wait • <span data-demo-wait-timer="${esc(player.name)}">${timer}</span></span>`:''}</div></div></article>`;
+      }).join('');
     }
+    setInterval(()=>{
+      document.querySelectorAll('[data-demo-wait-timer]').forEach(timer=>{
+        const elapsed=Math.floor((Date.now()-demoBattleWaitStartedAt.get(timer.dataset.demoWaitTimer))/1000);
+        timer.textContent=`${String(Math.floor(elapsed/60)).padStart(2,'0')}:${String(elapsed%60).padStart(2,'0')}`;
+      });
+    },1000);
     const gameSamplePanel=document.createElement('div');
     gameSamplePanel.className='panel sample-running-panel';
     gameSamplePanel.innerHTML='<p class="sample-running-notice">Running Battles</p><div id="sampleRunningMatches" class="sample-running-list"></div>';
@@ -710,6 +719,19 @@
       if(view){event.preventDefault();return setView(view.dataset.view)}
       const filter=event.target.closest('[data-game]');
       if(filter){game=filter.dataset.game;document.querySelectorAll('.game-filter').forEach(button=>button.classList.toggle('active',button===filter));return loadOpen().catch(showError)}
+      const demoPlay=event.target.closest('[data-demo-play]');
+      if(demoPlay){
+        const playerName=demoPlay.dataset.demoPlay;
+        if(!demoBattleWaitStartedAt.has(playerName))demoBattleWaitStartedAt.set(playerName,Date.now());
+        demoPlay.disabled=true;
+        demoPlay.setAttribute('aria-disabled','true');
+        demoPlay.textContent='WAITING';
+        const elapsed=document.createElement('span');
+        elapsed.className='demo-wait-status';
+        elapsed.innerHTML=`Room code ka wait • <span data-demo-wait-timer="${esc(playerName)}">00:00</span>`;
+        demoPlay.after(elapsed);
+        return;
+      }
       const join=event.target.closest('[data-join]');
       if(join){
         join.disabled=true;
