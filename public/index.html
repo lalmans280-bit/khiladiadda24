@@ -676,7 +676,7 @@
       const openMarkup=openMatches.map(m=>matchCard(m)).join('');
       renderDemoBattles();
       const fallbackDemoMarkup = demoBattlesHeader + demoBattlesList.innerHTML;
-      const allOpenBattlesMarkup = `<div class="open-list-box">${openMarkup}<div class="demo-open-list-box">${fallbackDemoMarkup}</div></div>`;
+      const allOpenBattlesMarkup = `<div class="open-list-box">${openMarkup}</div><div class="demo-open-list-box">${fallbackDemoMarkup}</div>`;
       el('openMatches').innerHTML = allOpenBattlesMarkup;
       if(el('gameOpenMatches'))el('gameOpenMatches').innerHTML = allOpenBattlesMarkup;
       const currentPlayerId=String(player?._id||storedUser?._id||storedUser?.id||'');
