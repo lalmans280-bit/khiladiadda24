@@ -198,23 +198,32 @@
         });
         const data = await readResponse(res);
 
-        const finalUser = data.user ? {
-          ...data.user,
-          role: (loginMode === 'admin' || data.user.role === 'admin') ? 'admin' : 'user'
-        } : { role: loginMode === 'admin' ? 'admin' : 'user' };
+        if (!data.user || !data.token) {
+          throw new Error('Login response mein account details nahi mili. Dobara try karein.');
+        }
+        const finalUser = { ...data.user, role: data.user.role === 'admin' ? 'admin' : 'user' };
 
         if (loginMode === 'admin' && finalUser.role !== 'admin') {
           throw new Error('Admin account not authorized for this login mode.');
         }
 
-        localStorage.removeItem('user');
-        localStorage.removeItem('token');
-        localStorage.setItem('user', JSON.stringify(finalUser));
-        localStorage.setItem('token', data.token);
-
         if (finalUser.role === 'admin') {
+          localStorage.setItem('adminUser', JSON.stringify(finalUser));
+          localStorage.setItem('adminToken', data.token);
+          const previousUser = (() => {
+            try { return JSON.parse(localStorage.getItem('user') || 'null'); }
+            catch { return null; }
+          })();
+          if (previousUser?.role === 'admin') {
+            localStorage.removeItem('user');
+            localStorage.removeItem('token');
+          }
           window.location.href = '/admin.html';
         } else {
+          localStorage.removeItem('adminUser');
+          localStorage.removeItem('adminToken');
+          localStorage.setItem('user', JSON.stringify(finalUser));
+          localStorage.setItem('token', data.token);
           try { sessionStorage.setItem('showAppPromoAfterLogin', 'yes'); } catch {}
           window.location.href = playerDestination();
         }
