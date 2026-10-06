@@ -30,6 +30,7 @@ const matchSchema = new mongoose.Schema({
   joinerResultReason: { type: String, default: '' },
   joinerProofScreenshot: { type: String, default: '' },
   proofScreenshot: { type: String },
+  proofScreenshotsDeleteAt: { type: Date },
   cancelReason: { type: String, default: '' },
   cancelRequestReason: { type: String, default: '' },
   cancelRequestedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
