@@ -38,7 +38,8 @@ const defaultSupportContacts = { supportNumber: '79557295', whatsappNumber: '795
 
 const ADMIN_PHONES = new Set(['7828189494', '917828189494', '07828189494']);
 const PRIMARY_ADMIN_PHONE = '7828189494';
-const RANDOM_PROFILE_IMAGES = ['avatar-1.jpeg', 'avatar-2.jpeg', 'avatar-3.jpeg'];
+const RANDOM_PROFILE_IMAGES = ['1.png', '2.png', '3.png', '4.png', '5.png'];
+const LEGACY_DEFAULT_PROFILE_IMAGES = new Set(['avatar-1.jpeg', 'avatar-2.jpeg', 'avatar-3.jpeg']);
 
 function isTestLoginEnabled() {
   return /^(1|true|yes|on)$/i.test(String(process.env.ALLOW_TEST_LOGIN || '').trim());
@@ -300,6 +301,10 @@ function generateRandomName() {
 
 function generateRandomProfileImage() {
   return RANDOM_PROFILE_IMAGES[Math.floor(Math.random() * RANDOM_PROFILE_IMAGES.length)];
+}
+
+function needsDefaultProfileImage(profileImage) {
+  return !profileImage || LEGACY_DEFAULT_PROFILE_IMAGES.has(profileImage);
 }
 
 // Ensure uploads folder exists
@@ -1087,11 +1092,11 @@ app.post('/api/auth/verify-otp', async (req, res) => {
     if (!isAdminPhone(cleanedPhone) && user.isBlocked) {
       return res.status(403).json({ error: 'Aapka player account admin ne block kiya hai.' });
     }
-    if (mongoose.connection.readyState === 1 && !user.isAdmin && !user.isPrimaryAdmin && !user.profileImage) {
+    if (mongoose.connection.readyState === 1 && !user.isAdmin && !user.isPrimaryAdmin && needsDefaultProfileImage(user.profileImage)) {
       user.profileImage = generateRandomProfileImage();
       await user.save();
     }
-    if (mongoose.connection.readyState !== 1 && !user.isAdmin && !user.isPrimaryAdmin && !user.profileImage) {
+    if (mongoose.connection.readyState !== 1 && !user.isAdmin && !user.isPrimaryAdmin && needsDefaultProfileImage(user.profileImage)) {
       user.profileImage = generateRandomProfileImage();
     }
     let referralReferrer = null;
