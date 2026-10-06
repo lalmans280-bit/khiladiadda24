@@ -11,6 +11,7 @@ const QRCode = require('qrcode');
 const axios = require('axios');
 const jwt = require('jsonwebtoken');
 const { Server } = require('socket.io');
+const { pipeline } = require('stream/promises');
 
 // Models
 const User = require('./models/user');
@@ -26,6 +27,7 @@ const server = http.createServer(app);
 const io = new Server(server, { cors: { origin: '*' } });
 const JWT_SECRET = process.env.JWT_SECRET || crypto.randomBytes(32).toString('hex');
 const uploadDirectory = path.join(__dirname, 'uploads');
+const uploadBucketName = 'appUploads';
 
 const memoryStore = {
   users: new Map(),
@@ -326,10 +328,188 @@ const upload = multer({
   fileFilter: (req, file, cb) => cb(null, ['image/jpeg', 'image/png', 'image/webp'].includes(file.mimetype))
 });
 
+function getUploadBucket() {
+  if (mongoose.connection.readyState !== 1 || !mongoose.connection.db) {
+    throw new Error('MongoDB must be connected before uploaded files can be stored.');
+  }
+  return new mongoose.mongo.GridFSBucket(mongoose.connection.db, { bucketName: uploadBucketName });
+}
+
+async function deleteStoredUpload(filename) {
+  const safeFilename = path.basename(filename);
+  if (mongoose.connection.readyState !== 1 || !mongoose.connection.db) return;
+  const files = mongoose.connection.db.collection(`${uploadBucketName}.files`);
+  const storedFile = await files.findOne({ filename: safeFilename }, { projection: { _id: 1 } });
+  if (storedFile) await getUploadBucket().delete(storedFile._id);
+}
+
+function getUploadFilename(filePath) {
+  return path.basename(String(filePath || '').replace(/\\/g, '/'));
+}
+
+async function deleteReviewedScreenshotFiles(filePaths) {
+  const filenames = [...new Set(filePaths.map(getUploadFilename).filter(Boolean))];
+  for (const filename of filenames) {
+    await deleteStoredUpload(filename);
+  }
+}
+
+async function scheduleScreenshotCleanupAfterReview(filename) {
+  const reviewedAt = new Date(Date.now() + 2 * 60 * 1000);
+  const storedPath = `uploads/${filename}`;
+  const localPath = path.join(uploadDirectory, filename);
+  await Deposit.updateMany(
+    {
+      screenshot: storedPath,
+      $or: [{ screenshotDeleteAt: { $exists: false } }, { screenshotDeleteAt: null }]
+    },
+    { $set: { screenshotDeleteAt: reviewedAt } }
+  );
+  await Match.updateMany(
+    {
+      $and: [
+        { $or: [
+          { creatorProofScreenshot: { $in: [storedPath, localPath] } },
+          { joinerProofScreenshot: { $in: [storedPath, localPath] } },
+          { proofScreenshot: { $in: [storedPath, localPath] } }
+        ] },
+        { $or: [
+          { proofScreenshotsDeleteAt: { $exists: false } },
+          { proofScreenshotsDeleteAt: null }
+        ] }
+      ]
+    },
+    { $set: { proofScreenshotsDeleteAt: reviewedAt } }
+  );
+}
+
+async function cleanupReviewedScreenshots() {
+  if (mongoose.connection.readyState !== 1 || !mongoose.connection.db) return;
+
+  const now = new Date();
+  const expiredDeposits = await Deposit.find({
+    screenshotDeleteAt: { $lte: now },
+    screenshot: { $nin: ['', null] }
+  });
+  for (const deposit of expiredDeposits) {
+    try {
+      await deleteReviewedScreenshotFiles([deposit.screenshot]);
+      deposit.screenshot = '';
+      deposit.screenshotDeleteAt = undefined;
+      await deposit.save();
+    } catch (error) {
+      console.error(`Could not remove reviewed deposit screenshot ${deposit._id}:`, error);
+    }
+  }
+
+  const expiredMatches = await Match.find({
+    proofScreenshotsDeleteAt: { $lte: now },
+    $or: [
+      { creatorProofScreenshot: { $nin: ['', null] } },
+      { joinerProofScreenshot: { $nin: ['', null] } },
+      { proofScreenshot: { $nin: ['', null] } }
+    ]
+  });
+  for (const match of expiredMatches) {
+    try {
+      await deleteReviewedScreenshotFiles([
+        match.creatorProofScreenshot,
+        match.joinerProofScreenshot,
+        match.proofScreenshot
+      ]);
+      match.creatorProofScreenshot = '';
+      match.joinerProofScreenshot = '';
+      match.proofScreenshot = '';
+      match.proofScreenshotsDeleteAt = undefined;
+      await match.save();
+    } catch (error) {
+      console.error(`Could not remove reviewed match screenshots ${match._id}:`, error);
+    }
+  }
+}
+
+async function cleanupTemporaryUpload(file) {
+  if (!file?.path) return;
+  await fs.promises.unlink(file.path).catch(error => {
+    if (error.code !== 'ENOENT') console.error('Could not remove temporary upload:', error);
+  });
+}
+
+function persistUploads(multerMiddleware) {
+  return (req, res, next) => {
+    multerMiddleware(req, res, uploadError => {
+      if (uploadError) return next(uploadError);
+      const files = req.file ? [req.file] : Object.values(req.files || {}).flat();
+      if (!files.length) return next();
+
+      (async () => {
+        const bucket = getUploadBucket();
+        for (const file of files) {
+          await pipeline(
+            fs.createReadStream(file.path),
+            bucket.openUploadStream(file.filename, { metadata: { contentType: file.mimetype } })
+          );
+        }
+      })().then(() => {
+        const cleanup = () => {
+          void Promise.all(files.map(cleanupTemporaryUpload));
+        };
+        res.once('finish', cleanup);
+        res.once('close', cleanup);
+        next();
+      }).catch(async error => {
+        await Promise.all(files.map(async file => {
+          await cleanupTemporaryUpload(file);
+          try {
+            await deleteStoredUpload(file.filename);
+          } catch (cleanupError) {
+            console.error('Could not remove an incomplete uploaded file:', cleanupError);
+          }
+        }));
+        console.error('Could not persist uploaded files in MongoDB:', error);
+        if (!res.headersSent) {
+          res.status(503).json({ error: 'File storage is unavailable. Please try again later.' });
+        }
+      });
+    });
+  };
+}
+
+async function sendUploadedFile(filename, res, cacheControl = 'private, no-store') {
+  const safeFilename = path.basename(filename);
+  if (mongoose.connection.readyState === 1 && mongoose.connection.db) {
+    const storedFile = await mongoose.connection.db
+      .collection(`${uploadBucketName}.files`)
+      .findOne({ filename: safeFilename }, { projection: { _id: 1, metadata: 1 } });
+    if (storedFile) {
+      if (storedFile.metadata?.contentType) res.type(storedFile.metadata.contentType);
+      res.set('Cache-Control', cacheControl);
+      const download = getUploadBucket().openDownloadStream(storedFile._id);
+      download.on('error', error => {
+        console.error('Could not read uploaded file from MongoDB:', error);
+        if (res.headersSent) res.destroy(error);
+        else res.status(500).end();
+      });
+      download.pipe(res);
+      return true;
+    }
+  }
+
+  const localFile = path.join(uploadDirectory, safeFilename);
+  if (!fs.existsSync(localFile)) return false;
+  res.set('Cache-Control', cacheControl);
+  res.sendFile(localFile);
+  return true;
+}
+
 // Middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
+
+app.get('/healthz', (req, res) => {
+  res.sendStatus(200);
+});
 
 function brandingImageUrl(settings, key, fallback) {
   const storedPath = settings?.[key];
@@ -417,11 +597,10 @@ app.get('/api/site-branding/image/:asset', async (req, res) => {
     const storedPath = settings?.[imageSettings[0]];
     const fallback = imageSettings[1];
     if (!storedPath) return res.redirect(fallback);
-    const filePath = path.join(uploadDirectory, path.basename(storedPath));
-    if (!fs.existsSync(filePath)) return res.redirect(fallback);
-    res.set('Cache-Control', 'public, max-age=31536000, immutable');
-    res.sendFile(filePath);
+    const sent = await sendUploadedFile(storedPath, res, 'public, max-age=31536000, immutable');
+    if (!sent) res.redirect(fallback);
   } catch (err) {
+    console.error('Could not serve site branding image:', err);
     res.status(500).end();
   }
 });
@@ -459,7 +638,7 @@ app.get('/api/site-manifest', async (req, res) => {
 app.post('/api/admin/branding', requireAdmin, (req, res, next) => {
   if (mongoose.connection.readyState !== 1) return res.status(503).json({ error: mongoUnavailableMessage() });
   next();
-}, upload.fields([
+}, persistUploads(upload.fields([
   { name: 'brandLogo', maxCount: 1 },
   { name: 'appIcon192', maxCount: 1 },
   { name: 'appIcon512', maxCount: 1 },
@@ -467,7 +646,7 @@ app.post('/api/admin/branding', requireAdmin, (req, res, next) => {
   { name: 'ludoBanner', maxCount: 1 },
   { name: 'snakeBanner', maxCount: 1 },
   { name: 'supportBanner', maxCount: 1 }
-]), async (req, res) => {
+])), async (req, res) => {
   const files = req.files || {};
   const selectedFiles = Object.values(files).flat();
   if (!selectedFiles.length) return res.status(400).json({ error: 'Kam se kam ek PNG image select karein.' });
@@ -479,7 +658,14 @@ app.post('/api/admin/branding', requireAdmin, (req, res, next) => {
       const invalidPng = file.mimetype !== 'image/png' || !header.subarray(0, 8).equals(pngSignature);
       const invalidDimensions = expectedSize && (header.length < 24 || header.readUInt32BE(16) !== expectedSize || header.readUInt32BE(20) !== expectedSize);
       if (invalidPng || invalidDimensions) {
-      await Promise.all(selectedFiles.map(item => fs.promises.unlink(item.path).catch(() => {})));
+        await Promise.all(selectedFiles.map(async item => {
+          await cleanupTemporaryUpload(item);
+          try {
+            await deleteStoredUpload(item.filename);
+          } catch (error) {
+            console.error('Could not remove an invalid branding image:', error);
+          }
+        }));
         const message = invalidDimensions ? `App icon ${expectedSize}x${expectedSize}px PNG hona chahiye.` : 'Sirf valid PNG images upload karein.';
         return res.status(400).json({ error: message });
       }
@@ -1185,7 +1371,7 @@ app.get('/api/profile/me', requireUser, async (req, res) => {
   }
 });
 
-app.post('/api/profile/update', requireUser, upload.single('profileImage'), async (req, res) => {
+app.post('/api/profile/update', requireUser, persistUploads(upload.single('profileImage')), async (req, res) => {
   const username = String(req.body.username || '').trim();
   if (username.length < 2 || username.length > 40) {
     return res.status(400).json({ error: 'Naam 2 se 40 characters ke beech hona chahiye' });
@@ -1206,19 +1392,22 @@ app.get('/api/profile/image/:filename', async (req, res) => {
   const filename = path.basename(req.params.filename);
   try {
     const user = await User.findOne({ profileImage: `uploads/${filename}` }).select('_id');
-    const file = path.join(uploadDirectory, filename);
-    if (!user || !fs.existsSync(file)) return res.status(404).end();
-    res.sendFile(file);
+    if (!user || !(await sendUploadedFile(filename, res))) return res.status(404).end();
   } catch (err) {
+    console.error('Could not serve profile image:', err);
     res.status(500).end();
   }
 });
 
 app.get('/api/admin/uploads/:filename', requireAdmin, async (req, res) => {
   const filename = path.basename(req.params.filename);
-  const file = path.join(uploadDirectory, filename);
-  if (!fs.existsSync(file)) return res.status(404).json({ error: 'File nahi mili' });
-  res.sendFile(file);
+  try {
+    await scheduleScreenshotCleanupAfterReview(filename);
+    if (!(await sendUploadedFile(filename, res))) return res.status(404).json({ error: 'File nahi mili' });
+  } catch (err) {
+    console.error('Could not serve uploaded admin file:', err);
+    res.status(500).json({ error: 'File nahi khul saki' });
+  }
 });
 
 // ================= MATCH & TOURNAMENT ROUTES ================= //
@@ -1628,7 +1817,7 @@ app.post('/api/matches/start-game', requireUser, async (req, res) => {
   }
 });
 
-app.post('/api/matches/submit-result', requireUser, upload.single('screenshot'), async (req, res) => {
+app.post('/api/matches/submit-result', requireUser, persistUploads(upload.single('screenshot')), async (req, res) => {
   const { matchId, winnerId } = req.body;
   const resultReason = String(req.body.resultReason || '').trim();
   const userId = req.auth.userId;
@@ -1694,7 +1883,7 @@ app.post('/api/matches/submit-result', requireUser, upload.single('screenshot'),
           [reasonField]: isWinReport ? '' : resultReason.slice(0, 300),
           [proofField]: req.file?.path || '',
           resultSubmittedBy: userId,
-          proofScreenshot: req.file?.path || '',
+          proofScreenshot: req.file ? `uploads/${req.file.filename}` : '',
           gameStartedAt: match.gameStartedAt || new Date()
         } },
         { new: true, session }
@@ -1920,7 +2109,7 @@ app.get('/api/wallet/generate-qr', requireUser, async (req, res) => {
   }
 });
 
-app.post('/api/wallet/submit-deposit', requireUser, upload.single('screenshot'), async (req, res) => {
+app.post('/api/wallet/submit-deposit', requireUser, persistUploads(upload.single('screenshot')), async (req, res) => {
   const { amount, utrNumber } = req.body;
   const userId = req.auth.userId;
   const depositAmount = Number(amount);
@@ -1975,7 +2164,7 @@ app.get('/api/kyc/:userId', requireUser, async (req, res) => {
   }
 });
 
-app.post('/api/kyc/submit', requireUser, upload.single('aadhaarImage'), async (req, res) => {
+app.post('/api/kyc/submit', requireUser, persistUploads(upload.single('aadhaarImage')), async (req, res) => {
   const userId = req.auth.userId;
   const aadhaarNumber = String(req.body.aadhaarNumber || '').replace(/\s/g, '');
   if (!userId || !/^\d{12}$/.test(aadhaarNumber)) {
@@ -1994,7 +2183,7 @@ app.post('/api/kyc/submit', requireUser, upload.single('aadhaarImage'), async (r
     const kycData = {
       userId,
       aadhaarNumber,
-      aadhaarImage: req.file.path,
+      aadhaarImage: `uploads/${req.file.filename}`,
       status: 'PENDING',
       rejectionReason: '',
       submittedAt: new Date(),
@@ -2007,7 +2196,7 @@ app.post('/api/kyc/submit', requireUser, upload.single('aadhaarImage'), async (r
   }
 });
 
-app.post('/api/wallet/withdraw', requireUser, upload.single('payoutQr'), async (req, res) => {
+app.post('/api/wallet/withdraw', requireUser, persistUploads(upload.single('payoutQr')), async (req, res) => {
   const { amount, accountHolderName, accountNumber, ifscCode, upiId } = req.body;
   const userId = req.auth.userId;
   const withdrawAmount = Number(amount);
@@ -2016,7 +2205,7 @@ app.post('/api/wallet/withdraw', requireUser, upload.single('payoutQr'), async (
   const holderName = String(accountHolderName || '').trim();
   const bankIfsc = String(ifscCode || '').trim().toUpperCase();
   const payoutUpiId = String(upiId || '').trim();
-  const payoutQr = req.file?.path || '';
+  const payoutQr = req.file ? `uploads/${req.file.filename}` : '';
   if (!Number.isInteger(withdrawAmount) || withdrawAmount < 500 || withdrawAmount % 100 !== 0) {
     return res.status(400).json({ error: 'Withdrawal ₹500 se shuru hoti hai aur ₹100 ke steps me request karein' });
   }
@@ -2206,6 +2395,7 @@ app.post('/api/admin/approve-deposit', requireAdmin, async (req, res) => {
     await user.save();
 
     deposit.status = 'APPROVED';
+    if (deposit.screenshot && !deposit.screenshotDeleteAt) deposit.screenshotDeleteAt = new Date(Date.now() + 2 * 60 * 1000);
     await deposit.save();
 
     io.emit('wallet_updated', {
@@ -2230,6 +2420,7 @@ app.post('/api/admin/cancel-deposit', requireAdmin, async (req, res) => {
 
     deposit.status = 'REJECTED';
     deposit.rejectionReason = String(rejectionReason || '').trim() || 'Deposit request admin ne cancel kiya.';
+    if (deposit.screenshot && !deposit.screenshotDeleteAt) deposit.screenshotDeleteAt = new Date(Date.now() + 2 * 60 * 1000);
     await deposit.save();
 
     res.json({ message: 'Deposit request cancel/reject ho gaya.' });
@@ -2238,7 +2429,7 @@ app.post('/api/admin/cancel-deposit', requireAdmin, async (req, res) => {
   }
 });
 
-app.put('/api/admin/kyc/:kycId', requireAdmin, upload.single('aadhaarImage'), async (req, res) => {
+app.put('/api/admin/kyc/:kycId', requireAdmin, persistUploads(upload.single('aadhaarImage')), async (req, res) => {
   const kycId = String(req.params.kycId || '');
   const aadhaarNumber = String(req.body.aadhaarNumber || '').replace(/\s/g, '');
   if (!mongoose.Types.ObjectId.isValid(kycId)) {
@@ -2253,7 +2444,7 @@ app.put('/api/admin/kyc/:kycId', requireAdmin, upload.single('aadhaarImage'), as
     if (!kyc) return res.status(404).json({ error: 'Pending KYC nahi mili' });
 
     kyc.aadhaarNumber = aadhaarNumber;
-    if (req.file) kyc.aadhaarImage = req.file.path;
+    if (req.file) kyc.aadhaarImage = `uploads/${req.file.filename}`;
     await kyc.save();
     res.json({ message: 'KYC details update ho gayi' });
   } catch (err) {
@@ -2337,6 +2528,9 @@ app.post('/api/admin/approve-match', requireAdmin, async (req, res) => {
     }
 
     match.status = 'COMPLETED';
+    if ((match.creatorProofScreenshot || match.joinerProofScreenshot || match.proofScreenshot) && !match.proofScreenshotsDeleteAt) {
+      match.proofScreenshotsDeleteAt = new Date(Date.now() + 2 * 60 * 1000);
+    }
     await match.save();
     await releaseMatchBetSlots(match);
     const completedMatch = await Match.findById(match._id)
@@ -2376,6 +2570,9 @@ app.post('/api/admin/cancel-match', requireAdmin, async (req, res) => {
     currentMatch.status = 'CANCELLED';
     currentMatch.cancelReason = 'ADMIN_CANCELLED';
     currentMatch.cancelledAt = new Date();
+    if ((currentMatch.creatorProofScreenshot || currentMatch.joinerProofScreenshot || currentMatch.proofScreenshot) && !currentMatch.proofScreenshotsDeleteAt) {
+      currentMatch.proofScreenshotsDeleteAt = new Date(Date.now() + 2 * 60 * 1000);
+    }
     await currentMatch.save();
     await releaseMatchBetSlots(currentMatch);
 
@@ -2728,6 +2925,13 @@ io.on('connection', (socket) => {
 });
 
 const PORT = process.env.PORT || 5000;
+const screenshotCleanupInterval = setInterval(() => {
+  cleanupReviewedScreenshots().catch(error => {
+    console.error('Could not process reviewed screenshot cleanup:', error);
+  });
+}, 5000);
+screenshotCleanupInterval.unref();
+
 const lanAddress = Object.values(os.networkInterfaces())
   .flatMap(addresses => addresses || [])
   .find(address => address.family === 'IPv4' && !address.internal)?.address;
