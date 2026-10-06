@@ -281,7 +281,8 @@
     #view-home>.home-running-battles-panel .battle-card .btn.danger{border-color:#ac514c;background:#642d29;color:#fff0ed}
   </style>
   <style id="mobileSizing">
-    #topInstallAppButton{width:34px;height:34px;min-height:34px;flex:none;padding:0;border-color:#69744c;color:#f8dc83;background:#222b27;font-size:20px;line-height:1}
+    #topInstallAppButton{display:grid;place-items:center;width:34px;height:34px;min-height:34px;flex:none;padding:3px;border-color:#69744c;background:#222b27}
+    #topInstallAppButton img{display:block;width:100%;height:100%;border-radius:6px;object-fit:cover}
     #gamePicker.game-launch{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
     #gamePicker .game-tile-image{width:min(100%,220px)}
     #gamePicker .game-coming-soon-tile{display:grid;place-content:center;justify-items:center;gap:5px;border-color:#647553;color:#fff;background:linear-gradient(140deg,#1d3929,#263b52);text-align:center}
@@ -493,7 +494,7 @@
     topInstallButton.id='topInstallAppButton';
     topInstallButton.className='icon top-install';
     topInstallButton.type='button';
-    topInstallButton.textContent='↓';
+    topInstallButton.innerHTML='<img src="/app-icon.svg" alt="">';
     topInstallButton.title='Install app';
     topInstallButton.setAttribute('aria-label','Install app');
     el('headerBalance').before(topInstallButton);
