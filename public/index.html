@@ -39,7 +39,7 @@
     .demo-battles-header{display:flex;align-items:center;gap:6px;margin:5px 0 2px;font-size:16px;font-weight:900;line-height:1.2}
     .demo-battles-header .open-heading-image{display:block;width:76px;height:42px;object-fit:contain;transform-origin:center;animation:open-heading-wiggle 2.8s ease-in-out infinite}
     .demo-battles-list{display:grid;gap:6px}
-    .demo-battle-card{margin:0 0 1px;padding:6px 8px}
+    .demo-battle-card{display:grid;gap:6px;margin:0;padding:7px 9px}
     .demo-wait-status{flex-basis:100%;color:var(--muted);font-size:11px;font-weight:700;text-align:right}
     .open-list-box{margin-top:10px;padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--panel);box-shadow:0 8px 24px #0003}
     .demo-open-list-box{width:100%;margin-top:12px;padding:14px;border:1px solid #ef4444;border-radius:10px;background:#b91c1c;color:#fff;box-shadow:0 8px 24px #0003}
@@ -294,6 +294,16 @@
     #view-home>.sample-running-panel .sample-running-notice{color:#fff}
     #view-home>.sample-running-panel,#view-home .demo-open-list-box{width:100%;margin-top:12px;padding:18px;border:1px solid #ef4444;border-radius:10px;background:#b91c1c;color:#fff;box-shadow:0 8px 24px #0003}
     @media(max-width:600px){#view-home>.sample-running-panel,#view-home .demo-open-list-box{padding:17px}}
+    html[data-theme="day"] #view-home .demo-open-list-box .battle-card{border-color:#bad9c0;background:#f3faf4;color:#214c30}
+    html[data-theme="day"] #view-home .demo-open-list-box .battle-prizes{border-color:#c3dfc9;background:#e6f4e9}
+    html[data-theme="day"] #view-home .demo-open-list-box .battle-prize small{color:#52745b}
+    html[data-theme="day"] #view-home .demo-open-list-box .battle-prize strong{color:#236b3b}
+    html[data-theme="night"] #view-home .demo-open-list-box .battle-card{border-color:#3c5d42;background:#19271d;color:var(--ink)}
+    html[data-theme="night"] #view-home .demo-open-list-box .battle-prizes{border-color:#3b5840;background:#121b15}
+    html[data-theme="night"] #view-home .demo-open-list-box .battle-prize small{color:#b4c4b7}
+    html[data-theme="night"] #view-home .demo-open-list-box .battle-prize strong{color:#f0c85b}
+    #view-home>.home-open-battles-panel #openMatches .demo-open-list-box .battle-prizes.open-battle-prizes{padding:5px;border:1px solid #3b5840;border-radius:8px;background:#121b15;box-shadow:none}
+    html[data-theme="day"] #view-home>.home-open-battles-panel #openMatches .demo-open-list-box .battle-prizes.open-battle-prizes{border-color:#c3dfc9;background:#e6f4e9}
     #view-home>.home-open-battles-panel .match-head h2,#view-home>.home-running-battles-panel>h2{display:block;margin:0;padding:0;border:0;border-radius:0;color:inherit;background:transparent;font-size:16px;line-height:1.2}
     html[data-theme="night"] .battle-prizes.open-battle-prizes .battle-player-amount{font-size:14px}
     @media(max-width:600px){.battle-prizes.open-battle-prizes .battle-player-name{font-size:10px}html[data-theme="night"] .battle-prizes.open-battle-prizes .battle-player-amount{font-size:12px}html[data-theme="day"] .battle-prizes.open-battle-prizes .battle-player-amount{font-size:12px}}
@@ -549,7 +559,7 @@
       const demoAmounts=[...sampleEntryAmounts];
       for(let index=demoNames.length-1;index>0;index-=1){const swapIndex=Math.floor(Math.random()*(index+1));[demoNames[index],demoNames[swapIndex]]=[demoNames[swapIndex],demoNames[index]]}
       for(let index=demoAmounts.length-1;index>0;index-=1){const swapIndex=Math.floor(Math.random()*(index+1));[demoAmounts[index],demoAmounts[swapIndex]]=[demoAmounts[swapIndex],demoAmounts[index]]}
-      return Array.from({length:10},(_,index)=>({player:{name:demoNames[index],avatar:sampleAvatarPaths[index%sampleAvatarPaths.length]},amount:demoAmounts[index],gameType:index%2===0?'LUDO':'SNAKE'}));
+      return Array.from({length:Math.floor(demoNames.length/3)},(_,index)=>({player:{name:demoNames[index],avatar:sampleAvatarPaths[index%sampleAvatarPaths.length]},amount:demoAmounts[index],gameType:index%2===0?'LUDO':'SNAKE'}));
     }
     let demoBattlePairs=createDemoBattlePairs();
     const demoBattleWaitStartedAt=new Map();
