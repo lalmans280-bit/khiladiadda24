@@ -400,9 +400,10 @@
           : 'Chrome ke menu (⋮) se “Install app” ya “Add to Home screen” chunein.');
         return;
       }
-      appInstallPrompt.prompt();
-      await appInstallPrompt.userChoice;
+      const installPrompt = appInstallPrompt;
       appInstallPrompt = null;
+      installPrompt.prompt();
+      await installPrompt.userChoice;
     }
     window.addEventListener('appinstalled', () => { appInstallPrompt = null; });
     async function shareWebsiteLink() {
@@ -694,7 +695,7 @@
       const openMarkup=openMatches.map(m=>matchCard(m)).join('');
       renderDemoBattles();
       const fallbackDemoMarkup = demoBattlesHeader + demoBattlesList.innerHTML;
-      const allOpenBattlesMarkup = `<div class="open-list-box">${openMarkup}</div><div class="demo-open-list-box">${fallbackDemoMarkup}</div>`;
+      const allOpenBattlesMarkup = `${openMarkup ? `<div class="open-list-box">${openMarkup}</div>` : ''}<div class="demo-open-list-box">${fallbackDemoMarkup}</div>`;
       el('openMatches').innerHTML = allOpenBattlesMarkup;
       if(el('gameOpenMatches'))el('gameOpenMatches').innerHTML = allOpenBattlesMarkup;
       const currentPlayerId=String(player?._id||storedUser?._id||storedUser?.id||'');
