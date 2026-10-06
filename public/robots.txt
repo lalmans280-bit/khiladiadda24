@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /admin.html
+Disallow: /login.html
+Disallow: /deposit.html
+
+Sitemap: https://khiladiadda24.com/sitemap.xml
