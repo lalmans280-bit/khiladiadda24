@@ -37,6 +37,7 @@
     .sample-running-notice{margin:0 0 10px;color:var(--ink);font-size:12px;font-weight:900}
     .sample-running-list{display:grid;gap:6px}
     .demo-battles-header{display:flex;align-items:center;gap:6px;margin:5px 0 2px;font-size:16px;font-weight:900;line-height:1.2}
+    .demo-battles-header .open-heading-image{display:block;width:76px;height:42px;object-fit:contain;transform-origin:center;animation:open-heading-wiggle 2.8s ease-in-out infinite}
     .demo-battles-list{display:grid;gap:6px}
     .demo-battle-card{margin:0 0 1px;padding:6px 8px}
     .demo-wait-status{flex-basis:100%;color:var(--muted);font-size:11px;font-weight:700;text-align:right}
@@ -316,7 +317,7 @@
     .open-battles-image-title{display:flex;align-items:center;gap:6px;min-height:42px;margin:0;padding:0;border:0;border-radius:0;background:transparent}
     .open-battles-image-title .open-heading-image{width:76px;height:42px;flex:none;object-fit:contain;transform-origin:center;animation:open-heading-wiggle 2.8s ease-in-out infinite}
     #view-home>.home-open-battles-panel .match-head h2.home-open-header-title{display:flex;align-items:center;justify-content:flex-start;gap:6px;min-height:42px;margin:0;padding:0;border:0;border-radius:0;background:transparent}
-    .sample-running-banner{display:block;width:min(100%,220px);height:auto;margin:0 0 10px;transform-origin:center;animation:open-heading-wiggle 2.8s ease-in-out infinite}
+    .sample-running-banner{display:block;width:min(100%,100px);height:auto;margin:0 0 10px;transform-origin:center;animation:open-heading-wiggle 2.8s ease-in-out infinite}
     @keyframes open-heading-wiggle{0%,100%{transform:translateY(0) rotate(-1deg)}50%{transform:translateY(-2px) rotate(1deg)}}
     @media(prefers-reduced-motion:reduce){.open-battles-image-title .open-heading-image,.sample-running-banner{animation:none}}
   </style>
@@ -553,7 +554,7 @@
     let sampleRunningBattles=createSampleRunningBattles(demoBattlePairs.map(({player})=>player.name));
     const demoBattlesList=document.createElement('div');
     demoBattlesList.className='demo-battles-list';
-    const demoBattlesHeader='<div class="demo-battles-header"><strong>OPEN</strong></div>';
+    const demoBattlesHeader='<div class="demo-battles-header"><img class="open-heading-image" src="/open.png" alt="Open battles"></div>';
     function renderDemoBattles(){
       demoBattlesList.innerHTML = demoBattlePairs.map(({player,amount,gameType})=>{
         const waiting=demoBattleWaitStartedAt.has(player.name);
