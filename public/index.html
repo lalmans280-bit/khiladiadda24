@@ -38,6 +38,11 @@
     .sample-running-list{display:grid;gap:6px}
     .demo-battles-header{display:flex;align-items:center;gap:6px;margin:5px 0 2px;font-size:16px;font-weight:900;line-height:1.2}
     .demo-battles-header .open-heading-image{display:block;width:76px;height:42px;object-fit:contain;transform-origin:center;animation:open-heading-wiggle 2.8s ease-in-out infinite}
+    .demo-running-header{display:flex;align-items:center;gap:8px;margin:0 0 10px}
+    .demo-running-header .sample-running-banner{margin:0}
+    .demo-live-badge{display:inline-flex;align-items:center;gap:5px;min-height:32px;padding:5px 9px;border:1px solid #ef444477;border-radius:6px;color:#ff7777;background:#101713;font-size:13px;font-weight:900;line-height:1}
+    .demo-live-dot{width:7px;height:7px;flex:none;border-radius:50%;background:#ef4444;box-shadow:0 0 7px #ef444477;animation:live-dot-pulse 1.5s ease-in-out infinite}
+    .demo-live-text{animation:live-text-pulse 1.8s ease-in-out infinite}
     .demo-battles-list{display:grid;gap:6px}
     .demo-battle-card{margin:0 0 1px;padding:6px 8px}
     .demo-wait-status{flex-basis:100%;color:var(--muted);font-size:11px;font-weight:700;text-align:right}
@@ -340,7 +345,7 @@
     #view-home>.home-open-battles-panel .match-head h2.home-open-header-title{display:flex;align-items:center;justify-content:flex-start;gap:6px;min-height:42px;margin:0;padding:0;border:0;border-radius:0;background:transparent}
     .sample-running-banner{display:block;width:min(100%,100px);height:auto;margin:0 0 10px;transform-origin:center;animation:open-heading-wiggle 2.8s ease-in-out infinite}
     @keyframes open-heading-wiggle{0%,100%{transform:translateY(0) rotate(-1deg)}50%{transform:translateY(-2px) rotate(1deg)}}
-    @media(prefers-reduced-motion:reduce){.open-battles-image-title .open-heading-image,.sample-running-banner{animation:none}}
+    @media(prefers-reduced-motion:reduce){.open-battles-image-title .open-heading-image,.sample-running-banner,.demo-live-dot,.demo-live-text{animation:none}}
   </style>
   <script>
     try {
@@ -576,7 +581,7 @@
     let sampleRunningBattles=createSampleRunningBattles(demoBattlePairs.map(({player})=>player.name));
     const demoBattlesList=document.createElement('div');
     demoBattlesList.className='demo-battles-list';
-    const demoBattlesHeader='<div class="demo-battles-header"><img class="open-heading-image" src="/open.png" alt="Open battles"></div>';
+    const demoBattlesHeader='<div class="demo-battles-header"><img class="open-heading-image" src="/open.png" alt="Open battles"><span class="demo-live-badge"><i class="demo-live-dot" aria-hidden="true"></i><span class="demo-live-text">LIVE</span></span></div>';
     function renderDemoBattles(){
       demoBattlesList.innerHTML = demoBattlePairs.map(({player,amount,gameType})=>{
         const waiting=demoBattleWaitStartedAt.has(player.name);
@@ -607,7 +612,7 @@
     },1000);
     const gameSamplePanel=document.createElement('div');
     gameSamplePanel.className='panel sample-running-panel demo-battles-container';
-    gameSamplePanel.innerHTML='<img class="sample-running-banner" src="/Battle-Run.png" alt="Running Battles"><div id="sampleRunningMatches" class="sample-running-list"></div>';
+    gameSamplePanel.innerHTML='<div class="demo-running-header"><img class="sample-running-banner" src="/Battle-Run.png" alt="Running Battles"><span class="demo-live-badge"><i class="demo-live-dot" aria-hidden="true"></i><span class="demo-live-text">LIVE</span></span></div><div id="sampleRunningMatches" class="sample-running-list"></div>';
     el('runningMatches').after(gameSamplePanel);
     const mySamplePanel=gameSamplePanel.cloneNode(true);
     mySamplePanel.querySelector('#sampleRunningMatches').id='mySampleRunningMatches';
