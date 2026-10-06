@@ -42,7 +42,6 @@
     .demo-battle-card{display:grid;gap:6px;margin:0;padding:7px 9px}
     .demo-wait-status{flex-basis:100%;color:var(--muted);font-size:11px;font-weight:700;text-align:right}
     .open-list-box{margin-top:10px;padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--panel);box-shadow:0 8px 24px #0003}
-    .demo-open-list-box{width:100%;margin-top:12px;padding:14px;border:1px solid #ef4444;border-radius:10px;background:#b91c1c;color:#fff;box-shadow:0 8px 24px #0003}
     .demo-open-list-box .demo-battles-header{margin-top:0;color:#fff}
     .sample-running-battle{display:grid;gap:6px;margin:0;padding:7px 9px}
     .sample-running-battle .battle-prizes{margin-bottom:0}
@@ -290,10 +289,9 @@
     #view-home>.home-open-battles-panel{padding:0;border:0;background:transparent;box-shadow:none}
     #view-home>.home-running-battles-panel,#view-home>.my-running-battles-section{padding:14px;border:1px solid var(--line);border-radius:10px;background:var(--panel);box-shadow:0 8px 24px #0003}
     #view-home>.my-running-battles-section{border-color:#ef4444;background:#b91c1c;color:#fff}
-    #view-home>.sample-running-panel{border-color:#ef4444;background:#b91c1c;color:#fff}
     #view-home>.sample-running-panel .sample-running-notice{color:#fff}
-    #view-home>.sample-running-panel,#view-home .demo-open-list-box{width:100%;margin-top:12px;padding:18px;border:1px solid #ef4444;border-radius:10px;background:#b91c1c;color:#fff;box-shadow:0 8px 24px #0003}
-    @media(max-width:600px){#view-home>.sample-running-panel,#view-home .demo-open-list-box{padding:17px}}
+    #view-home .demo-battles-container{width:100%;margin-top:12px;padding:18px;border:1px solid #ef4444;border-radius:10px;background:#b91c1c;color:#fff;box-shadow:0 8px 24px #0003}
+    @media(max-width:600px){#view-home .demo-battles-container{padding:17px}}
     html[data-theme="day"] #view-home .demo-open-list-box .battle-card{border-color:#bad9c0;background:#f3faf4;color:#214c30}
     html[data-theme="day"] #view-home .demo-open-list-box .battle-prizes{border-color:#c3dfc9;background:#e6f4e9}
     html[data-theme="day"] #view-home .demo-open-list-box .battle-prize small{color:#52745b}
@@ -596,7 +594,7 @@
       });
     },1000);
     const gameSamplePanel=document.createElement('div');
-    gameSamplePanel.className='panel sample-running-panel';
+    gameSamplePanel.className='panel sample-running-panel demo-battles-container';
     gameSamplePanel.innerHTML='<img class="sample-running-banner" src="/Battle-Run.png" alt="Running Battles"><div id="sampleRunningMatches" class="sample-running-list"></div>';
     el('runningMatches').after(gameSamplePanel);
     const mySamplePanel=gameSamplePanel.cloneNode(true);
@@ -706,7 +704,7 @@
       const openMarkup=openMatches.map(m=>matchCard(m)).join('');
       renderDemoBattles();
       const fallbackDemoMarkup = demoBattlesHeader + demoBattlesList.innerHTML;
-      const allOpenBattlesMarkup = `${openMarkup ? `<div class="open-list-box">${openMarkup}</div>` : ''}<div class="demo-open-list-box">${fallbackDemoMarkup}</div>`;
+      const allOpenBattlesMarkup = `${openMarkup ? `<div class="open-list-box">${openMarkup}</div>` : ''}<div class="demo-open-list-box demo-battles-container">${fallbackDemoMarkup}</div>`;
       el('openMatches').innerHTML = allOpenBattlesMarkup;
       if(el('gameOpenMatches'))el('gameOpenMatches').innerHTML = allOpenBattlesMarkup;
       const currentPlayerId=String(player?._id||storedUser?._id||storedUser?.id||'');
