@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="hi">
-<head>
+<head><script>window.khiladiAddToHomeScreenPrompt=null;window.addEventListener('beforeinstallprompt',event=>{event.preventDefault();window.khiladiAddToHomeScreenPrompt=event;});</script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#101713">
@@ -417,7 +417,7 @@
     const storedUser=(()=>{try{return JSON.parse(localStorage.getItem('user')||'null')}catch{return null}})();
     let player=null, game='LUDO', battlesPollTimer, kycApproved=false;
 
-    let appInstallPrompt = null;
+    let appInstallPrompt = window.khiladiAddToHomeScreenPrompt;
     window.addEventListener('beforeinstallprompt', event => {
       event.preventDefault();
       appInstallPrompt = event;
@@ -453,7 +453,7 @@
           : 'Chrome ke menu (⋮) se “Install app” ya “Add to Home screen” chunein.');
         return;
       }
-      const installPrompt = appInstallPrompt;
+      const installPrompt = appInstallPrompt || window.khiladiAddToHomeScreenPrompt; window.khiladiAddToHomeScreenPrompt = null;
       appInstallPrompt = null;
       installPrompt.prompt();
       await installPrompt.userChoice;
