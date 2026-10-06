@@ -349,8 +349,8 @@ function brandingImageUrl(settings, key, fallback) {
 function siteBrandingPayload(settings) {
   return {
     brandLogoUrl: brandingImageUrl(settings, 'brandLogoPath', '/logo.png'),
-    appIcon192Url: brandingImageUrl(settings, 'appIcon192Path', '/app-icon.svg'),
-    appIcon512Url: brandingImageUrl(settings, 'appIcon512Path', '/app-icon.svg'),
+    appIcon192Url: brandingImageUrl(settings, 'appIcon192Path', '/app-icon-192.png'),
+    appIcon512Url: brandingImageUrl(settings, 'appIcon512Path', '/app-icon-512.png'),
     homeBannerUrl: brandingImageUrl(settings, 'homeBannerPath', '/banner-ludo-snake.png'),
     ludoBannerUrl: brandingImageUrl(settings, 'ludoBannerPath', '/ludo-classic.png'),
     snakeBannerUrl: brandingImageUrl(settings, 'snakeBannerPath', '/snake-battles-banner.png'),
@@ -372,21 +372,9 @@ function defaultSiteManifest() {
     theme_color: '#101713',
     orientation: 'portrait',
     icons: [
-      { src: '/app-icon.svg', sizes: '192x192', type: 'image/svg+xml', purpose: 'any' },
-      { src: '/app-icon.svg', sizes: '512x512', type: 'image/svg+xml', purpose: 'any maskable' }
+      { src: '/app-icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
+      { src: '/app-icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any maskable' }
     ]
-  };
-}
-
-function siteManifestIcon(settings, key, size, purpose) {
-  const storedPath = settings?.[key];
-  const storedFile = storedPath && path.join(uploadDirectory, path.basename(storedPath));
-  const hasStoredIcon = Boolean(storedFile && fs.existsSync(storedFile));
-  return {
-    src: hasStoredIcon ? brandingImageUrl(settings, key, '/app-icon.svg') : '/app-icon.svg',
-    sizes: `${size}x${size}`,
-    type: hasStoredIcon ? 'image/png' : 'image/svg+xml',
-    purpose
   };
 }
 
@@ -427,7 +415,7 @@ app.get('/api/site-branding/image/:asset', async (req, res) => {
   try {
     const settings = await readSiteBranding();
     const storedPath = settings?.[imageSettings[0]];
-    const fallback = req.params.asset.startsWith('app-icon-') ? '/app-icon.svg' : imageSettings[1];
+    const fallback = imageSettings[1];
     if (!storedPath) return res.redirect(fallback);
     const filePath = path.join(uploadDirectory, path.basename(storedPath));
     if (!fs.existsSync(filePath)) return res.redirect(fallback);
@@ -444,8 +432,18 @@ app.get('/api/site-manifest', async (req, res) => {
     const manifest = {
       ...defaultSiteManifest(),
       icons: [
-        siteManifestIcon(settings, 'appIcon192Path', 192, 'any'),
-        siteManifestIcon(settings, 'appIcon512Path', 512, 'any maskable')
+        {
+          src: brandingImageUrl(settings, 'appIcon192Path', '/app-icon-192.png'),
+          sizes: '192x192',
+          type: 'image/png',
+          purpose: 'any'
+        },
+        {
+          src: brandingImageUrl(settings, 'appIcon512Path', '/app-icon-512.png'),
+          sizes: '512x512',
+          type: 'image/png',
+          purpose: 'any maskable'
+        }
       ]
     };
     res.set('Content-Type', 'application/manifest+json');
