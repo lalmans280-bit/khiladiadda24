@@ -65,7 +65,7 @@
     </form>
     <form id="otpForm" class="hidden" novalidate>
       <label for="otp">6-digit OTP</label>
-      <input type="text" id="otp" name="otp" placeholder="SMS mein mila OTP" inputmode="numeric" pattern="[0-9]{4,6}" maxlength="6" autocomplete="one-time-code" required>
+      <input type="text" id="otp" name="otp" placeholder="SMS mein mila OTP" inputmode="numeric" pattern="[0-9]{4,6}" maxlength="6" autocomplete="off" required>
       <div id="timerText" aria-live="polite"></div>
       <button id="otpVerifyBtn" type="submit">Login / Play</button>
       <button id="otpResendBtn" class="secondary" type="button" disabled>OTP dobara bhejein</button>
@@ -77,7 +77,7 @@
   <script>
     let otpTimer = null;
     let otpCooldown = 0;
-    let otpAutofillController = null;
+    let expectedOtpLength = 6;
     const phoneForm = document.getElementById('phoneForm');
     const otpForm = document.getElementById('otpForm');
     const otpInput = document.getElementById('otp');
@@ -142,25 +142,6 @@
       setMessage(text, true);
     }
 
-    function listenForOtp() {
-      otpAutofillController?.abort();
-      otpAutofillController = null;
-      if (!('OTPCredential' in window) || !navigator.credentials?.get) {
-        return { controller: null, code: Promise.resolve(null) };
-      }
-
-      const controller = new AbortController();
-      otpAutofillController = controller;
-      const code = navigator.credentials.get({
-        otp: { transport: ['sms'] },
-        signal: controller.signal
-      }).then(credential => credential?.code || null).catch(error => {
-        if (error.name !== 'AbortError') console.warn('SMS OTP autofill unavailable:', error);
-        return null;
-      });
-      return { controller, code };
-    }
-
     async function sendOtp(event) {
       event.preventDefault();
       const phone = document.getElementById('phone').value.trim();
@@ -176,7 +157,7 @@
       const sendButton = document.getElementById('otpSendBtn');
       const resendButton = document.getElementById('otpResendBtn');
       otpInput.value = '';
-      const otpAutofill = listenForOtp();
+      expectedOtpLength = 6;
       sendButton.disabled = true;
       resendButton.disabled = true;
       setMessage('OTP bheja ja raha hai...');
@@ -191,21 +172,13 @@
         phoneForm.classList.add('hidden');
         otpForm.classList.remove('hidden');
         const testLogin = String(data.message || '').startsWith('Test login enabled.');
-        if (testLogin) {
-          otpAutofill.controller?.abort();
-          if (otpAutofillController === otpAutofill.controller) otpAutofillController = null;
-        }
+        const localOtp = String(data.message || '').match(/Use OTP\s+(\d+)/i);
+        if (localOtp) expectedOtpLength = localOtp[1].length;
         formHint.textContent = testLogin ? data.message : `${phone} par bheja 6-digit OTP dalein.`;
         formHint.hidden = false;
         otpInput.focus();
         setMessage(testLogin ? 'Test OTP upar diya gaya hai.' : 'SMS mein aaye OTP ko yahan dalein.');
-        otpAutofill.code.then(code => {
-          if (!code || otpAutofill.controller?.signal.aborted || otpForm.classList.contains('hidden') || otpInput.value) return;
-          otpInput.value = String(code).replace(/\D/g, '').slice(0, 6);
-          otpInput.dispatchEvent(new Event('input', { bubbles: true }));
-        });
       } catch (error) {
-        otpAutofill.controller?.abort();
         showRequestError(error);
         updateOtpButtons();
       }
@@ -219,8 +192,6 @@
         return setMessage('Valid OTP dalein.', true);
       }
 
-      otpAutofillController?.abort();
-      otpAutofillController = null;
       const button = document.getElementById('otpVerifyBtn');
       button.disabled = true;
       button.textContent = 'Verify ho raha hai...';
@@ -264,10 +235,13 @@
 
     phoneForm.addEventListener('submit', sendOtp);
     otpForm.addEventListener('submit', verifyOtp);
+    otpInput.addEventListener('input', () => {
+      if (otpInput.value.length === expectedOtpLength && !document.getElementById('otpVerifyBtn').disabled) {
+        otpForm.requestSubmit();
+      }
+    });
     document.getElementById('otpResendBtn').addEventListener('click', sendOtp);
     document.getElementById('changePhoneBtn').addEventListener('click', () => {
-      otpAutofillController?.abort();
-      otpAutofillController = null;
       otpForm.classList.add('hidden');
       phoneForm.classList.remove('hidden');
       otpInput.value = '';
