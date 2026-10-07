@@ -14,6 +14,9 @@
     .wrap { max-width: 1200px; margin: 0 auto; padding: 24px; }
     .topbar { display: flex; justify-content: space-between; align-items: center; background: rgba(15, 23, 42, 0.9); padding: 18px 20px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.08); margin-bottom: 20px; }
     .logo { font-size: 28px; font-weight: 700; color: #fbbf24; }
+    .player-search-panel { display: grid; justify-items: center; gap: 6px; margin: 0 auto 20px; padding: 14px; border: 1px solid rgba(255,255,255,0.16); border-radius: 12px; background: rgba(17,24,39,0.9); }
+    .player-search-panel label { color: #fbbf24; font-weight: 700; }
+    .player-list-search { display: block; width: min(100%, 480px); height: 48px; margin: 0; }
     .card { background: rgba(17, 24, 39, 0.9); padding: 18px; margin-bottom: 20px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.08); }
     .card h3 { margin-top: 0; color: #fbbf24; }
     table { width: 100%; border-collapse: collapse; margin-top: 10px; }
@@ -97,6 +100,11 @@
         <button id="refreshAdminButton" type="button" class="secondary" onclick="refreshAdminData()">Refresh data</button>
         <button class="danger" onclick="adminLogout()">Logout</button>
       </div>
+    </div>
+
+    <div class="player-search-panel">
+      <label for="playerSearch">Search player profile</label>
+      <input class="player-list-search" id="playerSearch" type="search" aria-label="Search player by name, phone, or ID" placeholder="Name, mobile, or player ID — Enter to open profile">
     </div>
 
     <div class="card" id="runningGamesOverview" aria-live="polite">
@@ -338,31 +346,16 @@
   </dialog>
 
   <script>
-    const legacyAdminSession = (() => {
-      try {
-        const legacyUser = JSON.parse(localStorage.getItem('user') || 'null');
-        const legacyToken = localStorage.getItem('token');
-        return legacyUser?.role === 'admin' && legacyToken ? { user: legacyUser, token: legacyToken } : null;
-      } catch {
-        return null;
-      }
-    })();
-    if (!localStorage.getItem('adminUser') && legacyAdminSession) {
-      localStorage.setItem('adminUser', JSON.stringify(legacyAdminSession.user));
-      localStorage.setItem('adminToken', legacyAdminSession.token);
-      localStorage.removeItem('user');
-      localStorage.removeItem('token');
-    }
     const user = (() => {
-      try { return JSON.parse(localStorage.getItem('adminUser') || '{}'); }
+      try { return JSON.parse(localStorage.getItem('user') || '{}'); }
       catch { return null; }
     })();
-    if (!user || user.role !== 'admin' || !localStorage.getItem('adminToken')) {
+    if (!user || user.role !== 'admin') {
       alert('Admin login required');
       window.location.href = '/login.html?admin=1';
     }
 
-    const token = localStorage.getItem('adminToken');
+    const token = localStorage.getItem('token');
     const authHeaders = { 'Authorization': `Bearer ${token}` };
     let adminPreviewUrls = [];
     let allPlayers = [];
@@ -374,8 +367,8 @@
     });
 
     function adminLogout() {
-      localStorage.removeItem('adminUser');
-      localStorage.removeItem('adminToken');
+      localStorage.removeItem('user');
+      localStorage.removeItem('token');
       window.location.href = '/login.html?admin=1';
     }
 
@@ -487,10 +480,7 @@
               <td>₹${d.amount}</td>
               <td><b>${d.utrNumber}</b></td>
               <td><a href="/api/admin/uploads/${encodeURIComponent((d.screenshot || '').split('/').pop())}" target="_blank">Screenshot</a></td>
-              <td>
-                <button onclick="approveDep('${d._id}')">Approve Balance</button>
-                <button class="danger" onclick="cancelDep('${d._id}')">Cancel</button>
-              </td>
+              <td><button onclick="approveDep('${d._id}')">Approve Balance</button></td>
             </tr>
           `;
         });
@@ -873,14 +863,28 @@
     function renderPlayerList() {
       const table = document.getElementById('userTable');
       const newPlayerSince = Date.now() - 7 * 24 * 60 * 60 * 1000;
-      const players = playerListMode === 'NEW'
+      const modePlayers = playerListMode === 'NEW'
         ? allPlayers.filter(player => new Date(player.createdAt).getTime() >= newPlayerSince)
         : allPlayers;
+      const searchInput = document.getElementById('playerSearch').value.trim();
+      const searchTerm = searchInput.toLocaleLowerCase();
+      const searchDigits = searchInput.replace(/\D/g, '');
+      const players = searchTerm
+        ? modePlayers.filter(player => [player.username, player._id]
+          .some(value => String(value || '').toLocaleLowerCase().includes(searchTerm))
+          || String(player.phone || '').toLocaleLowerCase().includes(searchTerm)
+          || (searchDigits && String(player.phone || '').replace(/\D/g, '').includes(searchDigits)))
+        : modePlayers;
       document.getElementById('userListTitle').textContent = playerListMode === 'NEW' ? 'New Players · Last 7 Days' : 'All Players & Wallets';
       document.getElementById('playerListSummary').textContent = `${players.length} player${players.length === 1 ? '' : 's'}`;
       table.innerHTML = '<tr><th>S.N.</th><th>Player</th><th>Phone</th><th>Wallet</th><th>Joined</th><th>Status</th><th>Admin</th><th>Action</th></tr>';
       if (!players.length) {
-        table.innerHTML += `<tr><td colspan="8" class="empty">${playerListMode === 'NEW' ? 'Last 7 days mein koi naya player nahi.' : 'Player list khali hai.'}</td></tr>`;
+        const emptyMessage = searchTerm
+          ? 'Is search se koi player nahi mila.'
+          : playerListMode === 'NEW'
+            ? 'Last 7 days mein koi naya player nahi.'
+            : 'Player list khali hai.';
+        table.innerHTML += `<tr><td colspan="8" class="empty">${emptyMessage}</td></tr>`;
         return;
       }
       players.forEach((u, index) => {
@@ -889,18 +893,7 @@
         const isAdminUser = Boolean(u.isAdmin) || isPrimary;
         const adminLabel = isPrimary ? 'Primary' : isAdminUser ? 'Admin' : 'User';
         const adminAction = isPrimary ? '<button disabled>Primary admin</button>' : isAdminUser ? `<button class="danger" onclick="toggleAdminStatus('${u._id}', false)">Remove admin</button>` : `<button class="secondary" onclick="toggleAdminStatus('${u._id}', true)">Make admin</button>`;
-        const phoneDigits = String(u.phone || '').replace(/\D/g, '');
-        const whatsappPhone = phoneDigits.length === 12 && phoneDigits.startsWith('91')
-          ? phoneDigits
-          : phoneDigits.length === 11 && phoneDigits.startsWith('0')
-            ? `91${phoneDigits.slice(1)}`
-            : phoneDigits.length === 10
-              ? `91${phoneDigits}`
-              : '';
-        const phoneCell = whatsappPhone
-          ? `<a href="https://api.whatsapp.com/send?phone=${whatsappPhone}" target="_blank" rel="noopener noreferrer">${escapeHtml(u.phone)}</a>`
-          : escapeHtml(u.phone);
-        table.innerHTML += `<tr><td>${index + 1}</td><td><button type="button" class="player-name-link" onclick="openPlayerHistory('${u._id}')">${escapeHtml(u.username)}</button></td><td>${phoneCell}</td><td>₹${Number(u.walletBalance || 0).toLocaleString('en-IN')}</td><td>${new Date(u.createdAt).toLocaleString()}</td><td>${blocked ? 'Blocked' : 'Active'}</td><td>${adminLabel}</td><td><button class="secondary" onclick="openPlayerEditor('${u._id}')">Edit profile</button> <button class="${blocked ? 'unblock-button' : 'block-button'}" onclick="setPlayerBlocked('${u._id}', ${!blocked})">${blocked ? 'Unblock' : 'Block'}</button> ${adminAction}</td></tr>`;
+        table.innerHTML += `<tr><td>${index + 1}</td><td><button type="button" class="player-name-link" onclick="openPlayerHistory('${u._id}')">${escapeHtml(u.username)}</button></td><td>${escapeHtml(u.phone)}</td><td>₹${Number(u.walletBalance || 0).toLocaleString('en-IN')}</td><td>${new Date(u.createdAt).toLocaleString()}</td><td>${blocked ? 'Blocked' : 'Active'}</td><td>${adminLabel}</td><td><button class="secondary" onclick="openPlayerEditor('${u._id}')">Edit profile</button> <button class="${blocked ? 'unblock-button' : 'block-button'}" onclick="setPlayerBlocked('${u._id}', ${!blocked})">${blocked ? 'Unblock' : 'Block'}</button> ${adminAction}</td></tr>`;
       });
     }
 
@@ -1072,28 +1065,13 @@
     }
 
     async function approveDep(id) {
-      const res = await adminFetch('/api/admin/approve-deposit', {
+      await adminFetch('/api/admin/approve-deposit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ depositId: id })
       });
-      const data = await res.json();
-      alert(data.message || data.error || 'Approved');
-      if (res.ok) location.reload();
-    }
-
-    async function cancelDep(id) {
-      if (!confirm('Is this deposit request cancel/reject karna chahte ho?')) return;
-      const rejectionReason = prompt('Cancel reason likhein (optional):', 'Deposit request cancel ki gayi.');
-      if (rejectionReason === null) return;
-      const res = await adminFetch('/api/admin/cancel-deposit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ depositId: id, rejectionReason: rejectionReason || 'Deposit request cancel ki gayi.' })
-      });
-      const data = await res.json();
-      alert(data.message || data.error || 'Deposit cancelled');
-      if (res.ok) location.reload();
+      alert('Approved');
+      location.reload();
     }
 
     async function resolveMatchDecision(matchId, prefix = '') {
@@ -1240,6 +1218,32 @@
     }
 
     document.getElementById('allPlayersFilter').addEventListener('click', () => setPlayerListMode('ALL'));
+    document.getElementById('playerSearch').addEventListener('input', renderPlayerList);
+    document.getElementById('playerSearch').addEventListener('keydown', event => {
+      if (event.key !== 'Enter') return;
+      event.preventDefault();
+      const query = event.currentTarget.value.trim();
+      if (!query) return;
+      const queryLower = query.toLocaleLowerCase();
+      const queryDigits = query.replace(/\D/g, '');
+      const newPlayerSince = Date.now() - 7 * 24 * 60 * 60 * 1000;
+      const modePlayers = playerListMode === 'NEW'
+        ? allPlayers.filter(player => new Date(player.createdAt).getTime() >= newPlayerSince)
+        : allPlayers;
+      const matches = modePlayers.filter(player => [player.username, player._id]
+        .some(value => String(value || '').toLocaleLowerCase().includes(queryLower))
+        || String(player.phone || '').toLocaleLowerCase().includes(queryLower)
+        || (queryDigits && String(player.phone || '').replace(/\D/g, '').includes(queryDigits)));
+      const exactMatches = matches.filter(player => String(player.username || '').toLocaleLowerCase() === queryLower
+        || String(player._id || '').toLocaleLowerCase() === queryLower
+        || (queryDigits && String(player.phone || '').replace(/\D/g, '') === queryDigits));
+      const playerToOpen = exactMatches.length === 1 ? exactMatches[0] : matches.length === 1 ? matches[0] : null;
+      if (playerToOpen) {
+        openPlayerHistory(playerToOpen._id);
+      } else if (matches.length > 1) {
+        document.getElementById('playerListSummary').textContent = `${matches.length} players mile — naam, ID, ya mobile aur poora type karein.`;
+      }
+    });
     document.getElementById('kycEditForm').addEventListener('submit', saveKycEdit);
     document.getElementById('newPlayersFilter').addEventListener('click', () => setPlayerListMode('NEW'));
     document.getElementById('adminHomeButton').addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
