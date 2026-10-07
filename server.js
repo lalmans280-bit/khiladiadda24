@@ -63,6 +63,17 @@ function normalizePhone(phone) {
   return digits;
 }
 
+function getPhoneVariants(phone) {
+  const cleaned = normalizePhone(phone);
+  if (!cleaned) return [];
+  const variants = new Set([cleaned]);
+  if (cleaned.length === 10) {
+    variants.add(`0${cleaned}`);
+    variants.add(`91${cleaned}`);
+  }
+  return [...variants];
+}
+
 function isAdminPhone(phone) {
   const cleaned = normalizePhone(phone);
   if (!cleaned) return false;
@@ -72,12 +83,9 @@ function isAdminPhone(phone) {
 }
 
 async function isAdminUserByPhone(phone) {
-  const cleaned = normalizePhone(phone);
-  if (!cleaned) return false;
-  if (isAdminPhone(cleaned)) return true;
-  if (mongoose.connection.readyState !== 1) return false;
-  const user = await User.findOne({ phone: cleaned }).select('isAdmin isPrimaryAdmin');
-  return Boolean(user && (user.isPrimaryAdmin || user.isAdmin));
+  const user = await findUserByPhone(phone);
+  if (!user) return false;
+  return Boolean(user.isPrimaryAdmin || user.isAdmin) || isAdminPhone(user.phone || phone);
 }
 
 async function findUserById(userId) {
@@ -923,7 +931,7 @@ async function findUserByPhone(phone) {
   if (!cleanedPhone) return null;
 
   if (mongoose.connection.readyState === 1) {
-    const variants = Array.from(new Set([cleanedPhone, `0${cleanedPhone}`, `91${cleanedPhone}`]));
+    const variants = getPhoneVariants(cleanedPhone);
     const candidates = await User.find({ phone: { $in: variants } }).sort({ isPrimaryAdmin: -1, isAdmin: -1, createdAt: 1 }).lean();
     if (!candidates.length) return null;
 
@@ -934,8 +942,39 @@ async function findUserByPhone(phone) {
       await User.updateOne({ _id: preferredId }, { $set: { phone: cleanedPhone } });
     }
 
+    const duplicateIds = candidates
+      .filter(candidate => String(candidate._id) !== preferredId)
+      .map(candidate => candidate._id);
+
+    if (duplicateIds.length) {
+      const primaryCandidate = await User.findById(preferredId);
+      if (primaryCandidate) {
+        const mergeFlags = candidates
+          .filter(candidate => String(candidate._id) !== preferredId)
+          .reduce((acc, candidate) => {
+            acc.isAdmin = acc.isAdmin || Boolean(candidate.isAdmin);
+            acc.isPrimaryAdmin = acc.isPrimaryAdmin || Boolean(candidate.isPrimaryAdmin);
+            acc.isBlocked = acc.isBlocked || Boolean(candidate.isBlocked);
+            if (!acc.username && candidate.username) acc.username = candidate.username;
+            if (!acc.profileImage && candidate.profileImage) acc.profileImage = candidate.profileImage;
+            if (!acc.referralCode && candidate.referralCode) acc.referralCode = candidate.referralCode;
+            return acc;
+          }, { isAdmin: Boolean(preferred.isAdmin), isPrimaryAdmin: Boolean(preferred.isPrimaryAdmin), isBlocked: Boolean(preferred.isBlocked), username: preferred.username, profileImage: preferred.profileImage, referralCode: preferred.referralCode });
+
+        primaryCandidate.isAdmin = primaryCandidate.isAdmin || mergeFlags.isAdmin;
+        primaryCandidate.isPrimaryAdmin = primaryCandidate.isPrimaryAdmin || mergeFlags.isPrimaryAdmin;
+        primaryCandidate.isBlocked = primaryCandidate.isBlocked || mergeFlags.isBlocked;
+        if (!primaryCandidate.username && mergeFlags.username) primaryCandidate.username = mergeFlags.username;
+        if (!primaryCandidate.profileImage && mergeFlags.profileImage) primaryCandidate.profileImage = mergeFlags.profileImage;
+        if (!primaryCandidate.referralCode && mergeFlags.referralCode) primaryCandidate.referralCode = mergeFlags.referralCode;
+        if (normalizePhone(primaryCandidate.phone) !== cleanedPhone) primaryCandidate.phone = cleanedPhone;
+        await primaryCandidate.save();
+      }
+      await User.deleteMany({ _id: { $in: duplicateIds, $ne: preferredId } });
+    }
+
     const normalizedUser = await User.findById(preferredId);
-    if (normalizedUser && normalizedUser.phone !== cleanedPhone) {
+    if (normalizedUser && normalizePhone(normalizedUser.phone) !== cleanedPhone) {
       normalizedUser.phone = cleanedPhone;
       await normalizedUser.save();
     }
