@@ -14,9 +14,7 @@
     .wrap { max-width: 1200px; margin: 0 auto; padding: 24px; }
     .topbar { display: flex; justify-content: space-between; align-items: center; background: rgba(15, 23, 42, 0.9); padding: 18px 20px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.08); margin-bottom: 20px; }
     .logo { font-size: 28px; font-weight: 700; color: #fbbf24; }
-    .player-search-panel { display: grid; justify-items: center; gap: 6px; margin: 0 auto 20px; padding: 14px; border: 1px solid rgba(255,255,255,0.16); border-radius: 12px; background: rgba(17,24,39,0.9); }
-    .player-search-panel label { color: #fbbf24; font-weight: 700; }
-    .player-list-search { display: block; width: min(100%, 480px); height: 48px; margin: 0; }
+    .player-list-search { display: block; width: min(100%, 480px); height: 48px; margin: 0 auto 14px; }
     .card { background: rgba(17, 24, 39, 0.9); padding: 18px; margin-bottom: 20px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.08); }
     .card h3 { margin-top: 0; color: #fbbf24; }
     table { width: 100%; border-collapse: collapse; margin-top: 10px; }
@@ -100,11 +98,6 @@
         <button id="refreshAdminButton" type="button" class="secondary" onclick="refreshAdminData()">Refresh data</button>
         <button class="danger" onclick="adminLogout()">Logout</button>
       </div>
-    </div>
-
-    <div class="player-search-panel">
-      <label for="playerSearch">Search player profile</label>
-      <input class="player-list-search" id="playerSearch" type="search" aria-label="Search player by name, phone, or ID" placeholder="Name, mobile, or player ID — Enter to open profile">
     </div>
 
     <div class="card" id="runningGamesOverview" aria-live="polite">
@@ -254,6 +247,7 @@
 
     <div class="card">
       <h3 id="userListTitle">All Players & Wallets</h3>
+      <input class="player-list-search" id="playerSearch" type="search" aria-label="Search player by name, phone, or ID" placeholder="Search name, mobile, or player ID">
       <div class="toolbar player-list-toolbar">
         <div class="player-list-filters" role="group" aria-label="Player list filter">
           <button id="allPlayersFilter" type="button" aria-pressed="true">All players</button>
@@ -347,15 +341,19 @@
 
   <script>
     const user = (() => {
-      try { return JSON.parse(localStorage.getItem('user') || '{}'); }
-      catch { return null; }
+      for (const key of ['adminUser', 'user']) {
+        try {
+          const candidate = JSON.parse(localStorage.getItem(key) || 'null');
+          if (candidate?.role === 'admin') return candidate;
+        } catch {}
+      }
+      return null;
     })();
-    if (!user || user.role !== 'admin') {
+    const token = localStorage.getItem('adminToken') || (user ? localStorage.getItem('token') : '');
+    if (!token) {
       alert('Admin login required');
-      window.location.href = '/login.html?admin=1';
+      window.location.replace('/login.html?admin=1');
     }
-
-    const token = localStorage.getItem('token');
     const authHeaders = { 'Authorization': `Bearer ${token}` };
     let adminPreviewUrls = [];
     let allPlayers = [];
@@ -367,6 +365,8 @@
     });
 
     function adminLogout() {
+      localStorage.removeItem('adminUser');
+      localStorage.removeItem('adminToken');
       localStorage.removeItem('user');
       localStorage.removeItem('token');
       window.location.href = '/login.html?admin=1';
@@ -1219,31 +1219,6 @@
 
     document.getElementById('allPlayersFilter').addEventListener('click', () => setPlayerListMode('ALL'));
     document.getElementById('playerSearch').addEventListener('input', renderPlayerList);
-    document.getElementById('playerSearch').addEventListener('keydown', event => {
-      if (event.key !== 'Enter') return;
-      event.preventDefault();
-      const query = event.currentTarget.value.trim();
-      if (!query) return;
-      const queryLower = query.toLocaleLowerCase();
-      const queryDigits = query.replace(/\D/g, '');
-      const newPlayerSince = Date.now() - 7 * 24 * 60 * 60 * 1000;
-      const modePlayers = playerListMode === 'NEW'
-        ? allPlayers.filter(player => new Date(player.createdAt).getTime() >= newPlayerSince)
-        : allPlayers;
-      const matches = modePlayers.filter(player => [player.username, player._id]
-        .some(value => String(value || '').toLocaleLowerCase().includes(queryLower))
-        || String(player.phone || '').toLocaleLowerCase().includes(queryLower)
-        || (queryDigits && String(player.phone || '').replace(/\D/g, '').includes(queryDigits)));
-      const exactMatches = matches.filter(player => String(player.username || '').toLocaleLowerCase() === queryLower
-        || String(player._id || '').toLocaleLowerCase() === queryLower
-        || (queryDigits && String(player.phone || '').replace(/\D/g, '') === queryDigits));
-      const playerToOpen = exactMatches.length === 1 ? exactMatches[0] : matches.length === 1 ? matches[0] : null;
-      if (playerToOpen) {
-        openPlayerHistory(playerToOpen._id);
-      } else if (matches.length > 1) {
-        document.getElementById('playerListSummary').textContent = `${matches.length} players mile — naam, ID, ya mobile aur poora type karein.`;
-      }
-    });
     document.getElementById('kycEditForm').addEventListener('submit', saveKycEdit);
     document.getElementById('newPlayersFilter').addEventListener('click', () => setPlayerListMode('NEW'));
     document.getElementById('adminHomeButton').addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
