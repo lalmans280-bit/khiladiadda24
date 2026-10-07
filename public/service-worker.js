@@ -1,4 +1,4 @@
-const CACHE_NAME = 'khiladiadda24-shell-v20';
+const CACHE_NAME = 'khiladiadda24-shell-v23';
 const SHELL_URLS = ['/index.html', '/admin.html', '/login.html', '/app-icon.svg', '/app-icon-192.png', '/app-icon-512.png', '/logo.png', '/cricket.png', '/pubg.png'];
 
 self.addEventListener('install', event => {
