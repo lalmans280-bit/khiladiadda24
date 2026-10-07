@@ -14,7 +14,7 @@
     .wrap { max-width: 1200px; margin: 0 auto; padding: 24px; }
     .topbar { display: flex; justify-content: space-between; align-items: center; background: rgba(15, 23, 42, 0.9); padding: 18px 20px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.08); margin-bottom: 20px; }
     .logo { font-size: 28px; font-weight: 700; color: #fbbf24; }
-    .topbar .player-list-search { width: min(320px, 100%); margin: 0 16px; }
+    .topbar .player-list-search { display: block; flex: 0 1 320px; min-width: 180px; width: 320px; height: 44px; margin: 0 16px; }
     .card { background: rgba(17, 24, 39, 0.9); padding: 18px; margin-bottom: 20px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.08); }
     .card h3 { margin-top: 0; color: #fbbf24; }
     table { width: 100%; border-collapse: collapse; margin-top: 10px; }
@@ -73,7 +73,7 @@
       body { padding-bottom: 78px; }
       .topbar { align-items: flex-start; flex-direction: column; gap: 14px; padding: 14px; }
       .logo { font-size: 23px; }
-      .topbar .player-list-search { width: 100%; margin: 0; }
+      .topbar .player-list-search { flex: 0 0 auto; width: 100%; margin: 0; }
       .grid { grid-template-columns: minmax(0, 1fr); gap: 12px; }
       .finance-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
       .finance-stat { padding: 10px; }
@@ -861,10 +861,14 @@
       const modePlayers = playerListMode === 'NEW'
         ? allPlayers.filter(player => new Date(player.createdAt).getTime() >= newPlayerSince)
         : allPlayers;
-      const searchTerm = document.getElementById('playerSearch').value.trim().toLocaleLowerCase();
+      const searchInput = document.getElementById('playerSearch').value.trim();
+      const searchTerm = searchInput.toLocaleLowerCase();
+      const searchDigits = searchInput.replace(/\D/g, '');
       const players = searchTerm
-        ? modePlayers.filter(player => [player.username, player.phone, player._id]
-          .some(value => String(value || '').toLocaleLowerCase().includes(searchTerm)))
+        ? modePlayers.filter(player => [player.username, player._id]
+          .some(value => String(value || '').toLocaleLowerCase().includes(searchTerm))
+          || String(player.phone || '').toLocaleLowerCase().includes(searchTerm)
+          || (searchDigits && String(player.phone || '').replace(/\D/g, '').includes(searchDigits)))
         : modePlayers;
       document.getElementById('userListTitle').textContent = playerListMode === 'NEW' ? 'New Players · Last 7 Days' : 'All Players & Wallets';
       document.getElementById('playerListSummary').textContent = `${players.length} player${players.length === 1 ? '' : 's'}`;
@@ -1210,6 +1214,31 @@
 
     document.getElementById('allPlayersFilter').addEventListener('click', () => setPlayerListMode('ALL'));
     document.getElementById('playerSearch').addEventListener('input', renderPlayerList);
+    document.getElementById('playerSearch').addEventListener('keydown', event => {
+      if (event.key !== 'Enter') return;
+      event.preventDefault();
+      const query = event.currentTarget.value.trim();
+      if (!query) return;
+      const queryLower = query.toLocaleLowerCase();
+      const queryDigits = query.replace(/\D/g, '');
+      const newPlayerSince = Date.now() - 7 * 24 * 60 * 60 * 1000;
+      const modePlayers = playerListMode === 'NEW'
+        ? allPlayers.filter(player => new Date(player.createdAt).getTime() >= newPlayerSince)
+        : allPlayers;
+      const matches = modePlayers.filter(player => [player.username, player._id]
+        .some(value => String(value || '').toLocaleLowerCase().includes(queryLower))
+        || String(player.phone || '').toLocaleLowerCase().includes(queryLower)
+        || (queryDigits && String(player.phone || '').replace(/\D/g, '').includes(queryDigits)));
+      const exactMatches = matches.filter(player => String(player.username || '').toLocaleLowerCase() === queryLower
+        || String(player._id || '').toLocaleLowerCase() === queryLower
+        || (queryDigits && String(player.phone || '').replace(/\D/g, '') === queryDigits));
+      const playerToOpen = exactMatches.length === 1 ? exactMatches[0] : matches.length === 1 ? matches[0] : null;
+      if (playerToOpen) {
+        openPlayerHistory(playerToOpen._id);
+      } else if (matches.length > 1) {
+        document.getElementById('playerListSummary').textContent = `${matches.length} players mile — naam, ID, ya mobile aur poora type karein.`;
+      }
+    });
     document.getElementById('kycEditForm').addEventListener('submit', saveKycEdit);
     document.getElementById('newPlayersFilter').addEventListener('click', () => setPlayerListMode('NEW'));
     document.getElementById('adminHomeButton').addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
