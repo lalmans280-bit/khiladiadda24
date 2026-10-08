@@ -53,6 +53,7 @@
     .finance-stat small { display: block; color: #94a3b8; }
     .finance-stat strong { display: block; margin-top: 6px; color: #f8fafc; font-size: 22px; overflow-wrap: anywhere; }
     .player-name-link { padding: 0; border: 0; color: #60a5fa; background: transparent; font: inherit; text-align: left; text-decoration: underline; }
+    .player-whatsapp-link { color: #22c55e; text-decoration: underline; cursor: pointer; }
     .history-dialog { width: min(900px, calc(100vw - 28px)); max-height: min(86vh, 900px); overflow: auto; padding: 20px; border: 1px solid rgba(255,255,255,0.16); border-radius: 10px; color: #e5e7eb; background: #111827; }
     .history-dialog::backdrop { background: rgba(0,0,0,0.75); }
     .history-dialog-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
@@ -94,7 +95,7 @@
     <div class="topbar">
       <div class="logo">KhiladiAdda24 Admin</div>
       <div class="toolbar">
-        <a href="/index.html" style="color:#60a5fa;">Player Site</a>
+        <a href="/index.html" onclick="openPlayerSite(event)" style="color:#60a5fa;">Player Site</a>
         <button id="refreshAdminButton" type="button" class="secondary" onclick="refreshAdminData()">Refresh data</button>
         <button class="danger" onclick="adminLogout()">Logout</button>
       </div>
@@ -354,6 +355,7 @@
       alert('Admin login required');
       window.location.replace('/login.html?admin=1');
     }
+
     const authHeaders = { 'Authorization': `Bearer ${token}` };
     let adminPreviewUrls = [];
     let allPlayers = [];
@@ -376,6 +378,14 @@
       return String(value ?? '').replace(/[&<>"']/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[character]));
     }
 
+    function playerWhatsAppLink(phone) {
+      let digits = String(phone || '').replace(/\D/g, '');
+      if (digits.length === 12 && digits.startsWith('91')) digits = digits.slice(2);
+      if (digits.length === 11 && digits.startsWith('0')) digits = digits.slice(1);
+      if (!/^\d{10}$/.test(digits)) return escapeHtml(phone);
+      return `<a class="player-whatsapp-link" href="https://wa.me/91${digits}" target="_blank" rel="noopener noreferrer" title="WhatsApp chat kholen">${escapeHtml(phone)}</a>`;
+    }
+
     async function adminFetch(url, options = {}) {
       const headers = { ...authHeaders, ...(options.headers || {}) };
       const res = await fetch(url, { ...options, headers });
@@ -384,6 +394,25 @@
         throw new Error('Admin session expired');
       }
       return res;
+    }
+
+    async function openPlayerSite(event) {
+      event.preventDefault();
+      const link = event.currentTarget;
+      const originalText = link.textContent;
+      link.textContent = 'Opening...';
+      try {
+        const res = await adminFetch('/api/admin/player-session', { method: 'POST' });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Player session start nahi hui.');
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        sessionStorage.setItem('adminPlayerView', 'yes');
+        window.location.href = '/index.html?adminPlayer=1';
+      } catch (error) {
+        alert(error.message || 'Player site open nahi hui.');
+        link.textContent = originalText;
+      }
     }
 
     function adminImagePreview(filePath, altText, className) {
@@ -893,7 +922,7 @@
         const isAdminUser = Boolean(u.isAdmin) || isPrimary;
         const adminLabel = isPrimary ? 'Primary' : isAdminUser ? 'Admin' : 'User';
         const adminAction = isPrimary ? '<button disabled>Primary admin</button>' : isAdminUser ? `<button class="danger" onclick="toggleAdminStatus('${u._id}', false)">Remove admin</button>` : `<button class="secondary" onclick="toggleAdminStatus('${u._id}', true)">Make admin</button>`;
-        table.innerHTML += `<tr><td>${index + 1}</td><td><button type="button" class="player-name-link" onclick="openPlayerHistory('${u._id}')">${escapeHtml(u.username)}</button></td><td>${escapeHtml(u.phone)}</td><td>₹${Number(u.walletBalance || 0).toLocaleString('en-IN')}</td><td>${new Date(u.createdAt).toLocaleString()}</td><td>${blocked ? 'Blocked' : 'Active'}</td><td>${adminLabel}</td><td><button class="secondary" onclick="openPlayerEditor('${u._id}')">Edit profile</button> <button class="${blocked ? 'unblock-button' : 'block-button'}" onclick="setPlayerBlocked('${u._id}', ${!blocked})">${blocked ? 'Unblock' : 'Block'}</button> ${adminAction}</td></tr>`;
+        table.innerHTML += `<tr><td>${index + 1}</td><td><button type="button" class="player-name-link" onclick="openPlayerHistory('${u._id}')">${escapeHtml(u.username)}</button></td><td>${playerWhatsAppLink(u.phone)}</td><td>₹${Number(u.walletBalance || 0).toLocaleString('en-IN')}</td><td>${new Date(u.createdAt).toLocaleString()}</td><td>${blocked ? 'Blocked' : 'Active'}</td><td>${adminLabel}</td><td><button class="secondary" onclick="openPlayerEditor('${u._id}')">Edit profile</button> <button class="${blocked ? 'unblock-button' : 'block-button'}" onclick="setPlayerBlocked('${u._id}', ${!blocked})">${blocked ? 'Unblock' : 'Block'}</button> ${adminAction}</td></tr>`;
       });
     }
 
