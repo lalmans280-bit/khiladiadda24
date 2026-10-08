@@ -381,7 +381,7 @@
     }
 
     function adminGameTypeLabel(gameType) {
-      return gameType === 'POPULAR_LUDO' ? 'Popular Ludo' : gameType === 'SNAKE' ? 'Snake' : 'Ludo Classic';
+      return gameType === 'LUDO_RACE' ? 'Ludo Race' : gameType === 'POPULAR_LUDO' ? 'Popular Ludo' : gameType === 'SNAKE' ? 'Snake' : 'Ludo Classic';
     }
 
     function playerWhatsAppLink(phone) {
@@ -495,7 +495,7 @@
           <div class="finance-stat">
             <small>${adminGameTypeLabel(match.gameType)} · ${escapeHtml(match.status)} · Entry ₹${Number(match.amount).toLocaleString('en-IN')} each</small>
             <strong>${escapeHtml(match.creator?.username || 'Creator')} vs ${escapeHtml(match.joiner?.username || 'Joiner')}</strong>
-            <small>${match.roomCode ? `Room: ${escapeHtml(match.roomCode)}` : 'Room code not shared'} · ${match.gameStartedAt ? 'Game started' : 'Waiting to start'}</small>
+            <small>${match.gameType === 'LUDO_RACE' ? 'In-app board' : match.roomCode ? `Room: ${escapeHtml(match.roomCode)}` : 'Room code not shared'} · ${match.gameStartedAt ? 'Game started' : 'Waiting to start'}</small>
             <small>${resultReports}</small>
             <div class="running-overview-proofs">${resultProofs}</div>
             ${adminMatchDecisionControls(match, 'overview-')}
