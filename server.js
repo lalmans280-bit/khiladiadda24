@@ -1939,6 +1939,23 @@ app.get('/api/admin/support/threads/:userId', requireAdmin, async (req, res) => 
   }
 });
 
+app.delete('/api/admin/support/threads/:userId', requireAdmin, async (req, res) => {
+  const userId = String(req.params.userId || '');
+  if (!mongoose.Types.ObjectId.isValid(userId)) return res.status(400).json({ error: 'Valid player select karein.' });
+  try {
+    const messages = await SupportMessage.find({ userId }).select('attachment').lean();
+    await SupportMessage.deleteMany({ userId });
+    try {
+      await deleteReviewedScreenshotFiles(messages.map(message => message.attachment));
+    } catch (error) {
+      console.error(`Could not remove support chat attachments for player ${userId}:`, error);
+    }
+    res.json({ message: 'Player support conversation delete ho gayi.' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 app.get('/api/admin/support/messages/:messageId/attachment', requireAdmin, async (req, res) => {
   const messageId = String(req.params.messageId || '');
   if (!mongoose.Types.ObjectId.isValid(messageId)) return res.status(400).end();
