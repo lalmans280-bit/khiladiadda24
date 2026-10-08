@@ -1621,11 +1621,22 @@ function monthlyLeaderboardId(monthStart) {
 
 function defaultMonthlyPrizes() {
   const prizes = Array(100).fill(0);
-  [12000, 8000, 5000, 4000, 3000, 2500, 2000, 1500, 1500, 1500].forEach((amount, index) => {
+  [1200, 800, 500, 400, 300, 250, 200, 150, 150, 150].forEach((amount, index) => {
     prizes[index] = amount;
   });
-  prizes.fill(100, 10);
+  prizes.fill(10, 10);
   return prizes;
+}
+
+async function migrateDefaultMonthlyPrizes(monthStart) {
+  const previousDefaults = Array(100).fill(100);
+  [12000, 8000, 5000, 4000, 3000, 2500, 2000, 1500, 1500, 1500].forEach((amount, index) => {
+    previousDefaults[index] = amount;
+  });
+  await MonthlyLeaderboard.updateOne(
+    { _id: monthlyLeaderboardId(monthStart), prizePool: 50000, prizes: previousDefaults },
+    { $set: { prizePool: 5000, prizes: defaultMonthlyPrizes() } }
+  );
 }
 
 async function getMonthlyLeaderboard(monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1), includeAllUsers = false) {
@@ -1718,11 +1729,12 @@ app.get('/api/leaderboard/monthly', async (req, res) => {
   const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
 
   try {
+    await migrateDefaultMonthlyPrizes(monthStart);
     const rankings = await getMonthlyLeaderboard(monthStart);
     const settings = await MonthlyLeaderboard.findById(monthlyLeaderboardId(monthStart)).lean();
     res.json({
       month: monthStart.toLocaleString('en-IN', { month: 'long', year: 'numeric' }),
-      prizePool: settings?.prizePool ?? 50000,
+      prizePool: settings?.prizePool ?? 5000,
       pointsPerGame: settings?.pointsPerGame ?? 5,
       winBonus: settings?.winBonus ?? 15,
       rankings: rankings.slice(0, 100)
@@ -1735,6 +1747,7 @@ app.get('/api/leaderboard/monthly', async (req, res) => {
 app.get('/api/admin/leaderboard/monthly', requireAdmin, async (req, res) => {
   try {
     const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+    await migrateDefaultMonthlyPrizes(monthStart);
     const [settings, rankings] = await Promise.all([
       MonthlyLeaderboard.findById(monthlyLeaderboardId(monthStart)).lean(),
       getMonthlyLeaderboard(monthStart, true)
@@ -1743,7 +1756,7 @@ app.get('/api/admin/leaderboard/monthly', requireAdmin, async (req, res) => {
       month: monthStart.toLocaleString('en-IN', { month: 'long', year: 'numeric' }),
       pointsPerGame: settings?.pointsPerGame ?? 5,
       winBonus: settings?.winBonus ?? 15,
-      prizePool: settings?.prizePool ?? 50000,
+      prizePool: settings?.prizePool ?? 5000,
       prizes: settings?.prizes?.length ? settings.prizes : defaultMonthlyPrizes(),
       rankings
     });
@@ -1795,7 +1808,7 @@ app.put('/api/admin/leaderboard/monthly/player/:userId', requireAdmin, async (re
     const leaderboardId = monthlyLeaderboardId(monthStart);
     await MonthlyLeaderboard.updateOne(
       { _id: leaderboardId },
-      { $setOnInsert: { pointsPerGame: 5, winBonus: 15, prizePool: 50000, prizes: defaultMonthlyPrizes() } },
+      { $setOnInsert: { pointsPerGame: 5, winBonus: 15, prizePool: 5000, prizes: defaultMonthlyPrizes() } },
       { upsert: true }
     );
     await MonthlyLeaderboard.updateOne(
