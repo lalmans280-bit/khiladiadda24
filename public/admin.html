@@ -82,9 +82,14 @@
     .support-admin-message { max-width: 85%; padding: 9px 11px; border-radius: 10px; background: #263449; overflow-wrap: anywhere; }
     .support-admin-message.admin { justify-self: end; background: #14532d; }
     .support-admin-message small { display: block; margin-top: 4px; color: #cbd5e1; }
+    .support-message-delete { margin-top: 7px; padding: 4px 7px; border: 1px solid #7f1d1d; border-radius: 6px; color: #fecaca; background: #450a0a; font-size: 11px; }
     .support-admin-attachment { display: block; width: min(100%, 320px); max-height: 240px; margin-top: 8px; border: 1px solid rgba(255,255,255,0.16); border-radius: 8px; object-fit: contain; background: #0f172a; }
-    .support-admin-form { display: grid; grid-template-columns: 1fr auto; gap: 8px; }
+    .support-admin-form { display: grid; grid-template-columns: 1fr; gap: 8px; }
     .support-admin-form textarea { width: 100%; padding: 10px; border: 1px solid #475569; border-radius: 7px; color: #fff; background: #0f172a; font: inherit; }
+    .support-admin-form-actions { display: flex; align-items: center; justify-content: flex-end; gap: 8px; }
+    .support-admin-attach { min-height: 40px; padding: 8px 10px; border: 1px solid #475569; border-radius: 8px; color: #e2e8f0; background: #334155; font-size: 13px; }
+    .support-admin-file { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+    .support-admin-file-name { flex: 1; min-width: 0; overflow: hidden; color: #94a3b8; font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
     .leaderboard-settings { display: grid; grid-template-columns: repeat(3, minmax(120px, 1fr)); gap: 10px; }
     .leaderboard-settings label { color: #cbd5e1; font-size: 12px; }
     .leaderboard-prizes { width: 100%; min-height: 90px; padding: 10px; border: 1px solid #475569; border-radius: 7px; color: #fff; background: #0f172a; font: inherit; }
@@ -313,7 +318,12 @@
           <div id="supportAdminMessages" class="support-admin-messages"><p class="muted">Conversation kholne ke liye player select karein.</p></div>
           <form id="supportAdminForm" class="support-admin-form">
             <textarea id="supportAdminInput" rows="2" maxlength="1000" placeholder="Player ko reply likhein..." disabled></textarea>
-            <button id="supportAdminSend" type="submit" disabled>Send reply</button>
+            <div class="support-admin-form-actions">
+              <span id="supportAdminAttachmentName" class="support-admin-file-name">No screenshot selected</span>
+              <button id="supportAdminAttachButton" class="support-admin-attach" type="button" disabled>📎 Attach screenshot</button>
+              <input id="supportAdminAttachment" class="support-admin-file" type="file" accept="image/jpeg,image/png,image/webp" aria-label="Reply screenshot attach karein" disabled>
+              <button id="supportAdminSend" type="submit" disabled>Send reply</button>
+            </div>
           </form>
         </div>
       </div>
@@ -1079,6 +1089,20 @@
     let activeSupportUserId = '';
 
     const adminSupportAttachmentUrls = new Map();
+    const supportAdminAttachment = document.getElementById('supportAdminAttachment');
+    const supportAdminAttachmentName = document.getElementById('supportAdminAttachmentName');
+    document.getElementById('supportAdminAttachButton').addEventListener('click', () => supportAdminAttachment.click());
+    supportAdminAttachment.addEventListener('change', () => {
+      const file = supportAdminAttachment.files[0];
+      if (file && (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type) || file.size > 5 * 1024 * 1024)) {
+        supportAdminAttachment.value = '';
+        supportAdminAttachmentName.textContent = 'No screenshot selected';
+        alert('JPEG, PNG ya WebP screenshot 5 MB ke andar select karein.');
+        return;
+      }
+      supportAdminAttachmentName.textContent = file?.name || 'No screenshot selected';
+      supportAdminAttachmentName.title = file?.name || '';
+    });
 
     async function renderAdminSupportMessages(messages) {
       const container = document.getElementById('supportAdminMessages');
@@ -1117,6 +1141,27 @@
         const timestamp = document.createElement('small');
         timestamp.textContent = new Date(message.createdAt).toLocaleString('en-IN');
         bubble.appendChild(timestamp);
+        const deleteButton = document.createElement('button');
+        deleteButton.type = 'button';
+        deleteButton.className = 'support-message-delete';
+        deleteButton.textContent = 'Delete message';
+        deleteButton.addEventListener('click', async () => {
+          if (!confirm('Is chat message ko delete karna hai?')) return;
+          deleteButton.disabled = true;
+          try {
+            const response = await adminFetch(`/api/admin/support/messages/${encodeURIComponent(message.id)}`, { method: 'DELETE' });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.error || 'Message delete nahi hua.');
+            const objectUrl = adminSupportAttachmentUrls.get(message.id);
+            if (objectUrl) URL.revokeObjectURL(objectUrl);
+            adminSupportAttachmentUrls.delete(message.id);
+            await loadAdminSupportThreads();
+          } catch (error) {
+            alert(error.message || 'Message delete nahi hua.');
+            deleteButton.disabled = false;
+          }
+        });
+        bubble.appendChild(deleteButton);
         container.appendChild(bubble);
       }
       if (!messages.length) {
@@ -1136,6 +1181,17 @@
         const list = document.getElementById('supportThreadList');
         if (!data.threads.length) {
           list.innerHTML = '<p class="muted">Abhi koi player support message nahi aaya.</p>';
+          if (activeSupportUserId) {
+            activeSupportUserId = '';
+            document.getElementById('supportAdminInput').value = '';
+            document.getElementById('supportAdminInput').disabled = true;
+            document.getElementById('supportAdminAttachment').value = '';
+            document.getElementById('supportAdminAttachment').disabled = true;
+            document.getElementById('supportAdminAttachmentName').textContent = 'No screenshot selected';
+            document.getElementById('supportAdminAttachButton').disabled = true;
+            document.getElementById('supportAdminSend').disabled = true;
+            document.getElementById('supportAdminMessages').innerHTML = '<p class="muted">Conversation kholne ke liye player select karein.</p>';
+          }
           return;
         }
         list.innerHTML = data.threads.map(thread => {
@@ -1161,6 +1217,10 @@
                 activeSupportUserId = '';
                 document.getElementById('supportAdminInput').value = '';
                 document.getElementById('supportAdminInput').disabled = true;
+                document.getElementById('supportAdminAttachment').value = '';
+                document.getElementById('supportAdminAttachment').disabled = true;
+                document.getElementById('supportAdminAttachmentName').textContent = 'No screenshot selected';
+                document.getElementById('supportAdminAttachButton').disabled = true;
                 document.getElementById('supportAdminSend').disabled = true;
                 document.getElementById('supportAdminMessages').innerHTML = '<p class="muted">Conversation kholne ke liye player select karein.</p>';
               }
@@ -1171,8 +1231,20 @@
             }
           });
         });
-        if (activeSupportUserId && data.threads.some(thread => String(thread.user._id) === activeSupportUserId)) {
-          await refreshAdminSupportThread();
+        if (activeSupportUserId) {
+          if (data.threads.some(thread => String(thread.user._id) === activeSupportUserId)) {
+            await refreshAdminSupportThread();
+          } else {
+            activeSupportUserId = '';
+            document.getElementById('supportAdminInput').value = '';
+            document.getElementById('supportAdminInput').disabled = true;
+            document.getElementById('supportAdminAttachment').value = '';
+            document.getElementById('supportAdminAttachment').disabled = true;
+            document.getElementById('supportAdminAttachmentName').textContent = 'No screenshot selected';
+            document.getElementById('supportAdminAttachButton').disabled = true;
+            document.getElementById('supportAdminSend').disabled = true;
+            document.getElementById('supportAdminMessages').innerHTML = '<p class="muted">Conversation kholne ke liye player select karein.</p>';
+          }
         }
       } catch (error) {
         document.getElementById('supportThreadList').innerHTML = `<p class="notice error">${escapeHtml(error.message)}</p>`;
@@ -1182,6 +1254,8 @@
     async function openAdminSupportThread(userId) {
       activeSupportUserId = userId;
       document.getElementById('supportAdminInput').disabled = false;
+      document.getElementById('supportAdminAttachment').disabled = false;
+      document.getElementById('supportAdminAttachButton').disabled = false;
       document.getElementById('supportAdminSend').disabled = false;
       await refreshAdminSupportThread();
       await loadAdminSupportThreads();
@@ -1199,17 +1273,23 @@
       event.preventDefault();
       const input = document.getElementById('supportAdminInput');
       const text = input.value.trim();
-      if (!activeSupportUserId || !text) return;
+      const attachment = document.getElementById('supportAdminAttachment').files[0];
+      if (!activeSupportUserId || (!text && !attachment)) return;
       document.getElementById('supportAdminSend').disabled = true;
       try {
+        const body = new FormData();
+        body.set('text', text);
+        if (attachment) body.set('attachment', attachment);
         const response = await adminFetch(`/api/admin/support/threads/${encodeURIComponent(activeSupportUserId)}`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ text })
+          body
         });
         const data = await response.json();
         if (!response.ok) throw new Error(data.error || 'Reply send nahi hui.');
         input.value = '';
+        document.getElementById('supportAdminAttachment').value = '';
+        supportAdminAttachmentName.textContent = 'No screenshot selected';
+        supportAdminAttachmentName.title = '';
         await Promise.all([refreshAdminSupportThread(), loadAdminSupportThreads()]);
       } catch (error) {
         alert(error.message || 'Reply send nahi hui.');
