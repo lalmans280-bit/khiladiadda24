@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const matchSchema = new mongoose.Schema({
-  gameType: { type: String, enum: ['LUDO', 'SNAKE'], required: true },
+  gameType: { type: String, enum: ['LUDO', 'POPULAR_LUDO', 'SNAKE'], required: true },
   creator: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   joiner: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   amount: { type: Number, required: true },
@@ -30,6 +30,7 @@ const matchSchema = new mongoose.Schema({
   joinerResultReason: { type: String, default: '' },
   joinerProofScreenshot: { type: String, default: '' },
   proofScreenshot: { type: String },
+  proofScreenshotsDeleteAt: { type: Date },
   cancelReason: { type: String, default: '' },
   cancelRequestReason: { type: String, default: '' },
   cancelRequestedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
