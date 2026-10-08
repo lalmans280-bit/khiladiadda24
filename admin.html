@@ -95,7 +95,7 @@
     <div class="topbar">
       <div class="logo">KhiladiAdda24 Admin</div>
       <div class="toolbar">
-        <a href="/index.html" style="color:#60a5fa;">Player Site</a>
+        <a href="/index.html" onclick="openPlayerSite(event)" style="color:#60a5fa;">Player Site</a>
         <button id="refreshAdminButton" type="button" class="secondary" onclick="refreshAdminData()">Refresh data</button>
         <button class="danger" onclick="adminLogout()">Logout</button>
       </div>
@@ -394,6 +394,25 @@
         throw new Error('Admin session expired');
       }
       return res;
+    }
+
+    async function openPlayerSite(event) {
+      event.preventDefault();
+      const link = event.currentTarget;
+      const originalText = link.textContent;
+      link.textContent = 'Opening...';
+      try {
+        const res = await adminFetch('/api/admin/player-session', { method: 'POST' });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Player session start nahi hui.');
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        sessionStorage.setItem('adminPlayerView', 'yes');
+        window.location.href = '/index.html?adminPlayer=1';
+      } catch (error) {
+        alert(error.message || 'Player site open nahi hui.');
+        link.textContent = originalText;
+      }
     }
 
     function adminImagePreview(filePath, altText, className) {
