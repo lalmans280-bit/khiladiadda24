@@ -21,6 +21,8 @@ const Deposit = require('./models/deposit');
 const Withdraw = require('./models/withdraw');
 const Kyc = require('./models/kyc');
 const SiteSettings = require('./models/site-settings');
+const MonthlyLeaderboard = require('./models/monthly-leaderboard');
+const SupportMessage = require('./models/support-message');
 
 const app = express();
 const server = http.createServer(app);
@@ -1613,34 +1615,320 @@ app.get('/api/matches/running', requireUser, async (req, res) => {
   }
 });
 
+function monthlyLeaderboardId(monthStart) {
+  return `${monthStart.getFullYear()}-${String(monthStart.getMonth() + 1).padStart(2, '0')}`;
+}
+
+function defaultMonthlyPrizes() {
+  const prizes = Array(100).fill(0);
+  [12000, 8000, 5000, 4000, 3000, 2500, 2000, 1500, 1500, 1500].forEach((amount, index) => {
+    prizes[index] = amount;
+  });
+  prizes.fill(100, 10);
+  return prizes;
+}
+
+async function getMonthlyLeaderboard(monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1), includeAllUsers = false) {
+  const nextMonth = new Date(monthStart.getFullYear(), monthStart.getMonth() + 1, 1);
+  const [matches, settings, allUsers] = await Promise.all([
+    Match.find({
+      status: 'COMPLETED',
+      $or: [
+        { completedAt: { $gte: monthStart, $lt: nextMonth } },
+        { completedAt: { $exists: false }, updatedAt: { $gte: monthStart, $lt: nextMonth } }
+      ]
+    })
+      .select('creator joiner winner completedAt updatedAt createdAt')
+      .populate('creator', 'username profileImage')
+      .populate('joiner', 'username profileImage')
+      .populate('winner', 'username')
+      .lean(),
+    MonthlyLeaderboard.findById(monthlyLeaderboardId(monthStart)).lean(),
+    includeAllUsers ? User.find({}, 'username profileImage').lean() : Promise.resolve([])
+  ]);
+  const pointsPerGame = Number.isFinite(settings?.pointsPerGame) ? settings.pointsPerGame : 5;
+  const winBonus = Number.isFinite(settings?.winBonus) ? settings.winBonus : 15;
+  const prizes = Array.isArray(settings?.prizes) && settings.prizes.length
+    ? [...settings.prizes, ...Array(Math.max(0, 100 - settings.prizes.length)).fill(0)].slice(0, 100)
+    : defaultMonthlyPrizes();
+  const overrides = new Map((settings?.playerOverrides || []).map(item => [String(item.userId), item]));
+  const users = includeAllUsers
+    ? allUsers
+    : overrides.size
+      ? await User.find({ _id: { $in: [...overrides.keys()] } }, 'username profileImage').lean()
+      : [];
+
+  const players = new Map();
+  matches.forEach(match => {
+    [match.creator, match.joiner].filter(Boolean).forEach(player => {
+      const id = String(player._id);
+      const current = players.get(id) || {
+        userId: id,
+        username: player.username || 'Player',
+        profileImage: player.profileImage || '',
+        gamesPlayed: 0,
+        wins: 0,
+        points: 0
+      };
+      current.gamesPlayed += 1;
+      if (match.winner && String(match.winner._id) === id) {
+        current.wins += 1;
+        current.points += pointsPerGame + winBonus;
+      } else {
+        current.points += pointsPerGame;
+      }
+      players.set(id, current);
+    });
+  });
+
+  if (includeAllUsers) {
+    users.forEach(user => {
+      const id = String(user._id);
+      if (!players.has(id)) {
+        players.set(id, {
+          userId: id,
+          username: user.username || 'Player',
+          profileImage: user.profileImage || '',
+          gamesPlayed: 0,
+          wins: 0,
+          points: 0
+        });
+      }
+    });
+  }
+
+  const ranked = [...players.values()].map(player => {
+    const override = overrides.get(player.userId);
+    return {
+      ...player,
+      points: Number.isFinite(override?.points) ? override.points : player.points,
+      pointsOverride: Number.isFinite(override?.points) ? override.points : null,
+      prizeOverride: Number.isFinite(override?.prize) ? override.prize : null
+    };
+  }).sort((a, b) => b.points - a.points || b.wins - a.wins || b.gamesPlayed - a.gamesPlayed || a.username.localeCompare(b.username));
+
+  return ranked.map((player, index) => ({
+    ...player,
+    rank: index + 1,
+    prize: player.prizeOverride === null ? (prizes[index] || 0) : player.prizeOverride
+  }));
+}
+
 app.get('/api/leaderboard/monthly', async (req, res) => {
-  const now = new Date();
-  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-  const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
-  const prizePool = 50000;
-  const prizeDistribution = [15000, 10000, 7500, 5000, 3500, 2500, 2000, 1500, 1000, 1000];
+  const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
 
   try {
-    const matches = await Match.find({
-      status: 'COMPLETED',
-      createdAt: { $gte: monthStart, $lt: nextMonth }
-    }).populate('creator', 'username phone').populate('joiner', 'username phone').populate('winner', 'username phone').lean();
-
-    const players = new Map();
-    matches.forEach(match => {
-      [match.creator, match.joiner].filter(Boolean).forEach(player => {
-        const id = String(player._id);
-        const current = players.get(id) || { userId: id, username: player.username, gamesPlayed: 0, wins: 0 };
-        current.gamesPlayed += 1;
-        if (match.winner && String(match.winner._id) === id) current.wins += 1;
-        players.set(id, current);
-      });
+    const rankings = await getMonthlyLeaderboard(monthStart);
+    const settings = await MonthlyLeaderboard.findById(monthlyLeaderboardId(monthStart)).lean();
+    res.json({
+      month: monthStart.toLocaleString('en-IN', { month: 'long', year: 'numeric' }),
+      prizePool: settings?.prizePool ?? 50000,
+      pointsPerGame: settings?.pointsPerGame ?? 5,
+      winBonus: settings?.winBonus ?? 15,
+      rankings: rankings.slice(0, 100)
     });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
-    const rankings = [...players.values()]
-      .sort((a, b) => b.gamesPlayed - a.gamesPlayed || b.wins - a.wins || a.username.localeCompare(b.username))
-      .map((player, index) => ({ ...player, rank: index + 1, estimatedPrize: prizeDistribution[index] || 0 }));
-    res.json({ month: monthStart.toLocaleString('en-IN', { month: 'long', year: 'numeric' }), prizePool, estimatedTopPrize: prizeDistribution[0], rankings });
+app.get('/api/admin/leaderboard/monthly', requireAdmin, async (req, res) => {
+  try {
+    const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+    const [settings, rankings] = await Promise.all([
+      MonthlyLeaderboard.findById(monthlyLeaderboardId(monthStart)).lean(),
+      getMonthlyLeaderboard(monthStart, true)
+    ]);
+    res.json({
+      month: monthStart.toLocaleString('en-IN', { month: 'long', year: 'numeric' }),
+      pointsPerGame: settings?.pointsPerGame ?? 5,
+      winBonus: settings?.winBonus ?? 15,
+      prizePool: settings?.prizePool ?? 50000,
+      prizes: settings?.prizes?.length ? settings.prizes : defaultMonthlyPrizes(),
+      rankings
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.put('/api/admin/leaderboard/monthly/settings', requireAdmin, async (req, res) => {
+  const pointsPerGame = Number(req.body.pointsPerGame);
+  const winBonus = Number(req.body.winBonus);
+  const prizePool = Number(req.body.prizePool);
+  const prizes = Array.isArray(req.body.prizes) ? req.body.prizes.map(Number) : [];
+  if (![pointsPerGame, winBonus, prizePool].every(value => Number.isInteger(value) && value >= 0)
+    || prizes.length !== 100
+    || prizes.some(value => !Number.isInteger(value) || value < 0)) {
+    return res.status(400).json({ error: 'Points, prize pool aur 100 valid rank prizes enter karein.' });
+  }
+  if (prizes.reduce((total, amount) => total + amount, 0) !== prizePool) {
+    return res.status(400).json({ error: 'Rank 1–100 prizes ka total prize pool ke barabar hona chahiye.' });
+  }
+
+  try {
+    const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+    const settings = await MonthlyLeaderboard.findByIdAndUpdate(
+      monthlyLeaderboardId(monthStart),
+      { $set: { pointsPerGame, winBonus, prizePool, prizes } },
+      { new: true, upsert: true, runValidators: true, setDefaultsOnInsert: true }
+    );
+    res.json({ message: 'Monthly leaderboard settings save ho gayi.', settings });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.put('/api/admin/leaderboard/monthly/player/:userId', requireAdmin, async (req, res) => {
+  const userId = String(req.params.userId || '');
+  const points = req.body.points === '' || req.body.points === null ? null : Number(req.body.points);
+  const prize = req.body.prize === '' || req.body.prize === null ? null : Number(req.body.prize);
+  if (!mongoose.Types.ObjectId.isValid(userId)
+    || (points !== null && (!Number.isInteger(points) || points < 0))
+    || (prize !== null && (!Number.isInteger(prize) || prize < 0))) {
+    return res.status(400).json({ error: 'Valid player, points aur prize amount enter karein.' });
+  }
+
+  try {
+    if (!(await User.exists({ _id: userId }))) return res.status(404).json({ error: 'Player nahi mila.' });
+    const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+    const leaderboardId = monthlyLeaderboardId(monthStart);
+    await MonthlyLeaderboard.updateOne(
+      { _id: leaderboardId },
+      { $setOnInsert: { pointsPerGame: 5, winBonus: 15, prizePool: 50000, prizes: defaultMonthlyPrizes() } },
+      { upsert: true }
+    );
+    await MonthlyLeaderboard.updateOne(
+      { _id: leaderboardId, 'playerOverrides.userId': userId },
+      { $set: { 'playerOverrides.$.points': points, 'playerOverrides.$.prize': prize } }
+    ).then(async result => {
+      if (!result.matchedCount) {
+        await MonthlyLeaderboard.updateOne(
+          { _id: leaderboardId },
+          { $push: { playerOverrides: { userId, points, prize } } }
+        );
+      }
+    });
+    res.json({ message: 'Player ke monthly points aur prize override save ho gaye.' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+function supportMessagePayload(message) {
+  return {
+    id: String(message._id),
+    userId: String(message.userId),
+    senderId: String(message.senderId),
+    senderRole: message.senderRole,
+    senderName: message.senderName,
+    text: message.text,
+    createdAt: message.createdAt
+  };
+}
+
+app.get('/api/support/messages', requireUser, async (req, res) => {
+  try {
+    const messages = await SupportMessage.find({ userId: req.auth.userId })
+      .sort({ createdAt: -1 })
+      .limit(100)
+      .lean();
+    await SupportMessage.updateMany(
+      { userId: req.auth.userId, senderRole: 'admin', readAt: null },
+      { $set: { readAt: new Date() } }
+    );
+    res.json({ messages: messages.reverse().map(supportMessagePayload) });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/support/messages', requireUser, async (req, res) => {
+  const text = String(req.body.text || '').trim();
+  if (!text || text.length > 1000) return res.status(400).json({ error: 'Message 1 se 1000 characters ka hona chahiye.' });
+  try {
+    const user = await User.findById(req.auth.userId).select('username');
+    if (!user) return res.status(404).json({ error: 'Player nahi mila.' });
+    const message = await SupportMessage.create({
+      userId: user._id,
+      senderId: user._id,
+      senderRole: 'player',
+      senderName: user.username,
+      text
+    });
+    const payload = supportMessagePayload(message);
+    io.to('admin-support').emit('support_message', payload);
+    res.status(201).json({ message: payload });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/admin/support/threads', requireAdmin, async (req, res) => {
+  try {
+    const latestMessages = await SupportMessage.aggregate([
+      { $sort: { createdAt: -1 } },
+      { $group: { _id: '$userId', lastMessage: { $first: '$$ROOT' } } },
+      { $sort: { 'lastMessage.createdAt': -1 } }
+    ]);
+    const userIds = latestMessages.map(thread => thread._id);
+    const [users, unreadCounts] = await Promise.all([
+      User.find({ _id: { $in: userIds } }).select('username phone profileImage').lean(),
+      SupportMessage.aggregate([
+        { $match: { userId: { $in: userIds }, senderRole: 'player', readAt: null } },
+        { $group: { _id: '$userId', count: { $sum: 1 } } }
+      ])
+    ]);
+    const userMap = new Map(users.map(user => [String(user._id), user]));
+    const unreadMap = new Map(unreadCounts.map(item => [String(item._id), item.count]));
+    res.json({
+      threads: latestMessages.map(thread => ({
+        user: userMap.get(String(thread._id)),
+        lastMessage: supportMessagePayload(thread.lastMessage),
+        unreadCount: unreadMap.get(String(thread._id)) || 0
+      })).filter(thread => thread.user)
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/admin/support/threads/:userId', requireAdmin, async (req, res) => {
+  const userId = String(req.params.userId || '');
+  if (!mongoose.Types.ObjectId.isValid(userId)) return res.status(400).json({ error: 'Valid player select karein.' });
+  try {
+    const messages = await SupportMessage.find({ userId }).sort({ createdAt: -1 }).limit(100).lean();
+    await SupportMessage.updateMany(
+      { userId, senderRole: 'player', readAt: null },
+      { $set: { readAt: new Date() } }
+    );
+    res.json({ messages: messages.reverse().map(supportMessagePayload) });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/admin/support/threads/:userId', requireAdmin, async (req, res) => {
+  const userId = String(req.params.userId || '');
+  const text = String(req.body.text || '').trim();
+  if (!mongoose.Types.ObjectId.isValid(userId)) return res.status(400).json({ error: 'Valid player select karein.' });
+  if (!text || text.length > 1000) return res.status(400).json({ error: 'Message 1 se 1000 characters ka hona chahiye.' });
+  try {
+    const [player, admin] = await Promise.all([
+      User.findById(userId).select('_id'),
+      findUserById(req.admin.userId)
+    ]);
+    if (!player) return res.status(404).json({ error: 'Player nahi mila.' });
+    const message = await SupportMessage.create({
+      userId: player._id,
+      senderId: req.admin.userId,
+      senderRole: 'admin',
+      senderName: admin?.username || 'Admin',
+      text
+    });
+    const payload = supportMessagePayload(message);
+    io.to(`player:${userId}`).emit('support_message', payload);
+    res.status(201).json({ message: payload });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -2167,6 +2455,7 @@ app.post('/api/matches/submit-result', requireUser, persistUploads(upload.single
 
         updated.winner = winnerId;
         updated.status = 'COMPLETED';
+        updated.completedAt = new Date();
         await updated.save({ session });
         await releaseMatchBetSlots(updated, session);
         finalMatch = updated;
@@ -2783,6 +3072,7 @@ app.post('/api/admin/approve-match', requireAdmin, async (req, res) => {
     }
 
     match.status = 'COMPLETED';
+    match.completedAt = new Date();
     if ((match.creatorProofScreenshot || match.joinerProofScreenshot || match.proofScreenshot) && !match.proofScreenshotsDeleteAt) {
       match.proofScreenshotsDeleteAt = new Date(Date.now() + 2 * 60 * 1000);
     }
@@ -2909,8 +3199,22 @@ app.post('/api/admin/review-cancel-request', requireAdmin, async (req, res) => {
 
 app.get('/api/admin/users', requireAdmin, async (req, res) => {
   try {
-    const users = await User.find({}, 'username phone walletBalance createdAt isBlocked isAdmin isPrimaryAdmin').sort({ createdAt: -1 }).lean();
-    res.json({ users });
+    const [users, monthlyLeaderboard] = await Promise.all([
+      User.find({}, 'username phone profileImage walletBalance createdAt isBlocked isAdmin isPrimaryAdmin').sort({ createdAt: -1 }).lean(),
+      getMonthlyLeaderboard(new Date(new Date().getFullYear(), new Date().getMonth(), 1), true)
+    ]);
+    const monthlyStats = new Map(monthlyLeaderboard.map(player => [player.userId, player]));
+    const usersWithMonthlyPoints = users.map(user => {
+      const monthly = monthlyStats.get(String(user._id));
+      return {
+        ...user,
+        monthlyPoints: monthly?.points || 0,
+        monthlyGamesPlayed: monthly?.gamesPlayed || 0,
+        monthlyRank: monthly?.rank || null,
+        monthlyPrize: monthly?.prize || 0
+      };
+    });
+    res.json({ users: usersWithMonthlyPoints });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
