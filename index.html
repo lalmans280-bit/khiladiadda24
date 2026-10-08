@@ -2,25 +2,60 @@
 <html lang="hi">
 <head>
   <meta charset="UTF-8">
+  <script>
+    window.khiladiAddToHomeScreenPrompt = null;
+    window.addEventListener('beforeinstallprompt', event => {
+      event.preventDefault();
+      window.khiladiAddToHomeScreenPrompt = event;
+    });
+  </script>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#101713">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link rel="manifest" href="/api/site-manifest">
-  <link rel="icon" href="/app-icon.svg" type="image/svg+xml">
-  <link rel="shortcut icon" href="/app-icon.svg" type="image/svg+xml">
+  <meta name="description" content="KhiladiAdda24 par online Ludo Classic aur Snake battles explore karein. Games, support aur platform policies ki jaankari yahan paayein.">
+  <meta name="robots" content="index,follow">
+  <link rel="canonical" href="https://khiladiadda24.com/">
+  <link rel="icon" href="/app-icon-192.png" type="image/png">
+  <link rel="shortcut icon" href="/app-icon-192.png" type="image/png">
   <link rel="icon" href="/app-icon-192.png" type="image/png" sizes="192x192">
   <link rel="apple-touch-icon" href="/app-icon-192.png">
   <link rel="mask-icon" href="/app-icon.svg" color="#f4c84b">
   <title>KhiladiAdda24 | Ludo & Snake Battles</title>
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="KhiladiAdda24">
+  <meta property="og:title" content="KhiladiAdda24 | Ludo & Snake Battles">
+  <meta property="og:description" content="KhiladiAdda24 par online Ludo Classic aur Snake battles explore karein.">
+  <meta property="og:url" content="https://khiladiadda24.com/">
+  <meta property="og:image" content="https://khiladiadda24.com/app-icon-512.png">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Organization",
+          "name": "KhiladiAdda24",
+          "url": "https://khiladiadda24.com/",
+          "logo": "https://khiladiadda24.com/app-icon-512.png"
+        },
+        {
+          "@type": "WebSite",
+          "name": "KhiladiAdda24",
+          "url": "https://khiladiadda24.com/"
+        }
+      ]
+    }
+  </script>
   <style>
     :root{color-scheme:dark;--ink:#f2f5ef;--muted:#a8b2b0;--panel:#18232b;--line:#33423f;--gold:#f4c84b;--green:#71d6a1;--red:#f07b72}
     *{box-sizing:border-box}body{margin:0;min-height:100vh;color:var(--ink);font:15px/1.5 "Trebuchet MS",Verdana,sans-serif;background:radial-gradient(ellipse at 90% 0,#283f35 0,transparent 38%),linear-gradient(145deg,#101720,#111d25 60%,#182923)}button,input,select{font:inherit}button{cursor:pointer}button:disabled{opacity:.55;cursor:wait}a{color:inherit;text-decoration:none}.shell{max-width:1120px;margin:auto;padding:0 18px 90px}.topbar{position:sticky;top:0;z-index:5;background:#101720ed;border-bottom:1px solid var(--line);backdrop-filter:blur(14px)}.top-inner{max-width:1120px;margin:auto;min-height:68px;padding:10px 18px;display:flex;align-items:center;justify-content:space-between;gap:14px}.brand{font-size:22px;font-weight:900;color:var(--gold);line-height:1}.brand-content{display:flex;flex-direction:column;align-items:flex-start;gap:3px}.brand-name{font-size:22px;line-height:1.05}.brand-main{display:flex;align-items:baseline;gap:6px;flex-wrap:wrap;font-size:9px}.brand-main span{display:inline-block}.brand-win{color:#ffde7a}.brand small{display:block;margin-top:0;color:#b0c6bd;font-size:9px;letter-spacing:2px}.brand .brand-tagline{display:inline-block;margin-top:0;color:#e9f1e8;font-size:9px;letter-spacing:1.2px;font-weight:900;text-transform:uppercase;line-height:1.1}.top-actions{display:flex;align-items:center;gap:10px}.lang-toggle{display:flex;align-items:center;gap:4px;padding:4px;border:1px solid var(--line);border-radius:999px;background:#1b282e}.lang-btn{min-width:36px;padding:6px 8px;border:0;border-radius:999px;background:transparent;color:var(--ink);font-size:11px;font-weight:800;cursor:pointer}.lang-btn.active{background:var(--gold);color:#172018}.balance{padding:8px 13px;border:1px solid #69744c;border-radius:999px;color:#f8dc83;background:#222b27;font-weight:800;white-space:nowrap}.icon{width:42px;height:42px;border:1px solid var(--line);border-radius:10px;color:var(--ink);background:#1b282e;font-size:21px}.menu{display:none;position:absolute;right:18px;top:62px;width:220px;padding:8px;background:#172329;border:1px solid var(--line);border-radius:10px;box-shadow:0 15px 36px #0008}.menu.open{display:grid}.menu button{padding:11px;border:0;border-radius:7px;text-align:left;color:var(--ink);background:transparent}.menu button:hover{background:#273831}.nav{max-width:1120px;margin:auto;padding:0 18px 10px;display:flex;gap:7px;overflow:auto}.nav button{padding:8px 13px;border:1px solid transparent;border-radius:8px;color:#c4cfca;background:transparent;white-space:nowrap}.nav button.active,.nav button:hover{border-color:#69744c;color:var(--gold);background:#222b27}.content{padding-top:20px}.view{display:none}.view.active{display:block}.hero{padding:26px clamp(20px,5vw,46px);border:1px solid #566849;border-radius:14px;background:linear-gradient(115deg,#273b31,#273546 65%,#3b3b28)}.hero h1{max-width:650px;margin:0 0 10px;color:#ffda68;font-size:clamp(27px,5vw,38px);line-height:1.15}.hero p{max-width:650px;margin:0 0 15px;color:#d2ddd5}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin:16px 0}.stat,.panel,.match{min-width:0;border:1px solid var(--line);border-radius:10px;background:#18232b}.stat{padding:16px}.stat small,.muted{color:var(--muted)}.stat strong{display:block;margin-top:5px;color:#f5d46b;font-size:23px;overflow-wrap:anywhere}.panel{padding:18px;margin-top:15px}.panel h2,.panel h3{margin:0 0 10px}.panel p{margin:6px 0}.row{display:flex;align-items:center;gap:9px;flex-wrap:wrap}.btn{min-height:40px;padding:9px 14px;border:1px solid #e3b842;border-radius:8px;background:var(--gold);color:#222718;font-weight:800}.btn.secondary{border-color:#52656a;background:#293842;color:#e9f2ed}.btn.green{border-color:var(--green);background:var(--green);color:#13261b}.btn.danger{border-color:#8b4943;background:#4c2828;color:#ffe0dc}.btn.small{min-height:34px;padding:6px 10px;font-size:13px}.field{margin:11px 0}.field label{display:block;margin-bottom:5px;color:#cad4ce;font-size:13px}.field input,.field select{width:100%;min-height:43px;padding:10px 12px;border:1px solid #40524f;border-radius:8px;outline:0;color:var(--ink);background:#101920}.field input:focus,.field select:focus{border-color:var(--gold)}.field input[type=file]{padding:8px}.two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.match{padding:14px;margin-top:10px}.match-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}.match h3{margin:7px 0 2px}.amount{color:var(--gold);font-size:20px;font-weight:900;white-space:nowrap}.status{display:inline-flex;padding:4px 9px;border-radius:6px;background:#25382f;color:#a9edc5;font-size:12px;font-weight:800}.status.pending{background:#3e3723;color:#ffdb78}.notice{margin:12px 0;padding:11px 13px;border:1px solid #466a5a;border-radius:8px;color:#c6f5d8;background:#1c342d}.notice.error{border-color:#784743;color:#ffd1cc;background:#392625}.notice.warning{border-color:#66572b;color:#f5dfa0;background:#282517}.qr{display:block;width:min(230px,100%);margin:12px 0;padding:9px;border-radius:8px;background:#fff}.person{display:flex;align-items:center;gap:12px;margin:12px 0}.avatar{width:68px;height:68px;border:2px solid #c4aa4c;border-radius:50%;object-fit:cover;background:#273832}.bottom{display:none}[hidden]{display:none!important}
     @media(max-width:600px){.shell{padding:0 12px 84px}.top-inner{padding:9px 12px}.brand{font-size:19px}.balance{padding:7px 9px;font-size:12px}.nav{display:none}.two{grid-template-columns:1fr}.panel{padding:15px}.match-head{flex-direction:column}.match-head>div:last-child{display:flex;align-items:center;gap:10px}.bottom{position:fixed;z-index:4;right:0;bottom:0;left:0;display:grid;grid-template-columns:repeat(4,1fr);padding-bottom:env(safe-area-inset-bottom);border-top:1px solid var(--line);background:#101720f5}.bottom button{padding:8px 3px 10px;border:0;color:#c0cbc4;background:transparent;font-size:11px}.bottom button span{display:block;color:var(--gold);font-size:18px}}
   .match-head.home-open-header{display:grid;grid-template-columns:minmax(0,1fr) 68px 68px;align-items:center;gap:8px;margin-bottom:8px}.match-head.home-open-header>h2{display:inline-flex;align-items:center;justify-content:flex-start;min-height:32px;margin:0;padding:0;border:0;border-radius:0;background:transparent;color:var(--gold);font-size:12px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;line-height:1.2;white-space:nowrap;justify-self:start}.home-open-header .lang-toggle{display:flex;align-items:center;justify-self:center;width:68px;height:32px;gap:0;padding:2px;border-radius:7px}.home-open-header .lang-btn{flex:1;min-width:0;height:26px;padding:3px 2px;border-radius:5px;font-size:10px}.match-head.home-open-header>.btn.secondary.small{width:68px;min-height:32px;padding:6px 4px;font-size:11px;font-weight:800;justify-self:end}
     .brand{display:flex;align-items:center;gap:9px}.top-inner>#menuToggle{flex:none}
-    .menu{width:250px;max-height:calc(100vh - 82px);overflow:auto}.menu button,.menu a{display:block;padding:11px;border:0;border-radius:7px;text-align:left;color:var(--ink);background:transparent}.menu a:hover,.menu button:hover{background:#273831}.menu .menu-logout{margin-top:5px;border-top:1px solid var(--line);border-radius:0 0 7px 7px;color:var(--red)}
+    .menu{width:250px;max-height:calc(100vh - 82px);overflow:auto}.menu button,.menu a{display:block;padding:11px;border:0;border-radius:7px;text-align:left;color:var(--ink);background:transparent}.menu a:hover,.menu button:hover{background:#273831}.menu a[hidden]{display:none}.menu .menu-logout{margin-top:5px;border-top:1px solid var(--line);border-radius:0 0 7px 7px;color:var(--red)}
     .battle-card-game-tag{display:inline-flex;align-items:center;justify-content:center;gap:5px;padding:0;margin:0;color:var(--gold);font-size:8px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap}
     .battle-player .battle-player-info{display:flex;align-items:center;gap:6px;flex-wrap:wrap}.battle-player-game-tag{display:inline-flex;align-items:center;justify-content:center;margin-left:6px;padding:2px 5px;border-radius:999px;background:rgba(255,189,89,.12);border:1px solid rgba(255,189,89,.25);color:var(--gold);font-size:7px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap}
     .open-battle-group{display:grid;gap:8px;margin:8px 0 12px}.open-battle-group-label{display:flex;align-items:center;justify-content:center;padding:2px 0 4px;color:var(--gold);font-size:11px;font-weight:900;letter-spacing:.12em;text-transform:uppercase} 
@@ -37,8 +72,17 @@
     .sample-running-notice{margin:0 0 10px;color:var(--ink);font-size:12px;font-weight:900}
     .sample-running-list{display:grid;gap:6px}
     .demo-battles-header{display:flex;align-items:center;gap:6px;margin:5px 0 2px;font-size:16px;font-weight:900;line-height:1.2}
+    .demo-battles-header .open-heading-image{display:block;width:76px;height:42px;object-fit:contain;transform-origin:center;animation:open-heading-wiggle 2.8s ease-in-out infinite}
+    .demo-running-header{display:flex;align-items:center;gap:8px;margin:0 0 10px}
+    .demo-running-header .sample-running-banner{margin:0}
+    .demo-live-badge{display:inline-flex;align-items:center;gap:5px;min-height:32px;padding:5px 9px;border:1px solid #ef444477;border-radius:6px;color:#ff7777;background:#101713;font-size:13px;font-weight:900;line-height:1}
+    .demo-live-dot{width:7px;height:7px;flex:none;border-radius:50%;background:#ef4444;box-shadow:0 0 7px #ef444477;animation:live-dot-pulse 1.5s ease-in-out infinite}
+    .demo-live-text{animation:live-text-pulse 1.8s ease-in-out infinite}
     .demo-battles-list{display:grid;gap:6px}
     .demo-battle-card{margin:0 0 1px;padding:6px 8px}
+    .demo-wait-status{flex-basis:100%;color:var(--muted);font-size:11px;font-weight:700;text-align:right}
+    .open-list-box{margin-top:10px;padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--panel);box-shadow:0 8px 24px #0003}
+    .demo-open-list-box .demo-battles-header{margin-top:0;color:#fff}
     .sample-running-battle{display:grid;gap:6px;margin:0;padding:7px 9px}
     .sample-running-battle .battle-prizes{margin-bottom:0}
     .entry-amount-control{position:relative}
@@ -65,6 +109,7 @@
     .battle-player-role{display:block;color:var(--muted);font-size:7px;line-height:1.1}
     .battle-player-amount{display:inline-flex;align-items:center;justify-content:center;gap:2px;min-width:46px;padding:2px 4px;border-radius:999px;background:rgba(247,217,120,.1);border:1px solid rgba(247,217,120,.2);color:var(--gold);font-size:10px;font-weight:800;line-height:1.2;white-space:nowrap}
     .battle-versus{padding:0 1px;color:transparent;background:linear-gradient(110deg,#ff746c 5%,#f5c84b 38%,#75dfa9 67%,#79a9ff 96%);background-clip:text;-webkit-background-clip:text;font-size:10px;font-weight:1000;line-height:1}
+    .battle-versus-image{display:block;width:24px;height:24px;flex:none;padding:0;object-fit:contain}
     .battle-prizes{display:grid;grid-template-columns:58px minmax(0, 1fr) auto;align-items:center;gap:3px;margin:0 0 8px;padding:5px 5px;border:1px solid var(--line);border-radius:8px;background:#101920}.battle-prizes.open-battle-prizes{grid-template-columns:minmax(0,1fr) auto;gap:6px}.battle-prizes.open-battle-prizes .battle-prize-players{grid-column:1;border-left:0;min-width:0}.battle-prizes.open-battle-prizes .battle-card-actions{grid-column:2;grid-row:1;min-width:0;justify-self:end}.battle-prizes.open-battle-prizes .battle-player-main,.battle-prizes.open-battle-prizes .battle-player-info,.battle-prizes.open-battle-prizes .battle-player-name,.battle-prizes.open-battle-prizes .battle-player-amount{border:0;background:transparent;box-shadow:none}.battle-prizes.open-battle-prizes .battle-avatar{border-color:transparent;background:transparent}.battle-prizes.open-battle-prizes .battle-player-name{font-size:12px}.battle-prizes.open-battle-prizes .battle-player-amount{min-width:0;padding:0 2px;font-size:13px}.battle-prizes:not(.open-battle-prizes) .battle-player-amount{min-width:46px;padding:2px 4px;border:1px solid rgba(247,217,120,.2);background:rgba(247,217,120,.1);font-size:11px}
     .battle-prize{min-width:0;padding:0 1px;text-align:left;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;line-height:1.1}
     .battle-prize small{display:block;color:var(--muted);font-size:7px;letter-spacing:.04em;text-transform:uppercase}
@@ -192,8 +237,8 @@
   </style>
   <style id="nightPalette">
     :root{color-scheme:dark;--ink:#edf5ef;--muted:#b0beb4;--panel:#1b2720;--line:#35483a;--gold:#f0c85b;--green:#79d39a;--red:#f18a82}
-    html{background:#101713}
-    body{font-size:16px;color:var(--ink);background-color:#101713;background-image:linear-gradient(145deg,#101713 0%,#162119 55%,#0e1410 100%)}
+    html{background:#1b1008}
+    body{font-size:16px;color:var(--ink);background-color:#1b1008;background-image:linear-gradient(145deg,#1b1008 0%,#38200e 55%,#201308 100%)}
     .topbar,.menu,.panel,.stat,.match,.hero,.cash-banner,.game-tile,.battle-prizes,.trust-ticker{color:var(--ink);background:#1b2720;border-color:#35483a}
     .topbar{box-shadow:0 3px 16px #0005}
     .brand{color:#f0c85b}.brand small{color:#b0beb4}
@@ -269,18 +314,49 @@
     #view-home>.home-running-battles-panel .battle-card .btn.danger{border-color:#ac514c;background:#642d29;color:#fff0ed}
   </style>
   <style id="mobileSizing">
-    #topInstallAppButton{width:34px;height:34px;min-height:34px;flex:none;padding:0;border-color:#69744c;color:#f8dc83;background:#222b27;font-size:20px;line-height:1}
+    #topInstallAppButton{display:grid;place-content:center;justify-items:center;gap:0;width:34px;height:34px;min-height:34px;flex:none;padding:2px;border-color:#991b1b;color:#fff;background:#dc2626}
+    #topInstallAppButton svg{display:block;width:19px;height:19px;fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round;stroke-width:2.5}
+    #topInstallAppButton .install-app-label{font-size:7px;font-weight:900;line-height:1}
     #gamePicker.game-launch{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
     #gamePicker .game-tile-image{width:min(100%,220px)}
     #gamePicker .game-coming-soon-tile{display:grid;place-content:center;justify-items:center;gap:5px;border-color:#647553;color:#fff;background:linear-gradient(140deg,#1d3929,#263b52);text-align:center}
     #gamePicker .game-coming-soon-tile strong{color:#fff;font-size:18px}
     #gamePicker .game-coming-soon-icon{font-size:34px;line-height:1.1}
     #gamePicker .game-coming-soon-badge{position:absolute;right:8px;bottom:8px;left:8px;padding:4px 7px;border:1px solid #f4c84b88;border-radius:999px;color:#ffe18a;background:#101713ed;font:800 10px/1 Arial,sans-serif}
+    #gamePicker .game-coming-soon-tile:nth-child(3){background:linear-gradient(0deg,#101713df,#1017131a 75%),url('/cricket.png') center/cover no-repeat}
+    #gamePicker .game-coming-soon-tile:nth-child(4){background:linear-gradient(0deg,#101713df,#1017131a 75%),url('/pubg.png') center/cover no-repeat}
+    #gamePicker .game-coming-soon-icon{display:none}
     @media(max-width:600px){.top-actions{gap:5px}}
     #view-home>.home-running-battles-panel{border-color:#5f7a9b;background:linear-gradient(125deg,#1b3b30 0%,#1e3a56 52%,#473049 100%);color:#f4f7f5}
     #view-home>.home-open-battles-panel #openMatches .battle-prizes.open-battle-prizes{margin:0;padding:0;border:0;background:transparent;box-shadow:none}
     #view-home>.home-open-battles-panel{padding:0;border:0;background:transparent;box-shadow:none}
     #view-home>.home-running-battles-panel,#view-home>.my-running-battles-section{padding:14px;border:1px solid var(--line);border-radius:10px;background:var(--panel);box-shadow:0 8px 24px #0003}
+    #view-home>.my-running-battles-section{border-color:#ef4444;background:#b91c1c;color:#fff}
+    #view-home>.sample-running-panel .sample-running-notice{color:#fff}
+    #view-home .demo-battles-container{width:100%;margin-top:12px;padding:18px;border:1px solid #ef4444;border-radius:10px;background:#b91c1c;color:#fff;box-shadow:0 8px 24px #0003}
+    @media(max-width:600px){#view-home .demo-battles-container{padding:17px}}
+    html[data-theme="day"] #view-home .demo-open-list-box .battle-card{border-color:#bad9c0;background:#f3faf4;color:#214c30}
+    html[data-theme="day"] #view-home .demo-open-list-box .battle-prizes{border-color:#c3dfc9;background:#e6f4e9}
+    html[data-theme="day"] #view-home .demo-open-list-box .battle-prize small{color:#52745b}
+    html[data-theme="day"] #view-home .demo-open-list-box .battle-prize strong{color:#236b3b}
+    html[data-theme="night"] #view-home .demo-open-list-box .battle-card{border-color:#3c5d42;background:#19271d;color:var(--ink)}
+    html[data-theme="night"] #view-home .demo-open-list-box .battle-prizes{border-color:#3b5840;background:#121b15}
+    html[data-theme="night"] #view-home .demo-open-list-box .battle-prize small{color:#b4c4b7}
+    html[data-theme="night"] #view-home .demo-open-list-box .battle-prize strong{color:#f0c85b}
+    #view-home>.home-open-battles-panel #openMatches .demo-open-list-box .battle-prizes.open-battle-prizes{padding:5px;border:1px solid #3b5840;border-radius:8px;background:#121b15;box-shadow:none}
+    html[data-theme="day"] #view-home>.home-open-battles-panel #openMatches .demo-open-list-box .battle-prizes.open-battle-prizes{border-color:#c3dfc9;background:#e6f4e9}
+    #view-home>.home-open-battles-panel #openMatches .open-list-box{width:100%;margin-top:12px;padding:18px;border:1px solid #ef4444;border-radius:10px;background:#b91c1c;color:#fff;box-shadow:0 8px 24px #0003}
+    @media(max-width:600px){#view-home>.home-open-battles-panel #openMatches .open-list-box{padding:17px}}
+    html[data-theme="day"] #view-home>.home-open-battles-panel #openMatches .open-list-box .battle-card{border-color:#bad9c0;background:#f3faf4;color:#214c30}
+    html[data-theme="day"] #view-home>.home-open-battles-panel #openMatches .open-list-box .battle-prizes{border-color:#c3dfc9;background:#e6f4e9}
+    html[data-theme="day"] #view-home>.home-open-battles-panel #openMatches .open-list-box .battle-prize small{color:#52745b}
+    html[data-theme="day"] #view-home>.home-open-battles-panel #openMatches .open-list-box .battle-prize strong{color:#236b3b}
+    html[data-theme="night"] #view-home>.home-open-battles-panel #openMatches .open-list-box .battle-card{border-color:#3c5d42;background:#19271d;color:var(--ink)}
+    html[data-theme="night"] #view-home>.home-open-battles-panel #openMatches .open-list-box .battle-prizes{border-color:#3b5840;background:#121b15}
+    html[data-theme="night"] #view-home>.home-open-battles-panel #openMatches .open-list-box .battle-prize small{color:#b4c4b7}
+    html[data-theme="night"] #view-home>.home-open-battles-panel #openMatches .open-list-box .battle-prize strong{color:#f0c85b}
+    #view-home>.home-open-battles-panel #openMatches .open-list-box .battle-prizes.open-battle-prizes{margin:0;padding:5px;border:1px solid #3b5840;border-radius:8px;background:#121b15;box-shadow:none}
+    html[data-theme="day"] #view-home>.home-open-battles-panel #openMatches .open-list-box .battle-prizes.open-battle-prizes{border-color:#c3dfc9;background:#e6f4e9}
     #view-home>.home-open-battles-panel .match-head h2,#view-home>.home-running-battles-panel>h2{display:block;margin:0;padding:0;border:0;border-radius:0;color:inherit;background:transparent;font-size:16px;line-height:1.2}
     html[data-theme="night"] .battle-prizes.open-battle-prizes .battle-player-amount{font-size:14px}
     @media(max-width:600px){.battle-prizes.open-battle-prizes .battle-player-name{font-size:10px}html[data-theme="night"] .battle-prizes.open-battle-prizes .battle-player-amount{font-size:12px}html[data-theme="day"] .battle-prizes.open-battle-prizes .battle-player-amount{font-size:12px}}
@@ -296,20 +372,23 @@
   <style id="ludoAppButtonPalette">
     .ludo-app-button,#view-home>.home-open-battles-panel .battle-card .btn.ludo-app-button,#view-home>.home-running-battles-panel .battle-card .btn.ludo-app-button{border-color:#991f1f;background:#c62828;color:#fff}
     .ludo-app-button:hover,#view-home>.home-open-battles-panel .battle-card .btn.ludo-app-button:hover,#view-home>.home-running-battles-panel .battle-card .btn.ludo-app-button:hover{border-color:#7f1d1d;background:#a91f1f;color:#fff}
-    main.content>.home-open-battles-panel{padding:14px;border:1px solid #a9601d;border-radius:10px;background:#482a16;color:#fff1df;box-shadow:0 8px 24px #0003}
-    main.content>.home-open-battles-panel h2{display:block;margin:0;padding:0;border:0;border-radius:0;color:inherit;background:transparent;font-size:16px;line-height:1.2}
-    main.content>.home-open-battles-panel #openMatches .battle-prizes.open-battle-prizes{margin:0;padding:0;border:0;background:transparent;box-shadow:none}
-    main.content>.home-open-battles-panel .battle-card{border-color:#b46b2e;background:#38200f;color:#fff4e4}
-    main.content>.home-open-battles-panel .battle-prizes{border-color:#9f5f29;background:#29180d}
-    main.content>.home-open-battles-panel .battle-prize small{color:#e8c8a1}
-    main.content>.home-open-battles-panel .battle-prize strong{color:#ffd17b}
-    main.content>.home-open-battles-panel .battle-card .btn:not(.danger){border-color:#cd8138;background:#874711;color:#fff4e5}
-    main.content>.home-open-battles-panel .battle-card .btn.danger{border-color:#ac514c;background:#642d29;color:#fff0ed}
-    @media(max-width:600px){main.content>.home-open-battles-panel .match-head{flex-direction:row;align-items:center}}
   </style>
   <style id="walletActionButtonPalette">
     #view-wallet #withdrawForm>button[type="submit"],#view-wallet #qrForm>button[type="submit"]{border-color:#991b1b;background:#dc2626;color:#fff}
     #view-wallet #withdrawForm>button[type="submit"]:hover:not(:disabled),#view-wallet #qrForm>button[type="submit"]:hover:not(:disabled){border-color:#7f1d1d;background:#b91c1c;color:#fff}
+  </style>
+  <style id="openBattlesHeadingStyle">
+    .open-battles-image-title{display:flex;align-items:center;gap:6px;min-height:42px;margin:0;padding:0;border:0;border-radius:0;background:transparent}
+    .open-battles-image-title .open-heading-image{width:76px;height:42px;flex:none;object-fit:contain;transform-origin:center;animation:open-heading-wiggle 2.8s ease-in-out infinite}
+    #view-home>.home-open-battles-panel .match-head h2.home-open-header-title{display:flex;align-items:center;justify-content:flex-start;gap:6px;min-height:42px;margin:0;padding:0;border:0;border-radius:0;background:transparent}
+    .sample-running-banner{display:block;width:min(100%,100px);height:auto;margin:0 0 10px;transform-origin:center;animation:open-heading-wiggle 2.8s ease-in-out infinite}
+    @keyframes open-heading-wiggle{0%,100%{transform:translateY(0) rotate(-1deg)}50%{transform:translateY(-2px) rotate(1deg)}}
+    @media(prefers-reduced-motion:reduce){.open-battles-image-title .open-heading-image,.sample-running-banner,.demo-live-dot,.demo-live-text{animation:none}}
+    html[data-theme="day"] body{background:radial-gradient(ellipse at 90% 0,#dbeafe 0,transparent 42%),linear-gradient(145deg,#f1f5ff,#e8f4ff 55%,#edf8f4)}
+    html[data-theme="night"] body{background:radial-gradient(ellipse at 12% 8%,#26355f 0,transparent 36%),radial-gradient(ellipse at 92% 22%,#15505a 0,transparent 34%),radial-gradient(ellipse at 52% 100%,#38294d 0,transparent 42%),linear-gradient(145deg,#0c1427,#111b31 58%,#0b2028)}
+    #view-home>.panel:first-child{background:#dc2626}
+    #view-home>.panel:first-child .challenge-info-row>.muted,#view-home>.panel:first-child #createForm label{color:#fff;font-weight:800}
+    #view-home>.panel:first-child .game-rules-button{color:#000;font-weight:800;font-size:10px;line-height:14px;padding:3px 6px;min-height:26px}
   </style>
   <script>
     try {
@@ -330,7 +409,7 @@
     <button type="button" class="app-promo-close" id="closeAppPromo" aria-label="Close">×</button>
   </div>
   <main class="shell content"><div id="notice" class="notice" role="status" hidden></div>
-      <section class="view" id="view-games"><div class="game-launch" id="gamePicker"><button class="game-tile game-tile-image" data-launch-game="LUDO" aria-label="Ludo Classic"><img src="/ludo-classic.png" alt="Ludo Classic"><span class="game-live-badge"><i class="game-live-dot" aria-hidden="true"></i><span class="game-live-text">LIVE</span></span></button><button class="game-tile game-tile-image" data-launch-game="SNAKE" aria-label="Snake Battle"><img src="/snake-battles-banner.png" alt="Snake Battle"><span class="game-live-badge"><i class="game-live-dot" aria-hidden="true"></i><span class="game-live-text">LIVE</span></span></button><div class="game-tile game-tile-image game-coming-soon-tile" aria-label="Cricket - Coming Soon"><span class="game-coming-soon-icon" aria-hidden="true">🏏</span><strong>Cricket</strong><span class="game-coming-soon-badge">Coming Soon</span></div><div class="game-tile game-tile-image game-coming-soon-tile" aria-label="PUBG - Coming Soon"><span class="game-coming-soon-icon" aria-hidden="true">🎯</span><strong>PUBG</strong><span class="game-coming-soon-badge">Coming Soon</span></div><a class="game-support-banner" href="/support.html" aria-label="WhatsApp and support"><img src="/whatsapp-support.png" alt="WhatsApp and Support"><span class="game-live-badge"><i class="game-live-dot" aria-hidden="true"></i><span class="game-live-text">LIVE</span></span></a></div><div id="gameBattleView" hidden><div class="match-head"><div><button class="btn secondary small" id="backToGames">← Games</button><h2 id="gameViewTitle"></h2></div><button id="gameRefreshOpen" class="btn secondary small" type="button">Refresh</button></div><div class="panel"><h2>Open battles</h2><div id="gameOpenMatches"></div></div><div class="panel"><h2>My running battles</h2><div id="gameRunningMatches"></div></div></div></section>
+      <section class="view" id="view-games"><div class="game-launch" id="gamePicker"><button class="game-tile game-tile-image" data-launch-game="LUDO" aria-label="Ludo Classic"><img src="/ludo-classic.png" alt="Ludo Classic"><span class="game-live-badge"><i class="game-live-dot" aria-hidden="true"></i><span class="game-live-text">LIVE</span></span></button><button class="game-tile game-tile-image" data-launch-game="SNAKE" aria-label="Snake Battle"><img src="/snake-battles-banner.png" alt="Snake Battle"><span class="game-live-badge"><i class="game-live-dot" aria-hidden="true"></i><span class="game-live-text">LIVE</span></span></button><div class="game-tile game-tile-image game-coming-soon-tile" aria-label="Cricket - Coming Soon"><span class="game-coming-soon-icon" aria-hidden="true">🏏</span><strong>Cricket</strong><span class="game-coming-soon-badge">Coming Soon</span></div><div class="game-tile game-tile-image game-coming-soon-tile" aria-label="PUBG - Coming Soon"><span class="game-coming-soon-icon" aria-hidden="true">🎯</span><strong>PUBG</strong><span class="game-coming-soon-badge">Coming Soon</span></div><a class="game-support-banner" href="/support.html" aria-label="WhatsApp and support"><img src="/whatsapp-support.png" alt="WhatsApp and Support"><span class="game-live-badge"><i class="game-live-dot" aria-hidden="true"></i><span class="game-live-text">LIVE</span></span></a></div><div id="gameBattleView" hidden><div class="match-head"><div><button class="btn secondary small" id="backToGames">← Games</button><h2 id="gameViewTitle"></h2></div><button id="gameRefreshOpen" class="btn secondary small" type="button">Refresh</button></div><div class="panel"><h2 class="open-battles-image-title" aria-label="Open battles"><img class="open-heading-image" src="/open.png" alt=""></h2><div id="gameOpenMatches"></div></div><div class="panel"><h2>My running battles</h2><div id="gameRunningMatches"></div></div></div></section>
     <section class="view active" id="view-home"><div class="panel"><img class="battle-banner" src="/banner-ludo-snake.png" alt="Ludo and Snake Game"><p class="muted">Minimum ₹100. Multiples of ₹50.</p><form id="createForm"><div class="two"><div class="field"><label for="gameType">Game</label><select id="gameType"><option value="LUDO">Ludo Classic</option><option value="SNAKE">Snake</option></select></div><div class="field"><label for="entryAmount">Entry amount (₹)</label><input id="entryAmount" type="number" min="100" max="50000" step="50" value="100" placeholder="e.g. 250" required></div></div><button class="btn" type="submit">Set challenge</button></form></div><div class="panel"><div class="match-head"><button id="refreshOpen" class="btn secondary small">Refresh</button></div><p class="muted">Challenger, entry amount aur winning amount dekhein.</p><div id="openMatches"></div></div><div class="panel"><div id="runningMatches"></div></div></section>
     <section class="view" id="view-wallet"><div class="grid"><div class="stat"><small>Available balance</small><strong id="walletBalance">₹ --</strong></div><div class="stat"><small>Aadhaar KYC</small><strong id="kycStatus">Loading</strong><p class="muted" id="kycMessage">Withdraw ke liye KYC approval zaroori hai.</p></div></div><div class="two"><div class="panel"><h2>Wallet deposit</h2><p class="muted">Minimum ₹100. QR se payment ke baad UTR aur screenshot bhejein; admin approval par amount credit hoga.</p><form id="qrForm"><div class="field"><label for="depositAmount">Deposit amount (₹)</label><input id="depositAmount" type="number" min="100" max="1000000" value="100" required></div><button class="btn" type="submit">UPI QR banayein</button></form><div id="qrArea"></div><form id="depositForm" hidden><div class="field"><label for="utr">UTR / reference number</label><input id="utr" name="utrNumber" minlength="12" maxlength="22" required></div><div class="field"><label for="proof">Payment screenshot</label><input id="proof" name="screenshot" type="file" accept="image/jpeg,image/png,image/webp" required></div><button class="btn green" type="submit">Deposit request bhejein</button></form></div><div class="panel"><h2>Withdraw</h2><p class="muted">Minimum ₹500. Aadhaar KYC approve hone ke baad hi request bhej sakte hain.</p><form id="withdrawForm"><div class="field"><label for="withdrawAmount">Amount (₹)</label><input id="withdrawAmount" name="amount" type="number" min="500" step="1" value="500" required></div><div class="field"><label for="upiId">Aapka UPI ID</label><input id="upiId" name="upiId" placeholder="name@bank" required></div><button class="btn" type="submit">Withdrawal request bhejein</button></form></div></div><div class="panel"><h2>Aadhaar KYC</h2><p class="muted">Aadhaar number aur card image admin verification ke liye upload karein. OTP ya PIN kabhi share na karein.</p><form id="kycForm"><div class="two"><div class="field"><label for="aadhaarNumber">Aadhaar number</label><input id="aadhaarNumber" name="aadhaarNumber" type="password" inputmode="numeric" autocomplete="off" minlength="12" maxlength="12" pattern="[0-9]{12}" required></div><div class="field"><label for="aadhaarImage">Aadhaar card image</label><input id="aadhaarImage" name="aadhaarImage" type="file" accept="image/jpeg,image/png,image/webp" required></div></div><button class="btn secondary" type="submit">KYC review ke liye bhejein</button></form></div></section>
     <section class="view" id="view-profile"><div class="panel"><h2>Player profile</h2><div class="person"><img id="avatar" class="avatar" alt="Player profile"><div><strong id="profileName">--</strong><div class="muted" id="profilePhone">--</div></div></div><form id="profileForm"><div class="field"><label for="username">Player name</label><input id="username" name="username" minlength="2" maxlength="40" required></div><div class="field"><label for="profileImage">Profile image</label><input id="profileImage" name="profileImage" type="file" accept="image/jpeg,image/png,image/webp"></div><button class="btn" type="submit">Profile save karein</button></form></div><div class="panel"><h2>Account details</h2><p>Mobile: <strong id="accountPhone">--</strong></p><p>Balance: <strong id="profileBalance">--</strong></p><p>Your referral ID: <strong id="profileReferralCode">--</strong></p><button class="btn secondary small" id="copyReferral">📋 Referral ID copy karein</button><button class="btn danger small" id="logoutProfile">Logout</button></div></section>
@@ -353,11 +432,21 @@
     const token=localStorage.getItem('token');
     const storedUser=(()=>{try{return JSON.parse(localStorage.getItem('user')||'null')}catch{return null}})();
     let player=null, game='LUDO', battlesPollTimer, kycApproved=false;
+    const adminPhoneDigits=String(storedUser?.phone||'').replace(/\D/g,'');
+    const adminPlayerPhone=adminPhoneDigits.length===12&&adminPhoneDigits.startsWith('91')?adminPhoneDigits.slice(2):adminPhoneDigits.length===11&&adminPhoneDigits.startsWith('0')?adminPhoneDigits.slice(1):adminPhoneDigits;
+    const adminPlayerView=sessionStorage.getItem('adminPlayerView')==='yes'&&Boolean(localStorage.getItem('adminToken'))&&storedUser?.role==='user'&&adminPlayerPhone==='7828189494';
+    const adminPanelReturn=document.createElement('a');
+    adminPanelReturn.href='/admin.html';
+    adminPanelReturn.id='adminPanelReturn';
+    adminPanelReturn.textContent='↩ Admin Panel';
+    adminPanelReturn.hidden=!adminPlayerView;
+    document.getElementById('menu').insertBefore(adminPanelReturn,document.getElementById('logout'));
 
-    let appInstallPrompt = null;
+    let appInstallPrompt = window.khiladiAddToHomeScreenPrompt;
     window.addEventListener('beforeinstallprompt', event => {
       event.preventDefault();
       appInstallPrompt = event;
+      window.khiladiAddToHomeScreenPrompt = event;
     });
 
     const appPromo = document.getElementById('appPromo');
@@ -390,11 +479,16 @@
           : 'Chrome ke menu (⋮) se “Install app” ya “Add to Home screen” chunein.');
         return;
       }
-      appInstallPrompt.prompt();
-      await appInstallPrompt.userChoice;
+      const installPrompt = appInstallPrompt;
       appInstallPrompt = null;
+      window.khiladiAddToHomeScreenPrompt = null;
+      installPrompt.prompt();
+      await installPrompt.userChoice;
     }
-    window.addEventListener('appinstalled', () => { appInstallPrompt = null; });
+    window.addEventListener('appinstalled', () => {
+      appInstallPrompt = null;
+      window.khiladiAddToHomeScreenPrompt = null;
+    });
     async function shareWebsiteLink() {
       const appUrl = `${location.origin}/index.html`;
       try {
@@ -456,9 +550,9 @@
     topInstallButton.id='topInstallAppButton';
     topInstallButton.className='icon top-install';
     topInstallButton.type='button';
-    topInstallButton.textContent='↓';
+    topInstallButton.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v11m0 0 4-4m-4 4-4-4M5 16v4h14v-4"/></svg><span class="install-app-label" aria-hidden="true">APP</span>';
     topInstallButton.title='Install app';
-    topInstallButton.setAttribute('aria-label','Install app');
+    topInstallButton.setAttribute('aria-label','Install app and add to home screen');
     el('headerBalance').before(topInstallButton);
     topInstallButton.addEventListener('click',promptAppInstall);
     const profileShareButton=document.createElement('button');
@@ -501,17 +595,18 @@
       notify('Pehle valid entry amount par SET dabayein.',true);
     });
     const openBattlesHeading=document.createElement('h2');
-    openBattlesHeading.className='home-open-header-title';
-    openBattlesHeading.textContent='OPEN Battles';
+    openBattlesHeading.className='open-battles-image-title home-open-header-title';
+    openBattlesHeading.setAttribute('aria-label','Open battles');
+    const openBattlesImage=document.createElement('img');
+    openBattlesImage.className='open-heading-image';
+    openBattlesImage.src='/open.png';
+    openBattlesImage.alt='';
+    openBattlesHeading.append(openBattlesImage);
     const homeMatchHeader=el('refreshOpen').closest('.match-head');
     if(homeMatchHeader)homeMatchHeader.classList.add('home-open-header');
     el('refreshOpen').before(openBattlesHeading);
     const languageToggle=document.querySelector('.top-inner .lang-toggle');
     if(languageToggle&&homeMatchHeader)homeMatchHeader.insertBefore(languageToggle,el('refreshOpen'));
-    const runningBattlesHeading=document.createElement('h2');
-    runningBattlesHeading.textContent='Running Battles';
-    runningBattlesHeading.style.fontWeight='900';
-    el('runningMatches').before(runningBattlesHeading);
     const samplePlayerNames=['Aarav Sharma','Vivaan Verma','Aditya Singh','Arjun Patel','Ishaan Gupta','Rohan Yadav','Kabir Mehta','Reyansh Kumar','Advika Joshi','Sai Prasad','Ananya Sharma','Diya Patel','Aadhya Verma','Saanvi Gupta','Myra Singh','Kiara Nair','Isha Reddy','Pari Shah','Meera Iyer','Avni Das','Kunal Mishra','Dev Malhotra','Yash Thakur','Omkar Pawar','Manav Jain','Harsh Agarwal','Nikhil Rao','Rahul Sinha','Siddharth Bose','Varun Kapoor','Priya Menon','Kavya Kulkarni','Neha Choudhary','Riya Banerjee','Tara Bhat','Sneha Desai','Pooja Bansal','Nandini Pillai','Anika Roy','Sanjana Kulkarni'];
     const sampleEntryAmounts=[100,150,200,250,300,350,400,450,500,600,700,800,900,1000,1250,1500,2000,2500,3000,5000];
     const sampleAvatarPaths=['/1.png','/2.png','/3.png','/4.png','/5.png'];
@@ -539,17 +634,42 @@
       return Array.from({length:10},(_,index)=>({player:{name:demoNames[index],avatar:sampleAvatarPaths[index%sampleAvatarPaths.length]},amount:demoAmounts[index],gameType:index%2===0?'LUDO':'SNAKE'}));
     }
     let demoBattlePairs=createDemoBattlePairs();
+    const demoBattleWaitStartedAt=new Map();
     let sampleRunningBattles=createSampleRunningBattles(demoBattlePairs.map(({player})=>player.name));
     const demoBattlesList=document.createElement('div');
     demoBattlesList.className='demo-battles-list';
-    const demoBattlesHeader='<div class="demo-battles-header"><strong>OPEN</strong></div>';
+    const demoBattlesHeader='<div class="demo-battles-header"><img class="open-heading-image" src="/open.png" alt="Open battles"><span class="demo-live-badge"><i class="demo-live-dot" aria-hidden="true"></i><span class="demo-live-text">LIVE</span></span></div>';
     function renderDemoBattles(){
-      const showDemoCards = !window.__REAL_OPEN_BATTLES_AVAILABLE;
-      demoBattlesList.innerHTML = showDemoCards ? demoBattlePairs.map(({player,amount,gameType})=>`<article class="match battle-card demo-battle-card"><div class="battle-prizes open-battle-prizes"><div class="battle-prize-players"><div class="battle-players battle-players-waiting">${battlePlayerMarkup({username:player.name,profileImage:player.avatar.replace(/^\//,'')},'Challenger',false,amount,gameType==='SNAKE'?'Snake Battle':'Ludo Classic')}</div></div><div class="battle-card-actions"><button class="btn green small" type="button" disabled aria-disabled="true">PLAY</button></div></div></article>`).join('') : '';
+      demoBattlesList.innerHTML = demoBattlePairs.map(({player,amount,gameType})=>{
+        const waiting=demoBattleWaitStartedAt.has(player.name);
+        const remaining=waiting?Math.max(0,Math.ceil((demoBattleWaitStartedAt.get(player.name)+60000-Date.now())/1000)):60;
+        const timer=`${String(Math.floor(remaining/60)).padStart(2,'0')}:${String(remaining%60).padStart(2,'0')}`;
+        return `<article class="match battle-card demo-battle-card"><div class="battle-prizes open-battle-prizes"><div class="battle-prize-players"><div class="battle-players battle-players-waiting">${battlePlayerMarkup({username:player.name,profileImage:player.avatar.replace(/^\//,'')},'Challenger',false,amount,gameType==='SNAKE'?'Snake Battle':'Ludo Classic')}</div></div><div class="battle-card-actions"><button class="btn green small" type="button" data-demo-play="${esc(player.name)}" data-demo-amount="${amount}"${waiting?' disabled aria-disabled="true"':''}>${waiting?'WAITING':'PLAY'}</button>${waiting?`<span class="demo-wait-status">Room code ka wait • <span data-demo-wait-timer="${esc(player.name)}">${timer}</span></span><button class="btn danger small" type="button" data-demo-cancel="${esc(player.name)}">CANCEL</button>`:''}</div></div></article>`;
+      }).join('');
     }
+    function cancelDemoWait(playerName,card){
+      demoBattleWaitStartedAt.delete(playerName);
+      const playButton=card.querySelector('[data-demo-play]');
+      if(!playButton)return;
+      playButton.disabled=false;
+      playButton.removeAttribute('aria-disabled');
+      playButton.textContent='PLAY';
+      card.querySelector('.demo-wait-status')?.remove();
+      card.querySelector('[data-demo-cancel]')?.remove();
+    }
+    setInterval(()=>{
+      document.querySelectorAll('[data-demo-wait-timer]').forEach(timer=>{
+        const playerName=timer.dataset.demoWaitTimer;
+        const startedAt=demoBattleWaitStartedAt.get(playerName);
+        if(startedAt===undefined)return;
+        const remaining=Math.ceil((startedAt+60000-Date.now())/1000);
+        if(remaining<=0){cancelDemoWait(playerName,timer.closest('.demo-battle-card'));return}
+        timer.textContent=`${String(Math.floor(remaining/60)).padStart(2,'0')}:${String(remaining%60).padStart(2,'0')}`;
+      });
+    },1000);
     const gameSamplePanel=document.createElement('div');
-    gameSamplePanel.className='panel sample-running-panel';
-    gameSamplePanel.innerHTML='<p class="sample-running-notice">Running Battles</p><div id="sampleRunningMatches" class="sample-running-list"></div>';
+    gameSamplePanel.className='panel sample-running-panel demo-battles-container';
+    gameSamplePanel.innerHTML='<div class="demo-running-header"><img class="sample-running-banner" src="/Battle-Run.png" alt="Running Battles"><span class="demo-live-badge"><i class="demo-live-dot" aria-hidden="true"></i><span class="demo-live-text">LIVE</span></span></div><div id="sampleRunningMatches" class="sample-running-list"></div>';
     el('runningMatches').after(gameSamplePanel);
     const mySamplePanel=gameSamplePanel.cloneNode(true);
     mySamplePanel.querySelector('#sampleRunningMatches').id='mySampleRunningMatches';
@@ -560,9 +680,10 @@
     const openBattlesPanel=el('openMatches').closest('.panel');
     openBattlesPanel.classList.add('home-open-battles-panel');
     const allRunningBattlesPanel=el('runningMatches').closest('.panel');
-    allRunningBattlesPanel.classList.add('home-running-battles-panel');
+    allRunningBattlesPanel.before(el('runningMatches'));
+    allRunningBattlesPanel.after(gameSamplePanel);
+    allRunningBattlesPanel.remove();
     homeView.insertBefore(myRunningBattlesPanel,openBattlesPanel);
-    homeView.after(openBattlesPanel);
     const themeButton=document.createElement('button');
     themeButton.id='themeToggle';
     themeButton.type='button';
@@ -608,12 +729,11 @@
     const esc=value=>String(value??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
     const loginUrl=()=>`/login.html?next=${encodeURIComponent(location.pathname+location.search+location.hash)}`;
     if(!token||!storedUser)location.replace(loginUrl());
-    else if(storedUser.role==='admin')location.replace('/admin.html');
     function notify(text,error=false){const box=el('notice');box.textContent=text;box.className=`notice${error?' error':''}`;box.hidden=!text;}
     async function api(url,options={}){const headers=new Headers(options.headers||{});headers.set('Authorization',`Bearer ${token}`);if(options.body&&!(options.body instanceof FormData))headers.set('Content-Type','application/json');const response=await fetch(url,{...options,headers});const data=await response.json().catch(()=>({}));if(response.status===401){localStorage.removeItem('token');localStorage.removeItem('user');location.replace(loginUrl());throw new Error('Session expire hua. Dobara login karein.')}if(!response.ok)throw new Error(data.error||'Request complete nahi hui.');return data}
     window.pendingEntryAmount=100;
     const showError=error=>{const message=error.message||'Kuch problem hui.';if(/balance|insufficient|recharge/i.test(message)){const required=Number(window.pendingEntryAmount)||100,balance=Number(player?.walletBalance??storedUser?.walletBalance??0),depositAmount=Math.max(100,required-balance);el('depositAmount').value=String(depositAmount);notify(`₹${required} entry ke liye balance kam hai. ₹${depositAmount} deposit karein.`,true);document.querySelector('.bottom [data-view="wallet"]')?.click();return}notify(message,true)};
-    function setView(name){const viewName=name==='battles'||name==='games'?'home':name;document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===`view-${viewName}`));document.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===viewName));el('menu').classList.remove('open');el('menuToggle').setAttribute('aria-expanded','false');clearInterval(battlesPollTimer);if(viewName==='wallet'||viewName==='profile')loadKyc().catch(showError);if(viewName==='home')loadMine().catch(showError);if(viewName==='history')loadHistory().catch(showError);loadOpen().catch(showError);battlesPollTimer=setInterval(()=>loadOpen().catch(showError),30000)}
+    function setView(name){const viewName=name==='battles'||name==='games'?'home':name;document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===`view-${viewName}`||(viewName==='match'&&v.id==='view-home')));document.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===(viewName==='match'?'home':viewName)));el('menu').classList.remove('open');el('menuToggle').setAttribute('aria-expanded','false');clearInterval(battlesPollTimer);if(viewName==='wallet'||viewName==='profile')loadKyc().catch(showError);if(viewName==='home')loadMine().catch(showError);if(viewName==='history')loadHistory().catch(showError);loadOpen().catch(showError);battlesPollTimer=setInterval(()=>loadOpen().catch(showError),30000)}
     function renderPlayer(){const name=player?.username||storedUser?.username||'Player',phone=player?.phone||storedUser?.phone||'',balance=Number(player?.walletBalance||0),formatted=`₹ ${balance.toLocaleString('en-IN')}`;['headerBalance','walletBalance','profileBalance'].forEach(id=>el(id).textContent=formatted);el('profileName').textContent=name;el('profilePhone').textContent=phone;el('accountPhone').textContent=phone;el('profileReferralCode').textContent=player?.referralCode||'--';el('username').value=name;const image=player?.profileImage;el('avatar').src=image?(image.startsWith('uploads/')?`/api/profile/image/${encodeURIComponent(image.split('/').pop())}`:`/${image.split('/').map(encodeURIComponent).join('/')}`):'';el('avatar').onerror=()=>el('avatar').removeAttribute('src')}
     async function loadProfile(){const data=await api('/api/profile/me');player=data.user;renderPlayer()}
     async function loadWalletSummary(){const data=await api('/api/wallet/summary'),format=value=>`₹ ${Number(value||0).toLocaleString('en-IN')}`;el('profileTotalDeposits').textContent=format(data.totalDeposits);el('profilePaidWithdrawals').textContent=format(data.paidWithdrawals);el('profilePendingWithdrawals').textContent=format(data.pendingWithdrawals);el('profileTotalWinnings').textContent=format(data.totalWinnings);const withdrawableWinnings=el('withdrawableWinnings');if(withdrawableWinnings)withdrawableWinnings.textContent=`Withdrawable game winnings: ${format(data.availableWinnings)}. Deposits and bonuses cannot be withdrawn.`;el('profileMoneyUpdated').textContent=`Updated ${new Date().toLocaleTimeString('en-IN')}`}
@@ -647,7 +767,7 @@
     function battlePlayerMarkup(user,role,opponent=false,amount='',gameLabel=''){const username=nameOf(user),profileImage=String(user?.profileImage||'').trim(),imageUrl=profileImage.startsWith('uploads/')?`/api/profile/image/${encodeURIComponent(profileImage.slice('uploads/'.length))}`:profileImage?`/${profileImage.split('/').map(encodeURIComponent).join('/')}`:'',initial=String(username).trim().charAt(0).toUpperCase()||'?';const avatar=imageUrl?`<img class="battle-avatar" src="${esc(imageUrl)}" alt="">`:`<span class="battle-avatar">${esc(initial)}</span>`;const amountMarkup=amount?`<span class="battle-player-amount">₹${Number(amount).toLocaleString('en-IN')}</span>`:'';const gameTag=gameLabel?`<span class="battle-player-game-tag">${esc(gameLabel)}</span>`:'';return `<div class="battle-player${opponent?' battle-player-opponent':''}"><div class="battle-player-main">${avatar}<span class="battle-player-info"><strong class="battle-player-name">${esc(username)}</strong><small class="battle-player-role">${esc(role)}</small>${gameTag}</span></div>${amountMarkup}</div>`}
     renderDemoBattles();
     function gameTypeLabel(gameType){return gameType==='SNAKE'?'Snake battle':'Ludo Classic';}
-    function matchCard(m,mine=false){const entry=Number(m.amount),prize=entry*2*0.95,playerId=String(player?._id||storedUser?.id||''),isOwnOpen=m.status==='OPEN'&&String(m.creator?._id||m.creator)===playerId;const action=isOwnOpen?`<button class="btn danger small" data-cancel-match="${esc(m._id)}">Cancel</button>`:`<button class="btn ${mine?'secondary':'green'} small" data-${mine?'match':'join'}="${esc(m._id)}">${mine?'Details':'PLAY'}</button>`;const status=m.status==='PENDING_RESULT'?'Result review':m.status==='PENDING_CANCELLATION'?'Cancel review':m.status;const gameLabel=gameTypeLabel(m.gameType||game);const playersMarkup=m.joiner?`<div class="battle-players">${battlePlayerMarkup(m.creator,mine?'Creator':'Challenger',false,entry,gameLabel)}<span class="battle-versus" aria-label="versus">VS</span>${battlePlayerMarkup(m.joiner,'Opponent',true,entry)}</div>`:`<div class="battle-players battle-players-waiting">${battlePlayerMarkup(m.creator,mine?'Creator':'Challenger',false,entry,gameLabel)}</div>`;const statusMarkup=m.status==='OPEN'?'':`<div class="battle-card-top"><span class="status ${['PENDING_RESULT','PENDING_CANCELLATION'].includes(m.status)?'pending':''}">${esc(status)}</span></div>`;const prizeMarkup=m.status==='OPEN'?'':`<div class="battle-prize"><small>WIN</small><strong>₹${prize.toLocaleString('en-IN')}</strong></div>`;const prizeClass=m.status==='OPEN'?' open-battle-prizes':'';return `<article class="match battle-card">${statusMarkup}<div class="battle-prizes${prizeClass}">${prizeMarkup}<div class="battle-prize-players">${playersMarkup}</div><div class="battle-card-actions">${action}</div></div></article>`}
+    function matchCard(m,mine=false){const entry=Number(m.amount),prize=entry*2*0.95,playerId=String(player?._id||storedUser?.id||''),isOwnOpen=m.status==='OPEN'&&String(m.creator?._id||m.creator)===playerId;const action=isOwnOpen?`<button class="btn danger small" data-cancel-match="${esc(m._id)}">Cancel</button>`:`<button class="btn ${mine?'secondary':'green'} small" data-${mine?'match':'join'}="${esc(m._id)}">${mine?'Details':'PLAY'}</button>`;const status=m.status==='PENDING_RESULT'?'Result review':m.status==='PENDING_CANCELLATION'?'Cancel review':m.status;const gameLabel=gameTypeLabel(m.gameType||game);const playersMarkup=m.joiner?`<div class="battle-players">${battlePlayerMarkup(m.creator,mine?'Creator':'Challenger',false,entry,gameLabel)}<img class="battle-versus battle-versus-image" src="/vs.png" alt="versus">${battlePlayerMarkup(m.joiner,'Opponent',true,entry)}</div>`:`<div class="battle-players battle-players-waiting">${battlePlayerMarkup(m.creator,mine?'Creator':'Challenger',false,entry,gameLabel)}</div>`;const statusMarkup=m.status==='OPEN'?'':`<div class="battle-card-top"><span class="status ${['PENDING_RESULT','PENDING_CANCELLATION'].includes(m.status)?'pending':''}">${esc(status)}</span></div>`;const prizeMarkup=m.status==='OPEN'?'':`<div class="battle-prize"><small>WIN</small><strong>₹${prize.toLocaleString('en-IN')}</strong></div>`;const prizeClass=m.status==='OPEN'?' open-battle-prizes':'';return `<article class="match battle-card">${statusMarkup}<div class="battle-prizes${prizeClass}">${prizeMarkup}<div class="battle-prize-players">${playersMarkup}</div><div class="battle-card-actions">${action}</div></div></article>`}
     async function loadOpen(){
       const [openData,runningData]=await Promise.all([api('/api/matches/open?gameType=ALL'),api('/api/matches/running?gameType=ALL')]);
       const openMatches=Array.isArray(openData)?openData:openData.matches||[];
@@ -656,8 +776,8 @@
       window.__REAL_OPEN_BATTLES_AVAILABLE = hasRealOpenMatches;
       const openMarkup=openMatches.map(m=>matchCard(m)).join('');
       renderDemoBattles();
-      const fallbackDemoMarkup = hasRealOpenMatches ? '' : demoBattlesHeader + demoBattlesList.innerHTML;
-      const allOpenBattlesMarkup = openMarkup + fallbackDemoMarkup;
+      const fallbackDemoMarkup = demoBattlesHeader + demoBattlesList.innerHTML;
+      const allOpenBattlesMarkup = `${openMarkup ? `<div class="open-list-box">${openMarkup}</div>` : ''}<div class="demo-open-list-box demo-battles-container">${fallbackDemoMarkup}</div>`;
       el('openMatches').innerHTML = allOpenBattlesMarkup;
       if(el('gameOpenMatches'))el('gameOpenMatches').innerHTML = allOpenBattlesMarkup;
       const currentPlayerId=String(player?._id||storedUser?._id||storedUser?.id||'');
@@ -687,13 +807,24 @@
         }else if(isJoiner&&!m.roomCode&&!m.gameStartedAt){
           actions=`<div class="row"><button class="btn danger small" data-running-cancel="${esc(m._id)}" data-room-code-shared="0">Cancel</button></div>`;
         }
-        const secondaryAction = m.roomCode && (isCreator || isJoiner) ? `<div class="battle-inline-secondary-action"><button class="btn secondary small" type="button" data-match="${esc(m._id)}">Result / screenshot</button>${m.gameType==='LUDO'?`<a class="btn secondary small ludo-app-button" data-open-ludo="true" href="${ludoKingOpenUrl()}">Open Ludo King App</a>`:''}</div>` : '';
+        const secondaryAction = m.roomCode && (isCreator || isJoiner) ? `<div class="battle-inline-secondary-action"><button class="btn secondary small" type="button" data-running-result="${esc(m._id)}">Result / screenshot</button>${m.gameType==='LUDO'?`<a class="btn secondary small ludo-app-button" data-open-ludo="true" href="${ludoKingOpenUrl()}">Open Ludo King App</a>`:''}</div>` : '';
         const roomCodePanel=m.roomCode&&(isCreator||isJoiner)?`<div class="battle-room-code-panel"><div class="battle-room-code-box"><input id="runningCode-${esc(m._id)}" value="${esc(m.roomCode)}" readonly><button class="btn secondary small" type="button" data-running-copy="${esc(m._id)}" data-room-code="${esc(m.roomCode)}" data-copy-open-game="${m.gameType==='LUDO'?'LUDO':''}">Copy</button><span class="battle-room-code-label">Locked</span></div></div>`:'';
         const statusMarkup=isParticipant?`<div class="battle-card-top"><span class="status">${m.gameStartedAt?'Game chal raha hai':m.roomCodeSharedAt?'Room code locked • Ludo King mein kheliye':'Opponent joined • room code pending'}</span></div>`:'';
         const prize=Number(m.amount)*2*0.95;
-        return `<article class="match battle-card">${statusMarkup}<div class="battle-prizes running-battle-prizes"><div class="battle-prize"><small>WIN</small><strong>₹${prize.toLocaleString('en-IN')}</strong></div><div class="battle-prize-players"><div class="battle-players">${battlePlayerMarkup(m.creator,'Creator',false,Number(m.amount))}<span class="battle-versus" aria-label="versus">VS</span>${battlePlayerMarkup(m.joiner,'Opponent',true,Number(m.amount))}</div></div>${actions?`<div class="battle-card-actions">${actions}</div>`:''}</div>${secondaryAction}<div class="battle-room-actions">${roomCodePanel}</div></article>`
+        return `<article class="match battle-card">${statusMarkup}<div class="battle-prizes running-battle-prizes"><div class="battle-prize"><small>WIN</small><strong>₹${prize.toLocaleString('en-IN')}</strong></div><div class="battle-prize-players"><div class="battle-players">${battlePlayerMarkup(m.creator,'Creator',false,Number(m.amount))}<img class="battle-versus battle-versus-image" src="/vs.png" alt="versus">${battlePlayerMarkup(m.joiner,'Opponent',true,Number(m.amount))}</div></div>${actions?`<div class="battle-card-actions">${actions}</div>`:''}</div>${secondaryAction}<div class="battle-room-actions">${roomCodePanel}</div></article>`
       }).join(''):'';
-      const sampleMarkup=sampleRunningBattles.map(({name,avatar,opponent,opponentAvatar,amount})=>`<article class="match battle-card sample-running-battle"><div class="battle-prizes running-battle-prizes"><div class="battle-prize"><small>WIN</small><strong>₹${(amount*2*0.95).toLocaleString('en-IN')}</strong></div><div class="battle-prize-players"><div class="battle-players">${battlePlayerMarkup({username:name,profileImage:avatar.replace(/^\//,'')},'Creator',false,amount)}<span class="battle-versus" aria-label="versus">VS</span>${battlePlayerMarkup({username:opponent,profileImage:opponentAvatar.replace(/^\//,'')},'Opponent',true,amount)}</div></div></div></article>`).join('');
+      runningList.querySelectorAll('[data-running-result]').forEach(button=>button.addEventListener('click',async()=>{
+        button.disabled=true;
+        button.textContent='Opening...';
+        try{
+          await window.openMatchPage(button.dataset.runningResult,'details');
+          const resultForm=el('resultForm');
+          if(resultForm)resultForm.scrollIntoView({behavior:'smooth',block:'center'});
+          else notify('Is match ke current status mein screenshot submit karne ka option available nahi hai.',true);
+        }catch(error){showError(error)}
+        finally{button.disabled=false;button.textContent='Result / screenshot'}
+      }));
+      const sampleMarkup=sampleRunningBattles.map(({name,avatar,opponent,opponentAvatar,amount})=>`<article class="match battle-card sample-running-battle"><div class="battle-prizes running-battle-prizes"><div class="battle-prize"><small>WIN</small><strong>₹${(amount*2*0.95).toLocaleString('en-IN')}</strong></div><div class="battle-prize-players"><div class="battle-players">${battlePlayerMarkup({username:name,profileImage:avatar.replace(/^\//,'')},'Creator',false,amount)}<img class="battle-versus battle-versus-image" src="/vs.png" alt="versus">${battlePlayerMarkup({username:opponent,profileImage:opponentAvatar.replace(/^\//,'')},'Opponent',true,amount)}</div></div></div></article>`).join('');
       el('sampleRunningMatches').innerHTML=sampleMarkup;
       el('mySampleRunningMatches').innerHTML=sampleMarkup;
       runningList.querySelectorAll('a[href^="intent://"]').forEach(link=>{link.href=ludoKingOpenUrl()});
@@ -710,7 +841,7 @@
     async function loadMine(){const container=el('myMatches');if(!container)return;const data=await api('/api/matches/mine'),matches=data.matches||[];container.innerHTML=matches.length?matches.map(m=>matchCard(m,true)).join(''):'<p class="muted">Abhi koi active battle nahi hai.</p>'}
     function refreshSamplePlayers(){
       if(!el('sampleRunningMatches')||!el('mySampleRunningMatches')||window.__REAL_OPEN_BATTLES_AVAILABLE)return;
-      const sampleMarkup=sampleRunningBattles.map(({name,avatar,opponent,opponentAvatar,amount})=>`<article class="match battle-card sample-running-battle"><div class="battle-prizes running-battle-prizes"><div class="battle-prize"><small>WIN</small><strong>₹${(amount*2*0.95).toLocaleString('en-IN')}</strong></div><div class="battle-prize-players"><div class="battle-players">${battlePlayerMarkup({username:name,profileImage:avatar.replace(/^\//,'')},'Creator',false,amount)}<span class="battle-versus" aria-label="versus">VS</span>${battlePlayerMarkup({username:opponent,profileImage:opponentAvatar.replace(/^\//,'')},'Opponent',true,amount)}</div></div></div></article>`).join('');
+      const sampleMarkup=sampleRunningBattles.map(({name,avatar,opponent,opponentAvatar,amount})=>`<article class="match battle-card sample-running-battle"><div class="battle-prizes running-battle-prizes"><div class="battle-prize"><small>WIN</small><strong>₹${(amount*2*0.95).toLocaleString('en-IN')}</strong></div><div class="battle-prize-players"><div class="battle-players">${battlePlayerMarkup({username:name,profileImage:avatar.replace(/^\//,'')},'Creator',false,amount)}<img class="battle-versus battle-versus-image" src="/vs.png" alt="versus">${battlePlayerMarkup({username:opponent,profileImage:opponentAvatar.replace(/^\//,'')},'Opponent',true,amount)}</div></div></div></article>`).join('');
       el('sampleRunningMatches').innerHTML=sampleMarkup;
       el('mySampleRunningMatches').innerHTML=sampleMarkup;
     }
@@ -724,6 +855,52 @@
       if(view){event.preventDefault();return setView(view.dataset.view)}
       const filter=event.target.closest('[data-game]');
       if(filter){game=filter.dataset.game;document.querySelectorAll('.game-filter').forEach(button=>button.classList.toggle('active',button===filter));return loadOpen().catch(showError)}
+      const demoCancel=event.target.closest('[data-demo-cancel]');
+      if(demoCancel){
+        cancelDemoWait(demoCancel.dataset.demoCancel,demoCancel.closest('.demo-battle-card'));
+        return;
+      }
+      const demoPlay=event.target.closest('[data-demo-play]');
+      if(demoPlay){
+        const playerName=demoPlay.dataset.demoPlay;
+        if(demoBattleWaitStartedAt.has(playerName))return;
+        demoPlay.disabled=true;
+        const requiredAmount=Number(demoPlay.dataset.demoAmount);
+        try{
+          const profile=await api('/api/profile/me');
+          player=profile.user;
+          renderPlayer();
+          const walletBalance=Number(player.walletBalance||0);
+          if(walletBalance<requiredAmount){
+            const depositAmount=Math.max(100,requiredAmount-walletBalance);
+            window.pendingEntryAmount=requiredAmount;
+            el('depositAmount').value=String(depositAmount);
+            notify(`₹${requiredAmount} entry ke liye wallet balance kam hai. ₹${depositAmount} recharge karein.`,true);
+            setView('wallet');
+            return;
+          }
+        }catch(error){
+          showError(error);
+          return;
+        }finally{
+          demoPlay.disabled=false;
+        }
+        demoBattleWaitStartedAt.set(playerName,Date.now());
+        demoPlay.disabled=true;
+        demoPlay.setAttribute('aria-disabled','true');
+        demoPlay.textContent='WAITING';
+        const elapsed=document.createElement('span');
+        elapsed.className='demo-wait-status';
+        elapsed.innerHTML=`Room code ka wait • <span data-demo-wait-timer="${esc(playerName)}">01:00</span>`;
+        demoPlay.after(elapsed);
+        const cancelButton=document.createElement('button');
+        cancelButton.className='btn danger small';
+        cancelButton.type='button';
+        cancelButton.dataset.demoCancel=playerName;
+        cancelButton.textContent='CANCEL';
+        elapsed.after(cancelButton);
+        return;
+      }
       const join=event.target.closest('[data-join]');
       if(join){
         join.disabled=true;
@@ -735,17 +912,17 @@
         return;
       }
       const detail=event.target.closest('[data-match]');
-      if(detail)window.openMatchPage(detail.dataset.match,'details')
+      if(detail)window.openMatchPage(detail.dataset.match,'details').catch(showError)
     });
-    document.addEventListener('click',async event=>{const cancel=event.target.closest('[data-cancel-match]');if(!cancel)return;cancel.disabled=true;try{const matchId=cancel.dataset.cancelMatch,result=await api('/api/matches/cancel',{method:'POST',body:JSON.stringify({matchId})});notify(result.message);await refresh();window.openMatchPage(matchId,'details')}catch(error){showError(error);cancel.disabled=false}});
+    document.addEventListener('click',async event=>{const cancel=event.target.closest('[data-cancel-match]');if(!cancel)return;cancel.disabled=true;try{const matchId=cancel.dataset.cancelMatch,result=await api('/api/matches/cancel',{method:'POST',body:JSON.stringify({matchId})});notify(result.message);await refresh();await window.openMatchPage(matchId,'details')}catch(error){showError(error);cancel.disabled=false}});
     document.addEventListener('click',async event=>{const start=event.target.closest('[data-running-start]');if(!start)return;start.disabled=true;try{await api('/api/matches/start-setup',{method:'POST',body:JSON.stringify({matchId:start.dataset.runningStart})});await loadOpen()}catch(error){showError(error);start.disabled=false}});
     document.addEventListener('click',async event=>{const copy=event.target.closest('[data-running-copy]');if(!copy)return;const code=copy.dataset.roomCode;let copied=false;try{if(navigator.clipboard?.writeText){await navigator.clipboard.writeText(code);copied=true}}catch{}if(!copied){const field=document.createElement('textarea');field.value=code;field.setAttribute('readonly','');field.style.position='fixed';field.style.opacity='0';document.body.append(field);field.select();copied=document.execCommand('copy');field.remove()}notify(copied?'Room code copy ho gaya.':`Room code: ${code}`,!copied)});
     document.addEventListener('submit',async event=>{const form=event.target.closest('[data-running-room-share]');if(!form)return;event.preventDefault();const code=form.querySelector('[data-running-room-code]').value.trim(),matchId=form.dataset.runningRoomShare;if(!/^[0-9]{4,8}$/.test(code))return notify('4-8 digit room code enter karein.',true);try{await api('/api/matches/set-room-code',{method:'POST',body:JSON.stringify({matchId,roomCode:code})});notify('Room code share ho gaya.');document.activeElement.blur();await loadOpen()}catch(error){notify(error.message,true)}});
-    document.addEventListener('click',async event=>{const cancel=event.target.closest('[data-running-cancel]');if(!cancel)return;const roomCodeShared=cancel.dataset.roomCodeShared==='1',matchId=cancel.dataset.runningCancel,body={matchId};if(roomCodeShared){const reasons=[['1','Galat room code','WRONG_ROOM_CODE'],['2','Opponent respond nahi kar raha','OPPONENT_NOT_RESPONDING'],['3','Technical issue','TECHNICAL_ISSUE'],['4','Other','OTHER']],choice=prompt(`Cancel reason chunein:\n${reasons.map(([number,label])=>`${number}. ${label}`).join('\n')}`);if(choice===null)return;const reason=reasons.find(([number])=>number===choice.trim());if(!reason)return notify('Cancel reason list se number select karein.',true);body.reason=reason[2]}cancel.disabled=true;try{const result=await api('/api/matches/cancel',{method:'POST',body:JSON.stringify(body)});notify(result.message);await refresh();window.openMatchPage(matchId,'details')}catch(error){showError(error);cancel.disabled=false}});
+    document.addEventListener('click',async event=>{const cancel=event.target.closest('[data-running-cancel]');if(!cancel)return;const roomCodeShared=cancel.dataset.roomCodeShared==='1',matchId=cancel.dataset.runningCancel,body={matchId};if(roomCodeShared){const reasons=[['1','Galat room code','WRONG_ROOM_CODE'],['2','Opponent respond nahi kar raha','OPPONENT_NOT_RESPONDING'],['3','Technical issue','TECHNICAL_ISSUE'],['4','Other','OTHER']],choice=prompt(`Cancel reason chunein:\n${reasons.map(([number,label])=>`${number}. ${label}`).join('\n')}`);if(choice===null)return;const reason=reasons.find(([number])=>number===choice.trim());if(!reason)return notify('Cancel reason list se number select karein.',true);body.reason=reason[2]}cancel.disabled=true;try{const result=await api('/api/matches/cancel',{method:'POST',body:JSON.stringify(body)});notify(result.message);await refresh();await window.openMatchPage(matchId,'details')}catch(error){showError(error);cancel.disabled=false}});
     el('gameType').addEventListener('change',()=>{syncGameSelection(el('gameType').value);loadOpen().catch(showError)});document.querySelectorAll('.game-filter').forEach(button=>button.addEventListener('click',()=>syncGameSelection(button.dataset.game)));document.querySelectorAll('[data-launch-game]').forEach(button=>button.addEventListener('click',()=>{syncGameSelection(button.dataset.launchGame);el('gamePicker').hidden=true;el('gameBattleView').hidden=false;setView('games')}));el('backToGames').addEventListener('click',()=>{el('gameBattleView').hidden=true;el('gamePicker').hidden=false;setView('games')});el('gameRefreshOpen').addEventListener('click',()=>location.reload());
     el('menuToggle').addEventListener('click',()=>{el('menu').classList.toggle('open');el('menuToggle').setAttribute('aria-expanded',el('menu').classList.contains('open'))});el('refreshHistory').addEventListener('click',()=>location.reload());
     el('copyReferral').addEventListener('click',async()=>{const code=player?.referralCode;if(!code)return notify('Referral ID abhi load nahi hui.',true);try{await navigator.clipboard.writeText(code);notify('Referral ID copy ho gayi.')}catch{notify(`Aapki Referral ID: ${code}`)}});
-    function logout(){localStorage.removeItem('token');localStorage.removeItem('user');location.replace('/login.html')}el('logout').addEventListener('click',logout);el('logoutProfile').addEventListener('click',logout);el('refreshMatches')?.addEventListener('click',()=>location.reload());el('refreshOpen').addEventListener('click',()=>location.reload());
+    function logout(){localStorage.removeItem('token');localStorage.removeItem('user');if(adminPlayerView){localStorage.removeItem('adminToken');localStorage.removeItem('adminUser');sessionStorage.removeItem('adminPlayerView')}location.replace('/login.html')}el('logout').addEventListener('click',logout);el('logoutProfile').addEventListener('click',logout);el('refreshMatches')?.addEventListener('click',()=>location.reload());el('refreshOpen').addEventListener('click',()=>location.reload());
     el('createForm').addEventListener('submit',async event=>{
       event.preventDefault();
       const amount=Number(entryAmountInput.value);
@@ -774,7 +951,7 @@
       const result=el('resultForm');if(result)result.addEventListener('submit',async event=>{event.preventDefault();const body=new FormData(result);body.set('matchId',id);try{const data=await api('/api/matches/submit-result',{method:'POST',body});notify(data.message);await refresh();await openMatch(id)}catch(error){showError(error)}});
       const cancel=el('cancelForm');if(cancel){const reasonSelect=cancel.querySelector('#reason'),requiresAdmin=m.status==='RUNNING'&&Boolean(m.roomCode);cancel.addEventListener('submit',async event=>{event.preventDefault();const prompt=requiresAdmin?'Room code share ho chuka hai. Cancel reason admin ko bhejein? Approval ke baad hi cancel aur refund hoga.':'Room code share hone se pehle game cancel karke entry refund karein?';if(!confirm(prompt))return;const body={matchId:id};if(requiresAdmin){const reason=reasonSelect?.value;if(!reason)return notify('Cancel reason select karein.',true);body.reason=reason}try{const data=await api('/api/matches/cancel',{method:'POST',body:JSON.stringify(body)});notify(data.message);await refresh();await openMatch(id)}catch(error){showError(error)}})}
     }
-    window.openMatchPage=(id,stage,showResult=false)=>{const url=new URL('/index.html',location.origin);url.searchParams.set('matchId',id);if(stage)url.searchParams.set('stage',stage);if(showResult)url.searchParams.set('showResult','1');history.pushState({matchId:id},'',url);window.openMatch(id).catch(showError)};
+    window.openMatchPage=(id,stage,showResult=false)=>{const url=new URL('/index.html',location.origin);url.searchParams.set('matchId',id);if(stage)url.searchParams.set('stage',stage);if(showResult)url.searchParams.set('showResult','1');history.pushState({matchId:id},'',url);return window.openMatch(id)};
     window.matchApp={api,el,notify,esc,nameOf,setView,refresh,getPlayer:()=>player,getUser:()=>storedUser};
     refresh().catch(showError);setInterval(refreshSamplePlayers,10*1000);setInterval(()=>{if(el('view-profile').classList.contains('active'))loadWalletSummary().catch(showError)},30000);const initialMatchId=new URLSearchParams(location.search).get('matchId');if(initialMatchId)window.openMatch(initialMatchId).catch(showError);
   </script>
