@@ -68,6 +68,25 @@
     .history-dialog table { margin-top: 0; }
     .kyc-edit-dialog { width: min(480px, calc(100vw - 28px)); }
     .kyc-edit-dialog label { display: block; margin-top: 14px; color: #cbd5e1; font-size: 13px; }
+    .support-admin-layout { display: grid; grid-template-columns: minmax(220px, 0.8fr) minmax(0, 1.5fr); gap: 14px; }
+    .support-thread-list { display: grid; align-content: start; gap: 8px; max-height: 420px; overflow: auto; }
+    .support-thread-button { width: 100%; padding: 10px; border: 1px solid rgba(255,255,255,0.1); background: rgba(15,23,42,0.7); text-align: left; }
+    .support-thread-button.active { outline: 2px solid #fbbf24; }
+    .support-thread-button small, .support-thread-button strong { display: block; }
+    .support-thread-button small { color: #94a3b8; margin-top: 4px; }
+    .support-admin-chat { display: grid; grid-template-rows: minmax(180px, 1fr) auto; gap: 10px; min-height: 300px; }
+    .support-admin-messages { display: grid; align-content: start; gap: 8px; max-height: 380px; overflow: auto; padding: 10px; border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; background: #0f172a; }
+    .support-admin-message { max-width: 85%; padding: 9px 11px; border-radius: 10px; background: #263449; overflow-wrap: anywhere; }
+    .support-admin-message.admin { justify-self: end; background: #14532d; }
+    .support-admin-message small { display: block; margin-top: 4px; color: #cbd5e1; }
+    .support-admin-form { display: grid; grid-template-columns: 1fr auto; gap: 8px; }
+    .support-admin-form textarea { width: 100%; padding: 10px; border: 1px solid #475569; border-radius: 7px; color: #fff; background: #0f172a; font: inherit; }
+    .leaderboard-settings { display: grid; grid-template-columns: repeat(3, minmax(120px, 1fr)); gap: 10px; }
+    .leaderboard-settings label { color: #cbd5e1; font-size: 12px; }
+    .leaderboard-prizes { width: 100%; min-height: 90px; padding: 10px; border: 1px solid #475569; border-radius: 7px; color: #fff; background: #0f172a; font: inherit; }
+    .leaderboard-player-image { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; vertical-align: middle; background: #263449; }
+    .leaderboard-player-input { width: 90px; }
+    @media (max-width: 700px) { .support-admin-layout { grid-template-columns: 1fr; } .leaderboard-settings { grid-template-columns: 1fr; } .support-admin-form { grid-template-columns: 1fr; } }
     @media (max-width: 600px) { .history-dialog { padding: 14px; } .history-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
     .admin-bottom-nav { position: fixed; z-index: 10; right: 0; bottom: 0; left: 0; display: flex; justify-content: center; gap: 12px; padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); border-top: 1px solid rgba(255,255,255,0.12); background: rgba(15,23,42,0.96); backdrop-filter: blur(12px); }
     .admin-bottom-nav button { min-width: 132px; }
@@ -259,9 +278,42 @@
         <span id="playerListSummary" class="muted" aria-live="polite"></span>
       </div>
       <table id="userTable">
-        <tr><th>S.N.</th><th>Player</th><th>Phone</th><th>Wallet</th><th>Joined</th><th>Status</th><th>Admin</th><th>Action</th></tr>
+        <tr><th>S.N.</th><th>Player</th><th>Phone</th><th>Wallet</th><th>Monthly rank</th><th>Monthly points</th><th>Joined</th><th>Status</th><th>Admin</th><th>Action</th></tr>
       </table>
     </div>
+
+    <section class="card" aria-labelledby="adminLeaderboardTitle">
+      <h3 id="adminLeaderboardTitle">Monthly Standings & Prize Controls</h3>
+      <p class="muted"><span id="adminLeaderboardMonth">Loading...</span> — har completed game ke points aur rank prizes yahan configure karein. Empty player override se automatic points/prize use honge.</p>
+      <div class="leaderboard-settings">
+        <label>Points per completed game<input id="pointsPerGameInput" type="number" min="0" step="1"></label>
+        <label>Winner bonus points<input id="winBonusInput" type="number" min="0" step="1"></label>
+        <label>Total prize pool (₹)<input id="prizePoolInput" type="number" min="0" step="1"></label>
+      </div>
+      <label for="rankPrizesInput">Rank 1–100 prize amounts (₹), comma/newline separated; use 0 for no prize</label>
+      <textarea id="rankPrizesInput" class="leaderboard-prizes"></textarea>
+      <div class="toolbar" style="margin-top: 10px;"><button id="saveLeaderboardSettings" type="button">Save points & rank prizes</button><span id="leaderboardSettingsStatus" class="muted" aria-live="polite"></span></div>
+      <div style="overflow-x:auto">
+        <table id="adminLeaderboardTable">
+          <tr><th>Rank</th><th>Player</th><th>Points override</th><th>Prize override (₹)</th><th>Games</th><th>Wins</th><th>Action</th></tr>
+        </table>
+      </div>
+    </section>
+
+    <section class="card" aria-labelledby="adminSupportChatTitle">
+      <h3 id="adminSupportChatTitle">Direct Player Support Chat</h3>
+      <p class="muted">Players ke support messages yahan aayenge. Reply admin account se player ke chat me directly jayega.</p>
+      <div class="support-admin-layout">
+        <div id="supportThreadList" class="support-thread-list"><p class="muted">Conversations load ho rahi hain...</p></div>
+        <div class="support-admin-chat">
+          <div id="supportAdminMessages" class="support-admin-messages"><p class="muted">Conversation kholne ke liye player select karein.</p></div>
+          <form id="supportAdminForm" class="support-admin-form">
+            <textarea id="supportAdminInput" rows="2" maxlength="1000" placeholder="Player ko reply likhein..." disabled></textarea>
+            <button id="supportAdminSend" type="submit" disabled>Send reply</button>
+          </form>
+        </div>
+      </div>
+    </section>
 
     <div class="card">
       <h3>Pending Deposits (QR Verify)</h3>
@@ -901,6 +953,9 @@
       const modePlayers = playerListMode === 'NEW'
         ? allPlayers.filter(player => new Date(player.createdAt).getTime() >= newPlayerSince)
         : allPlayers;
+      modePlayers.sort((a, b) => Number(b.monthlyPoints || 0) - Number(a.monthlyPoints || 0)
+        || Number(b.monthlyGamesPlayed || 0) - Number(a.monthlyGamesPlayed || 0)
+        || new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
       const searchInput = document.getElementById('playerSearch').value.trim();
       const searchTerm = searchInput.toLocaleLowerCase();
       const searchDigits = searchInput.replace(/\D/g, '');
@@ -911,15 +966,15 @@
           || (searchDigits && String(player.phone || '').replace(/\D/g, '').includes(searchDigits)))
         : modePlayers;
       document.getElementById('userListTitle').textContent = playerListMode === 'NEW' ? 'New Players · Last 7 Days' : 'All Players & Wallets';
-      document.getElementById('playerListSummary').textContent = `${players.length} player${players.length === 1 ? '' : 's'}`;
-      table.innerHTML = '<tr><th>S.N.</th><th>Player</th><th>Phone</th><th>Wallet</th><th>Joined</th><th>Status</th><th>Admin</th><th>Action</th></tr>';
+      document.getElementById('playerListSummary').textContent = `${players.length} player${players.length === 1 ? '' : 's'} · Monthly points: 20 per win, 5 per completed game`;
+      table.innerHTML = '<tr><th>S.N.</th><th>Player</th><th>Phone</th><th>Wallet</th><th>Monthly rank</th><th>Monthly points</th><th>Joined</th><th>Status</th><th>Admin</th><th>Action</th></tr>';
       if (!players.length) {
         const emptyMessage = searchTerm
           ? 'Is search se koi player nahi mila.'
           : playerListMode === 'NEW'
             ? 'Last 7 days mein koi naya player nahi.'
             : 'Player list khali hai.';
-        table.innerHTML += `<tr><td colspan="8" class="empty">${emptyMessage}</td></tr>`;
+        table.innerHTML += `<tr><td colspan="10" class="empty">${emptyMessage}</td></tr>`;
         return;
       }
       players.forEach((u, index) => {
@@ -928,9 +983,171 @@
         const isAdminUser = Boolean(u.isAdmin) || isPrimary;
         const adminLabel = isPrimary ? 'Primary' : isAdminUser ? 'Admin' : 'User';
         const adminAction = isPrimary ? '<button disabled>Primary admin</button>' : isAdminUser ? `<button class="danger" onclick="toggleAdminStatus('${u._id}', false)">Remove admin</button>` : `<button class="secondary" onclick="toggleAdminStatus('${u._id}', true)">Make admin</button>`;
-        table.innerHTML += `<tr><td>${index + 1}</td><td><button type="button" class="player-name-link" onclick="openPlayerHistory('${u._id}')">${escapeHtml(u.username)}</button></td><td>${playerWhatsAppLink(u.phone)}</td><td>₹${Number(u.walletBalance || 0).toLocaleString('en-IN')}</td><td>${new Date(u.createdAt).toLocaleString()}</td><td>${blocked ? 'Blocked' : 'Active'}</td><td>${adminLabel}</td><td><button class="secondary" onclick="openPlayerEditor('${u._id}')">Edit profile</button> <button class="${blocked ? 'unblock-button' : 'block-button'}" onclick="setPlayerBlocked('${u._id}', ${!blocked})">${blocked ? 'Unblock' : 'Block'}</button> ${adminAction}</td></tr>`;
+        table.innerHTML += `<tr><td>${index + 1}</td><td><button type="button" class="player-name-link" onclick="openPlayerHistory('${u._id}')">${escapeHtml(u.username)}</button></td><td>${playerWhatsAppLink(u.phone)}</td><td>₹${Number(u.walletBalance || 0).toLocaleString('en-IN')}</td><td>${u.monthlyRank || '-'}</td><td><strong>${Number(u.monthlyPoints || 0).toLocaleString('en-IN')}</strong><br><small>${Number(u.monthlyGamesPlayed || 0)} completed games</small></td><td>${new Date(u.createdAt).toLocaleString()}</td><td>${blocked ? 'Blocked' : 'Active'}</td><td>${adminLabel}</td><td><button class="secondary" onclick="openPlayerEditor('${u._id}')">Edit profile</button> <button class="${blocked ? 'unblock-button' : 'block-button'}" onclick="setPlayerBlocked('${u._id}', ${!blocked})">${blocked ? 'Unblock' : 'Block'}</button> ${adminAction}</td></tr>`;
       });
     }
+
+    function adminProfileImageUrl(profileImage) {
+      const image = String(profileImage || '');
+      if (!image) return '/app-icon-192.png';
+      if (image.startsWith('uploads/')) return `/api/profile/image/${encodeURIComponent(image.split('/').pop())}`;
+      return image.startsWith('/') ? image : `/${image}`;
+    }
+
+    function escapeAttribute(value) {
+      return escapeHtml(value).replace(/`/g, '&#96;');
+    }
+
+    async function loadAdminLeaderboard() {
+      const status = document.getElementById('leaderboardSettingsStatus');
+      try {
+        const response = await adminFetch('/api/admin/leaderboard/monthly', { cache: 'no-store' });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Monthly standings load nahi hui.');
+        document.getElementById('adminLeaderboardMonth').textContent = data.month;
+        document.getElementById('pointsPerGameInput').value = data.pointsPerGame;
+        document.getElementById('winBonusInput').value = data.winBonus;
+        document.getElementById('prizePoolInput').value = data.prizePool;
+        document.getElementById('rankPrizesInput').value = data.prizes.join(', ');
+        const table = document.getElementById('adminLeaderboardTable');
+        table.innerHTML = '<tr><th>Rank</th><th>Player</th><th>Points override</th><th>Prize override (₹)</th><th>Games</th><th>Wins</th><th>Action</th></tr>';
+        data.rankings.forEach(player => {
+          const image = adminProfileImageUrl(player.profileImage);
+          table.insertAdjacentHTML('beforeend', `<tr><td>${player.rank || '-'}</td><td><img class="leaderboard-player-image" src="${escapeAttribute(image)}" alt="" loading="lazy"> ${escapeHtml(player.username)}<br><small>${escapeHtml(player.userId)}</small></td><td><strong>${Number(player.points).toLocaleString('en-IN')} pts</strong><br><input class="leaderboard-player-input" type="number" min="0" step="1" aria-label="Points override for ${escapeAttribute(player.username)}" data-points-for="${escapeAttribute(player.userId)}" value="${player.pointsOverride ?? ''}" placeholder="Automatic"></td><td><strong>₹${Number(player.prize || 0).toLocaleString('en-IN')}</strong><br><input class="leaderboard-player-input" type="number" min="0" step="1" aria-label="Prize override for ${escapeAttribute(player.username)}" data-prize-for="${escapeAttribute(player.userId)}" value="${player.prizeOverride ?? ''}" placeholder="Rank prize"></td><td>${Number(player.gamesPlayed)}</td><td>${Number(player.wins)}</td><td><button type="button" onclick="saveMonthlyPlayer('${escapeAttribute(player.userId)}')">Save player</button></td></tr>`);
+        });
+        status.textContent = `${data.rankings.length} players loaded. Blank override uses automatic game points and rank prize.`;
+      } catch (error) {
+        status.textContent = error.message || 'Monthly standings load nahi hui.';
+      }
+    }
+
+    async function saveAdminLeaderboardSettings() {
+      const status = document.getElementById('leaderboardSettingsStatus');
+      const prizes = document.getElementById('rankPrizesInput').value
+        .split(/[,\n]+/)
+        .map(value => value.trim())
+        .filter(Boolean)
+        .map(Number);
+      const body = {
+        pointsPerGame: Number(document.getElementById('pointsPerGameInput').value),
+        winBonus: Number(document.getElementById('winBonusInput').value),
+        prizePool: Number(document.getElementById('prizePoolInput').value),
+        prizes
+      };
+      if (prizes.length !== 100) {
+        status.textContent = `Rank 1–100 ke liye exactly 100 prize amounts chahiye; abhi ${prizes.length} hain.`;
+        return;
+      }
+      try {
+        const response = await adminFetch('/api/admin/leaderboard/monthly/settings', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Leaderboard settings save nahi hui.');
+        status.textContent = data.message || 'Leaderboard settings save ho gayi.';
+        await Promise.all([loadAdminLeaderboard(), loadUsers()]);
+      } catch (error) {
+        status.textContent = error.message || 'Leaderboard settings save nahi hui.';
+      }
+    }
+
+    async function saveMonthlyPlayer(userId) {
+      const status = document.getElementById('leaderboardSettingsStatus');
+      const points = document.querySelector(`[data-points-for="${CSS.escape(userId)}"]`).value;
+      const prize = document.querySelector(`[data-prize-for="${CSS.escape(userId)}"]`).value;
+      try {
+        const response = await adminFetch(`/api/admin/leaderboard/monthly/player/${encodeURIComponent(userId)}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ points, prize })
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Player ke points/prize save nahi hue.');
+        status.textContent = data.message || 'Player points/prize saved.';
+        await Promise.all([loadAdminLeaderboard(), loadUsers()]);
+      } catch (error) {
+        status.textContent = error.message || 'Player ke points/prize save nahi hue.';
+      }
+    }
+
+    let activeSupportUserId = '';
+
+    function renderAdminSupportMessages(messages) {
+      const container = document.getElementById('supportAdminMessages');
+      container.innerHTML = messages.length ? messages.map(message => {
+        const date = new Date(message.createdAt).toLocaleString('en-IN');
+        return `<div class="support-admin-message ${message.senderRole === 'admin' ? 'admin' : ''}"><strong>${escapeHtml(message.senderName)}</strong><div>${escapeHtml(message.text)}</div><small>${escapeHtml(date)}</small></div>`;
+      }).join('') : '<p class="muted">Abhi koi message nahi. Player yahan chat shuru kar sakta hai.</p>';
+      container.scrollTop = container.scrollHeight;
+    }
+
+    async function loadAdminSupportThreads() {
+      try {
+        const response = await adminFetch('/api/admin/support/threads', { cache: 'no-store' });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Support conversations load nahi hui.');
+        const list = document.getElementById('supportThreadList');
+        if (!data.threads.length) {
+          list.innerHTML = '<p class="muted">Abhi koi player support message nahi aaya.</p>';
+          return;
+        }
+        list.innerHTML = data.threads.map(thread => {
+          const player = thread.user;
+          const last = thread.lastMessage;
+          const preview = last.text.length > 65 ? `${last.text.slice(0, 65)}…` : last.text;
+          return `<button type="button" class="support-thread-button ${activeSupportUserId === String(player._id) ? 'active' : ''}" data-support-user="${escapeAttribute(player._id)}"><strong>${escapeHtml(player.username)} ${thread.unreadCount ? `(${thread.unreadCount} new)` : ''}</strong><small>${escapeHtml(player.phone || '')} · ${escapeHtml(preview)}</small></button>`;
+        }).join('');
+        list.querySelectorAll('[data-support-user]').forEach(button => {
+          button.addEventListener('click', () => openAdminSupportThread(button.dataset.supportUser));
+        });
+        if (activeSupportUserId && data.threads.some(thread => String(thread.user._id) === activeSupportUserId)) {
+          await refreshAdminSupportThread();
+        }
+      } catch (error) {
+        document.getElementById('supportThreadList').innerHTML = `<p class="notice error">${escapeHtml(error.message)}</p>`;
+      }
+    }
+
+    async function openAdminSupportThread(userId) {
+      activeSupportUserId = userId;
+      document.getElementById('supportAdminInput').disabled = false;
+      document.getElementById('supportAdminSend').disabled = false;
+      await refreshAdminSupportThread();
+      await loadAdminSupportThreads();
+    }
+
+    async function refreshAdminSupportThread() {
+      if (!activeSupportUserId) return;
+      const response = await adminFetch(`/api/admin/support/threads/${encodeURIComponent(activeSupportUserId)}`, { cache: 'no-store' });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Conversation refresh nahi hui.');
+      renderAdminSupportMessages(data.messages || []);
+    }
+
+    document.getElementById('supportAdminForm').addEventListener('submit', async event => {
+      event.preventDefault();
+      const input = document.getElementById('supportAdminInput');
+      const text = input.value.trim();
+      if (!activeSupportUserId || !text) return;
+      document.getElementById('supportAdminSend').disabled = true;
+      try {
+        const response = await adminFetch(`/api/admin/support/threads/${encodeURIComponent(activeSupportUserId)}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text })
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Reply send nahi hui.');
+        input.value = '';
+        await Promise.all([refreshAdminSupportThread(), loadAdminSupportThreads()]);
+      } catch (error) {
+        alert(error.message || 'Reply send nahi hui.');
+      } finally {
+        document.getElementById('supportAdminSend').disabled = false;
+      }
+    });
 
     function formatHistoryDate(value) {
       return value ? new Date(value).toLocaleString('en-IN') : '-';
@@ -1262,6 +1479,7 @@
     document.getElementById('saveSupportNumbersBtn').addEventListener('click', saveSupportNumbers);
     document.getElementById('saveBrandingBtn').addEventListener('click', saveBranding);
     document.getElementById('saveDepositUpiIdBtn').addEventListener('click', saveDepositUpiId);
+    document.getElementById('saveLeaderboardSettings').addEventListener('click', saveAdminLeaderboardSettings);
     document.getElementById('addPlayerCopyRowBtn').addEventListener('click', () => addPlayerCopyRow());
     document.getElementById('savePlayerCopyBtn').addEventListener('click', savePlayerCopy);
     loadSupportNumbers();
@@ -1270,8 +1488,11 @@
     loadPlayerCopy();
     loadData();
     loadUsers();
+    loadAdminLeaderboard();
+    loadAdminSupportThreads();
     loadHistory();
     setInterval(loadData, 30000);
+    setInterval(loadAdminSupportThreads, 4000);
   </script>
   <script src="/i18n.js"></script>
 </body>
