@@ -383,7 +383,7 @@
       if (digits.length === 12 && digits.startsWith('91')) digits = digits.slice(2);
       if (digits.length === 11 && digits.startsWith('0')) digits = digits.slice(1);
       if (!/^\d{10}$/.test(digits)) return escapeHtml(phone);
-      return `<a class="player-whatsapp-link" href="https://wa.me/91${digits}" title="WhatsApp chat kholen">${escapeHtml(phone)}</a>`;
+      return `<a class="player-whatsapp-link" href="https://wa.me/91${digits}" target="_blank" rel="noopener noreferrer" title="WhatsApp chat kholen">${escapeHtml(phone)}</a>`;
     }
 
     async function adminFetch(url, options = {}) {
