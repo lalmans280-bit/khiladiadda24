@@ -4,270 +4,1275 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#101713">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <link rel="manifest" href="/api/site-manifest">
   <link rel="icon" href="/app-icon.svg" type="image/svg+xml">
   <link rel="shortcut icon" href="/app-icon.svg" type="image/svg+xml">
   <link rel="icon" href="/app-icon-192.png" type="image/png" sizes="192x192">
   <link rel="apple-touch-icon" href="/app-icon-192.png">
-  <link rel="mask-icon" href="/app-icon.svg" color="#f4c84b">
-  <title>Login - KhiladiAdda24.com</title>
+  <title>KhiladiAdda24.com Admin Panel</title>
   <style>
-    :root { color-scheme: dark; --panel: #19231d; --line: #35483a; --ink: #f3f4ed; --muted: #b4c0b6; --gold: #e7b83f; --error: #ffb4a9; }
-    * { box-sizing: border-box; }
-    body { min-height: 100vh; min-height: 100dvh; margin: 0; padding: 16px; display: grid; place-items: center; background: #0b1b3a; color: var(--ink); font-family: Arial, sans-serif; }
-    .box { width: min(390px, 100%); max-height: calc(100vh - 32px); max-height: calc(100dvh - 32px); overflow-y: auto; padding: 26px; border: 1px solid var(--line); border-radius: 10px; background: #b91c1c; box-shadow: 0 18px 52px #0006; font-weight: 700; }
-    .login-logo-frame { display: grid; place-items: center; width: 112px; height: 92px; margin: 0 auto 14px; padding: 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
-    .login-logo { display: block; width: 100%; height: 100%; object-fit: contain; }
-    h1 { margin: 0; color: #0b1b3a; text-align: center; font-size: 30px; font-weight: 900; }
-    .brand-tagline { margin: 5px 0 18px; color: #0b1b3a; font-size: 11px; font-weight: 800; letter-spacing: 1px; text-align: center; }
-    .welcome-back { margin: 0 0 6px; color: #0b1b3a; font-size: 18px; text-align: center; }
-    .security-note { margin: 0 0 12px; color: #0b1b3a; font-size: 12px; text-align: center; }
-    .form-hint { margin: 7px 0 22px; color: #0b1b3a; font-size: 14px; line-height: 1.5; text-align: center; }
-    label { display: block; margin: 14px 0 6px; color: #0b1b3a; font-size: 13px; }
-    input, button { width: 100%; min-height: 48px; margin: 7px 0; padding: 12px; border-radius: 7px; font: inherit; }
-    .login-modes { display: grid; grid-template-columns: 1fr 1fr; gap: 0; margin: 0 0 18px; padding: 4px; border: 1px solid #fff; border-radius: 8px; background: #fff; }
-    .login-modes a { min-height: 42px; display: grid; place-items: center; border-radius: 5px; color: #000; font-size: 14px; font-weight: 900; text-transform: uppercase; text-decoration: none; }
-    .login-modes a:first-child { border-right: 1px solid #000; border-radius: 5px 0 0 5px; }
-    .login-modes a[aria-current="page"] { background: #e5e7eb; color: #000; font-weight: 900; }
-    input { border: 1px solid #46594a; background: #101813; color: var(--ink); font-size: 16px; }
-    input::placeholder { color: #8f9e92; }
-    input:focus-visible, button:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
-    button { border: 0; background: var(--gold); color: #0b1b3a; font-weight: 700; cursor: pointer; }
-    button.secondary { border: 1px solid var(--line); background: transparent; color: #0b1b3a; }
-    button:disabled { opacity: 0.6; cursor: not-allowed; }
-    #timerText { min-height: 20px; margin: 7px 0; color: #0b1b3a; font-size: 13px; text-align: center; }
-    #msg { min-height: 22px; margin: 12px 0 0; color: #0b1b3a; font-size: 13px; line-height: 1.5; text-align: center; overflow-wrap: anywhere; }
-    #msg.error { color: var(--error); }
-    .hidden { display: none; }
-    @media (max-height: 560px) { body { place-items: start center; } .box { max-height: calc(100vh - 32px); max-height: calc(100dvh - 32px); } }
+    body { font-family: Arial, sans-serif; margin: 0; padding-bottom: 82px; background: #fff; color: #e5e7eb; }
+    .wrap { max-width: 1200px; margin: 0 auto; padding: 24px; }
+    .topbar { display: flex; justify-content: space-between; align-items: center; background: rgba(15, 23, 42, 0.9); padding: 18px 20px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.08); margin-bottom: 20px; }
+    .logo { font-size: 28px; font-weight: 700; color: #fbbf24; }
+    .player-list-search { display: block; width: min(100%, 480px); height: 48px; margin: 0 auto 14px; }
+    .card { background: rgba(17, 24, 39, 0.9); padding: 18px; margin-bottom: 20px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.08); }
+    .card h3 { margin-top: 0; color: #fbbf24; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th, td { border-bottom: 1px solid rgba(255,255,255,0.08); padding: 10px; text-align: left; }
+    th { color: #fbbf24; }
+    a { color: #60a5fa; }
+    button { background: linear-gradient(135deg, #22c55e, #16a34a); color: white; border: none; padding: 8px 12px; cursor: pointer; border-radius: 8px; font-weight: bold; }
+    .empty { color: #cbd5e1; padding: 10px 0; }
+    .toolbar { display: flex; gap: 10px; flex-wrap: wrap; }
+    .toolbar button, .toolbar a { text-decoration: none; display: inline-block; }
+    .topbar .toolbar > a, .topbar .toolbar > button { min-height: 40px; padding: 10px 14px; border: 1px solid rgba(255,255,255,0.3); border-radius: 8px; font-size: 12px; font-weight: 800; text-align: center; text-transform: uppercase; }
+    .topbar .toolbar > a { color: #fff; background: #2563eb; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+    .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; }
+    .player-copy-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto; align-items: end; gap: 8px; margin: 10px 0; }
+    .player-copy-row label { display: block; color: #cbd5e1; font-size: 12px; }
+    .player-copy-row textarea { width: 100%; min-height: 64px; box-sizing: border-box; padding: 9px; border: 1px solid #475569; border-radius: 7px; color: #fff; background: #0f172a; font: inherit; resize: vertical; }
+    .player-copy-row button { background: #dc2626; }
+    input, select { width: 100%; box-sizing: border-box; padding: 9px; border-radius: 7px; border: 1px solid #475569; background: #0f172a; color: #fff; margin: 4px 0; }
+    .secondary { background: #2563eb; }
+    .danger { background: #dc2626; }
+    .muted { color: #94a3b8; font-size: 13px; }
+    .match-proof-preview { display: block; width: 140px; max-height: 100px; object-fit: contain; border: 1px solid rgba(255,255,255,0.16); border-radius: 6px; background: #0f172a; }
+    .payout-qr-preview { display: block; width: 110px; max-height: 110px; object-fit: contain; border: 1px solid rgba(255,255,255,0.16); border-radius: 6px; background: white; }
+    .branding-preview { display: block; width: 88px; height: 88px; margin: 8px 0; object-fit: contain; border: 1px solid rgba(255,255,255,0.16); border-radius: 8px; background: #0f172a; }
+    .notifications { border-left: 4px solid #fbbf24; }
+    .notifications h3 { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+    .notice-list { display: flex; flex-wrap: wrap; gap: 10px 20px; margin: 0; padding: 0; list-style: none; }
+    .notice-list a { text-decoration: none; }
+    .block-button { background: #dc2626; }
+    .unblock-button { background: #2563eb; }
+    .player-list-toolbar { align-items: center; justify-content: space-between; margin-bottom: 10px; }
+    .player-list-filters { display: flex; gap: 8px; }
+    .player-list-filters button[aria-pressed="true"] { outline: 2px solid #fbbf24; outline-offset: 2px; }
+    .finance-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+    .running-overview-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 16px; }
+    .finance-stat { min-width: 0; padding: 12px 14px; border-left: 2px solid #fbbf24; background: rgba(15,23,42,0.52); }
+    .finance-stat small { display: block; color: #94a3b8; }
+    .finance-stat strong { display: block; margin-top: 6px; color: #f8fafc; font-size: 22px; overflow-wrap: anywhere; }
+    .player-name-link { padding: 0; border: 0; color: #60a5fa; background: transparent; font: inherit; text-align: left; text-decoration: underline; }
+    .player-whatsapp-link { color: #22c55e; text-decoration: underline; cursor: pointer; }
+    .history-dialog { width: min(900px, calc(100vw - 28px)); max-height: min(86vh, 900px); overflow: auto; padding: 20px; border: 1px solid rgba(255,255,255,0.16); border-radius: 10px; color: #e5e7eb; background: #111827; }
+    .history-dialog::backdrop { background: rgba(0,0,0,0.75); }
+    .history-dialog-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+    .history-summary { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin: 14px 0 22px; }
+    .history-summary div { padding: 10px; border-left: 2px solid #fbbf24; background: rgba(15,23,42,0.7); }
+    .history-summary small, .history-summary strong { display: block; }
+    .history-summary small { color: #94a3b8; }
+    .history-summary strong { margin-top: 5px; overflow-wrap: anywhere; }
+    .history-dialog h4 { margin: 20px 0 8px; color: #fbbf24; }
+    .history-dialog table { margin-top: 0; }
+    .kyc-edit-dialog { width: min(480px, calc(100vw - 28px)); }
+    .kyc-edit-dialog label { display: block; margin-top: 14px; color: #cbd5e1; font-size: 13px; }
+    @media (max-width: 600px) { .history-dialog { padding: 14px; } .history-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    .admin-bottom-nav { position: fixed; z-index: 10; right: 0; bottom: 0; left: 0; display: flex; justify-content: center; gap: 12px; padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); border-top: 1px solid rgba(255,255,255,0.12); background: rgba(15,23,42,0.96); backdrop-filter: blur(12px); }
+    .admin-bottom-nav button { min-width: 132px; }
+    @media (max-width: 600px) {
+      .wrap { padding: 12px; }
+      body { padding-bottom: 78px; }
+      .topbar { align-items: flex-start; flex-direction: column; gap: 14px; padding: 14px; }
+      .logo { font-size: 23px; }
+      .grid { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+      .finance-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+      .finance-stat { padding: 10px; }
+      .finance-stat strong { font-size: 18px; }
+      .card { padding: 14px; overflow: hidden; }
+      .notifications h3 { align-items: flex-start; flex-direction: column; }
+      table { display: block; max-width: 100%; overflow-x: auto; white-space: nowrap; }
+      th, td { padding: 9px 8px; }
+      button { min-height: 40px; }
+      .admin-bottom-nav { gap: 8px; }
+      .admin-bottom-nav button { flex: 1; min-width: 0; }
+      .player-list-toolbar { align-items: flex-start; flex-direction: column; }
+      .player-copy-row { grid-template-columns: minmax(0, 1fr); }
+    }
   </style>
 </head>
 <body>
-  <div class="box">
-    <div class="login-logo-frame"><img class="login-logo" src="/app-icon-192.png" alt="KhiladiAdda24 app icon"></div>
-    <h1>KhiladiAdda24</h1>
-    <p class="brand-tagline">PLAY &amp; WIN REAL CASH</p>
-    <p class="form-hint" id="formHint" hidden></p>
-    <nav class="login-modes" aria-label="Login type">
-      <a id="playerModeLink" href="/login.html">Player</a>
-      <a id="adminModeLink" href="/login.html?admin=1">Admin</a>
-    </nav>
-    <form id="phoneForm" novalidate>
-      <h2 class="welcome-back">Welcome back</h2>
-      <label for="phone">Mobile number</label>
-      <input type="tel" id="phone" name="phone" placeholder="10 digit mobile number" inputmode="numeric" pattern="[6-9][0-9]{9}" maxlength="10" autocomplete="tel-national" required>
-      <label for="referralCode">Referral ID (optional)</label>
-      <input type="text" id="referralCode" name="referralCode" placeholder="8 character referral ID" maxlength="8" autocomplete="off" autocapitalize="characters">
-      <button id="otpSendBtn" type="submit">Login with OTP</button>
-      <p class="security-note">100% Safe &amp; Secure Platform</p>
-    </form>
-    <form id="otpForm" class="hidden" novalidate>
-      <label for="otp">6-digit OTP</label>
-      <input type="text" id="otp" name="otp" placeholder="SMS mein mila OTP" inputmode="numeric" pattern="[0-9]{4,6}" maxlength="6" autocomplete="off" required>
-      <div id="timerText" aria-live="polite"></div>
-      <button id="otpVerifyBtn" type="submit">Login / Play</button>
-      <button id="otpResendBtn" class="secondary" type="button" disabled>OTP dobara bhejein</button>
-      <button id="changePhoneBtn" class="secondary" type="button">Mobile number badlein</button>
-    </form>
-    <p id="msg" role="status" aria-live="polite" aria-atomic="true"></p>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="logo">KhiladiAdda24 Admin</div>
+      <div class="toolbar">
+        <a href="/index.html" onclick="openPlayerSite(event)">Player Site</a>
+        <button id="refreshAdminButton" type="button" class="secondary" onclick="refreshAdminData()">Refresh data</button>
+        <button class="danger" onclick="adminLogout()">Logout</button>
+      </div>
+    </div>
+
+    <div class="card" id="runningGamesOverview" aria-live="polite">
+      <h3>Running Games <span id="runningGamesCount" class="muted">Loading...</span></h3>
+      <div id="runningGamesOverviewList" class="empty">Running games load ho rahe hain...</div>
+    </div>
+
+    <div class="card notifications" aria-live="polite">
+      <h3>Admin Notifications <span id="notificationTotal" class="muted">Loading...</span></h3>
+      <ul id="notificationList" class="notice-list"><li class="muted">Pending work check ho raha hai...</li></ul>
+    </div>
+
+    <div class="card">
+      <h3>Notification Line</h3>
+      <p class="muted">Top ke niche ya banner ke upar chali hui line admin se edit hogi.</p>
+      <div class="form-grid">
+        <div style="grid-column: 1 / -1;">
+          <input id="announcementTextInput" type="text" maxlength="120" placeholder="Welcome to khiladiadda24.com">
+        </div>
+      </div>
+      <div class="toolbar" style="margin-top: 12px;">
+        <button id="saveAnnouncementBtn" type="button">Save notification line</button>
+      </div>
+      <p id="announcementStatus" class="muted">Loading...</p>
+    </div>
+
+    <div class="card">
+      <h3>WhatsApp &amp; Support Numbers</h3>
+      <p class="muted">Dono fields mein valid 10-digit Indian mobile number dalein. WhatsApp aur support ke numbers alag ho sakte hain.</p>
+      <div class="form-grid">
+        <div>
+          <label for="supportNumberInput">Support phone</label>
+          <input id="supportNumberInput" type="tel" inputmode="numeric" pattern="[6-9][0-9]{9}" maxlength="10" placeholder="9876543210">
+        </div>
+        <div>
+          <label for="whatsappNumberInput">WhatsApp phone</label>
+          <input id="whatsappNumberInput" type="tel" inputmode="numeric" pattern="[6-9][0-9]{9}" maxlength="10" placeholder="9876543210">
+        </div>
+      </div>
+      <div class="toolbar" style="margin-top: 12px;">
+        <button id="saveSupportNumbersBtn" type="button">Save contact numbers</button>
+      </div>
+      <p id="supportNumbersStatus" class="muted">Loading...</p>
+    </div>
+
+    <div class="card">
+      <h3>Site Logo &amp; App Icons</h3>
+      <p class="muted">PNG images upload karke logo, app icon, game banners aur support graphic badlein. App icons ki dimensions exact rakhein.</p>
+      <div class="form-grid">
+        <div>
+          <label for="brandLogoFile">Login logo PNG</label>
+          <img id="brandLogoPreview" class="branding-preview" alt="Current top logo preview" hidden>
+          <input id="brandLogoFile" type="file" accept="image/png,.png">
+        </div>
+        <div>
+          <label for="appIcon192File">App icon PNG (192 x 192)</label>
+          <img id="appIcon192Preview" class="branding-preview" alt="Current 192 pixel app icon preview" hidden>
+          <input id="appIcon192File" type="file" accept="image/png,.png">
+        </div>
+        <div>
+          <label for="appIcon512File">App icon PNG (512 x 512)</label>
+          <img id="appIcon512Preview" class="branding-preview" alt="Current 512 pixel app icon preview" hidden>
+          <input id="appIcon512File" type="file" accept="image/png,.png">
+        </div>
+        <div>
+          <label for="homeBannerFile">Home battle banner PNG</label>
+          <img id="homeBannerPreview" class="branding-preview" alt="Current home banner preview" hidden>
+          <input id="homeBannerFile" type="file" accept="image/png,.png">
+        </div>
+        <div>
+          <label for="ludoBannerFile">Ludo card PNG</label>
+          <img id="ludoBannerPreview" class="branding-preview" alt="Current Ludo card preview" hidden>
+          <input id="ludoBannerFile" type="file" accept="image/png,.png">
+        </div>
+        <div>
+          <label for="snakeBannerFile">Snake card PNG</label>
+          <img id="snakeBannerPreview" class="branding-preview" alt="Current Snake card preview" hidden>
+          <input id="snakeBannerFile" type="file" accept="image/png,.png">
+        </div>
+        <div>
+          <label for="supportBannerFile">Support banner PNG</label>
+          <img id="supportBannerPreview" class="branding-preview" alt="Current support banner preview" hidden>
+          <input id="supportBannerFile" type="file" accept="image/png,.png">
+        </div>
+      </div>
+      <div class="toolbar" style="margin-top: 12px;">
+        <button id="saveBrandingBtn" type="button">Save selected images</button>
+      </div>
+      <p id="brandingStatus" class="muted">Loading current images...</p>
+    </div>
+
+    <div class="card">
+      <h3>Deposit UPI ID</h3>
+      <p class="muted">Player deposit QR aur UPI app payment ke liye use hone wala UPI ID.</p>
+      <div class="form-grid">
+        <div>
+          <label for="depositUpiIdInput">UPI ID</label>
+          <input id="depositUpiIdInput" type="text" inputmode="email" autocomplete="off" maxlength="203" placeholder="name@bank">
+        </div>
+      </div>
+      <div class="toolbar" style="margin-top: 12px;">
+        <button id="saveDepositUpiIdBtn" type="button">Save deposit UPI ID</button>
+      </div>
+      <p id="depositUpiIdStatus" class="muted">Loading...</p>
+    </div>
+
+    <div class="card">
+      <h3>Player Text Settings</h3>
+      <p class="muted">Player pages ki kisi bhi exact line ko badalne ke liye current line aur naya text bharein. Blank naya text us line ko hide karega.</p>
+      <div id="playerCopyRows"></div>
+      <div class="toolbar" style="margin-top: 12px;">
+        <button id="addPlayerCopyRowBtn" type="button" class="secondary">Add text line</button>
+        <button id="savePlayerCopyBtn" type="button">Save player text</button>
+      </div>
+      <p id="playerCopyStatus" class="muted">Loading...</p>
+    </div>
+
+    <div class="card" aria-live="polite">
+      <h3>Deposit & Withdrawal Summary</h3>
+      <div class="finance-grid">
+        <div class="finance-stat"><small>Total deposits approved</small><strong id="totalDeposits">₹ --</strong></div>
+        <div class="finance-stat"><small>Withdrawals paid</small><strong id="paidWithdrawals">₹ --</strong></div>
+        <div class="finance-stat"><small>Withdrawals pending</small><strong id="pendingWithdrawals">₹ --</strong></div>
+        <div class="finance-stat"><small>Players' wallet balance</small><strong id="playerWalletBalance">₹ --</strong></div>
+      </div>
+      <p id="financeUpdatedAt" class="muted">Loading totals...</p>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <h3>Wallet Update</h3>
+        <p class="muted">Player wallet me amount add ya deduct karein.</p>
+        <select id="walletUser"></select>
+        <input type="number" id="walletAmount" placeholder="Amount (+ add / - deduct)">
+        <input type="text" id="walletReason" placeholder="Reason">
+        <button onclick="adjustWallet()">Update Wallet</button>
+      </div>
+      <div class="card">
+        <h3>Bonus Credit</h3>
+        <p class="muted">Bonus direct player wallet me add hoga.</p>
+        <select id="bonusUser"></select>
+        <input type="number" id="bonusAmount" placeholder="Bonus amount">
+        <input type="text" id="bonusReason" placeholder="Bonus reason">
+        <button class="secondary" onclick="giveBonus()">Add Bonus</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 id="userListTitle">All Players & Wallets</h3>
+      <input class="player-list-search" id="playerSearch" type="search" aria-label="Search player by name, phone, or ID" placeholder="Search name, mobile, or player ID">
+      <div class="toolbar player-list-toolbar">
+        <div class="player-list-filters" role="group" aria-label="Player list filter">
+          <button id="allPlayersFilter" type="button" aria-pressed="true">All players</button>
+          <button id="newPlayersFilter" type="button" class="secondary" aria-pressed="false">New players · 7 days</button>
+        </div>
+        <span id="playerListSummary" class="muted" aria-live="polite"></span>
+      </div>
+      <table id="userTable">
+        <tr><th>S.N.</th><th>Player</th><th>Phone</th><th>Wallet</th><th>Joined</th><th>Status</th><th>Admin</th><th>Action</th></tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3>Pending Deposits (QR Verify)</h3>
+      <table id="depTable">
+        <tr><th>User</th><th>Amount</th><th>UTR</th><th>Proof</th><th>Action</th></tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3>Pending Aadhaar KYC</h3>
+      <p class="muted">Target: har KYC ko submission ke 30 minutes ke andar review karein.</p>
+      <table id="kycTable">
+        <tr><th>Player</th><th>Aadhaar</th><th>Image</th><th>Submitted</th><th>Action</th></tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3>Pending Match Results</h3>
+      <table id="matchTable">
+        <tr><th>Game / Entry</th><th>Players</th><th>Winner</th><th>Screenshot</th><th>Room / Start</th><th>Action</th></tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3>Running Games</h3>
+      <table id="runningTable">
+        <tr><th>Game</th><th>Players</th><th>Entry</th><th>Room / Deadline</th><th>Confirmations</th><th>Cancel reason</th><th>Action</th></tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3>Cancel Requests for Review</h3>
+      <table id="cancellationTable">
+        <tr><th>Game</th><th>Players</th><th>Requested by</th><th>Reason</th><th>Entry refund</th><th>Action</th></tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3>Pending Withdrawals</h3>
+      <table id="withdrawTable">
+        <tr><th>Player</th><th>Amount</th><th>Method</th><th>Payout details</th><th>QR</th><th>Action</th></tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3>Complete Game History</h3>
+      <table id="historyTable">
+        <tr><th>Game</th><th>Players</th><th>Entry</th><th>Status</th><th>Winner / Cancel reason</th><th>Room code</th><th>Proof</th><th>Joined / Started</th></tr>
+      </table>
+    </div>
   </div>
+  <nav class="admin-bottom-nav" aria-label="Admin navigation">
+    <button id="adminHomeButton" type="button">⌂ Home</button>
+    <button id="adminNewPlayersButton" type="button" class="secondary">New players</button>
+  </nav>
+  <dialog id="playerHistoryDialog" class="history-dialog" aria-labelledby="playerHistoryTitle">
+    <div class="history-dialog-header">
+      <div><h2 id="playerHistoryTitle">Player history</h2><p id="playerHistoryAccount" class="muted"></p></div>
+      <form method="dialog"><button type="submit" class="danger">Close</button></form>
+    </div>
+    <div id="playerHistoryContent"><p class="muted">Player history load ho rahi hai...</p></div>
+  </dialog>
+  <dialog id="kycEditDialog" class="history-dialog kyc-edit-dialog" aria-labelledby="kycEditTitle">
+    <div class="history-dialog-header">
+      <div><h2 id="kycEditTitle">Edit player KYC</h2><p class="muted">Save karne ke baad KYC pending review mein rahegi.</p></div>
+      <form method="dialog"><button type="submit" class="danger">Close</button></form>
+    </div>
+    <form id="kycEditForm">
+      <input type="hidden" name="kycId">
+      <label for="kycEditAadhaar">Aadhaar number</label>
+      <input id="kycEditAadhaar" name="aadhaarNumber" type="tel" inputmode="numeric" pattern="[0-9]{12}" maxlength="12" required>
+      <label for="kycEditImage">Replace Aadhaar image (optional)</label>
+      <input id="kycEditImage" name="aadhaarImage" type="file" accept="image/jpeg,image/png,image/webp">
+      <div class="toolbar" style="margin-top: 12px;">
+        <button id="saveKycEditButton" type="submit">Save KYC</button>
+        <button type="button" class="secondary" onclick="document.getElementById('kycEditDialog').close()">Cancel</button>
+      </div>
+    </form>
+  </dialog>
 
   <script>
-    let otpTimer = null;
-    let otpCooldown = 0;
-    let expectedOtpLength = 6;
-    const phoneForm = document.getElementById('phoneForm');
-    const otpForm = document.getElementById('otpForm');
-    const otpInput = document.getElementById('otp');
-    const formHint = document.getElementById('formHint');
-    const message = document.getElementById('msg');
-    const loginMode = new URLSearchParams(location.search).get('admin') === '1' ? 'admin' : 'player';
-    function playerDestination() {
-      const next = new URLSearchParams(location.search).get('next');
-      if (!next) return '/index.html';
-      try {
-        const target = new URL(next, location.origin);
-        if (target.origin === location.origin && target.pathname === '/index.html') {
-          return `${target.pathname}${target.search}${target.hash}`;
-        }
-      } catch {}
-      return '/index.html';
-    }
-    const verifyButtonLabel = loginMode === 'admin' ? 'Admin panel mein login karein' : 'Verify OTP';
-    document.getElementById(`${loginMode}ModeLink`).setAttribute('aria-current', 'page');
-    formHint.textContent = loginMode === 'admin' ? 'Admin panel ke liye allowlisted mobile number se login karein.' : '';
-    formHint.hidden = loginMode !== 'admin';
-    document.getElementById('otpVerifyBtn').textContent = verifyButtonLabel;
-
-    function setMessage(text, isError = false) {
-      message.textContent = text;
-      message.classList.toggle('error', isError);
+    const user = (() => {
+      for (const key of ['adminUser', 'user']) {
+        try {
+          const candidate = JSON.parse(localStorage.getItem(key) || 'null');
+          if (candidate?.role === 'admin') return candidate;
+        } catch {}
+      }
+      return null;
+    })();
+    const token = localStorage.getItem('adminToken') || (user ? localStorage.getItem('token') : '');
+    if (!token) {
+      alert('Admin login required');
+      window.location.replace('/login.html?admin=1');
     }
 
-    function updateOtpButtons() {
-      const waiting = otpCooldown > 0;
-      document.getElementById('otpSendBtn').disabled = waiting;
-      document.getElementById('otpSendBtn').textContent = waiting ? `OTP bhejein (${otpCooldown}s)` : 'Login with OTP';
-      document.getElementById('otpResendBtn').disabled = waiting;
-      document.getElementById('otpResendBtn').textContent = waiting ? `OTP dobara bhejein (${otpCooldown}s)` : 'OTP dobara bhejein';
-      document.getElementById('timerText').textContent = waiting ? `Naya OTP ${otpCooldown}s baad bhej sakte hain.` : 'Naya OTP bhejne ke liye taiyar.';
+    const authHeaders = { 'Authorization': `Bearer ${token}` };
+    let adminPreviewUrls = [];
+    let allPlayers = [];
+    let playerListMode = 'ALL';
+    document.querySelectorAll('.wrap .card, .wrap .finance-stat, .history-summary > div').forEach((box, index) => {
+      const hue = (index * 137.508) % 360;
+      box.style.backgroundColor = `hsl(${hue} 36% 20%)`;
+      box.style.borderColor = `hsl(${hue} 32% 37%)`;
+    });
+
+    function adminLogout() {
+      localStorage.removeItem('adminUser');
+      localStorage.removeItem('adminToken');
+      localStorage.removeItem('user');
+      localStorage.removeItem('token');
+      window.location.href = '/login.html?admin=1';
     }
 
-    function startOtpTimer() {
-      if (otpTimer) clearInterval(otpTimer);
-      otpCooldown = 60;
-      updateOtpButtons();
-      otpTimer = setInterval(() => {
-        otpCooldown -= 1;
-        updateOtpButtons();
-        if (otpCooldown <= 0) {
-          clearInterval(otpTimer);
-          otpTimer = null;
-        }
-      }, 1000);
+    function escapeHtml(value) {
+      return String(value ?? '').replace(/[&<>"']/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[character]));
     }
 
-    async function readResponse(res) {
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(data.error || 'Request complete nahi hui. Dobara try karein.');
-      return data;
+    function adminGameTypeLabel(gameType) {
+      return gameType === 'LUDO_RACE' ? 'Ludo Race' : gameType === 'POPULAR_LUDO' ? 'Popular Ludo' : gameType === 'SNAKE' ? 'Snake' : 'Ludo Classic';
     }
 
-    function showRequestError(error) {
-      const text = error instanceof TypeError
-        ? 'Internet connection check karein aur dobara try karein.'
-        : error.message || 'Kuch problem hui. Dobara try karein.';
-      setMessage(text, true);
+    function playerWhatsAppLink(phone) {
+      let digits = String(phone || '').replace(/\D/g, '');
+      if (digits.length === 12 && digits.startsWith('91')) digits = digits.slice(2);
+      if (digits.length === 11 && digits.startsWith('0')) digits = digits.slice(1);
+      if (!/^\d{10}$/.test(digits)) return escapeHtml(phone);
+      return `<a class="player-whatsapp-link" href="https://wa.me/91${digits}" target="_blank" rel="noopener noreferrer" title="WhatsApp chat kholen">${escapeHtml(phone)}</a>`;
     }
 
-    async function sendOtp(event) {
+    async function adminFetch(url, options = {}) {
+      const headers = { ...authHeaders, ...(options.headers || {}) };
+      const res = await fetch(url, { ...options, headers });
+      if (res.status === 401 || res.status === 403) {
+        adminLogout();
+        throw new Error('Admin session expired');
+      }
+      return res;
+    }
+
+    async function openPlayerSite(event) {
       event.preventDefault();
-      const phone = document.getElementById('phone').value.trim();
-      const referralCode = document.getElementById('referralCode').value.trim().toUpperCase();
-
-      if (!/^[6-9]\d{9}$/.test(phone)) {
-        return setMessage('Valid 10 digit Indian mobile number dalein.', true);
-      }
-      if (referralCode && !/^[A-Z0-9]{8}$/.test(referralCode)) {
-        return setMessage('Referral ID 8 characters ki dalein.', true);
-      }
-
-      const sendButton = document.getElementById('otpSendBtn');
-      const resendButton = document.getElementById('otpResendBtn');
-      otpInput.value = '';
-      expectedOtpLength = 6;
-      sendButton.disabled = true;
-      resendButton.disabled = true;
-      setMessage('OTP bheja ja raha hai...');
+      const link = event.currentTarget;
+      const originalText = link.textContent;
+      link.textContent = 'Opening...';
       try {
-        const res = await fetch('/api/auth/send-otp', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ phone, referralCode, loginMode })
-        });
-        const data = await readResponse(res);
-        startOtpTimer();
-        phoneForm.classList.add('hidden');
-        otpForm.classList.remove('hidden');
-        const testLogin = String(data.message || '').startsWith('Test login enabled.');
-        const localOtp = String(data.message || '').match(/Use OTP\s+(\d+)/i);
-        if (localOtp) expectedOtpLength = localOtp[1].length;
-        formHint.textContent = testLogin ? data.message : `${phone} par bheja 6-digit OTP dalein.`;
-        formHint.hidden = false;
-        otpInput.focus();
-        setMessage(testLogin ? 'Test OTP upar diya gaya hai.' : 'SMS mein aaye OTP ko yahan dalein.');
+        const res = await adminFetch('/api/admin/player-session', { method: 'POST' });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Player session start nahi hui.');
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        sessionStorage.setItem('adminPlayerView', 'yes');
+        window.location.href = '/index.html?adminPlayer=1';
       } catch (error) {
-        showRequestError(error);
-        updateOtpButtons();
+        alert(error.message || 'Player site open nahi hui.');
+        link.textContent = originalText;
       }
     }
 
-    async function verifyOtp(event) {
-      event.preventDefault();
-      const phone = document.getElementById('phone').value.trim();
-      const otp = document.getElementById('otp').value.trim();
-      if (!/^\d{4,6}$/.test(otp)) {
-        return setMessage('Valid OTP dalein.', true);
+    function adminImagePreview(filePath, altText, className) {
+      if (!filePath) return 'No screenshot';
+      const filename = encodeURIComponent(filePath.split('/').pop());
+      return `<a data-admin-upload="${filename}" target="_blank" rel="noopener"><img class="${className}" alt="${altText}" loading="lazy"></a>`;
+    }
+
+    function matchProofPreview(filePath) {
+      return adminImagePreview(filePath, 'Winning screenshot', 'match-proof-preview');
+    }
+
+    function adminMatchDecisionControls(match, prefix = '') {
+      const matchId = escapeHtml(match._id);
+      const creatorId = escapeHtml(match.creator?._id || '');
+      const joinerId = escapeHtml(match.joiner?._id || '');
+      const creatorName = escapeHtml(match.creator?.username || 'Creator');
+      const joinerName = escapeHtml(match.joiner?.username || 'Joiner');
+      return `
+        <div class="admin-decision-wrap">
+          <select id="${prefix}winner-${matchId}" data-creator-id="${creatorId}" data-joiner-id="${joinerId}">
+            <option value="${creatorId}">${creatorName}</option>
+            <option value="${joinerId}">${joinerName}</option>
+          </select>
+          <select id="${prefix}decision-${matchId}">
+            <option value="">Select action</option>
+            <option value="WIN-CREATOR">Winner: ${creatorName}</option>
+            <option value="WIN-JOINER">Winner: ${joinerName}</option>
+            <option value="LOSS-CREATOR">Loss: ${creatorName}</option>
+            <option value="LOSS-JOINER">Loss: ${joinerName}</option>
+            <option value="CANCEL">Cancel &amp; refund</option>
+            <option value="REFUND">Refund both players</option>
+          </select>
+          <button onclick="resolveMatchDecision('${matchId}', '${prefix}')">Apply</button>
+        </div>
+      `;
+    }
+
+    async function loadAdminImagePreviews() {
+      adminPreviewUrls.forEach(URL.revokeObjectURL);
+      adminPreviewUrls = [];
+      await Promise.all([...document.querySelectorAll('[data-admin-upload]')].map(async link => {
+        try {
+          const res = await adminFetch(`/api/admin/uploads/${link.dataset.adminUpload}`);
+          if (!res.ok) return;
+          const imageUrl = URL.createObjectURL(await res.blob());
+          adminPreviewUrls.push(imageUrl);
+          link.href = imageUrl;
+          link.querySelector('img').src = imageUrl;
+        } catch {}
+      }));
+    }
+
+    async function loadData() {
+      const res = await adminFetch('/api/admin/pending-all');
+      const data = await res.json();
+      renderFinanceSummary(data.financeSummary);
+      updateNotifications(data);
+      const reviewMatches = (data.runningMatches || []).filter(match => ['RUNNING', 'PENDING_RESULT'].includes(match.status));
+      const pendingResultCount = reviewMatches.filter(match => match.status === 'PENDING_RESULT').length;
+      const activeRunningCount = reviewMatches.length - pendingResultCount;
+      document.getElementById('runningGamesCount').textContent = `${activeRunningCount} active · ${pendingResultCount} result review`;
+      const runningOverview = document.getElementById('runningGamesOverviewList');
+      if (!reviewMatches.length) {
+        runningOverview.innerHTML = '<p class="empty">Abhi koi running game nahi hai.</p>';
+      } else {
+        runningOverview.innerHTML = `<div class="running-overview-grid">${reviewMatches.map(match => {
+          const resultProofs = [
+            match.creatorProofScreenshot ? `<small>${escapeHtml(match.creator?.username || 'Creator')}</small>${matchProofPreview(match.creatorProofScreenshot)}` : '',
+            match.joinerProofScreenshot ? `<small>${escapeHtml(match.joiner?.username || 'Joiner')}</small>${matchProofPreview(match.joinerProofScreenshot)}` : ''
+          ].filter(Boolean).join('<br>') || '<small class="muted">Screenshot abhi upload nahi hua.</small>';
+          const resultReports = `Reports: ${escapeHtml(match.creator?.username || 'Creator')} ${escapeHtml(match.creatorResult || 'Pending')} / ${escapeHtml(match.joiner?.username || 'Joiner')} ${escapeHtml(match.joinerResult || 'Pending')}`;
+          return `
+          <div class="finance-stat">
+            <small>${adminGameTypeLabel(match.gameType)} · ${escapeHtml(match.status)} · Entry ₹${Number(match.amount).toLocaleString('en-IN')} each</small>
+            <strong>${escapeHtml(match.creator?.username || 'Creator')} vs ${escapeHtml(match.joiner?.username || 'Joiner')}</strong>
+            <small>${match.gameType === 'LUDO_RACE' ? 'In-app board' : match.roomCode ? `Room: ${escapeHtml(match.roomCode)}` : 'Room code not shared'} · ${match.gameStartedAt ? 'Game started' : 'Waiting to start'}</small>
+            <small>${resultReports}</small>
+            <div class="running-overview-proofs">${resultProofs}</div>
+            ${adminMatchDecisionControls(match, 'overview-')}
+          </div>
+        `}).join('')}</div><p><a href="#runningTable">Open running game details</a></p>`;
       }
 
-      const button = document.getElementById('otpVerifyBtn');
+      const dTable = document.getElementById('depTable');
+      dTable.innerHTML = '<tr><th>User</th><th>Amount</th><th>UTR</th><th>Proof</th><th>Action</th></tr>';
+      if (!data.deposits || data.deposits.length === 0) {
+        dTable.innerHTML += '<tr><td colspan="5" class="empty">No pending deposits</td></tr>';
+      } else {
+        data.deposits.forEach(d => {
+          dTable.innerHTML += `
+            <tr>
+              <td>${d.userId ? d.userId.phone : 'N/A'}</td>
+              <td>₹${d.amount}</td>
+              <td><b>${d.utrNumber}</b></td>
+              <td><a href="/api/admin/uploads/${encodeURIComponent((d.screenshot || '').split('/').pop())}" target="_blank">Screenshot</a></td>
+              <td><button onclick="approveDep('${d._id}')">Approve Balance</button></td>
+            </tr>
+          `;
+        });
+      }
+
+      const mTable = document.getElementById('matchTable');
+      mTable.innerHTML = '<tr><th>Game / Entry</th><th>Players</th><th>Player reports / proof</th><th>Winner</th><th>Room / Start</th><th>Decision</th></tr>';
+      if (!data.matches || data.matches.length === 0) {
+        mTable.innerHTML += '<tr><td colspan="6" class="empty">No pending match results</td></tr>';
+      } else {
+        data.matches.forEach(m => {
+          const creatorWinnerId = m.creatorResult ? String(m.creatorResult === 'WIN' ? m.creator?._id : m.joiner?._id) : '';
+          const joinerWinnerId = m.joinerResult ? String(m.joinerResult === 'WIN' ? m.joiner?._id : m.creator?._id) : '';
+          const reportsConflict = creatorWinnerId && joinerWinnerId && creatorWinnerId !== joinerWinnerId;
+          const creatorProof = matchProofPreview(m.creatorProofScreenshot);
+          const joinerProof = matchProofPreview(m.joinerProofScreenshot);
+          mTable.innerHTML += `
+            <tr>
+              <td>${adminGameTypeLabel(m.gameType)} · ₹${m.amount}</td>
+              <td>${m.creator?.username || 'N/A'} (${m.creator?.phone || '-'}) vs ${m.joiner?.username || 'N/A'} (${m.joiner?.phone || '-'})</td>
+              <td>${m.creator?.username || 'Creator'}: ${m.creatorResult || 'Not submitted'}${m.creatorResultReason ? ` · Reason: ${m.creatorResultReason}` : ''} · ${creatorProof}<br>${m.joiner?.username || 'Joiner'}: ${m.joinerResult || 'Not submitted'}${m.joinerResultReason ? ` · Reason: ${m.joinerResultReason}` : ''} · ${joinerProof}</td>
+              <td>${reportsConflict ? `Reports differ.<br>Manual admin decision required.` : m.winner ? `${m.winner.username} (${m.winner.phone || '-'})` : 'N/A'}</td>
+              <td>${m.roomCode || 'N/A'}<br>Shared by: ${m.roomCodeSharedBy?.username || '-'}<br>${m.gameStartedAt ? new Date(m.gameStartedAt).toLocaleString() : 'Not started'}</td>
+              <td><a href="#runningGamesOverview">Decision in Running Games above</a></td>
+            </tr>
+          `;
+        });
+      }
+
+      const kTable = document.getElementById('kycTable');
+      kTable.innerHTML = '<tr><th>Player</th><th>Aadhaar</th><th>Image</th><th>Submitted</th><th>Action</th></tr>';
+      if (!data.kycs || data.kycs.length === 0) {
+        kTable.innerHTML += '<tr><td colspan="5" class="empty">No pending KYC</td></tr>';
+      } else {
+        data.kycs.forEach(k => {
+          const maskedAadhaar = `XXXX XXXX ${String(k.aadhaarNumber).slice(-4)}`;
+          kTable.innerHTML += `<tr><td>${k.userId ? `${k.userId.username} (${k.userId.phone})` : 'N/A'}</td><td>${maskedAadhaar}</td><td><a href="/api/admin/uploads/${encodeURIComponent((k.aadhaarImage || '').split('/').pop())}" target="_blank">View Aadhaar</a></td><td>${new Date(k.submittedAt).toLocaleString()}</td><td><button class="secondary" onclick="openKycEditor('${k._id}', '${String(k.aadhaarNumber).replace(/\D/g, '')}')">Edit</button> <button onclick="setKycStatus('${k._id}', 'APPROVED')">Approve</button> <button class="danger" onclick="setKycStatus('${k._id}', 'REJECTED')">Reject</button></td></tr>`;
+        });
+      }
+
+      const wTable = document.getElementById('withdrawTable');
+      wTable.innerHTML = '<tr><th>Player</th><th>Amount</th><th>Method</th><th>Payout details</th><th>QR</th><th>Action</th></tr>';
+      if (!data.withdrawals || data.withdrawals.length === 0) {
+        wTable.innerHTML += '<tr><td colspan="6" class="empty">No pending withdrawals</td></tr>';
+      } else {
+        data.withdrawals.forEach(w => {
+          const method = w.payoutMethod || 'UPI';
+          const payoutDetails = method === 'BANK'
+            ? `${w.accountHolderName || '-'}<br>Account: ${w.accountNumber || '-'}<br>IFSC: ${w.ifscCode || '-'}`
+            : method === 'UPI' ? (w.upiId || '-') : '-';
+          const payoutQr = method === 'QR' ? adminImagePreview(w.payoutQr, 'Player UPI QR', 'payout-qr-preview') : '-';
+          wTable.innerHTML += `<tr><td>${w.userId ? w.userId.username : 'N/A'}</td><td>₹${w.amount}</td><td>${method}</td><td>${payoutDetails}</td><td>${payoutQr}</td><td><button onclick="setWithdrawal('${w._id}', 'PAID')">Paid</button> <button class="danger" onclick="setWithdrawal('${w._id}', 'REJECTED')">Reject & Refund</button></td></tr>`;
+        });
+      }
+
+      const rTable = document.getElementById('runningTable');
+      const runningTableMatches = (data.runningMatches || []).filter(match => match.status !== 'PENDING_RESULT');
+      rTable.innerHTML = '<tr><th>Game</th><th>Players</th><th>Entry</th><th>Room / Deadline</th><th>Confirmations</th><th>Result proof</th><th>Cancel reason</th><th>Decision</th></tr>';
+      if (!runningTableMatches.length) {
+        rTable.innerHTML += '<tr><td colspan="8" class="empty">No running games</td></tr>';
+      } else {
+        runningTableMatches.forEach(m => {
+          const players = `${m.creator?.username || 'N/A'} vs ${m.joiner?.username || 'Waiting'}`;
+          const playerContacts = `${m.creator?.phone || '-'} vs ${m.joiner?.phone || 'Waiting'}`;
+          const confirmations = `${m.creatorConfirmedAt ? 'Creator ✓' : 'Creator waiting'} / ${m.joinerConfirmedAt ? 'Opponent ✓' : 'Opponent waiting'}`;
+          const deadline = m.roomCodeDeadline ? new Date(m.roomCodeDeadline).toLocaleString() : 'Not set';
+          const resultProofs = [
+            m.creatorProofScreenshot ? `<small>${m.creator?.username || 'Creator'}</small>${matchProofPreview(m.creatorProofScreenshot)}` : '',
+            m.joinerProofScreenshot ? `<small>${m.joiner?.username || 'Joiner'}</small>${matchProofPreview(m.joinerProofScreenshot)}` : ''
+          ].filter(Boolean).join('<br>') || 'No screenshot';
+          const runningDecision = m.status === 'OPEN'
+            ? `<button class="danger" onclick="cancelAdminMatch('${escapeHtml(m._id)}')">Cancel &amp; refund</button>`
+            : '<a href="#runningGamesOverview">Decision in Running Games above</a>';
+          rTable.innerHTML += `<tr><td>${adminGameTypeLabel(m.gameType)} (${m.status})</td><td>${players}<br>${playerContacts}</td><td>₹${m.amount} each</td><td>${m.roomCode || 'Not shared'}<br>Due: ${deadline}</td><td>${confirmations}<br>${m.gameStartedAt ? `Started: ${new Date(m.gameStartedAt).toLocaleString()}` : 'Not started'}</td><td>${resultProofs}</td><td>${m.cancelReason || '-'}</td><td>${runningDecision}</td></tr>`;
+        });
+      }
+
+      const cTable = document.getElementById('cancellationTable');
+      cTable.innerHTML = '<tr><th>Game</th><th>Players</th><th>Requested by</th><th>Reason</th><th>Entry refund</th><th>Action</th></tr>';
+      if (!data.cancellationRequests || data.cancellationRequests.length === 0) {
+        cTable.innerHTML += '<tr><td colspan="6" class="empty">No cancel requests</td></tr>';
+      } else {
+        data.cancellationRequests.forEach(match => {
+          const players = `${match.creator?.username || 'N/A'} vs ${match.joiner?.username || 'Waiting'}`;
+          const playerContacts = `${match.creator?.phone || '-'} vs ${match.joiner?.phone || 'Waiting'}`;
+          cTable.innerHTML += `<tr><td>${adminGameTypeLabel(match.gameType)} (${match.cancelRequestedFromStatus})</td><td>${players}<br>${playerContacts}</td><td>${match.cancelRequestedBy?.username || 'Player'} (${match.cancelRequestedBy?.phone || '-'})<br>${match.cancelRequestedAt ? new Date(match.cancelRequestedAt).toLocaleString() : ''}</td><td>${match.cancelRequestReason || '-'}</td><td>₹${Number(match.amount) * (match.joiner ? 2 : 1)}</td><td><button onclick="reviewCancelRequest('${match._id}', 'APPROVE')">Approve & Refund</button> <button class="danger" onclick="reviewCancelRequest('${match._id}', 'REJECT')">Reject</button></td></tr>`;
+        });
+      }
+      await loadAdminImagePreviews();
+    }
+
+    async function refreshAdminData() {
+      const button = document.getElementById('refreshAdminButton');
       button.disabled = true;
-      button.textContent = 'Verify ho raha hai...';
-      setMessage('OTP verify ho raha hai...');
+      button.textContent = 'Refreshing...';
       try {
-        const res = await fetch('/api/auth/verify-otp', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ phone, otp, loginMode, referralCode: document.getElementById('referralCode').value.trim().toUpperCase() })
-        });
-        const data = await readResponse(res);
-
-        if (!data.user || !data.token) {
-          throw new Error('Login response mein account details nahi mili. Dobara try karein.');
-        }
-        const finalUser = {
-          ...data.user,
-          role: loginMode === 'admin' || data.user.role === 'admin' ? 'admin' : 'user'
-        };
-
-        if (finalUser.role === 'admin') {
-          localStorage.setItem('adminUser', JSON.stringify(finalUser));
-          localStorage.setItem('adminToken', data.token);
-          localStorage.setItem('user', JSON.stringify(finalUser));
-          localStorage.setItem('token', data.token);
-          window.location.href = '/admin.html';
-        } else {
-          localStorage.removeItem('adminUser');
-          localStorage.removeItem('adminToken');
-          localStorage.setItem('user', JSON.stringify(finalUser));
-          localStorage.setItem('token', data.token);
-          try { sessionStorage.setItem('showAppPromoAfterLogin', 'yes'); } catch {}
-          window.location.href = playerDestination();
-        }
+        await Promise.all([loadData(), loadUsers(), loadHistory()]);
       } catch (error) {
-        showRequestError(error);
+        alert(error.message || 'Dashboard refresh nahi ho paaya.');
+      } finally {
         button.disabled = false;
-        button.textContent = verifyButtonLabel;
+        button.textContent = 'Refresh data';
       }
     }
 
-    phoneForm.addEventListener('submit', sendOtp);
-    otpForm.addEventListener('submit', verifyOtp);
-    otpInput.addEventListener('input', () => {
-      if (otpInput.value.length === expectedOtpLength && !document.getElementById('otpVerifyBtn').disabled) {
-        otpForm.requestSubmit();
+    function updateNotifications(data) {
+      const tasks = [
+        { label: 'Deposits', count: data.deposits?.length || 0, target: 'depTable' },
+        { label: 'KYC reviews', count: data.kycs?.length || 0, target: 'kycTable' },
+        { label: 'Match results', count: data.matches?.length || 0, target: 'matchTable' },
+        { label: 'Cancel requests', count: data.cancellationRequests?.length || 0, target: 'cancellationTable' },
+        { label: 'Withdrawals', count: data.withdrawals?.length || 0, target: 'withdrawTable' }
+      ];
+      const total = tasks.reduce((sum, task) => sum + task.count, 0);
+      document.getElementById('notificationTotal').textContent = `${total} pending`;
+      document.getElementById('notificationList').innerHTML = tasks.map(task =>
+        `<li><a href="#${task.target}">${task.label}: ${task.count}</a></li>`
+      ).join('');
+    }
+
+    async function loadAnnouncementText() {
+      const input = document.getElementById('announcementTextInput');
+      const status = document.getElementById('announcementStatus');
+      try {
+        const res = await adminFetch('/api/admin/site-announcement');
+        const data = await res.json();
+        input.value = data.text || 'Welcome to khiladiadda24.com';
+        status.textContent = 'Current line: ' + (data.text || 'Welcome to khiladiadda24.com');
+      } catch (error) {
+        status.textContent = error.message || 'Announcement load nahi ho paaya.';
       }
-    });
-    document.getElementById('otpResendBtn').addEventListener('click', sendOtp);
-    document.getElementById('changePhoneBtn').addEventListener('click', () => {
-      otpForm.classList.add('hidden');
-      phoneForm.classList.remove('hidden');
-      otpInput.value = '';
-      formHint.textContent = loginMode === 'admin' ? 'Admin panel ke liye allowlisted mobile number se login karein.' : '';
-      formHint.hidden = loginMode !== 'admin';
-      setMessage('');
-      document.getElementById('phone').focus();
-    });
-  </script>
-  <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/service-worker.js').catch(error => {
-        console.error('Service worker registration failed:', error);
+    }
+
+    async function saveAnnouncementText() {
+      const input = document.getElementById('announcementTextInput');
+      const status = document.getElementById('announcementStatus');
+      const text = (input.value || '').trim();
+      const payload = { text: text || 'Welcome to khiladiadda24.com' };
+      try {
+        const res = await adminFetch('/api/admin/site-announcement', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Announcement save nahi ho paaya');
+        input.value = data.text || 'Welcome to khiladiadda24.com';
+        status.textContent = 'Saved: ' + (data.text || 'Welcome to khiladiadda24.com');
+      } catch (error) {
+        status.textContent = error.message || 'Announcement save nahi ho paaya';
+      }
+    }
+
+    async function loadSupportNumbers() {
+      const status = document.getElementById('supportNumbersStatus');
+      try {
+        const res = await adminFetch('/api/admin/site-support');
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Contact numbers load nahi ho sake.');
+        document.getElementById('supportNumberInput').value = data.supportNumber || '';
+        document.getElementById('whatsappNumberInput').value = data.whatsappNumber || '';
+        status.textContent = 'Current support and WhatsApp numbers loaded.';
+      } catch (error) {
+        status.textContent = error.message || 'Contact numbers load nahi ho sake.';
+      }
+    }
+
+    async function saveSupportNumbers() {
+      const supportNumber = document.getElementById('supportNumberInput').value.trim();
+      const whatsappNumber = document.getElementById('whatsappNumberInput').value.trim();
+      const status = document.getElementById('supportNumbersStatus');
+      if (!/^[6-9]\d{9}$/.test(supportNumber) || !/^[6-9]\d{9}$/.test(whatsappNumber)) {
+        status.textContent = 'Dono fields mein valid 10-digit Indian mobile number dalein.';
+        return;
+      }
+      try {
+        const res = await adminFetch('/api/admin/site-support', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ supportNumber, whatsappNumber })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Contact numbers save nahi ho sake.');
+        status.textContent = data.message || 'Support and WhatsApp numbers saved.';
+      } catch (error) {
+        status.textContent = error.message || 'Contact numbers save nahi ho sake.';
+      }
+    }
+
+    async function loadBranding() {
+      const status = document.getElementById('brandingStatus');
+      try {
+        const res = await adminFetch('/api/admin/branding');
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Logo aur app icons load nahi hue.');
+        [['brandLogoPreview', data.brandLogoUrl], ['appIcon192Preview', data.appIcon192Url], ['appIcon512Preview', data.appIcon512Url], ['homeBannerPreview', data.homeBannerUrl], ['ludoBannerPreview', data.ludoBannerUrl], ['snakeBannerPreview', data.snakeBannerUrl], ['supportBannerPreview', data.supportBannerUrl]].forEach(([id, url]) => {
+          const preview = document.getElementById(id);
+          preview.src = url;
+          preview.hidden = false;
+        });
+        status.textContent = 'Current logo and app icons loaded.';
+      } catch (error) {
+        status.textContent = error.message || 'Logo aur app icons load nahi hue.';
+      }
+    }
+
+    async function saveBranding() {
+      const fields = [
+        ['brandLogoFile', 'brandLogo', null],
+        ['appIcon192File', 'appIcon192', 192],
+        ['appIcon512File', 'appIcon512', 512],
+        ['homeBannerFile', 'homeBanner', null],
+        ['ludoBannerFile', 'ludoBanner', null],
+        ['snakeBannerFile', 'snakeBanner', null],
+        ['supportBannerFile', 'supportBanner', null]
+      ];
+      const formData = new FormData();
+      let selectedCount = 0;
+      const status = document.getElementById('brandingStatus');
+      for (const [inputId, fieldName, expectedSize] of fields) {
+        const file = document.getElementById(inputId).files[0];
+        if (!file) continue;
+        if (file.type !== 'image/png' || !file.name.toLowerCase().endsWith('.png')) {
+          status.textContent = 'Sirf PNG image select karein.';
+          return;
+        }
+        if (expectedSize) {
+          try {
+            const image = await createImageBitmap(file);
+            const validSize = image.width === expectedSize && image.height === expectedSize;
+            image.close();
+            if (!validSize) {
+              status.textContent = `${inputId.includes('192') ? '192' : '512'} x ${expectedSize}px PNG select karein.`;
+              return;
+            }
+          } catch {
+            status.textContent = 'PNG image read nahi ho paayi.';
+            return;
+          }
+        }
+        formData.append(fieldName, file);
+        selectedCount += 1;
+      }
+      if (!selectedCount) {
+        status.textContent = 'Kam se kam ek PNG image select karein.';
+        return;
+      }
+      status.textContent = 'Images upload ho rahi hain...';
+      try {
+        const res = await adminFetch('/api/admin/branding', { method: 'POST', body: formData });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Images save nahi hui.');
+        fields.forEach(([inputId]) => { document.getElementById(inputId).value = ''; });
+        [['brandLogoPreview', data.brandLogoUrl], ['appIcon192Preview', data.appIcon192Url], ['appIcon512Preview', data.appIcon512Url], ['homeBannerPreview', data.homeBannerUrl], ['ludoBannerPreview', data.ludoBannerUrl], ['snakeBannerPreview', data.snakeBannerUrl], ['supportBannerPreview', data.supportBannerUrl]].forEach(([id, url]) => {
+          const preview = document.getElementById(id);
+          preview.src = url;
+          preview.hidden = false;
+        });
+        status.textContent = data.message || 'Logo aur app icons save ho gaye.';
+      } catch (error) {
+        status.textContent = error.message || 'Images save nahi hui.';
+      }
+    }
+
+    async function loadDepositUpiId() {
+      const input = document.getElementById('depositUpiIdInput');
+      const status = document.getElementById('depositUpiIdStatus');
+      try {
+        const res = await adminFetch('/api/admin/deposit-upi');
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Deposit UPI ID load nahi ho saka.');
+        input.value = data.depositUpiId || '';
+        status.textContent = data.depositUpiId ? 'Current deposit UPI ID loaded.' : 'Abhi deposit UPI ID configure nahi hai.';
+      } catch (error) {
+        status.textContent = error.message || 'Deposit UPI ID load nahi ho saka.';
+      }
+    }
+
+    async function saveDepositUpiId() {
+      const input = document.getElementById('depositUpiIdInput');
+      const status = document.getElementById('depositUpiIdStatus');
+      const depositUpiId = input.value.trim();
+      if (!/^[a-zA-Z0-9._-]{2,100}@[a-zA-Z0-9.-]{2,100}$/.test(depositUpiId)) {
+        status.textContent = 'Valid UPI ID dalein, jaise name@bank.';
+        return;
+      }
+      try {
+        const res = await adminFetch('/api/admin/deposit-upi', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ depositUpiId })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Deposit UPI ID save nahi ho saka.');
+        input.value = data.depositUpiId || depositUpiId;
+        status.textContent = data.message || 'Deposit UPI ID save ho gaya.';
+      } catch (error) {
+        status.textContent = error.message || 'Deposit UPI ID save nahi ho saka.';
+      }
+    }
+
+    function addPlayerCopyRow(entry = {}) {
+      const row = document.createElement('div');
+      row.className = 'player-copy-row';
+      const fromLabel = document.createElement('label');
+      fromLabel.textContent = 'Current player line';
+      const fromInput = document.createElement('textarea');
+      fromInput.dataset.playerCopyFrom = '';
+      fromInput.placeholder = 'Exact existing line from player page';
+      fromInput.value = entry.from || '';
+      fromLabel.append(fromInput);
+      const toLabel = document.createElement('label');
+      toLabel.textContent = 'New text';
+      const toInput = document.createElement('textarea');
+      toInput.dataset.playerCopyTo = '';
+      toInput.placeholder = 'Replacement text';
+      toInput.value = entry.to ?? '';
+      toLabel.append(toInput);
+      const removeButton = document.createElement('button');
+      removeButton.type = 'button';
+      removeButton.textContent = 'Remove';
+      removeButton.addEventListener('click', () => row.remove());
+      row.append(fromLabel, toLabel, removeButton);
+      document.getElementById('playerCopyRows').append(row);
+    }
+
+    async function loadPlayerCopy() {
+      const status = document.getElementById('playerCopyStatus');
+      try {
+        const res = await adminFetch('/api/admin/player-copy');
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Player text load nahi hua.');
+        const entries = data.entries?.length ? data.entries : [
+          { from: 'Challenger, entry amount aur winning amount dekhein.', to: 'Challenger, entry amount aur winning amount dekhein.' },
+          { from: 'Is game ke liye abhi open challenge nahi hai.', to: 'Is game ke liye abhi open challenge nahi hai.' }
+        ];
+        document.getElementById('playerCopyRows').replaceChildren();
+        entries.forEach(addPlayerCopyRow);
+        status.textContent = 'Player text lines loaded.';
+      } catch (error) {
+        status.textContent = error.message || 'Player text load nahi hua.';
+      }
+    }
+
+    async function savePlayerCopy() {
+      const status = document.getElementById('playerCopyStatus');
+      const rows = [...document.querySelectorAll('#playerCopyRows .player-copy-row')];
+      const entries = rows.map(row => ({
+        from: row.querySelector('[data-player-copy-from]').value.trim(),
+        to: row.querySelector('[data-player-copy-to]').value
+      })).filter(entry => entry.from);
+      const uniqueLines = new Set(entries.map(entry => entry.from));
+      if (uniqueLines.size !== entries.length) {
+        status.textContent = 'Current player line duplicate nahi ho sakti.';
+        return;
+      }
+      try {
+        const res = await adminFetch('/api/admin/player-copy', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ entries })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Player text save nahi hua.');
+        status.textContent = data.message || 'Player text settings save ho gayi.';
+      } catch (error) {
+        status.textContent = error.message || 'Player text save nahi hua.';
+      }
+    }
+
+    function renderFinanceSummary(summary = {}) {
+      const formatAmount = amount => `₹ ${Number(amount || 0).toLocaleString('en-IN')}`;
+      document.getElementById('totalDeposits').textContent = formatAmount(summary.totalDeposits);
+      document.getElementById('paidWithdrawals').textContent = formatAmount(summary.paidWithdrawals);
+      document.getElementById('pendingWithdrawals').textContent = formatAmount(summary.pendingWithdrawals);
+      document.getElementById('playerWalletBalance').textContent = formatAmount(summary.playerWalletBalance);
+      document.getElementById('financeUpdatedAt').textContent = `Updated ${new Date().toLocaleTimeString('en-IN')}`;
+    }
+
+    function renderPlayerList() {
+      const table = document.getElementById('userTable');
+      const newPlayerSince = Date.now() - 7 * 24 * 60 * 60 * 1000;
+      const modePlayers = playerListMode === 'NEW'
+        ? allPlayers.filter(player => new Date(player.createdAt).getTime() >= newPlayerSince)
+        : allPlayers;
+      const searchInput = document.getElementById('playerSearch').value.trim();
+      const searchTerm = searchInput.toLocaleLowerCase();
+      const searchDigits = searchInput.replace(/\D/g, '');
+      const players = searchTerm
+        ? modePlayers.filter(player => [player.username, player._id]
+          .some(value => String(value || '').toLocaleLowerCase().includes(searchTerm))
+          || String(player.phone || '').toLocaleLowerCase().includes(searchTerm)
+          || (searchDigits && String(player.phone || '').replace(/\D/g, '').includes(searchDigits)))
+        : modePlayers;
+      document.getElementById('userListTitle').textContent = playerListMode === 'NEW' ? 'New Players · Last 7 Days' : 'All Players & Wallets';
+      document.getElementById('playerListSummary').textContent = `${players.length} player${players.length === 1 ? '' : 's'}`;
+      table.innerHTML = '<tr><th>S.N.</th><th>Player</th><th>Phone</th><th>Wallet</th><th>Joined</th><th>Status</th><th>Admin</th><th>Action</th></tr>';
+      if (!players.length) {
+        const emptyMessage = searchTerm
+          ? 'Is search se koi player nahi mila.'
+          : playerListMode === 'NEW'
+            ? 'Last 7 days mein koi naya player nahi.'
+            : 'Player list khali hai.';
+        table.innerHTML += `<tr><td colspan="8" class="empty">${emptyMessage}</td></tr>`;
+        return;
+      }
+      players.forEach((u, index) => {
+        const blocked = Boolean(u.isBlocked);
+        const isPrimary = Boolean(u.isPrimaryAdmin);
+        const isAdminUser = Boolean(u.isAdmin) || isPrimary;
+        const adminLabel = isPrimary ? 'Primary' : isAdminUser ? 'Admin' : 'User';
+        const adminAction = isPrimary ? '<button disabled>Primary admin</button>' : isAdminUser ? `<button class="danger" onclick="toggleAdminStatus('${u._id}', false)">Remove admin</button>` : `<button class="secondary" onclick="toggleAdminStatus('${u._id}', true)">Make admin</button>`;
+        table.innerHTML += `<tr><td>${index + 1}</td><td><button type="button" class="player-name-link" onclick="openPlayerHistory('${u._id}')">${escapeHtml(u.username)}</button></td><td>${playerWhatsAppLink(u.phone)}</td><td>₹${Number(u.walletBalance || 0).toLocaleString('en-IN')}</td><td>${new Date(u.createdAt).toLocaleString()}</td><td>${blocked ? 'Blocked' : 'Active'}</td><td>${adminLabel}</td><td><button class="secondary" onclick="openPlayerEditor('${u._id}')">Edit profile</button> <button class="${blocked ? 'unblock-button' : 'block-button'}" onclick="setPlayerBlocked('${u._id}', ${!blocked})">${blocked ? 'Unblock' : 'Block'}</button> ${adminAction}</td></tr>`;
       });
     }
-    fetch('/api/site-branding').then(response => response.ok ? response.json() : null).then(branding => {
-      if (!branding) return;
-      const logo = document.querySelector('.login-logo');
-      const favicon = document.querySelector('link[rel="icon"]');
-      const appleIcon = document.querySelector('link[rel="apple-touch-icon"]');
-      if (favicon && branding.appIcon192Url) favicon.href = branding.appIcon192Url;
-      if (appleIcon && branding.appIcon192Url) appleIcon.href = branding.appIcon192Url;
-    }).catch(() => {});
+
+    function formatHistoryDate(value) {
+      return value ? new Date(value).toLocaleString('en-IN') : '-';
+    }
+
+    function openPlayerEditor(userId) {
+      const dialog = document.getElementById('playerHistoryDialog');
+      const content = document.getElementById('playerHistoryContent');
+      content.innerHTML = '<p class="muted">Player profile load ho rahi hai...</p>';
+      dialog.showModal();
+      adminFetch(`/api/admin/users/${encodeURIComponent(userId)}/history`, { cache: 'no-store' })
+        .then(async res => {
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error || 'Player profile nahi mili');
+          const user = data.user;
+          content.innerHTML = `
+            <div class="history-summary">
+              <div><small>Selected player</small><strong>${escapeHtml(user.username)}</strong></div>
+              <div><small>Phone</small><strong>${escapeHtml(user.phone)}</strong></div>
+              <div><small>Wallet</small><strong>₹${Number(user.walletBalance || 0).toLocaleString('en-IN')}</strong></div>
+              <div><small>Status</small><strong>${user.isBlocked ? 'Blocked' : 'Active'}</strong></div>
+            </div>
+            <form id="adminPlayerEditForm" class="admin-player-form">
+              <div class="field"><label>Username<input name="username" value="${escapeHtml(user.username)}" required></label></div>
+              <div class="field"><label>Phone<input name="phone" value="${escapeHtml(user.phone)}" required></label></div>
+              <div class="field"><label>Wallet balance<input name="walletBalance" type="number" step="1" value="${Number(user.walletBalance || 0)}" required></label></div>
+              <div class="field"><label><input type="checkbox" name="isBlocked" ${user.isBlocked ? 'checked' : ''}> Block player</label></div>
+              <div class="field"><label><input type="checkbox" name="isAdmin" ${user.isAdmin ? 'checked' : ''} ${user.isPrimaryAdmin ? 'disabled' : ''}> Admin access</label></div>
+              <div class="field"><button type="submit">Save profile</button></div>
+            </form>
+          `;
+          const form = document.getElementById('adminPlayerEditForm');
+          form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const body = {
+              username: form.username.value.trim(),
+              phone: form.phone.value.trim(),
+              walletBalance: Number(form.walletBalance.value),
+              isBlocked: !!form.isBlocked.checked,
+              isAdmin: !!form.isAdmin.checked
+            };
+            const res = await adminFetch(`/api/admin/users/${encodeURIComponent(userId)}/edit`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(body)
+            });
+            const data = await res.json();
+            alert(data.message || data.error);
+            if (res.ok) {
+              await loadUsers();
+              dialog.close();
+            }
+          });
+        })
+        .catch(error => {
+          content.innerHTML = `<p class="notice error">${escapeHtml(error.message)}</p>`;
+        });
+    }
+
+    async function openPlayerHistory(userId) {
+      const dialog = document.getElementById('playerHistoryDialog');
+      const content = document.getElementById('playerHistoryContent');
+      content.innerHTML = '<p class="muted">Player history load ho rahi hai...</p>';
+      dialog.showModal();
+      try {
+        const res = await adminFetch(`/api/admin/users/${encodeURIComponent(userId)}/history`, { cache: 'no-store' });
+        let data;
+        try {
+          data = await res.json();
+        } catch {
+          throw new Error(res.status === 404
+            ? 'Player history API current server par nahi mili. Updated backend ko restart ya redeploy karke dobara try karein.'
+            : `Server ne JSON ke badle webpage bheja (HTTP ${res.status}). Backend restart ya redeploy karke dobara try karein.`);
+        }
+        if (!res.ok) throw new Error(data.error || 'Player history nahi mili');
+        const { user, deposits, withdrawals, matches } = data;
+        const approvedDeposits = deposits.filter(item => item.status === 'APPROVED');
+        const paidWithdrawals = withdrawals.filter(item => item.status === 'PAID');
+        const totalDeposits = approvedDeposits.reduce((total, item) => total + Number(item.amount || 0), 0);
+        const totalWithdrawals = paidWithdrawals.reduce((total, item) => total + Number(item.amount || 0), 0);
+        const playedMatches = matches.filter(match => match.gameStartedAt || ['PENDING_RESULT', 'COMPLETED'].includes(match.status));
+        document.getElementById('playerHistoryTitle').textContent = user.username;
+        document.getElementById('playerHistoryAccount').textContent = `${user.phone} · Joined ${formatHistoryDate(user.createdAt)} · ${user.isBlocked ? 'Blocked' : 'Active'}`;
+
+        const depositRows = deposits.map(item => `<tr><td>${formatHistoryDate(item.createdAt)}</td><td>₹${Number(item.amount).toLocaleString('en-IN')}</td><td>${escapeHtml(item.status)}</td></tr>`).join('') || '<tr><td colspan="3">No deposit history</td></tr>';
+        const withdrawalRows = withdrawals.map(item => `<tr><td>${formatHistoryDate(item.createdAt)}</td><td>₹${Number(item.amount).toLocaleString('en-IN')}</td><td>${escapeHtml(item.payoutMethod || 'UPI')}</td><td>${escapeHtml(item.status)}</td></tr>`).join('') || '<tr><td colspan="4">No withdrawal history</td></tr>';
+        const matchRows = matches.map(match => {
+          const creatorId = String(match.creator?._id || match.creator);
+          const isCreator = creatorId === String(user._id);
+          const opponent = isCreator ? match.joiner?.username : match.creator?.username;
+          const ownReport = isCreator ? match.creatorResult : match.joinerResult;
+          const winnerId = String(match.winner?._id || match.winner || '');
+          const outcome = winnerId ? (winnerId === String(user._id) ? 'WIN' : 'LOSS') : (ownReport || '-');
+          return `<tr><td>${formatHistoryDate(match.gameStartedAt || match.createdAt)}</td><td>${adminGameTypeLabel(match.gameType)}</td><td>${escapeHtml(opponent || 'Waiting for player')}</td><td>₹${Number(match.amount).toLocaleString('en-IN')}</td><td>${escapeHtml(match.status)}</td><td>${escapeHtml(outcome)}</td></tr>`;
+        }).join('') || '<tr><td colspan="6">No game history</td></tr>';
+        content.innerHTML = `
+          <div class="history-summary">
+            <div><small>Current wallet</small><strong>₹${Number(user.walletBalance).toLocaleString('en-IN')}</strong></div>
+            <div><small>Deposited · approved</small><strong>₹${totalDeposits.toLocaleString('en-IN')}</strong></div>
+            <div><small>Withdrawn · paid</small><strong>₹${totalWithdrawals.toLocaleString('en-IN')}</strong></div>
+            <div><small>Games played</small><strong>${playedMatches.length} / ${matches.length} total</strong></div>
+          </div>
+          <h4>Deposits</h4><table><tr><th>Date</th><th>Amount</th><th>Status</th></tr>${depositRows}</table>
+          <h4>Withdrawals</h4><table><tr><th>Date</th><th>Amount</th><th>Method</th><th>Status</th></tr>${withdrawalRows}</table>
+          <h4>Games</h4><table><tr><th>Date</th><th>Game</th><th>Opponent</th><th>Entry</th><th>Status</th><th>Result</th></tr>${matchRows}</table>`;
+      } catch (error) {
+        content.innerHTML = `<p class="notice error">${escapeHtml(error.message)}</p>`;
+      }
+    }
+
+    function setPlayerListMode(mode, scrollToList = false) {
+      playerListMode = mode === 'NEW' ? 'NEW' : 'ALL';
+      document.getElementById('allPlayersFilter').setAttribute('aria-pressed', String(playerListMode === 'ALL'));
+      document.getElementById('newPlayersFilter').setAttribute('aria-pressed', String(playerListMode === 'NEW'));
+      renderPlayerList();
+      if (scrollToList) document.getElementById('userListTitle').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    async function loadUsers() {
+      const res = await adminFetch('/api/admin/users');
+      const data = await res.json();
+      allPlayers = data.users || [];
+      const userSelects = [document.getElementById('walletUser'), document.getElementById('bonusUser')];
+      userSelects.forEach(select => {
+        select.innerHTML = '<option value="">Player select karein</option>';
+        allPlayers.forEach(u => { select.innerHTML += `<option value="${u._id}">${escapeHtml(u.username)} - ${escapeHtml(u.phone)} (₹${Number(u.walletBalance || 0).toLocaleString('en-IN')})</option>`; });
+      });
+      renderPlayerList();
+    }
+
+    async function toggleAdminStatus(userId, isAdmin) {
+      if (!confirm(isAdmin ? 'Is user ko admin banana chahte ho?' : 'Is user se admin access remove karna chahte ho?')) return;
+      const res = await adminFetch(`/api/admin/users/${encodeURIComponent(userId)}/admin`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isAdmin })
+      });
+      const data = await res.json();
+      alert(data.message || data.error);
+      if (res.ok) loadUsers();
+    }
+
+    async function setPlayerBlocked(userId, blocked) {
+      const action = blocked ? 'block' : 'unblock';
+      if (!confirm(`Is player ko ${action} karna hai?`)) return;
+      const res = await adminFetch(`/api/admin/users/${encodeURIComponent(userId)}/block`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ blocked })
+      });
+      const data = await res.json();
+      alert(data.message || data.error);
+      if (res.ok) loadUsers();
+    }
+
+    async function loadHistory() {
+      const res = await adminFetch('/api/admin/game-history');
+      const data = await res.json();
+      const table = document.getElementById('historyTable');
+      table.innerHTML = '<tr><th>Game</th><th>Players</th><th>Entry</th><th>Status</th><th>Winner / Cancel reason</th><th>Room code</th><th>Proof</th><th>Joined / Started</th></tr>';
+      data.matches.forEach(m => {
+        const players = `${m.creator?.username || 'N/A'} vs ${m.joiner?.username || 'Waiting'}`;
+        const proof = m.proofScreenshot ? `<a href="/api/admin/uploads/${encodeURIComponent(m.proofScreenshot.split('/').pop())}" target="_blank">View screenshot</a>` : '-';
+        table.innerHTML += `<tr><td>${adminGameTypeLabel(m.gameType)}</td><td>${players}<br>${m.creator?.phone || '-'} vs ${m.joiner?.phone || '-'}</td><td>₹${m.amount} each</td><td>${m.status}</td><td>${m.winner?.username || '-'}<br>${m.cancelReason || '-'}${m.cancelledBy?.username ? `<br>By ${m.cancelledBy.username}` : ''}${m.cancelledAt ? `<br>${new Date(m.cancelledAt).toLocaleString()}` : ''}</td><td>${m.roomCode || '-'}<br>By: ${m.roomCodeSharedBy?.username || '-'}</td><td>${proof}</td><td>Joined: ${m.joinedAt ? new Date(m.joinedAt).toLocaleString() : '-'}<br>Started: ${m.gameStartedAt ? new Date(m.gameStartedAt).toLocaleString() : '-'}</td></tr>`;
+      });
+      if (!data.matches.length) table.innerHTML += '<tr><td colspan="8" class="empty">No game history</td></tr>';
+    }
+
+    async function approveDep(id) {
+      await adminFetch('/api/admin/approve-deposit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ depositId: id })
+      });
+      alert('Approved');
+      location.reload();
+    }
+
+    async function resolveMatchDecision(matchId, prefix = '') {
+      const decision = document.getElementById(`${prefix}decision-${matchId}`)?.value;
+      if (!decision) return alert('Action select karein.');
+      const winnerSelect = document.getElementById(`${prefix}winner-${matchId}`);
+      const creatorId = winnerSelect?.dataset.creatorId || '';
+      const joinerId = winnerSelect?.dataset.joinerId || '';
+
+      if (decision === 'CANCEL' || decision === 'REFUND') {
+        const res = await adminFetch('/api/admin/cancel-match', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ matchId })
+        });
+        const data = await res.json();
+        if (!res.ok) return alert(data.error || 'Match cancel nahi hua');
+        alert(data.message || 'Match cancel ho gaya.');
+        location.reload();
+        return;
+      }
+
+      let winnerId = '';
+      if (decision === 'WIN-CREATOR') winnerId = creatorId;
+      if (decision === 'WIN-JOINER') winnerId = joinerId;
+      if (decision === 'LOSS-CREATOR') winnerId = joinerId;
+      if (decision === 'LOSS-JOINER') winnerId = creatorId;
+
+      if (!winnerId) return alert('Winner id resolve nahi hua. Match data refresh karke try karein.');
+
+      const matchRes = await adminFetch('/api/admin/approve-match', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ matchId, winnerId })
+      });
+      const matchData = await matchRes.json();
+      if (!matchRes.ok) return alert(matchData.error || 'Match result update nahi hua');
+      alert('Admin decision se result set aur payout ho gaya.');
+      location.reload();
+    }
+
+    async function approveMatch(id) {
+      const selectedWinner = document.getElementById(`winner-${id}`)?.value;
+      const res = await adminFetch('/api/admin/approve-match', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ matchId: id, ...(selectedWinner ? { winnerId: selectedWinner } : {}) })
+      });
+      const data = await res.json();
+      if (!res.ok) return alert(data.error || 'Match approve nahi hua');
+      alert('Winner ko payout transfer ho gaya!');
+      location.reload();
+    }
+
+    async function cancelAdminMatch(matchId) {
+      if (!confirm('Game cancel karke players ko entry refund karni hai?')) return;
+      const res = await adminFetch('/api/admin/cancel-match', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ matchId }) });
+      const data = await res.json();
+      alert(data.message || data.error);
+      if (res.ok) { loadData(); loadUsers(); loadHistory(); }
+    }
+
+    async function reviewCancelRequest(matchId, decision) {
+      const prompt = decision === 'APPROVE'
+        ? 'Approve cancel request and refund both players?'
+        : 'Reject cancel request and return the match to its previous state?';
+      if (!confirm(prompt)) return;
+      const res = await adminFetch('/api/admin/review-cancel-request', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ matchId, decision })
+      });
+      const data = await res.json();
+      alert(data.message || data.error);
+      if (res.ok) { loadData(); loadUsers(); loadHistory(); }
+    }
+
+    async function setKycStatus(kycId, status) {
+      const rejectionReason = status === 'REJECTED' ? prompt('Reject reason likhein:') : '';
+      if (status === 'REJECTED' && rejectionReason === null) return;
+      const res = await adminFetch('/api/admin/kyc-status', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ kycId, status, rejectionReason }) });
+      const data = await res.json();
+      alert(data.message || data.error);
+      if (res.ok) loadData();
+    }
+
+    function openKycEditor(kycId, aadhaarNumber) {
+      const form = document.getElementById('kycEditForm');
+      form.elements.kycId.value = kycId;
+      form.elements.aadhaarNumber.value = aadhaarNumber;
+      form.elements.aadhaarImage.value = '';
+      document.getElementById('kycEditDialog').showModal();
+      form.elements.aadhaarNumber.focus();
+    }
+
+    async function saveKycEdit(event) {
+      event.preventDefault();
+      const form = event.currentTarget;
+      const button = document.getElementById('saveKycEditButton');
+      button.disabled = true;
+      try {
+        const res = await adminFetch(`/api/admin/kyc/${encodeURIComponent(form.elements.kycId.value)}`, {
+          method: 'PUT',
+          body: new FormData(form)
+        });
+        const data = await res.json();
+        alert(data.message || data.error);
+        if (res.ok) {
+          document.getElementById('kycEditDialog').close();
+          loadData();
+        }
+      } catch (error) {
+        alert(error.message || 'KYC update nahi ho payi.');
+      } finally {
+        button.disabled = false;
+      }
+    }
+
+    async function adjustWallet() {
+      const userId = document.getElementById('walletUser').value;
+      const amount = document.getElementById('walletAmount').value;
+      const reason = document.getElementById('walletReason').value;
+      const res = await adminFetch('/api/admin/wallet-adjust', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId, amount, reason }) });
+      const data = await res.json();
+      alert(data.message || data.error);
+      if (res.ok) { document.getElementById('walletAmount').value = ''; loadUsers(); loadData(); }
+    }
+
+    async function giveBonus() {
+      const userId = document.getElementById('bonusUser').value;
+      const amount = document.getElementById('bonusAmount').value;
+      const reason = document.getElementById('bonusReason').value;
+      const res = await adminFetch('/api/admin/bonus', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId, amount, reason }) });
+      const data = await res.json();
+      alert(data.message || data.error);
+      if (res.ok) { document.getElementById('bonusAmount').value = ''; loadUsers(); loadData(); }
+    }
+
+    async function setWithdrawal(withdrawalId, status) {
+      const res = await adminFetch('/api/admin/withdrawal-status', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ withdrawalId, status }) });
+      const data = await res.json();
+      alert(data.message || data.error);
+      if (res.ok) loadData();
+    }
+
+    document.getElementById('allPlayersFilter').addEventListener('click', () => setPlayerListMode('ALL'));
+    document.getElementById('playerSearch').addEventListener('input', renderPlayerList);
+    document.getElementById('kycEditForm').addEventListener('submit', saveKycEdit);
+    document.getElementById('newPlayersFilter').addEventListener('click', () => setPlayerListMode('NEW'));
+    document.getElementById('adminHomeButton').addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+    document.getElementById('adminNewPlayersButton').addEventListener('click', () => setPlayerListMode('NEW', true));
+
+    document.getElementById('saveSupportNumbersBtn').addEventListener('click', saveSupportNumbers);
+    document.getElementById('saveBrandingBtn').addEventListener('click', saveBranding);
+    document.getElementById('saveDepositUpiIdBtn').addEventListener('click', saveDepositUpiId);
+    document.getElementById('addPlayerCopyRowBtn').addEventListener('click', () => addPlayerCopyRow());
+    document.getElementById('savePlayerCopyBtn').addEventListener('click', savePlayerCopy);
+    loadSupportNumbers();
+    loadBranding();
+    loadDepositUpiId();
+    loadPlayerCopy();
+    loadData();
+    loadUsers();
+    loadHistory();
+    setInterval(loadData, 30000);
   </script>
   <script src="/i18n.js"></script>
-  <script src="/player-copy.js" defer></script>
 </body>
 </html>
