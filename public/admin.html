@@ -70,15 +70,19 @@
     .kyc-edit-dialog label { display: block; margin-top: 14px; color: #cbd5e1; font-size: 13px; }
     .support-admin-layout { display: grid; grid-template-columns: minmax(220px, 0.8fr) minmax(0, 1.5fr); gap: 14px; }
     .support-thread-list { display: grid; align-content: start; gap: 8px; max-height: 420px; overflow: auto; }
+    .support-thread-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: stretch; gap: 6px; }
     .support-thread-button { width: 100%; padding: 10px; border: 1px solid rgba(255,255,255,0.1); background: rgba(15,23,42,0.7); text-align: left; }
     .support-thread-button.active { outline: 2px solid #fbbf24; }
     .support-thread-button small, .support-thread-button strong { display: block; }
     .support-thread-button small { color: #94a3b8; margin-top: 4px; }
+    .support-thread-delete { padding: 8px; border: 1px solid #7f1d1d; border-radius: 7px; color: #fecaca; background: #450a0a; }
+    .support-thread-delete:disabled { opacity: .6; }
     .support-admin-chat { display: grid; grid-template-rows: minmax(180px, 1fr) auto; gap: 10px; min-height: 300px; }
     .support-admin-messages { display: grid; align-content: start; gap: 8px; max-height: 380px; overflow: auto; padding: 10px; border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; background: #0f172a; }
     .support-admin-message { max-width: 85%; padding: 9px 11px; border-radius: 10px; background: #263449; overflow-wrap: anywhere; }
     .support-admin-message.admin { justify-self: end; background: #14532d; }
     .support-admin-message small { display: block; margin-top: 4px; color: #cbd5e1; }
+    .support-admin-attachment { display: block; width: min(100%, 320px); max-height: 240px; margin-top: 8px; border: 1px solid rgba(255,255,255,0.16); border-radius: 8px; object-fit: contain; background: #0f172a; }
     .support-admin-form { display: grid; grid-template-columns: 1fr auto; gap: 8px; }
     .support-admin-form textarea { width: 100%; padding: 10px; border: 1px solid #475569; border-radius: 7px; color: #fff; background: #0f172a; font: inherit; }
     .leaderboard-settings { display: grid; grid-template-columns: repeat(3, minmax(120px, 1fr)); gap: 10px; }
@@ -1074,12 +1078,53 @@
 
     let activeSupportUserId = '';
 
-    function renderAdminSupportMessages(messages) {
+    const adminSupportAttachmentUrls = new Map();
+
+    async function renderAdminSupportMessages(messages) {
       const container = document.getElementById('supportAdminMessages');
-      container.innerHTML = messages.length ? messages.map(message => {
-        const date = new Date(message.createdAt).toLocaleString('en-IN');
-        return `<div class="support-admin-message ${message.senderRole === 'admin' ? 'admin' : ''}"><strong>${escapeHtml(message.senderName)}</strong><div>${escapeHtml(message.text)}</div><small>${escapeHtml(date)}</small></div>`;
-      }).join('') : '<p class="muted">Abhi koi message nahi. Player yahan chat shuru kar sakta hai.</p>';
+      container.replaceChildren();
+      for (const message of messages) {
+        const bubble = document.createElement('div');
+        bubble.className = `support-admin-message ${message.senderRole === 'admin' ? 'admin' : ''}`;
+        const sender = document.createElement('strong');
+        sender.textContent = message.senderName || (message.senderRole === 'admin' ? 'Admin' : 'Player');
+        bubble.appendChild(sender);
+        if (message.text) {
+          const text = document.createElement('div');
+          text.textContent = message.text;
+          bubble.appendChild(text);
+        }
+        if (message.attachment) {
+          try {
+            let objectUrl = adminSupportAttachmentUrls.get(message.id);
+            if (!objectUrl) {
+              const response = await adminFetch(message.attachment, { cache: 'no-store' });
+              if (!response.ok) throw new Error('Screenshot load nahi ho saka.');
+              objectUrl = URL.createObjectURL(await response.blob());
+              adminSupportAttachmentUrls.set(message.id, objectUrl);
+            }
+            const image = document.createElement('img');
+            image.className = 'support-admin-attachment';
+            image.src = objectUrl;
+            image.alt = 'Player attached screenshot';
+            bubble.appendChild(image);
+          } catch (error) {
+            const attachmentError = document.createElement('small');
+            attachmentError.textContent = error.message || 'Screenshot load nahi ho saka.';
+            bubble.appendChild(attachmentError);
+          }
+        }
+        const timestamp = document.createElement('small');
+        timestamp.textContent = new Date(message.createdAt).toLocaleString('en-IN');
+        bubble.appendChild(timestamp);
+        container.appendChild(bubble);
+      }
+      if (!messages.length) {
+        const empty = document.createElement('p');
+        empty.className = 'muted';
+        empty.textContent = 'Abhi koi message nahi. Player yahan chat shuru kar sakta hai.';
+        container.appendChild(empty);
+      }
       container.scrollTop = container.scrollHeight;
     }
 
@@ -1097,10 +1142,34 @@
           const player = thread.user;
           const last = thread.lastMessage;
           const preview = last.text.length > 65 ? `${last.text.slice(0, 65)}…` : last.text;
-          return `<button type="button" class="support-thread-button ${activeSupportUserId === String(player._id) ? 'active' : ''}" data-support-user="${escapeAttribute(player._id)}"><strong>${escapeHtml(player.username)} ${thread.unreadCount ? `(${thread.unreadCount} new)` : ''}</strong><small>${escapeHtml(player.phone || '')} · ${escapeHtml(preview)}</small></button>`;
+          return `<div class="support-thread-row"><button type="button" class="support-thread-button ${activeSupportUserId === String(player._id) ? 'active' : ''}" data-support-user="${escapeAttribute(player._id)}"><strong>${escapeHtml(player.username)} ${thread.unreadCount ? `(${thread.unreadCount} new)` : ''}</strong><small>${escapeHtml(player.phone || '')} · ${escapeHtml(preview)}</small></button><button type="button" class="support-thread-delete" data-delete-support-user="${escapeAttribute(player._id)}" aria-label="Delete conversation with ${escapeAttribute(player.username)}" title="Delete conversation">Delete</button></div>`;
         }).join('');
         list.querySelectorAll('[data-support-user]').forEach(button => {
           button.addEventListener('click', () => openAdminSupportThread(button.dataset.supportUser));
+        });
+        list.querySelectorAll('[data-delete-support-user]').forEach(button => {
+          button.addEventListener('click', async () => {
+            const userId = button.dataset.deleteSupportUser;
+            const playerName = button.getAttribute('aria-label').replace('Delete conversation with ', '');
+            if (!confirm(`Delete ${playerName} ki poori support chat?`)) return;
+            button.disabled = true;
+            try {
+              const response = await adminFetch(`/api/admin/support/threads/${encodeURIComponent(userId)}`, { method: 'DELETE' });
+              const data = await response.json();
+              if (!response.ok) throw new Error(data.error || 'Conversation delete nahi hui.');
+              if (activeSupportUserId === userId) {
+                activeSupportUserId = '';
+                document.getElementById('supportAdminInput').value = '';
+                document.getElementById('supportAdminInput').disabled = true;
+                document.getElementById('supportAdminSend').disabled = true;
+                document.getElementById('supportAdminMessages').innerHTML = '<p class="muted">Conversation kholne ke liye player select karein.</p>';
+              }
+              await loadAdminSupportThreads();
+            } catch (error) {
+              alert(error.message || 'Conversation delete nahi hui.');
+              button.disabled = false;
+            }
+          });
         });
         if (activeSupportUserId && data.threads.some(thread => String(thread.user._id) === activeSupportUserId)) {
           await refreshAdminSupportThread();
@@ -1123,7 +1192,7 @@
       const response = await adminFetch(`/api/admin/support/threads/${encodeURIComponent(activeSupportUserId)}`, { cache: 'no-store' });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'Conversation refresh nahi hui.');
-      renderAdminSupportMessages(data.messages || []);
+      await renderAdminSupportMessages(data.messages || []);
     }
 
     document.getElementById('supportAdminForm').addEventListener('submit', async event => {
