@@ -363,11 +363,12 @@
     @media(max-width:600px){body{font-size:18px}.shell{padding-right:10px;padding-left:10px}.panel{padding:17px}.panel h2,.panel h3{font-size:23px}.panel p,.muted{font-size:15px}.field label{font-size:15px}.field input,.field select,.field textarea{font-size:17px}.btn{min-height:48px;font-size:16px}}
   </style>
   <style id="bottomPalette">
-    .bottom{grid-template-columns:repeat(3,minmax(0,1fr));background:linear-gradient(105deg,#10294d 0%,#17683d 52%,#b85f19 100%)}
+    .bottom{grid-template-columns:repeat(5,minmax(0,1fr));background:linear-gradient(105deg,#10294d 0%,#17683d 52%,#b85f19 100%)}
     .bottom button,.bottom button:nth-child(n){border-radius:8px;background:transparent}
     .bottom button>span:first-child,.bottom button .nav-label{color:#f5f7f4}
     .bottom button.active{background:#ffffff24;box-shadow:inset 0 -3px #ffbd59}
     .bottom button.active>span:first-child,.bottom button.active .nav-label{color:#fff}
+    @media(max-width:600px){.bottom{right:0;left:0;width:100%;grid-template-columns:repeat(5,minmax(0,1fr));padding:4px 4px max(4px,env(safe-area-inset-bottom));transform:none;border-radius:10px 10px 0 0}.bottom button{min-width:0;min-height:42px;gap:1px;padding:2px 1px;font-size:10px;line-height:1.1}.bottom button>span:first-child{font-size:16px;line-height:1}.bottom button .nav-label{gap:2px;white-space:nowrap;font-size:10px}.bottom button .nav-live{font-size:7px}}
   </style>
   <style id="ludoAppButtonPalette">
     .ludo-app-button,#view-home>.home-open-battles-panel .battle-card .btn.ludo-app-button,#view-home>.home-running-battles-panel .battle-card .btn.ludo-app-button{border-color:#991f1f;background:#c62828;color:#fff}
@@ -735,7 +736,7 @@
     async function api(url,options={}){const headers=new Headers(options.headers||{});headers.set('Authorization',`Bearer ${token}`);if(options.body&&!(options.body instanceof FormData))headers.set('Content-Type','application/json');const response=await fetch(url,{...options,headers});const data=await response.json().catch(()=>({}));if(response.status===401){localStorage.removeItem('token');localStorage.removeItem('user');location.replace(loginUrl());throw new Error('Session expire hua. Dobara login karein.')}if(!response.ok)throw new Error(data.error||'Request complete nahi hui.');return data}
     window.pendingEntryAmount=100;
     const showError=error=>{const message=error.message||'Kuch problem hui.';if(/balance|insufficient|recharge/i.test(message)){const required=Number(window.pendingEntryAmount)||100,balance=Number(player?.walletBalance??storedUser?.walletBalance??0),depositAmount=Math.max(100,required-balance);el('depositAmount').value=String(depositAmount);notify(`₹${required} entry ke liye balance kam hai. ₹${depositAmount} deposit karein.`,true);document.querySelector('.bottom [data-view="wallet"]')?.click();return}notify(message,true)};
-    function setView(name){if(name==='rank'){document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id==='view-home'));document.querySelectorAll('[data-view]').forEach(button=>button.classList.toggle('active',button.dataset.view==='rank'));el('menu').classList.remove('open');el('menuToggle').setAttribute('aria-expanded','false');if(!el('rankSection'))return notify('Rank section abhi load ho raha hai. Dobara try karein.',true);el('rankSection').scrollIntoView({behavior:'smooth',block:'start'});loadMine().catch(showError);loadOpen().catch(showError);return}const viewName=name==='battles'||name==='games'?'home':name;document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===`view-${viewName}`||(viewName==='match'&&v.id==='view-home')));document.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===(viewName==='match'?'home':viewName)));el('menu').classList.remove('open');el('menuToggle').setAttribute('aria-expanded','false');clearInterval(battlesPollTimer);if(viewName==='wallet'||viewName==='profile')loadKyc().catch(showError);if(viewName==='home')loadMine().catch(showError);if(viewName==='history')loadHistory().catch(showError);loadOpen().catch(showError);battlesPollTimer=setInterval(()=>loadOpen().catch(showError),30000)}
+    function setView(name){const viewName=name==='battles'||name==='games'?'home':name;document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===`view-${viewName}`||(viewName==='match'&&v.id==='view-home')));document.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===(viewName==='match'?'home':viewName)));el('menu').classList.remove('open');el('menuToggle').setAttribute('aria-expanded','false');clearInterval(battlesPollTimer);if(viewName==='rank')window.scrollTo({top:0,behavior:'smooth'});if(viewName==='wallet'||viewName==='profile')loadKyc().catch(showError);if(viewName==='home')loadMine().catch(showError);if(viewName==='history')loadHistory().catch(showError);loadOpen().catch(showError);battlesPollTimer=setInterval(()=>loadOpen().catch(showError),30000)}
     function renderPlayer(){const name=player?.username||storedUser?.username||'Player',phone=player?.phone||storedUser?.phone||'',balance=Number(player?.walletBalance||0),formatted=`₹ ${balance.toLocaleString('en-IN')}`;['headerBalance','walletBalance','profileBalance'].forEach(id=>el(id).textContent=formatted);el('profileName').textContent=name;el('profilePhone').textContent=phone;el('accountPhone').textContent=phone;el('profileReferralCode').textContent=player?.referralCode||'--';el('username').value=name;const image=player?.profileImage;el('avatar').src=image?(image.startsWith('uploads/')?`/api/profile/image/${encodeURIComponent(image.split('/').pop())}`:`/${image.split('/').map(encodeURIComponent).join('/')}`):'';el('avatar').onerror=()=>el('avatar').removeAttribute('src')}
     async function loadProfile(){const data=await api('/api/profile/me');player=data.user;renderPlayer()}
     async function loadWalletSummary(){const data=await api('/api/wallet/summary'),format=value=>`₹ ${Number(value||0).toLocaleString('en-IN')}`;el('profileTotalDeposits').textContent=format(data.totalDeposits);el('profilePaidWithdrawals').textContent=format(data.paidWithdrawals);el('profilePendingWithdrawals').textContent=format(data.pendingWithdrawals);el('profileTotalWinnings').textContent=format(data.totalWinnings);const withdrawableWinnings=el('withdrawableWinnings');if(withdrawableWinnings)withdrawableWinnings.textContent=`Withdrawable game winnings: ${format(data.availableWinnings)}. Deposits and bonuses cannot be withdrawn.`;el('profileMoneyUpdated').textContent=`Updated ${new Date().toLocaleTimeString('en-IN')}`}
@@ -1126,25 +1127,15 @@
   </style>
   <script>
     (function () {
-      const nav = document.querySelector('.nav');
-      if (nav && !nav.querySelector('[data-rank-link="true"]')) {
-        const rankLink = document.createElement('button');
-        rankLink.type = 'button';
-        rankLink.dataset.rankLink = 'true';
-        rankLink.textContent = 'Rank';
-        rankLink.addEventListener('click', function () {
-          const panel = document.getElementById('rankSection');
-          if (panel) panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        });
-        nav.appendChild(rankLink);
-      }
-
-      const homepage = document.getElementById('view-home');
-      if (homepage && !document.getElementById('rankSection')) {
+      const content = document.querySelector('main.shell.content');
+      if (content && !document.getElementById('view-rank')) {
         const section = document.createElement('section');
-        section.id = 'rankSection';
-        section.className = 'panel rank-panel';
-        section.innerHTML = `
+        section.id = 'view-rank';
+        section.className = 'view';
+        const panel = document.createElement('div');
+        panel.id = 'rankSection';
+        panel.className = 'panel rank-panel';
+        panel.innerHTML = `
           <div class="rank-panel-head">
             <h2>🏆 Rank & Prize Pool</h2>
             <span id="rankMonth" class="rank-month-pill">Loading...</span>
@@ -1166,12 +1157,8 @@
           <ul id="monthlyRankList" class="rank-list"><li class="muted">Monthly rank load ho raha hai...</li></ul>
           <p class="muted" style="margin-top: 16px; color: #b7c5bf;">Har completed game par 5 points aur winner ko 15 extra points milte hain. Rank points se decide hota hai; monthly leaderboard 1st date ko reset hota hai.</p>
         `;
-        const hero = homepage.querySelector('.hero');
-        if (hero) {
-          homepage.insertBefore(section, hero.nextSibling);
-        } else {
-          homepage.insertBefore(section, homepage.firstChild);
-        }
+        section.appendChild(panel);
+        content.appendChild(section);
 
         fetch('/api/leaderboard/monthly', { cache: 'no-store' })
           .then(async response => {
