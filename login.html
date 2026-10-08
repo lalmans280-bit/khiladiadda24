@@ -17,28 +17,30 @@
   <style>
     :root { color-scheme: dark; --panel: #19231d; --line: #35483a; --ink: #f3f4ed; --muted: #b4c0b6; --gold: #e7b83f; --error: #ffb4a9; }
     * { box-sizing: border-box; }
-    body { min-height: 100vh; min-height: 100dvh; margin: 0; padding: 16px; display: grid; place-items: center; background: radial-gradient(ellipse at top, #24372a 0%, #101713 62%); color: var(--ink); font-family: Arial, sans-serif; }
-    .box { width: min(390px, 100%); max-height: calc(100vh - 32px); max-height: calc(100dvh - 32px); overflow-y: auto; padding: 26px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); box-shadow: 0 18px 52px #0006; }
-    .login-logo-frame { display: grid; place-items: center; width: 112px; height: 92px; margin: 0 auto 14px; padding: 9px; border: 1px solid #806a36; border-radius: 14px; background: linear-gradient(145deg, #25362a, #111a14); box-shadow: 0 8px 22px #0005, inset 0 1px #ffffff12; }
+    body { min-height: 100vh; min-height: 100dvh; margin: 0; padding: 16px; display: grid; place-items: center; background: #0b1b3a; color: var(--ink); font-family: Arial, sans-serif; }
+    .box { width: min(390px, 100%); max-height: calc(100vh - 32px); max-height: calc(100dvh - 32px); overflow-y: auto; padding: 26px; border: 1px solid var(--line); border-radius: 10px; background: #b91c1c; box-shadow: 0 18px 52px #0006; font-weight: 700; }
+    .login-logo-frame { display: grid; place-items: center; width: 112px; height: 92px; margin: 0 auto 14px; padding: 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
     .login-logo { display: block; width: 100%; height: 100%; object-fit: contain; }
-    h1 { margin: 0; text-align: center; font-size: 22px; }
-    .brand-tagline { margin: 5px 0 18px; color: var(--gold); font-size: 11px; font-weight: 800; letter-spacing: 1px; text-align: center; }
-    .welcome-back { margin: 0 0 6px; color: var(--ink); font-size: 18px; text-align: center; }
-    .security-note { margin: 0 0 12px; color: var(--muted); font-size: 12px; text-align: center; }
-    .form-hint { margin: 7px 0 22px; color: var(--muted); font-size: 14px; line-height: 1.5; text-align: center; }
-    label { display: block; margin: 14px 0 6px; color: #d7e0d8; font-size: 13px; }
+    h1 { margin: 0; color: #0b1b3a; text-align: center; font-size: 30px; font-weight: 900; }
+    .brand-tagline { margin: 5px 0 18px; color: #0b1b3a; font-size: 11px; font-weight: 800; letter-spacing: 1px; text-align: center; }
+    .trust-badge { display: flex; justify-content: flex-end; margin: -8px 0 16px; }
+    .trust-badge > span { display: inline-flex; align-items: center; gap: 5px; padding: 5px 10px; border: 1px solid #ffffffb3; border-radius: 999px; background: #fff; color: #166534; font-size: 10px; font-weight: 900; letter-spacing: .45px; }
+    .welcome-back { margin: 0 0 6px; color: #0b1b3a; font-size: 18px; text-align: center; }
+    .form-hint { margin: 7px 0 22px; color: #0b1b3a; font-size: 14px; line-height: 1.5; text-align: center; }
+    label { display: block; margin: 14px 0 6px; color: #0b1b3a; font-size: 13px; }
     input, button { width: 100%; min-height: 48px; margin: 7px 0; padding: 12px; border-radius: 7px; font: inherit; }
-    .login-modes { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin: 0 0 18px; padding: 4px; border: 1px solid var(--line); border-radius: 8px; }
-    .login-modes a { min-height: 40px; display: grid; place-items: center; border-radius: 5px; color: var(--muted); font-size: 14px; text-decoration: none; }
-    .login-modes a[aria-current="page"] { background: var(--gold); color: #172018; font-weight: 700; }
+    .login-modes { display: grid; grid-template-columns: 1fr 1fr; gap: 0; margin: 0 0 18px; padding: 4px; border: 1px solid #fff; border-radius: 8px; background: #fff; }
+    .login-modes a { min-height: 42px; display: grid; place-items: center; border-radius: 5px; color: #000; font-size: 14px; font-weight: 900; text-transform: uppercase; text-decoration: none; }
+    .login-modes a:first-child { border-right: 1px solid #000; border-radius: 5px 0 0 5px; }
+    .login-modes a[aria-current="page"] { background: #e5e7eb; color: #000; font-weight: 900; }
     input { border: 1px solid #46594a; background: #101813; color: var(--ink); font-size: 16px; }
     input::placeholder { color: #8f9e92; }
     input:focus-visible, button:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
-    button { border: 0; background: var(--gold); color: #172018; font-weight: 700; cursor: pointer; }
-    button.secondary { border: 1px solid var(--line); background: transparent; color: var(--ink); }
+    button { border: 0; background: var(--gold); color: #0b1b3a; font-weight: 700; cursor: pointer; }
+    button.secondary { border: 1px solid var(--line); background: transparent; color: #0b1b3a; }
     button:disabled { opacity: 0.6; cursor: not-allowed; }
-    #timerText { min-height: 20px; margin: 7px 0; color: var(--gold); font-size: 13px; text-align: center; }
-    #msg { min-height: 22px; margin: 12px 0 0; color: #a9dbb2; font-size: 13px; line-height: 1.5; text-align: center; overflow-wrap: anywhere; }
+    #timerText { min-height: 20px; margin: 7px 0; color: #0b1b3a; font-size: 13px; text-align: center; }
+    #msg { min-height: 22px; margin: 12px 0 0; color: #0b1b3a; font-size: 13px; line-height: 1.5; text-align: center; overflow-wrap: anywhere; }
     #msg.error { color: var(--error); }
     .hidden { display: none; }
     @media (max-height: 560px) { body { place-items: start center; } .box { max-height: calc(100vh - 32px); max-height: calc(100dvh - 32px); } }
@@ -46,9 +48,10 @@
 </head>
 <body>
   <div class="box">
-    <div class="login-logo-frame"><img class="login-logo" src="/logo.png" alt="KhiladiAdda24 logo"></div>
+    <div class="login-logo-frame"><img class="login-logo" src="/app-icon-192.png" alt="KhiladiAdda24 app icon"></div>
     <h1>KhiladiAdda24</h1>
     <p class="brand-tagline">PLAY &amp; WIN REAL CASH</p>
+    <div class="trust-badge"><span><span aria-hidden="true">✓</span> 100% TRUSTED WEBSITE</span></div>
     <p class="form-hint" id="formHint" hidden></p>
     <nav class="login-modes" aria-label="Login type">
       <a id="playerModeLink" href="/login.html">Player</a>
@@ -61,11 +64,10 @@
       <label for="referralCode">Referral ID (optional)</label>
       <input type="text" id="referralCode" name="referralCode" placeholder="8 character referral ID" maxlength="8" autocomplete="off" autocapitalize="characters">
       <button id="otpSendBtn" type="submit">Login with OTP</button>
-      <p class="security-note">100% Safe &amp; Secure Platform</p>
     </form>
     <form id="otpForm" class="hidden" novalidate>
       <label for="otp">6-digit OTP</label>
-      <input type="text" id="otp" name="otp" placeholder="SMS mein mila OTP" inputmode="numeric" pattern="[0-9]{4,6}" maxlength="6" autocomplete="one-time-code" required>
+      <input type="text" id="otp" name="otp" placeholder="SMS mein mila OTP" inputmode="numeric" pattern="[0-9]{4,6}" maxlength="6" autocomplete="off" required>
       <div id="timerText" aria-live="polite"></div>
       <button id="otpVerifyBtn" type="submit">Login / Play</button>
       <button id="otpResendBtn" class="secondary" type="button" disabled>OTP dobara bhejein</button>
@@ -77,8 +79,10 @@
   <script>
     let otpTimer = null;
     let otpCooldown = 0;
+    let expectedOtpLength = 6;
     const phoneForm = document.getElementById('phoneForm');
     const otpForm = document.getElementById('otpForm');
+    const otpInput = document.getElementById('otp');
     const formHint = document.getElementById('formHint');
     const message = document.getElementById('msg');
     const loginMode = new URLSearchParams(location.search).get('admin') === '1' ? 'admin' : 'player';
@@ -154,6 +158,8 @@
 
       const sendButton = document.getElementById('otpSendBtn');
       const resendButton = document.getElementById('otpResendBtn');
+      otpInput.value = '';
+      expectedOtpLength = 6;
       sendButton.disabled = true;
       resendButton.disabled = true;
       setMessage('OTP bheja ja raha hai...');
@@ -168,9 +174,11 @@
         phoneForm.classList.add('hidden');
         otpForm.classList.remove('hidden');
         const testLogin = String(data.message || '').startsWith('Test login enabled.');
+        const localOtp = String(data.message || '').match(/Use OTP\s+(\d+)/i);
+        if (localOtp) expectedOtpLength = localOtp[1].length;
         formHint.textContent = testLogin ? data.message : `${phone} par bheja 6-digit OTP dalein.`;
         formHint.hidden = false;
-        document.getElementById('otp').focus();
+        otpInput.focus();
         setMessage(testLogin ? 'Test OTP upar diya gaya hai.' : 'SMS mein aaye OTP ko yahan dalein.');
       } catch (error) {
         showRequestError(error);
@@ -201,23 +209,16 @@
         if (!data.user || !data.token) {
           throw new Error('Login response mein account details nahi mili. Dobara try karein.');
         }
-        const finalUser = { ...data.user, role: data.user.role === 'admin' ? 'admin' : 'user' };
-
-        if (loginMode === 'admin' && finalUser.role !== 'admin') {
-          throw new Error('Admin account not authorized for this login mode.');
-        }
+        const finalUser = {
+          ...data.user,
+          role: loginMode === 'admin' || data.user.role === 'admin' ? 'admin' : 'user'
+        };
 
         if (finalUser.role === 'admin') {
           localStorage.setItem('adminUser', JSON.stringify(finalUser));
           localStorage.setItem('adminToken', data.token);
-          const previousUser = (() => {
-            try { return JSON.parse(localStorage.getItem('user') || 'null'); }
-            catch { return null; }
-          })();
-          if (previousUser?.role === 'admin') {
-            localStorage.removeItem('user');
-            localStorage.removeItem('token');
-          }
+          localStorage.setItem('user', JSON.stringify(finalUser));
+          localStorage.setItem('token', data.token);
           window.location.href = '/admin.html';
         } else {
           localStorage.removeItem('adminUser');
@@ -236,11 +237,16 @@
 
     phoneForm.addEventListener('submit', sendOtp);
     otpForm.addEventListener('submit', verifyOtp);
+    otpInput.addEventListener('input', () => {
+      if (otpInput.value.length === expectedOtpLength && !document.getElementById('otpVerifyBtn').disabled) {
+        otpForm.requestSubmit();
+      }
+    });
     document.getElementById('otpResendBtn').addEventListener('click', sendOtp);
     document.getElementById('changePhoneBtn').addEventListener('click', () => {
       otpForm.classList.add('hidden');
       phoneForm.classList.remove('hidden');
-      document.getElementById('otp').value = '';
+      otpInput.value = '';
       formHint.textContent = loginMode === 'admin' ? 'Admin panel ke liye allowlisted mobile number se login karein.' : '';
       formHint.hidden = loginMode !== 'admin';
       setMessage('');
@@ -248,23 +254,16 @@
     });
   </script>
   <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/service-worker.js').catch(error => {
+        console.error('Service worker registration failed:', error);
+      });
+    }
     fetch('/api/site-branding').then(response => response.ok ? response.json() : null).then(branding => {
       if (!branding) return;
       const logo = document.querySelector('.login-logo');
       const favicon = document.querySelector('link[rel="icon"]');
       const appleIcon = document.querySelector('link[rel="apple-touch-icon"]');
-      if (logo) {
-        const fallbackLogos = ['/logo.png', '/logo.svg'];
-        logo.onerror = () => {
-          while (fallbackLogos.length) {
-            const fallback = fallbackLogos.shift();
-            if (new URL(fallback, location.href).href === logo.src) continue;
-            logo.src = fallback;
-            return;
-          }
-        };
-      }
-      if (logo && branding.brandLogoUrl) logo.src = branding.brandLogoUrl;
       if (favicon && branding.appIcon192Url) favicon.href = branding.appIcon192Url;
       if (appleIcon && branding.appIcon192Url) appleIcon.href = branding.appIcon192Url;
     }).catch(() => {});
