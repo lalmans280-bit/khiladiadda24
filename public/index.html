@@ -52,16 +52,16 @@
   <style>
     :root{color-scheme:dark;--ink:#f2f5ef;--muted:#a8b2b0;--panel:#18232b;--line:#33423f;--gold:#f4c84b;--green:#71d6a1;--red:#f07b72}
     *{box-sizing:border-box}body{margin:0;min-height:100vh;color:var(--ink);font:15px/1.5 "Trebuchet MS",Verdana,sans-serif;background:radial-gradient(ellipse at 90% 0,#283f35 0,transparent 38%),linear-gradient(145deg,#101720,#111d25 60%,#182923)}button,input,select{font:inherit}button{cursor:pointer}button:disabled{opacity:.55;cursor:wait}a{color:inherit;text-decoration:none}.shell{max-width:1120px;margin:auto;padding:0 18px 90px}.topbar{position:sticky;top:0;z-index:5;background:#101720ed;border-bottom:1px solid var(--line);backdrop-filter:blur(14px)}.top-inner{max-width:1120px;margin:auto;min-height:68px;padding:10px 18px;display:flex;align-items:center;justify-content:space-between;gap:14px}.brand{font-size:22px;font-weight:900;color:var(--gold);line-height:1}.brand-content{display:flex;flex-direction:column;align-items:flex-start;gap:3px}.brand-name{font-size:22px;line-height:1.05}.brand-main{display:flex;align-items:baseline;gap:6px;flex-wrap:wrap;font-size:9px}.brand-main span{display:inline-block}.brand-win{color:#ffde7a}.brand small{display:block;margin-top:0;color:#b0c6bd;font-size:9px;letter-spacing:2px}.brand .brand-tagline{display:inline-block;margin-top:0;color:#e9f1e8;font-size:9px;letter-spacing:1.2px;font-weight:900;text-transform:uppercase;line-height:1.1}.top-actions{display:flex;align-items:center;gap:10px}.lang-toggle{display:flex;align-items:center;gap:4px;padding:4px;border:1px solid var(--line);border-radius:999px;background:#1b282e}.lang-btn{min-width:36px;padding:6px 8px;border:0;border-radius:999px;background:transparent;color:var(--ink);font-size:11px;font-weight:800;cursor:pointer}.lang-btn.active{background:var(--gold);color:#172018}.balance{padding:8px 13px;border:1px solid #69744c;border-radius:999px;color:#f8dc83;background:#222b27;font-weight:800;white-space:nowrap}.icon{width:42px;height:42px;border:1px solid var(--line);border-radius:10px;color:var(--ink);background:#1b282e;font-size:21px}.menu{display:none;position:absolute;right:18px;top:62px;width:220px;padding:8px;background:#172329;border:1px solid var(--line);border-radius:10px;box-shadow:0 15px 36px #0008}.menu.open{display:grid}.menu button{padding:11px;border:0;border-radius:7px;text-align:left;color:var(--ink);background:transparent}.menu button:hover{background:#273831}.nav{max-width:1120px;margin:auto;padding:0 18px 10px;display:flex;gap:7px;overflow:auto}.nav button{padding:8px 13px;border:1px solid transparent;border-radius:8px;color:#c4cfca;background:transparent;white-space:nowrap}.nav button.active,.nav button:hover{border-color:#69744c;color:var(--gold);background:#222b27}.content{padding-top:20px}.view{display:none}.view.active{display:block}.hero{padding:26px clamp(20px,5vw,46px);border:1px solid #566849;border-radius:14px;background:linear-gradient(115deg,#273b31,#273546 65%,#3b3b28)}.hero h1{max-width:650px;margin:0 0 10px;color:#ffda68;font-size:clamp(27px,5vw,38px);line-height:1.15}.hero p{max-width:650px;margin:0 0 15px;color:#d2ddd5}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin:16px 0}.stat,.panel,.match{min-width:0;border:1px solid var(--line);border-radius:10px;background:#18232b}.stat{padding:16px}.stat small,.muted{color:var(--muted)}.stat strong{display:block;margin-top:5px;color:#f5d46b;font-size:23px;overflow-wrap:anywhere}.panel{padding:18px;margin-top:15px}.panel h2,.panel h3{margin:0 0 10px}.panel p{margin:6px 0}.row{display:flex;align-items:center;gap:9px;flex-wrap:wrap}.btn{min-height:40px;padding:9px 14px;border:1px solid #e3b842;border-radius:8px;background:var(--gold);color:#222718;font-weight:800}.btn.secondary{border-color:#52656a;background:#293842;color:#e9f2ed}.btn.green{border-color:var(--green);background:var(--green);color:#13261b}.btn.danger{border-color:#8b4943;background:#4c2828;color:#ffe0dc}.btn.small{min-height:34px;padding:6px 10px;font-size:13px}.field{margin:11px 0}.field label{display:block;margin-bottom:5px;color:#cad4ce;font-size:13px}.field input,.field select{width:100%;min-height:43px;padding:10px 12px;border:1px solid #40524f;border-radius:8px;outline:0;color:var(--ink);background:#101920}.field input:focus,.field select:focus{border-color:var(--gold)}.field input[type=file]{padding:8px}.two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.match{padding:14px;margin-top:10px}.match-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}.match h3{margin:7px 0 2px}.amount{color:var(--gold);font-size:20px;font-weight:900;white-space:nowrap}.status{display:inline-flex;padding:4px 9px;border-radius:6px;background:#25382f;color:#a9edc5;font-size:12px;font-weight:800}.status.pending{background:#3e3723;color:#ffdb78}.notice{margin:12px 0;padding:11px 13px;border:1px solid #466a5a;border-radius:8px;color:#c6f5d8;background:#1c342d}.notice.error{border-color:#784743;color:#ffd1cc;background:#392625}.notice.warning{border-color:#66572b;color:#f5dfa0;background:#282517}.qr{display:block;width:min(230px,100%);margin:12px 0;padding:9px;border-radius:8px;background:#fff}.person{display:flex;align-items:center;gap:12px;margin:12px 0}.avatar{width:68px;height:68px;border:2px solid #c4aa4c;border-radius:50%;object-fit:cover;background:#273832}.bottom{display:none}[hidden]{display:none!important}
-    @media(max-width:600px){.shell{padding:0 12px 84px}.top-inner{padding:9px 12px}.brand{font-size:19px}.balance{padding:7px 9px;font-size:12px}.nav{display:none}.two{grid-template-columns:1fr}.panel{padding:15px}.match-head{flex-direction:column}.match-head>div:last-child{display:flex;align-items:center;gap:10px}.bottom{position:fixed;z-index:4;right:0;bottom:0;left:0;display:grid;grid-template-columns:repeat(4,1fr);padding-bottom:env(safe-area-inset-bottom);border-top:1px solid var(--line);background:#101720f5}.bottom button{padding:8px 3px 10px;border:0;color:#c0cbc4;background:transparent;font-size:11px}.bottom button span{display:block;color:var(--gold);font-size:18px}}
+    @media(max-width:600px){.shell{padding:0 12px 84px}.top-inner{padding:9px 12px}.brand{font-size:19px}.balance{padding:7px 9px;font-size:12px}.nav{display:none}.two{grid-template-columns:1fr}.panel{padding:15px}.match-head{flex-direction:column}.match-head>div:last-child{display:flex;align-items:center;gap:10px}.bottom{position:fixed;z-index:4;right:0;bottom:0;left:0;display:grid;grid-template-columns:repeat(5,1fr);padding-bottom:env(safe-area-inset-bottom);border-top:1px solid var(--line);background:#101720f5}.bottom button{padding:8px 3px 10px;border:0;color:#c0cbc4;background:transparent;font-size:11px}.bottom button span{display:block;color:var(--gold);font-size:18px}}
   .match-head.home-open-header{display:grid;grid-template-columns:minmax(0,1fr) 68px 68px;align-items:center;gap:8px;margin-bottom:8px}.match-head.home-open-header>h2{display:inline-flex;align-items:center;justify-content:flex-start;min-height:32px;margin:0;padding:0;border:0;border-radius:0;background:transparent;color:var(--gold);font-size:12px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;line-height:1.2;white-space:nowrap;justify-self:start}.home-open-header .lang-toggle{display:flex;align-items:center;justify-self:center;width:68px;height:32px;gap:0;padding:2px;border-radius:7px}.home-open-header .lang-btn{flex:1;min-width:0;height:26px;padding:3px 2px;border-radius:5px;font-size:10px}.match-head.home-open-header>.btn.secondary.small{width:68px;min-height:32px;padding:6px 4px;font-size:11px;font-weight:800;justify-self:end}
-    .brand{display:flex;align-items:center;gap:9px}.brand-logo{display:block;width:min(190px,42vw);height:48px;object-fit:contain;object-position:left center}.top-inner>#menuToggle{flex:none}
+    .brand{display:flex;align-items:center;gap:9px}.top-inner>#menuToggle{flex:none}
     .menu{width:250px;max-height:calc(100vh - 82px);overflow:auto}.menu button,.menu a{display:block;padding:11px;border:0;border-radius:7px;text-align:left;color:var(--ink);background:transparent}.menu a:hover,.menu button:hover{background:#273831}.menu a[hidden]{display:none}.menu .menu-logout{margin-top:5px;border-top:1px solid var(--line);border-radius:0 0 7px 7px;color:var(--red)}
     .battle-card-game-tag{display:inline-flex;align-items:center;justify-content:center;gap:5px;padding:0;margin:0;color:var(--gold);font-size:8px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap}
     .battle-player .battle-player-info{display:flex;align-items:center;gap:6px;flex-wrap:wrap}.battle-player-game-tag{display:inline-flex;align-items:center;justify-content:center;margin-left:6px;padding:2px 5px;border-radius:999px;background:rgba(255,189,89,.12);border:1px solid rgba(255,189,89,.25);color:var(--gold);font-size:7px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap}
     .open-battle-group{display:grid;gap:8px;margin:8px 0 12px}.open-battle-group-label{display:flex;align-items:center;justify-content:center;padding:2px 0 4px;color:var(--gold);font-size:11px;font-weight:900;letter-spacing:.12em;text-transform:uppercase} 
       .cash-banner{display:flex;align-items:center;gap:10px;margin-bottom:14px;padding:12px 15px;border:1px solid #69744c;border-radius:10px;background:#222b27;color:#f8dc83;font-weight:800}.game-launch{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-bottom:18px}.game-tile{display:flex;align-items:center;gap:13px;min-height:88px;padding:15px;border:1px solid var(--line);border-radius:12px;text-align:left;color:var(--ink);background:#18232b}.game-tile:hover{border-color:var(--gold);background:#222b27}.game-mark{display:grid;place-items:center;width:52px;height:52px;flex:none;border-radius:10px;background:#304336;font-size:30px}.game-tile strong{display:block;color:var(--gold);font-size:17px}.game-tile small{display:block;color:var(--muted)}.timer{font-size:24px;font-weight:900;color:var(--gold)}.confirm-state{display:flex;flex-wrap:wrap;gap:8px}.confirm-state span{padding:6px 10px;border:1px solid var(--line);border-radius:8px}.confirm-state .ready{border-color:var(--green);color:var(--green)}
       @media(max-width:600px){.game-launch{grid-template-columns:1fr}.game-tile{min-height:76px}}
-    .nav{display:none!important}.bottom{position:fixed;z-index:6;right:auto;bottom:0;left:50%;display:grid;width:min(100%,520px);grid-template-columns:repeat(4,minmax(0,1fr));margin:0;padding:8px 10px max(8px,env(safe-area-inset-bottom));transform:translateX(-50%);border:1px solid var(--line);border-bottom:0;border-radius:12px 12px 0 0;background:#101720f5;backdrop-filter:blur(14px)}.bottom button{display:grid;place-items:center;gap:2px;min-height:54px;padding:5px;border:0;color:#c0cbc4;background:transparent;font-size:12px}.bottom button span{display:block;color:var(--gold);font-size:18px}.bottom button.active{color:var(--gold)}
+    .nav{display:none!important}.bottom{position:fixed;z-index:6;right:auto;bottom:0;left:50%;display:grid;width:min(100%,520px);grid-template-columns:repeat(5,minmax(0,1fr));margin:0;padding:8px 10px max(8px,env(safe-area-inset-bottom));transform:translateX(-50%);border:1px solid var(--line);border-bottom:0;border-radius:12px 12px 0 0;background:#101720f5;backdrop-filter:blur(14px)}.bottom button{display:grid;place-items:center;gap:2px;min-height:54px;padding:5px;border:0;color:#c0cbc4;background:transparent;font-size:12px}.bottom button span{display:block;color:var(--gold);font-size:18px}.bottom button.active{color:var(--gold)}
     .trust-ticker{overflow:hidden;margin:0 0 14px;padding:9px 0;border:1px solid var(--line);border-radius:8px;color:#d9e6dd;background:#18232b}.trust-ticker-track{display:flex;width:max-content;animation:trust-ticker 32s linear infinite}.trust-ticker span{padding-right:48px;white-space:nowrap}.trust-ticker:hover .trust-ticker-track{animation-play-state:paused}@keyframes trust-ticker{to{transform:translateX(-50%)}}@media(prefers-reduced-motion:reduce){.trust-ticker-track{width:auto;animation:none}.trust-ticker span[aria-hidden="true"]{display:none}}
     .app-promo{display:flex;align-items:center;justify-content:center;gap:9px;padding:10px 12px;background:#132d20;color:#f2f5ef;border-bottom:1px solid #355b3e}.app-promo[hidden]{display:none}.app-promo-copy{font-size:13px;font-weight:700}.app-promo button{min-height:36px;padding:7px 12px;border:1px solid #6eaf79;border-radius:7px;color:#fff;background:#287442;font-weight:800}.app-promo .app-promo-share{border-color:#64776a;background:#24332a}.app-promo-close{width:34px;padding:4px!important;font-size:20px;line-height:1}.app-promo button:focus-visible{outline:2px solid #f7d978;outline-offset:2px}@media(max-width:600px){.app-promo{gap:7px;padding:9px 8px}.app-promo-copy{font-size:12px}.app-promo button{padding:7px 9px;font-size:12px}}@media(prefers-reduced-motion:reduce){.app-promo{scroll-behavior:auto}}
   </style>
@@ -401,7 +401,7 @@
   </script>
 </head>
 <body>
-  <header class="topbar"><div class="top-inner"><button class="icon" id="menuToggle" aria-label="Menu" aria-expanded="false">☰</button><a class="brand" href="#home" aria-label="KhiladiAdda24 home"><img class="brand-logo" src="/app-logo.png" alt="KhiladiAdda24"></a><div class="top-actions"><div class="lang-toggle" aria-label="Language selector"><button class="lang-btn active" type="button" data-lang-toggle="hi">HI</button><button class="lang-btn" type="button" data-lang-toggle="en">EN</button></div><span class="balance" id="headerBalance">₹ --</span></div></div><div class="menu" id="menu"><button data-view="profile" data-i18n-key="menuProfile">👤 My profile</button><button data-view="home" data-i18n-key="menuHome">🏆 Win cash</button><button data-view="wallet" data-i18n-key="menuWallet">👛 My wallet</button><button data-view="history" data-i18n-key="menuHistory">📜 History</button><button data-menu-action="referral" data-i18n-key="menuReferral">🎁 Refer and earn</button><button data-menu-action="notifications" data-i18n-key="menuNotifications">🔔 Notification</button><a href="/support.html" data-i18n-key="supportLink">🛟 Support</a><a href="/policy.html" data-i18n-key="policyLink">📄 All policies</a><button class="menu-logout" id="logout" data-i18n-key="logout">🚪 Logout</button></div><nav class="nav"><button class="active" data-view="home" data-i18n-key="navHome">Home</button><button data-view="games" data-i18n-key="navGames">Games</button><button data-view="wallet" data-i18n-key="navWallet">Wallet</button><button data-view="profile" data-i18n-key="navProfile">Profile</button></nav></header>
+  <header class="topbar"><div class="top-inner"><button class="icon" id="menuToggle" aria-label="Menu" aria-expanded="false">☰</button><a class="brand" href="#home" aria-label="KhiladiAdda24 home"><span class="brand-content"><strong class="brand-name">KhiladiAdda24</strong><span class="brand-main"><span>PLAY</span><span>•</span><span>BATTLE</span><span class="brand-win">WIN</span></span><small class="brand-tagline">OPEN 24/7 WITHDRAW</small></span></a><div class="top-actions"><div class="lang-toggle" aria-label="Language selector"><button class="lang-btn active" type="button" data-lang-toggle="hi">HI</button><button class="lang-btn" type="button" data-lang-toggle="en">EN</button></div><span class="balance" id="headerBalance">₹ --</span></div></div><div class="menu" id="menu"><button data-view="profile" data-i18n-key="menuProfile">👤 My profile</button><button data-view="home" data-i18n-key="menuHome">🏆 Win cash</button><button data-view="wallet" data-i18n-key="menuWallet">👛 My wallet</button><button data-view="history" data-i18n-key="menuHistory">📜 History</button><button data-menu-action="referral" data-i18n-key="menuReferral">🎁 Refer and earn</button><button data-menu-action="notifications" data-i18n-key="menuNotifications">🔔 Notification</button><a href="/support.html" data-i18n-key="supportLink">🛟 Support</a><a href="/policy.html" data-i18n-key="policyLink">📄 All policies</a><button class="menu-logout" id="logout" data-i18n-key="logout">🚪 Logout</button></div><nav class="nav"><button class="active" data-view="home" data-i18n-key="navHome">Home</button><button data-view="games" data-i18n-key="navGames">Games</button><button data-view="wallet" data-i18n-key="navWallet">Wallet</button><button data-view="profile" data-i18n-key="navProfile">Profile</button><button data-view="rank" aria-label="Rank and prize pool">🏆 Rank &amp; Prize Pool</button></nav></header>
   <div class="app-promo" id="appPromo" hidden role="region" aria-label="Mobile app options">
     <span class="app-promo-copy">KhiladiAdda24 mobile app</span>
     <button type="button" id="installAppButton">Install App</button>
@@ -416,7 +416,7 @@
     <section class="view" id="view-history"><div class="panel"><div class="match-head"><div><h2>Account history</h2><p class="muted">Game, deposit aur withdrawal ki latest activity.</p></div><button class="btn secondary small" id="refreshHistory">Refresh</button></div><div id="matchHistory" class="history-list" aria-live="polite"></div></div></section>
     <section class="view" id="view-match"><div class="panel"><button class="btn secondary small" data-view="battles">← Battles par wapas</button><div id="matchDetails"></div></div></section>
   </main>
-  <nav class="bottom"><button class="active" data-view="home"><span>⌂</span><span class="nav-label" data-i18n-key="bottomHome">Home</span></button><button data-view="games"><span>⚔</span><span class="nav-label" data-i18n-key="bottomGames">Games <small class="nav-live" aria-label="Live"><i class="nav-live-dot" aria-hidden="true"></i><span class="nav-live-text">LIVE</span></small></span></button><button data-view="wallet"><span>₹</span><span class="nav-label" data-i18n-key="bottomWallet">Wallet</span></button><button data-view="profile"><span>●</span><span class="nav-label" data-i18n-key="bottomProfile">Profile</span></button></nav>
+  <nav class="bottom"><button class="active" data-view="home"><span>⌂</span><span class="nav-label" data-i18n-key="bottomHome">Home</span></button><button data-view="games"><span>⚔</span><span class="nav-label" data-i18n-key="bottomGames">Games <small class="nav-live" aria-label="Live"><i class="nav-live-dot" aria-hidden="true"></i><span class="nav-live-text">LIVE</span></small></span></button><button data-view="wallet"><span>₹</span><span class="nav-label" data-i18n-key="bottomWallet">Wallet</span></button><button data-view="profile"><span>●</span><span class="nav-label" data-i18n-key="bottomProfile">Profile</span></button><button data-view="rank"><span>🏆</span><span class="nav-label">Rank</span></button></nav>
   <script src="/i18n.js"></script>
   <script>
     fetch('/api/site-branding', { cache: 'no-store' })
@@ -735,7 +735,7 @@
     async function api(url,options={}){const headers=new Headers(options.headers||{});headers.set('Authorization',`Bearer ${token}`);if(options.body&&!(options.body instanceof FormData))headers.set('Content-Type','application/json');const response=await fetch(url,{...options,headers});const data=await response.json().catch(()=>({}));if(response.status===401){localStorage.removeItem('token');localStorage.removeItem('user');location.replace(loginUrl());throw new Error('Session expire hua. Dobara login karein.')}if(!response.ok)throw new Error(data.error||'Request complete nahi hui.');return data}
     window.pendingEntryAmount=100;
     const showError=error=>{const message=error.message||'Kuch problem hui.';if(/balance|insufficient|recharge/i.test(message)){const required=Number(window.pendingEntryAmount)||100,balance=Number(player?.walletBalance??storedUser?.walletBalance??0),depositAmount=Math.max(100,required-balance);el('depositAmount').value=String(depositAmount);notify(`₹${required} entry ke liye balance kam hai. ₹${depositAmount} deposit karein.`,true);document.querySelector('.bottom [data-view="wallet"]')?.click();return}notify(message,true)};
-    function setView(name){const viewName=name==='battles'||name==='games'?'home':name;document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===`view-${viewName}`||(viewName==='match'&&v.id==='view-home')));document.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===(viewName==='match'?'home':viewName)));el('menu').classList.remove('open');el('menuToggle').setAttribute('aria-expanded','false');clearInterval(battlesPollTimer);if(viewName==='wallet'||viewName==='profile')loadKyc().catch(showError);if(viewName==='home')loadMine().catch(showError);if(viewName==='history')loadHistory().catch(showError);loadOpen().catch(showError);battlesPollTimer=setInterval(()=>loadOpen().catch(showError),30000)}
+    function setView(name){if(name==='rank'){document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id==='view-home'));document.querySelectorAll('[data-view]').forEach(button=>button.classList.toggle('active',button.dataset.view==='rank'));el('menu').classList.remove('open');el('menuToggle').setAttribute('aria-expanded','false');if(!el('rankSection'))return notify('Rank section abhi load ho raha hai. Dobara try karein.',true);el('rankSection').scrollIntoView({behavior:'smooth',block:'start'});loadMine().catch(showError);loadOpen().catch(showError);return}const viewName=name==='battles'||name==='games'?'home':name;document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===`view-${viewName}`||(viewName==='match'&&v.id==='view-home')));document.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===(viewName==='match'?'home':viewName)));el('menu').classList.remove('open');el('menuToggle').setAttribute('aria-expanded','false');clearInterval(battlesPollTimer);if(viewName==='wallet'||viewName==='profile')loadKyc().catch(showError);if(viewName==='home')loadMine().catch(showError);if(viewName==='history')loadHistory().catch(showError);loadOpen().catch(showError);battlesPollTimer=setInterval(()=>loadOpen().catch(showError),30000)}
     function renderPlayer(){const name=player?.username||storedUser?.username||'Player',phone=player?.phone||storedUser?.phone||'',balance=Number(player?.walletBalance||0),formatted=`₹ ${balance.toLocaleString('en-IN')}`;['headerBalance','walletBalance','profileBalance'].forEach(id=>el(id).textContent=formatted);el('profileName').textContent=name;el('profilePhone').textContent=phone;el('accountPhone').textContent=phone;el('profileReferralCode').textContent=player?.referralCode||'--';el('username').value=name;const image=player?.profileImage;el('avatar').src=image?(image.startsWith('uploads/')?`/api/profile/image/${encodeURIComponent(image.split('/').pop())}`:`/${image.split('/').map(encodeURIComponent).join('/')}`):'';el('avatar').onerror=()=>el('avatar').removeAttribute('src')}
     async function loadProfile(){const data=await api('/api/profile/me');player=data.user;renderPlayer()}
     async function loadWalletSummary(){const data=await api('/api/wallet/summary'),format=value=>`₹ ${Number(value||0).toLocaleString('en-IN')}`;el('profileTotalDeposits').textContent=format(data.totalDeposits);el('profilePaidWithdrawals').textContent=format(data.paidWithdrawals);el('profilePendingWithdrawals').textContent=format(data.pendingWithdrawals);el('profileTotalWinnings').textContent=format(data.totalWinnings);const withdrawableWinnings=el('withdrawableWinnings');if(withdrawableWinnings)withdrawableWinnings.textContent=`Withdrawable game winnings: ${format(data.availableWinnings)}. Deposits and bonuses cannot be withdrawn.`;el('profileMoneyUpdated').textContent=`Updated ${new Date().toLocaleTimeString('en-IN')}`}
@@ -972,162 +972,7 @@
     setWinLabels();
     new MutationObserver(setWinLabels).observe(document.body, { childList: true, subtree: true });
   </script>
-  <div id="supportChatWidget" class="support-chat-widget" aria-live="polite">
-    <button id="supportChatToggle" class="support-chat-toggle" type="button" aria-label="Support chat open">
-      <span class="support-chat-icon">💬</span>
-      <span class="support-chat-text">Need Help?</span>
-    </button>
-    <div id="supportChatPanel" class="support-chat-panel" hidden>
-      <div class="support-chat-header">
-        <div>
-          <strong>Player Support</strong>
-          <small>Chat with team</small>
-        </div>
-        <button id="supportChatClose" type="button" aria-label="Close support chat">×</button>
-      </div>
-      <div id="supportChatMessages" class="support-chat-messages"></div>
-      <div class="support-chat-quick-actions">
-        <button type="button" data-problem="wallet">Wallet</button>
-        <button type="button" data-problem="rank">Rank</button>
-        <button type="button" data-problem="game">Game issue</button>
-        <button type="button" data-problem="withdrawal">Withdrawal</button>
-      </div>
-      <form id="supportChatForm" class="support-chat-form">
-        <textarea id="supportChatInput" rows="2" placeholder="Apna problem likhein..." maxlength="300"></textarea>
-        <button type="submit">Send</button>
-      </form>
-    </div>
-  </div>
   <style>
-    .support-chat-widget {
-      position: fixed;
-      right: 16px;
-      bottom: 78px;
-      z-index: 50;
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: 10px;
-      font-family: "Trebuchet MS", Verdana, sans-serif;
-    }
-    .support-chat-toggle {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      min-height: 48px;
-      padding: 0 16px;
-      border: 1px solid #f4c84b;
-      border-radius: 999px;
-      background: linear-gradient(135deg, #f4c84b, #d9a849);
-      color: #1b1e17;
-      font-weight: 900;
-      box-shadow: 0 12px 28px rgba(0,0,0,0.28);
-      cursor: pointer;
-    }
-    .support-chat-icon { font-size: 20px; }
-    .support-chat-panel {
-      width: min(360px, calc(100vw - 24px));
-      padding: 12px;
-      border: 1px solid #3d5c4d;
-      border-radius: 16px;
-      background: rgba(17, 24, 19, 0.96);
-      box-shadow: 0 20px 40px rgba(0,0,0,0.32);
-      backdrop-filter: blur(12px);
-    }
-    .support-chat-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      padding-bottom: 10px;
-      border-bottom: 1px solid rgba(255,255,255,0.08);
-    }
-    .support-chat-header strong {
-      display: block;
-      color: #f4c84b;
-      font-size: 15px;
-    }
-    .support-chat-header small {
-      color: #b8c2ba;
-      font-size: 11px;
-    }
-    .support-chat-header button {
-      border: 0;
-      background: transparent;
-      color: #edf7f0;
-      font-size: 26px;
-      line-height: 1;
-      cursor: pointer;
-    }
-    .support-chat-messages {
-      display: grid;
-      gap: 8px;
-      margin: 12px 0;
-      max-height: 220px;
-      overflow: auto;
-      padding-right: 4px;
-    }
-    .chat-bubble {
-      max-width: 80%;
-      padding: 9px 11px;
-      border-radius: 12px;
-      font-size: 13px;
-      line-height: 1.45;
-      word-break: break-word;
-    }
-    .chat-bubble.user {
-      justify-self: end;
-      color: #101713;
-      background: #f4c84b;
-      border-bottom-right-radius: 4px;
-    }
-    .chat-bubble.bot {
-      justify-self: start;
-      color: #eaf6ec;
-      background: #20322c;
-      border: 1px solid rgba(255,255,255,0.05);
-      border-bottom-left-radius: 4px;
-    }
-    .support-chat-quick-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin-bottom: 10px;
-    }
-    .support-chat-quick-actions button {
-      min-height: 30px;
-      padding: 5px 10px;
-      border: 1px solid rgba(244,200,75,0.35);
-      border-radius: 999px;
-      background: rgba(244,200,75,0.08);
-      color: #f9e6a9;
-      font-size: 11px;
-      font-weight: 800;
-      cursor: pointer;
-    }
-    .support-chat-form {
-      display: grid;
-      gap: 8px;
-    }
-    .support-chat-form textarea {
-      width: 100%;
-      min-height: 72px;
-      padding: 10px 12px;
-      border: 1px solid #3f554b;
-      border-radius: 10px;
-      background: #0f1715;
-      color: #edf5ef;
-      resize: vertical;
-    }
-    .support-chat-form button {
-      min-height: 40px;
-      border: 1px solid #37a167;
-      border-radius: 10px;
-      background: linear-gradient(135deg, #2b8b57, #37a167);
-      color: #f3fff7;
-      font-weight: 800;
-      cursor: pointer;
-    }
     .rank-panel {
       margin-top: 18px;
       padding: 18px;
@@ -1267,10 +1112,6 @@
       letter-spacing: 0.08em;
     }
     @media (max-width: 640px) {
-      .support-chat-widget {
-        right: 12px;
-        bottom: 72px;
-      }
       .rank-summary {
         grid-template-columns: 1fr;
       }
@@ -1332,20 +1173,6 @@
           homepage.insertBefore(section, homepage.firstChild);
         }
 
-        const cta = document.createElement('button');
-        cta.type = 'button';
-        cta.className = 'btn secondary';
-        cta.style.marginTop = '12px';
-        cta.textContent = 'Check Rank & Rewards';
-        cta.addEventListener('click', function () {
-          section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        });
-        if (hero) {
-          const heroActions = hero.querySelector('.row');
-          if (heroActions) heroActions.appendChild(cta);
-          else hero.appendChild(cta);
-        }
-
         fetch('/api/leaderboard/monthly', { cache: 'no-store' })
           .then(async response => {
             const data = await response.json();
@@ -1377,114 +1204,6 @@
           });
       }
 
-      const supportWidget = document.getElementById('supportChatWidget');
-      if (supportWidget && !supportWidget.dataset.ready) {
-        supportWidget.dataset.ready = 'true';
-        const toggle = document.getElementById('supportChatToggle');
-        const panel = document.getElementById('supportChatPanel');
-        const close = document.getElementById('supportChatClose');
-        const form = document.getElementById('supportChatForm');
-        const input = document.getElementById('supportChatInput');
-        const messages = document.getElementById('supportChatMessages');
-        let supportMessages = [];
-        let supportRequestInFlight = false;
-
-        function renderMessages() {
-          messages.replaceChildren();
-          supportMessages.forEach(item => {
-            const bubble = document.createElement('div');
-            bubble.className = `chat-bubble ${item.senderRole === 'player' ? 'user' : 'bot'}`;
-            bubble.textContent = item.text;
-            messages.appendChild(bubble);
-          });
-          if (!supportMessages.length) {
-            const welcome = document.createElement('div');
-            welcome.className = 'chat-bubble bot';
-            welcome.textContent = 'Namaste! Apna problem yahan likhein. Aapka message admin support team ko directly milega.';
-            messages.appendChild(welcome);
-          }
-          messages.scrollTop = messages.scrollHeight;
-        }
-
-        async function loadSupportMessages() {
-          if (supportRequestInFlight) return;
-          supportRequestInFlight = true;
-          try {
-            const token = localStorage.getItem('token') || '';
-            const response = await fetch('/api/support/messages', {
-              cache: 'no-store',
-              headers: { Authorization: `Bearer ${token}` }
-            });
-            const data = await response.json();
-            if (!response.ok) throw new Error(data.error || 'Support chat load nahi ho saka.');
-            supportMessages = data.messages || [];
-            renderMessages();
-          } catch (error) {
-            messages.replaceChildren();
-            const notice = document.createElement('div');
-            notice.className = 'chat-bubble bot';
-            notice.textContent = error.message || 'Support chat abhi available nahi hai.';
-            messages.appendChild(notice);
-          } finally {
-            supportRequestInFlight = false;
-          }
-        }
-
-        toggle.addEventListener('click', function () {
-          panel.hidden = !panel.hidden;
-          if (!panel.hidden) {
-            loadSupportMessages();
-            input.focus();
-          }
-        });
-
-        close.addEventListener('click', function () {
-          panel.hidden = true;
-        });
-
-        document.querySelectorAll('[data-problem]').forEach(button => {
-          button.addEventListener('click', function () {
-            const value = this.getAttribute('data-problem');
-            input.value = value === 'wallet' ? 'Wallet balance issue' :
-                value === 'rank' ? 'Mera rank aur prize amount check karna hai' :
-              value === 'game' ? 'Game issue / match problem' :
-              value === 'withdrawal' ? 'Withdrawal request issue' : 'Player issue';
-            input.focus();
-          });
-        });
-
-        form.addEventListener('submit', async function (event) {
-          event.preventDefault();
-          const message = input.value.trim();
-          if (!message) return;
-          const submitButton = form.querySelector('button[type="submit"]');
-          submitButton.disabled = true;
-          try {
-            const token = localStorage.getItem('token') || '';
-            const response = await fetch('/api/support/messages', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-              body: JSON.stringify({ text: message })
-            });
-            const data = await response.json();
-            if (!response.ok) throw new Error(data.error || 'Message send nahi hua.');
-            input.value = '';
-            await loadSupportMessages();
-          } catch (error) {
-            const notice = document.createElement('div');
-            notice.className = 'chat-bubble bot';
-            notice.textContent = error.message || 'Message send nahi hua. Dobara try karein.';
-            messages.appendChild(notice);
-          } finally {
-            submitButton.disabled = false;
-          }
-        });
-
-        renderMessages();
-        window.setInterval(() => {
-          if (!panel.hidden) loadSupportMessages();
-        }, 4000);
-      }
     })();
   </script>
 </body>
