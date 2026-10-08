@@ -380,6 +380,10 @@
       return String(value ?? '').replace(/[&<>"']/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[character]));
     }
 
+    function adminGameTypeLabel(gameType) {
+      return gameType === 'POPULAR_LUDO' ? 'Popular Ludo' : gameType === 'SNAKE' ? 'Snake' : 'Ludo Classic';
+    }
+
     function playerWhatsAppLink(phone) {
       let digits = String(phone || '').replace(/\D/g, '');
       if (digits.length === 12 && digits.startsWith('91')) digits = digits.slice(2);
@@ -489,7 +493,7 @@
           const resultReports = `Reports: ${escapeHtml(match.creator?.username || 'Creator')} ${escapeHtml(match.creatorResult || 'Pending')} / ${escapeHtml(match.joiner?.username || 'Joiner')} ${escapeHtml(match.joinerResult || 'Pending')}`;
           return `
           <div class="finance-stat">
-            <small>${escapeHtml(match.gameType)} · ${escapeHtml(match.status)} · Entry ₹${Number(match.amount).toLocaleString('en-IN')} each</small>
+            <small>${adminGameTypeLabel(match.gameType)} · ${escapeHtml(match.status)} · Entry ₹${Number(match.amount).toLocaleString('en-IN')} each</small>
             <strong>${escapeHtml(match.creator?.username || 'Creator')} vs ${escapeHtml(match.joiner?.username || 'Joiner')}</strong>
             <small>${match.roomCode ? `Room: ${escapeHtml(match.roomCode)}` : 'Room code not shared'} · ${match.gameStartedAt ? 'Game started' : 'Waiting to start'}</small>
             <small>${resultReports}</small>
@@ -530,7 +534,7 @@
           const joinerProof = matchProofPreview(m.joinerProofScreenshot);
           mTable.innerHTML += `
             <tr>
-              <td>${m.gameType} · ₹${m.amount}</td>
+              <td>${adminGameTypeLabel(m.gameType)} · ₹${m.amount}</td>
               <td>${m.creator?.username || 'N/A'} (${m.creator?.phone || '-'}) vs ${m.joiner?.username || 'N/A'} (${m.joiner?.phone || '-'})</td>
               <td>${m.creator?.username || 'Creator'}: ${m.creatorResult || 'Not submitted'}${m.creatorResultReason ? ` · Reason: ${m.creatorResultReason}` : ''} · ${creatorProof}<br>${m.joiner?.username || 'Joiner'}: ${m.joinerResult || 'Not submitted'}${m.joinerResultReason ? ` · Reason: ${m.joinerResultReason}` : ''} · ${joinerProof}</td>
               <td>${reportsConflict ? `Reports differ.<br>Manual admin decision required.` : m.winner ? `${m.winner.username} (${m.winner.phone || '-'})` : 'N/A'}</td>
@@ -585,7 +589,7 @@
           const runningDecision = m.status === 'OPEN'
             ? `<button class="danger" onclick="cancelAdminMatch('${escapeHtml(m._id)}')">Cancel &amp; refund</button>`
             : '<a href="#runningGamesOverview">Decision in Running Games above</a>';
-          rTable.innerHTML += `<tr><td>${m.gameType} (${m.status})</td><td>${players}<br>${playerContacts}</td><td>₹${m.amount} each</td><td>${m.roomCode || 'Not shared'}<br>Due: ${deadline}</td><td>${confirmations}<br>${m.gameStartedAt ? `Started: ${new Date(m.gameStartedAt).toLocaleString()}` : 'Not started'}</td><td>${resultProofs}</td><td>${m.cancelReason || '-'}</td><td>${runningDecision}</td></tr>`;
+          rTable.innerHTML += `<tr><td>${adminGameTypeLabel(m.gameType)} (${m.status})</td><td>${players}<br>${playerContacts}</td><td>₹${m.amount} each</td><td>${m.roomCode || 'Not shared'}<br>Due: ${deadline}</td><td>${confirmations}<br>${m.gameStartedAt ? `Started: ${new Date(m.gameStartedAt).toLocaleString()}` : 'Not started'}</td><td>${resultProofs}</td><td>${m.cancelReason || '-'}</td><td>${runningDecision}</td></tr>`;
         });
       }
 
@@ -597,7 +601,7 @@
         data.cancellationRequests.forEach(match => {
           const players = `${match.creator?.username || 'N/A'} vs ${match.joiner?.username || 'Waiting'}`;
           const playerContacts = `${match.creator?.phone || '-'} vs ${match.joiner?.phone || 'Waiting'}`;
-          cTable.innerHTML += `<tr><td>${match.gameType} (${match.cancelRequestedFromStatus})</td><td>${players}<br>${playerContacts}</td><td>${match.cancelRequestedBy?.username || 'Player'} (${match.cancelRequestedBy?.phone || '-'})<br>${match.cancelRequestedAt ? new Date(match.cancelRequestedAt).toLocaleString() : ''}</td><td>${match.cancelRequestReason || '-'}</td><td>₹${Number(match.amount) * (match.joiner ? 2 : 1)}</td><td><button onclick="reviewCancelRequest('${match._id}', 'APPROVE')">Approve & Refund</button> <button class="danger" onclick="reviewCancelRequest('${match._id}', 'REJECT')">Reject</button></td></tr>`;
+          cTable.innerHTML += `<tr><td>${adminGameTypeLabel(match.gameType)} (${match.cancelRequestedFromStatus})</td><td>${players}<br>${playerContacts}</td><td>${match.cancelRequestedBy?.username || 'Player'} (${match.cancelRequestedBy?.phone || '-'})<br>${match.cancelRequestedAt ? new Date(match.cancelRequestedAt).toLocaleString() : ''}</td><td>${match.cancelRequestReason || '-'}</td><td>₹${Number(match.amount) * (match.joiner ? 2 : 1)}</td><td><button onclick="reviewCancelRequest('${match._id}', 'APPROVE')">Approve & Refund</button> <button class="danger" onclick="reviewCancelRequest('${match._id}', 'REJECT')">Reject</button></td></tr>`;
         });
       }
       await loadAdminImagePreviews();
@@ -1020,7 +1024,7 @@
           const ownReport = isCreator ? match.creatorResult : match.joinerResult;
           const winnerId = String(match.winner?._id || match.winner || '');
           const outcome = winnerId ? (winnerId === String(user._id) ? 'WIN' : 'LOSS') : (ownReport || '-');
-          return `<tr><td>${formatHistoryDate(match.gameStartedAt || match.createdAt)}</td><td>${escapeHtml(match.gameType)}</td><td>${escapeHtml(opponent || 'Waiting for player')}</td><td>₹${Number(match.amount).toLocaleString('en-IN')}</td><td>${escapeHtml(match.status)}</td><td>${escapeHtml(outcome)}</td></tr>`;
+          return `<tr><td>${formatHistoryDate(match.gameStartedAt || match.createdAt)}</td><td>${adminGameTypeLabel(match.gameType)}</td><td>${escapeHtml(opponent || 'Waiting for player')}</td><td>₹${Number(match.amount).toLocaleString('en-IN')}</td><td>${escapeHtml(match.status)}</td><td>${escapeHtml(outcome)}</td></tr>`;
         }).join('') || '<tr><td colspan="6">No game history</td></tr>';
         content.innerHTML = `
           <div class="history-summary">
@@ -1090,7 +1094,7 @@
       data.matches.forEach(m => {
         const players = `${m.creator?.username || 'N/A'} vs ${m.joiner?.username || 'Waiting'}`;
         const proof = m.proofScreenshot ? `<a href="/api/admin/uploads/${encodeURIComponent(m.proofScreenshot.split('/').pop())}" target="_blank">View screenshot</a>` : '-';
-        table.innerHTML += `<tr><td>${m.gameType}</td><td>${players}<br>${m.creator?.phone || '-'} vs ${m.joiner?.phone || '-'}</td><td>₹${m.amount} each</td><td>${m.status}</td><td>${m.winner?.username || '-'}<br>${m.cancelReason || '-'}${m.cancelledBy?.username ? `<br>By ${m.cancelledBy.username}` : ''}${m.cancelledAt ? `<br>${new Date(m.cancelledAt).toLocaleString()}` : ''}</td><td>${m.roomCode || '-'}<br>By: ${m.roomCodeSharedBy?.username || '-'}</td><td>${proof}</td><td>Joined: ${m.joinedAt ? new Date(m.joinedAt).toLocaleString() : '-'}<br>Started: ${m.gameStartedAt ? new Date(m.gameStartedAt).toLocaleString() : '-'}</td></tr>`;
+        table.innerHTML += `<tr><td>${adminGameTypeLabel(m.gameType)}</td><td>${players}<br>${m.creator?.phone || '-'} vs ${m.joiner?.phone || '-'}</td><td>₹${m.amount} each</td><td>${m.status}</td><td>${m.winner?.username || '-'}<br>${m.cancelReason || '-'}${m.cancelledBy?.username ? `<br>By ${m.cancelledBy.username}` : ''}${m.cancelledAt ? `<br>${new Date(m.cancelledAt).toLocaleString()}` : ''}</td><td>${m.roomCode || '-'}<br>By: ${m.roomCodeSharedBy?.username || '-'}</td><td>${proof}</td><td>Joined: ${m.joinedAt ? new Date(m.joinedAt).toLocaleString() : '-'}<br>Started: ${m.gameStartedAt ? new Date(m.gameStartedAt).toLocaleString() : '-'}</td></tr>`;
       });
       if (!data.matches.length) table.innerHTML += '<tr><td colspan="8" class="empty">No game history</td></tr>';
     }
