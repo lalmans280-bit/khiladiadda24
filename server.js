@@ -2700,6 +2700,34 @@ app.get('/api/admin/users', requireAdmin, async (req, res) => {
   }
 });
 
+app.post('/api/admin/player-session', requireAdmin, async (req, res) => {
+  try {
+    const user = await findUserById(req.admin.userId);
+    if (!user) return res.status(404).json({ error: 'Admin player account nahi mila' });
+
+    const token = jwt.sign(
+      { userId: user._id, phone: user.phone, role: 'user' },
+      JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+    res.json({
+      token,
+      user: {
+        _id: user._id,
+        id: user._id,
+        username: user.username,
+        phone: user.phone,
+        profileImage: user.profileImage || '',
+        walletBalance: user.walletBalance,
+        referralCode: user.referralCode || '',
+        role: 'user'
+      }
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 app.get('/api/admin/users/:userId/history', requireAdmin, async (req, res) => {
   const { userId } = req.params;
   if (!mongoose.Types.ObjectId.isValid(userId)) {
