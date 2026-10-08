@@ -1815,7 +1815,7 @@ app.put('/api/admin/leaderboard/monthly/player/:userId', requireAdmin, async (re
   }
 });
 
-function supportMessagePayload(message) {
+function supportMessagePayload(message, viewerRole = 'player') {
   return {
     id: String(message._id),
     userId: String(message.userId),
@@ -1823,6 +1823,11 @@ function supportMessagePayload(message) {
     senderRole: message.senderRole,
     senderName: message.senderName,
     text: message.text,
+    attachment: message.attachment
+      ? viewerRole === 'admin'
+        ? `/api/admin/support/messages/${String(message._id)}/attachment`
+        : `/api/support/messages/${String(message._id)}/attachment`
+      : '',
     createdAt: message.createdAt
   };
 }
@@ -1837,15 +1842,15 @@ app.get('/api/support/messages', requireUser, async (req, res) => {
       { userId: req.auth.userId, senderRole: 'admin', readAt: null },
       { $set: { readAt: new Date() } }
     );
-    res.json({ messages: messages.reverse().map(supportMessagePayload) });
+    res.json({ messages: messages.reverse().map(message => supportMessagePayload(message, 'player')) });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-app.post('/api/support/messages', requireUser, async (req, res) => {
+app.post('/api/support/messages', requireUser, persistUploads(upload.single('attachment')), async (req, res) => {
   const text = String(req.body.text || '').trim();
-  if (!text || text.length > 1000) return res.status(400).json({ error: 'Message 1 se 1000 characters ka hona chahiye.' });
+  if ((!text && !req.file) || text.length > 1000) return res.status(400).json({ error: 'Message ya screenshot bhejein. Message 1000 characters se zyada nahi ho sakta.' });
   try {
     const user = await User.findById(req.auth.userId).select('username');
     if (!user) return res.status(404).json({ error: 'Player nahi mila.' });
@@ -1854,13 +1859,26 @@ app.post('/api/support/messages', requireUser, async (req, res) => {
       senderId: user._id,
       senderRole: 'player',
       senderName: user.username,
-      text
+      text,
+      attachment: req.file ? `uploads/${req.file.filename}` : ''
     });
     const payload = supportMessagePayload(message);
     io.to('admin-support').emit('support_message', payload);
     res.status(201).json({ message: payload });
   } catch (err) {
     res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/support/messages/:messageId/attachment', requireUser, async (req, res) => {
+  const messageId = String(req.params.messageId || '');
+  if (!mongoose.Types.ObjectId.isValid(messageId)) return res.status(400).end();
+  try {
+    const message = await SupportMessage.findOne({ _id: messageId, userId: req.auth.userId }).select('attachment');
+    if (!message?.attachment) return res.status(404).end();
+    if (!(await sendUploadedFile(path.basename(message.attachment), res))) return res.status(404).end();
+  } catch (err) {
+    res.status(500).end();
   }
 });
 
@@ -1884,7 +1902,7 @@ app.get('/api/admin/support/threads', requireAdmin, async (req, res) => {
     res.json({
       threads: latestMessages.map(thread => ({
         user: userMap.get(String(thread._id)),
-        lastMessage: supportMessagePayload(thread.lastMessage),
+        lastMessage: supportMessagePayload(thread.lastMessage, 'admin'),
         unreadCount: unreadMap.get(String(thread._id)) || 0
       })).filter(thread => thread.user)
     });
@@ -1902,9 +1920,21 @@ app.get('/api/admin/support/threads/:userId', requireAdmin, async (req, res) => 
       { userId, senderRole: 'player', readAt: null },
       { $set: { readAt: new Date() } }
     );
-    res.json({ messages: messages.reverse().map(supportMessagePayload) });
+    res.json({ messages: messages.reverse().map(message => supportMessagePayload(message, 'admin')) });
   } catch (err) {
     res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/admin/support/messages/:messageId/attachment', requireAdmin, async (req, res) => {
+  const messageId = String(req.params.messageId || '');
+  if (!mongoose.Types.ObjectId.isValid(messageId)) return res.status(400).end();
+  try {
+    const message = await SupportMessage.findById(messageId).select('attachment');
+    if (!message?.attachment) return res.status(404).end();
+    if (!(await sendUploadedFile(path.basename(message.attachment), res))) return res.status(404).end();
+  } catch (err) {
+    res.status(500).end();
   }
 });
 
@@ -1926,7 +1956,7 @@ app.post('/api/admin/support/threads/:userId', requireAdmin, async (req, res) =>
       senderName: admin?.username || 'Admin',
       text
     });
-    const payload = supportMessagePayload(message);
+    const payload = supportMessagePayload(message, 'admin');
     io.to(`player:${userId}`).emit('support_message', payload);
     res.status(201).json({ message: payload });
   } catch (err) {
