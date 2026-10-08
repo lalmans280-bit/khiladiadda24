@@ -26,6 +26,7 @@
     .trust-badge { display: flex; justify-content: flex-end; margin: 0 0 12px; }
     .trust-badge > span { display: inline-flex; align-items: center; gap: 5px; padding: 5px 10px; border: 1px solid #ffffffb3; border-radius: 999px; background: #fff; color: #166534; font-size: 10px; font-weight: 900; letter-spacing: .45px; }
     .welcome-back { margin: 0 0 6px; color: #0b1b3a; font-size: 18px; text-align: center; }
+    .security-note { margin: 0 0 12px; color: #0b1b3a; font-size: 12px; text-align: center; }
     .form-hint { margin: 7px 0 22px; color: #0b1b3a; font-size: 14px; line-height: 1.5; text-align: center; }
     label { display: block; margin: 14px 0 6px; color: #0b1b3a; font-size: 13px; }
     input, button { width: 100%; min-height: 48px; margin: 7px 0; padding: 12px; border-radius: 7px; font: inherit; }
@@ -64,6 +65,7 @@
       <label for="referralCode">Referral ID (optional)</label>
       <input type="text" id="referralCode" name="referralCode" placeholder="8 character referral ID" maxlength="8" autocomplete="off" autocapitalize="characters">
       <button id="otpSendBtn" type="submit">Login with OTP</button>
+      <p class="security-note">100% Safe &amp; Secure Platform</p>
     </form>
     <form id="otpForm" class="hidden" novalidate>
       <label for="otp">6-digit OTP</label>
