@@ -1961,28 +1961,57 @@ app.get('/api/admin/support/messages/:messageId/attachment', requireAdmin, async
   }
 });
 
-app.post('/api/admin/support/threads/:userId', requireAdmin, async (req, res) => {
+app.delete('/api/admin/support/messages/:messageId', requireAdmin, async (req, res) => {
+  const messageId = String(req.params.messageId || '');
+  if (!mongoose.Types.ObjectId.isValid(messageId)) return res.status(400).json({ error: 'Valid message select karein.' });
+  try {
+    const message = await SupportMessage.findById(messageId).select('attachment');
+    if (!message) return res.status(404).json({ error: 'Message nahi mila.' });
+    await SupportMessage.deleteOne({ _id: messageId });
+    try {
+      await deleteReviewedScreenshotFiles([message.attachment]);
+    } catch (error) {
+      console.error(`Could not remove support message attachment ${messageId}:`, error);
+    }
+    res.json({ message: 'Chat message delete ho gaya.' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/admin/support/threads/:userId', requireAdmin, persistUploads(upload.single('attachment')), async (req, res) => {
   const userId = String(req.params.userId || '');
   const text = String(req.body.text || '').trim();
-  if (!mongoose.Types.ObjectId.isValid(userId)) return res.status(400).json({ error: 'Valid player select karein.' });
-  if (!text || text.length > 1000) return res.status(400).json({ error: 'Message 1 se 1000 characters ka hona chahiye.' });
+  if (!mongoose.Types.ObjectId.isValid(userId)) {
+    if (req.file) await deleteStoredUpload(req.file.filename).catch(() => {});
+    return res.status(400).json({ error: 'Valid player select karein.' });
+  }
+  if ((!text && !req.file) || text.length > 1000) {
+    if (req.file) await deleteStoredUpload(req.file.filename).catch(() => {});
+    return res.status(400).json({ error: 'Message ya screenshot bhejein. Message 1000 characters se zyada nahi ho sakta.' });
+  }
   try {
     const [player, admin] = await Promise.all([
       User.findById(userId).select('_id'),
       findUserById(req.admin.userId)
     ]);
-    if (!player) return res.status(404).json({ error: 'Player nahi mila.' });
+    if (!player) {
+      if (req.file) await deleteStoredUpload(req.file.filename).catch(() => {});
+      return res.status(404).json({ error: 'Player nahi mila.' });
+    }
     const message = await SupportMessage.create({
       userId: player._id,
       senderId: req.admin.userId,
       senderRole: 'admin',
       senderName: admin?.username || 'Admin',
-      text
+      text,
+      attachment: req.file ? `uploads/${req.file.filename}` : ''
     });
     const payload = supportMessagePayload(message, 'admin');
     io.to(`player:${userId}`).emit('support_message', payload);
     res.status(201).json({ message: payload });
   } catch (err) {
+    if (req.file) await deleteStoredUpload(req.file.filename).catch(() => {});
     res.status(500).json({ error: err.message });
   }
 });
