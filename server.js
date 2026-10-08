@@ -1459,8 +1459,8 @@ app.post('/api/matches/create', requireUser, async (req, res) => {
   if (!Number.isInteger(entryAmount) || entryAmount < 100 || entryAmount > 50000 || (entryAmount - 100) % 50 !== 0) {
     return res.status(400).json({ error: 'Battle entry ₹100 se ₹50,000 tak ₹50 ke steps mein honi chahiye' });
   }
-  if (!['LUDO', 'SNAKE'].includes(String(gameType || 'LUDO').toUpperCase())) {
-    return res.status(400).json({ error: 'Ludo ya Snake game select karein' });
+  if (!['LUDO', 'POPULAR_LUDO', 'SNAKE'].includes(String(gameType || 'LUDO').toUpperCase())) {
+    return res.status(400).json({ error: 'Ludo, Popular Ludo ya Snake game select karein' });
   }
 
   let reservationHeld = false;
@@ -1498,8 +1498,8 @@ app.post('/api/matches/create', requireUser, async (req, res) => {
 
 app.get('/api/matches/open', async (req, res) => {
   const gameType = String(req.query.gameType || 'ALL').toUpperCase();
-  if (!['ALL', 'LUDO', 'SNAKE'].includes(gameType)) {
-    return res.status(400).json({ error: 'Game type LUDO, SNAKE ya ALL hona chahiye' });
+  if (!['ALL', 'LUDO', 'POPULAR_LUDO', 'SNAKE'].includes(gameType)) {
+    return res.status(400).json({ error: 'Game type LUDO, POPULAR_LUDO, SNAKE ya ALL hona chahiye' });
   }
   try {
     const query = { status: 'OPEN' };
@@ -1528,8 +1528,8 @@ app.get('/api/matches/mine', requireUser, async (req, res) => {
 app.get('/api/matches/running', requireUser, async (req, res) => {
   try {
     const gameType = String(req.query.gameType || 'ALL').toUpperCase();
-    if (!['ALL', 'LUDO', 'SNAKE'].includes(gameType)) {
-      return res.status(400).json({ error: 'Game type LUDO, SNAKE ya ALL hona chahiye' });
+    if (!['ALL', 'LUDO', 'POPULAR_LUDO', 'SNAKE'].includes(gameType)) {
+      return res.status(400).json({ error: 'Game type LUDO, POPULAR_LUDO, SNAKE ya ALL hona chahiye' });
     }
     const requestedLimit = Number.parseInt(req.query.limit, 10);
     const limit = Number.isInteger(requestedLimit) ? Math.max(1, Math.min(requestedLimit, 20)) : 20;
@@ -1740,7 +1740,7 @@ app.post('/api/matches/set-room-code', requireUser, async (req, res) => {
     }
 
     const classicRoomCode = String(roomCode || '').trim();
-    if (!['LUDO', 'SNAKE'].includes(match.gameType) || !/^\d{4,8}$/.test(classicRoomCode)) {
+    if (!['LUDO', 'POPULAR_LUDO', 'SNAKE'].includes(match.gameType) || !/^\d{4,8}$/.test(classicRoomCode)) {
       return res.status(400).json({ error: 'Selected game ka 4-8 digit room code dalein' });
     }
 
