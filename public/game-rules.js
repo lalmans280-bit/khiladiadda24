@@ -64,6 +64,32 @@
       ]
     },
     {
+      title: '🏁 LUDO RACE – हिंदी नियम',
+      rules: [
+        'यह दो खिलाड़ियों का अलग Ludo Race mode है; Ludo Classic, Popular Ludo और Snake पहले की तरह अलग रहते हैं।',
+        'हर खिलाड़ी की 4 गोटियाँ होती हैं और चालें ऐप के अंदर पासे से चलती हैं।',
+        'गोटी घर से निकालने के लिए 6 आना जरूरी है; 6 आने पर खिलाड़ी को एक और turn मिलता है।',
+        'सुरक्षित खाने पर गोटी नहीं कटती; अन्य खाने पर opponent की गोटी कटकर base में वापस जा सकती है।',
+        '<strong>जिस खिलाड़ी की कोई एक गोटी सबसे पहले अपने घर के आखिरी खाने तक पहुँचती है, वही तुरंत winner होता है।</strong>',
+        'गेम शुरू होने से पहले cancel करके refund लिया जा सकता है; पहली dice roll के बाद cancel नहीं होगा।',
+        'Winner को अपनी जीत का screenshot upload करके result admin review के लिए भेजना होगा।',
+        'Payout screenshot और result के admin verification के बाद ही होगा।'
+      ]
+    },
+    {
+      title: '🏁 LUDO RACE – English Rules',
+      rules: [
+        'This is a separate two-player Ludo Race mode; Ludo Classic, Popular Ludo, and Snake remain unchanged.',
+        'Each player has 4 tokens and takes turns with the in-app dice.',
+        'A 6 is required to bring a token out of base; rolling a 6 grants another turn.',
+        'Tokens are safe on marked safe squares; elsewhere an opponent token may be captured and sent back to base.',
+        '<strong>The first player to move any one token to its final home square wins immediately.</strong>',
+        'A match can be cancelled and refunded before its first dice roll; it cannot be cancelled after play starts.',
+        'The winner must upload a screenshot and submit the result for admin review.',
+        'Payout is made only after the screenshot and result are verified by an admin.'
+      ]
+    },
+    {
       title: '🐍 SNAKE GAME – हिंदी नियम',
       rules: [
         'Snake Game में खिलाड़ी Snake को नियंत्रित करके Food/Points प्राप्त करता है।',
@@ -116,7 +142,8 @@
   const rulesButton = document.createElement('button');
   rulesButton.className = 'btn secondary game-rules-button';
   rulesButton.type = 'button';
-  rulesButton.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false"><rect x="3" y="3" width="18" height="18" rx="4" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="8" cy="8" r="1.5" fill="currentColor"/><circle cx="16" cy="8" r="1.5" fill="currentColor"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/><circle cx="8" cy="16" r="1.5" fill="currentColor"/><circle cx="16" cy="16" r="1.5" fill="currentColor"/></svg>'; rulesButton.setAttribute('aria-label', 'Game Rules');
+  rulesButton.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false"><rect x="3" y="3" width="18" height="18" rx="4" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="8" cy="8" r="1.5" fill="currentColor"/><circle cx="16" cy="8" r="1.5" fill="currentColor"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/><circle cx="8" cy="16" r="1.5" fill="currentColor"/><circle cx="16" cy="16" r="1.5" fill="currentColor"/></svg>';
+  rulesButton.setAttribute('aria-label', 'Game Rules');
   rulesButton.setAttribute('aria-haspopup', 'dialog');
   if (challengeButton.hidden) {
     const amountHint = createForm.previousElementSibling;
