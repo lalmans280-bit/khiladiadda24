@@ -2704,6 +2704,9 @@ app.post('/api/admin/player-session', requireAdmin, async (req, res) => {
   try {
     const user = await findUserById(req.admin.userId);
     if (!user) return res.status(404).json({ error: 'Admin player account nahi mila' });
+    if (!user.isPrimaryAdmin || normalizePhone(user.phone) !== PRIMARY_ADMIN_PHONE) {
+      return res.status(403).json({ error: 'Player site access sirf primary admin ke liye available hai.' });
+    }
 
     const token = jwt.sign(
       { userId: user._id, phone: user.phone, role: 'user' },
