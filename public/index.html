@@ -55,7 +55,7 @@
     @media(max-width:600px){.shell{padding:0 12px 84px}.top-inner{padding:9px 12px}.brand{font-size:19px}.balance{padding:7px 9px;font-size:12px}.nav{display:none}.two{grid-template-columns:1fr}.panel{padding:15px}.match-head{flex-direction:column}.match-head>div:last-child{display:flex;align-items:center;gap:10px}.bottom{position:fixed;z-index:4;right:0;bottom:0;left:0;display:grid;grid-template-columns:repeat(4,1fr);padding-bottom:env(safe-area-inset-bottom);border-top:1px solid var(--line);background:#101720f5}.bottom button{padding:8px 3px 10px;border:0;color:#c0cbc4;background:transparent;font-size:11px}.bottom button span{display:block;color:var(--gold);font-size:18px}}
   .match-head.home-open-header{display:grid;grid-template-columns:minmax(0,1fr) 68px 68px;align-items:center;gap:8px;margin-bottom:8px}.match-head.home-open-header>h2{display:inline-flex;align-items:center;justify-content:flex-start;min-height:32px;margin:0;padding:0;border:0;border-radius:0;background:transparent;color:var(--gold);font-size:12px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;line-height:1.2;white-space:nowrap;justify-self:start}.home-open-header .lang-toggle{display:flex;align-items:center;justify-self:center;width:68px;height:32px;gap:0;padding:2px;border-radius:7px}.home-open-header .lang-btn{flex:1;min-width:0;height:26px;padding:3px 2px;border-radius:5px;font-size:10px}.match-head.home-open-header>.btn.secondary.small{width:68px;min-height:32px;padding:6px 4px;font-size:11px;font-weight:800;justify-self:end}
     .brand{display:flex;align-items:center;gap:9px}.top-inner>#menuToggle{flex:none}
-    .menu{width:250px;max-height:calc(100vh - 82px);overflow:auto}.menu button,.menu a{display:block;padding:11px;border:0;border-radius:7px;text-align:left;color:var(--ink);background:transparent}.menu a:hover,.menu button:hover{background:#273831}.menu .menu-logout{margin-top:5px;border-top:1px solid var(--line);border-radius:0 0 7px 7px;color:var(--red)}
+    .menu{width:250px;max-height:calc(100vh - 82px);overflow:auto}.menu button,.menu a{display:block;padding:11px;border:0;border-radius:7px;text-align:left;color:var(--ink);background:transparent}.menu a:hover,.menu button:hover{background:#273831}.menu a[hidden]{display:none}.menu .menu-logout{margin-top:5px;border-top:1px solid var(--line);border-radius:0 0 7px 7px;color:var(--red)}
     .battle-card-game-tag{display:inline-flex;align-items:center;justify-content:center;gap:5px;padding:0;margin:0;color:var(--gold);font-size:8px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap}
     .battle-player .battle-player-info{display:flex;align-items:center;gap:6px;flex-wrap:wrap}.battle-player-game-tag{display:inline-flex;align-items:center;justify-content:center;margin-left:6px;padding:2px 5px;border-radius:999px;background:rgba(255,189,89,.12);border:1px solid rgba(255,189,89,.25);color:var(--gold);font-size:7px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap}
     .open-battle-group{display:grid;gap:8px;margin:8px 0 12px}.open-battle-group-label{display:flex;align-items:center;justify-content:center;padding:2px 0 4px;color:var(--gold);font-size:11px;font-weight:900;letter-spacing:.12em;text-transform:uppercase} 
@@ -432,6 +432,13 @@
     const token=localStorage.getItem('token');
     const storedUser=(()=>{try{return JSON.parse(localStorage.getItem('user')||'null')}catch{return null}})();
     let player=null, game='LUDO', battlesPollTimer, kycApproved=false;
+    const adminPlayerView=sessionStorage.getItem('adminPlayerView')==='yes'&&Boolean(localStorage.getItem('adminToken'));
+    const adminPanelReturn=document.createElement('a');
+    adminPanelReturn.href='/admin.html';
+    adminPanelReturn.id='adminPanelReturn';
+    adminPanelReturn.textContent='↩ Admin Panel';
+    adminPanelReturn.hidden=!adminPlayerView;
+    document.getElementById('menu').insertBefore(adminPanelReturn,document.getElementById('logout'));
 
     let appInstallPrompt = window.khiladiAddToHomeScreenPrompt;
     window.addEventListener('beforeinstallprompt', event => {
@@ -913,7 +920,7 @@
     el('gameType').addEventListener('change',()=>{syncGameSelection(el('gameType').value);loadOpen().catch(showError)});document.querySelectorAll('.game-filter').forEach(button=>button.addEventListener('click',()=>syncGameSelection(button.dataset.game)));document.querySelectorAll('[data-launch-game]').forEach(button=>button.addEventListener('click',()=>{syncGameSelection(button.dataset.launchGame);el('gamePicker').hidden=true;el('gameBattleView').hidden=false;setView('games')}));el('backToGames').addEventListener('click',()=>{el('gameBattleView').hidden=true;el('gamePicker').hidden=false;setView('games')});el('gameRefreshOpen').addEventListener('click',()=>location.reload());
     el('menuToggle').addEventListener('click',()=>{el('menu').classList.toggle('open');el('menuToggle').setAttribute('aria-expanded',el('menu').classList.contains('open'))});el('refreshHistory').addEventListener('click',()=>location.reload());
     el('copyReferral').addEventListener('click',async()=>{const code=player?.referralCode;if(!code)return notify('Referral ID abhi load nahi hui.',true);try{await navigator.clipboard.writeText(code);notify('Referral ID copy ho gayi.')}catch{notify(`Aapki Referral ID: ${code}`)}});
-    function logout(){localStorage.removeItem('token');localStorage.removeItem('user');location.replace('/login.html')}el('logout').addEventListener('click',logout);el('logoutProfile').addEventListener('click',logout);el('refreshMatches')?.addEventListener('click',()=>location.reload());el('refreshOpen').addEventListener('click',()=>location.reload());
+    function logout(){localStorage.removeItem('token');localStorage.removeItem('user');if(adminPlayerView){localStorage.removeItem('adminToken');localStorage.removeItem('adminUser');sessionStorage.removeItem('adminPlayerView')}location.replace('/login.html')}el('logout').addEventListener('click',logout);el('logoutProfile').addEventListener('click',logout);el('refreshMatches')?.addEventListener('click',()=>location.reload());el('refreshOpen').addEventListener('click',()=>location.reload());
     el('createForm').addEventListener('submit',async event=>{
       event.preventDefault();
       const amount=Number(entryAmountInput.value);
