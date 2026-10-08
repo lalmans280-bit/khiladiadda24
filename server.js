@@ -539,8 +539,8 @@ function brandingImageUrl(settings, key, fallback) {
 function siteBrandingPayload(settings) {
   return {
     brandLogoUrl: brandingImageUrl(settings, 'brandLogoPath', '/logo.png'),
-    appIcon192Url: brandingImageUrl(settings, 'appIcon192Path', '/app-icon-192.png'),
-    appIcon512Url: brandingImageUrl(settings, 'appIcon512Path', '/app-icon-512.png'),
+    appIcon192Url: brandingImageUrl(settings, 'appIcon192Path', '/app-logo.png?v=20261008-2304'),
+    appIcon512Url: brandingImageUrl(settings, 'appIcon512Path', '/app-logo.png?v=20261008-2304'),
     homeBannerUrl: brandingImageUrl(settings, 'homeBannerPath', '/banner-ludo-snake.png'),
     ludoBannerUrl: brandingImageUrl(settings, 'ludoBannerPath', '/ludo-classic.png'),
     snakeBannerUrl: brandingImageUrl(settings, 'snakeBannerPath', '/snake-battles-banner.png'),
@@ -562,8 +562,7 @@ function defaultSiteManifest() {
     theme_color: '#101713',
     orientation: 'portrait',
     icons: [
-      { src: '/app-icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
-      { src: '/app-icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any maskable' }
+      { src: '/app-logo.png?v=20261008-2304', sizes: '500x500', type: 'image/png', purpose: 'any' }
     ]
   };
 }
@@ -594,8 +593,8 @@ app.get('/api/admin/branding', requireAdmin, async (req, res) => {
 app.get('/api/site-branding/image/:asset', async (req, res) => {
   const imageSettings = {
     logo: ['brandLogoPath', '/logo.png'],
-    'app-icon-192': ['appIcon192Path', '/app-icon-192.png'],
-    'app-icon-512': ['appIcon512Path', '/app-icon-512.png'],
+    'app-icon-192': ['appIcon192Path', '/app-logo.png?v=20261008-2304'],
+    'app-icon-512': ['appIcon512Path', '/app-logo.png?v=20261008-2304'],
     'home-banner': ['homeBannerPath', '/banner-ludo-snake.png'],
     'ludo-banner': ['ludoBannerPath', '/ludo-classic.png'],
     'snake-banner': ['snakeBannerPath', '/snake-battles-banner.png'],
@@ -622,16 +621,10 @@ app.get('/api/site-manifest', async (req, res) => {
       ...defaultSiteManifest(),
       icons: [
         {
-          src: brandingImageUrl(settings, 'appIcon192Path', '/app-icon-192.png'),
-          sizes: '192x192',
+          src: brandingImageUrl(settings, 'appIcon512Path', '/app-logo.png?v=20261008-2304'),
+          sizes: '500x500',
           type: 'image/png',
           purpose: 'any'
-        },
-        {
-          src: brandingImageUrl(settings, 'appIcon512Path', '/app-icon-512.png'),
-          sizes: '512x512',
-          type: 'image/png',
-          purpose: 'any maskable'
         }
       ]
     };
