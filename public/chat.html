@@ -23,16 +23,19 @@
     .bubble.player{justify-self:end;background:#244e36}
     .bubble strong,.bubble small{display:block}
     .bubble small{margin-top:5px;color:var(--muted);font-size:12px}
-    .attachment-preview{display:block;width:min(100%,360px);max-height:300px;margin-top:8px;border-radius:8px;object-fit:contain}
+    .attachment-preview{display:block;width:min(100%,360px);max-height:300px;margin-top:8px;border-radius:8px;object-fit:contain;cursor:zoom-in}
     label{display:block;margin:10px 0 5px}
-    textarea,input[type=file]{width:100%;font:inherit}
-    textarea{min-height:76px;padding:10px;border:1px solid #52685a;border-radius:8px;color:inherit;background:#101920;resize:vertical}
+    .name-editor{margin:0 0 12px;padding:12px;border:1px solid var(--line);border-radius:9px;background:#121f1a}
+    .name-editor-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:end}
+    textarea,input[type=file],input[type=text]{width:100%;font:inherit}
+    input[type=text],textarea{padding:10px;border:1px solid #52685a;border-radius:8px;color:inherit;background:#101920}
+    textarea{min-height:76px;resize:vertical}
     input[type=file]{padding:8px;border:1px solid #52685a;border-radius:8px;background:#101920}
     .composer-actions{display:flex;align-items:center;gap:12px;margin-top:10px}
     button{min-height:42px;padding:9px 16px;border:0;border-radius:7px;background:var(--gold);color:#172018;font:inherit;font-weight:800;cursor:pointer}
     button:disabled{opacity:.6;cursor:wait}
     #status{min-height:24px;margin-top:8px;color:var(--muted)}
-    #status.error{color:#ffaaa2}
+    #status.error,.error{color:#ffaaa2}
     #preview{display:block;max-width:min(100%,220px);max-height:160px;margin-top:8px;border-radius:8px}
     [hidden]{display:none!important}
     @media(max-width:600px){body{padding:10px 8px 20px}main{min-height:calc(100vh - 30px)}.chat{padding:12px}.messages{max-height:calc(100vh - 290px)}}
@@ -48,6 +51,14 @@
       <div class="chat-heading"><h2 id="chatTitle">Customer Support</h2><p class="muted">Problem batayein; zarurat ho to screenshot bhejein.</p></div>
       <p id="loginPrompt" hidden>Chat ke liye <a href="/login.html?next=%2Fchat.html">player login karein</a>.</p>
       <div id="chatArea" hidden>
+        <div class="name-editor">
+          <label for="displayName">Player name</label>
+          <div class="name-editor-row">
+            <input id="displayName" type="text" minlength="2" maxlength="40" placeholder="Aapka naam likhein">
+            <button id="saveNameButton" type="button">Save name</button>
+          </div>
+          <div id="profileNameStatus" class="muted" role="status" aria-live="polite"></div>
+        </div>
         <div id="messages" class="messages" aria-live="polite"></div>
         <form id="chatForm">
           <label for="message">Aapka message</label>
@@ -70,15 +81,71 @@
     const attachmentInput = document.getElementById('attachment');
     const preview = document.getElementById('preview');
     const status = document.getElementById('status');
+    const displayNameInput = document.getElementById('displayName');
+    const profileNameStatus = document.getElementById('profileNameStatus');
     const attachmentUrls = new Map();
     let refreshInFlight = false;
 
     chatArea.hidden = !token;
     loginPrompt.hidden = Boolean(token);
 
+    function setProfileNameStatus(text, isError = false) {
+      profileNameStatus.textContent = text;
+      profileNameStatus.classList.toggle('error', isError);
+    }
+
     function showStatus(text, isError = false) {
       status.textContent = text;
       status.classList.toggle('error', isError);
+    }
+
+    function hydrateDisplayName() {
+      try {
+        const cachedUser = JSON.parse(localStorage.getItem('user') || 'null');
+        if (cachedUser?.username) {
+          displayNameInput.value = cachedUser.username;
+          return;
+        }
+      } catch {}
+      displayNameInput.value = 'Player';
+    }
+
+    async function savePlayerName() {
+      if (!token) {
+        showStatus('Chat ke liye player login zaroori hai.', true);
+        return;
+      }
+      const name = displayNameInput.value.trim();
+      if (name.length < 2 || name.length > 40) {
+        setProfileNameStatus('Naam 2 se 40 characters ke beech hona chahiye.', true);
+        return;
+      }
+      const formData = new FormData();
+      formData.set('username', name);
+      const saveButton = document.getElementById('saveNameButton');
+      saveButton.disabled = true;
+      try {
+        const response = await fetch('/api/profile/update', {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token}` },
+          body: formData
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Player name save nahi hua.');
+        try {
+          const storedUser = JSON.parse(localStorage.getItem('user') || 'null');
+          if (storedUser) {
+            storedUser.username = name;
+            localStorage.setItem('user', JSON.stringify(storedUser));
+          }
+        } catch {}
+        setProfileNameStatus('Player name save ho gaya.');
+        showStatus('');
+      } catch (error) {
+        setProfileNameStatus(error.message || 'Player name save nahi hua.', true);
+      } finally {
+        saveButton.disabled = false;
+      }
     }
 
     async function loadMessages() {
@@ -124,7 +191,13 @@
               image.className = 'attachment-preview';
               image.src = imageUrl;
               image.alt = 'Chat screenshot';
-              bubble.appendChild(image);
+              const imageLink = document.createElement('a');
+              imageLink.href = imageUrl;
+              imageLink.target = '_blank';
+              imageLink.rel = 'noopener noreferrer';
+              imageLink.setAttribute('aria-label', 'Open full-size chat screenshot');
+              imageLink.appendChild(image);
+              bubble.appendChild(imageLink);
             } catch (error) {
               const errorText = document.createElement('small');
               errorText.textContent = error.message;
@@ -143,6 +216,8 @@
         refreshInFlight = false;
       }
     }
+
+    document.getElementById('saveNameButton').addEventListener('click', savePlayerName);
 
     attachmentInput.addEventListener('change', () => {
       const file = attachmentInput.files[0];
@@ -191,8 +266,11 @@
       }
     });
 
-    loadMessages();
-    if (token) setInterval(loadMessages, 5000);
+    hydrateDisplayName();
+    if (token) {
+      loadMessages();
+      setInterval(loadMessages, 5000);
+    }
   </script>
 </body>
 </html>
