@@ -25,8 +25,6 @@
     .bubble small{margin-top:5px;color:var(--muted);font-size:12px}
     .attachment-preview{display:block;width:min(100%,360px);max-height:300px;margin-top:8px;border-radius:8px;object-fit:contain;cursor:zoom-in}
     label{display:block;margin:10px 0 5px}
-    .name-editor{margin:0 0 12px;padding:12px;border:1px solid var(--line);border-radius:9px;background:#121f1a}
-    .name-editor-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:end}
     .attachment-zone{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:8px}
     .attachment-name{flex:1;min-width:160px;padding:8px 10px;border:1px solid #52685a;border-radius:8px;background:#101920;color:var(--muted);font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
     .attachment-trigger{background:#1d4f3a;color:#e7f9ef;border:1px solid rgba(255,255,255,0.15)}
@@ -48,20 +46,12 @@
   <main>
     <header>
       <a href="/index.html" aria-label="App par wapas jaayein">←</a>
-      <div><h1>Need Chat</h1><p>Admin se seedhi baat karein</p></div>
+      <div><h1>Need Chat</h1></div>
     </header>
     <section class="chat" aria-labelledby="chatTitle">
-      <div class="chat-heading"><h2 id="chatTitle">Customer Support</h2><p class="muted">Problem batayein; zarurat ho to screenshot bhejein.</p></div>
+      <div class="chat-heading"><h2 id="chatTitle">Customer Support</h2><p class="muted">Need help? Describe your issue and attach a screenshot if needed.</p></div>
       <p id="loginPrompt" hidden>Chat ke liye <a href="/login.html?next=%2Fchat.html">player login karein</a>.</p>
       <div id="chatArea" hidden>
-        <div class="name-editor">
-          <label for="displayName">Player name</label>
-          <div class="name-editor-row">
-            <input id="displayName" type="text" minlength="2" maxlength="40" placeholder="Aapka naam likhein">
-            <button id="saveNameButton" type="button">Save name</button>
-          </div>
-          <div id="profileNameStatus" class="muted" role="status" aria-live="polite"></div>
-        </div>
         <div id="messages" class="messages" aria-live="polite"></div>
         <form id="chatForm">
           <label for="message">Aapka message</label>
@@ -90,72 +80,11 @@
     const attachmentName = document.getElementById('attachmentName');
     const preview = document.getElementById('preview');
     const status = document.getElementById('status');
-    const displayNameInput = document.getElementById('displayName');
-    const profileNameStatus = document.getElementById('profileNameStatus');
     const attachmentUrls = new Map();
     let refreshInFlight = false;
 
     chatArea.hidden = !token;
     loginPrompt.hidden = Boolean(token);
-
-    function setProfileNameStatus(text, isError = false) {
-      profileNameStatus.textContent = text;
-      profileNameStatus.classList.toggle('error', isError);
-    }
-
-    function showStatus(text, isError = false) {
-      status.textContent = text;
-      status.classList.toggle('error', isError);
-    }
-
-    function hydrateDisplayName() {
-      try {
-        const cachedUser = JSON.parse(localStorage.getItem('user') || 'null');
-        if (cachedUser?.username) {
-          displayNameInput.value = cachedUser.username;
-          return;
-        }
-      } catch {}
-      displayNameInput.value = 'Player';
-    }
-
-    async function savePlayerName() {
-      if (!token) {
-        showStatus('Chat ke liye player login zaroori hai.', true);
-        return;
-      }
-      const name = displayNameInput.value.trim();
-      if (name.length < 2 || name.length > 40) {
-        setProfileNameStatus('Naam 2 se 40 characters ke beech hona chahiye.', true);
-        return;
-      }
-      const formData = new FormData();
-      formData.set('username', name);
-      const saveButton = document.getElementById('saveNameButton');
-      saveButton.disabled = true;
-      try {
-        const response = await fetch('/api/profile/update', {
-          method: 'POST',
-          headers: { Authorization: `Bearer ${token}` },
-          body: formData
-        });
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.error || 'Player name save nahi hua.');
-        try {
-          const storedUser = JSON.parse(localStorage.getItem('user') || 'null');
-          if (storedUser) {
-            storedUser.username = name;
-            localStorage.setItem('user', JSON.stringify(storedUser));
-          }
-        } catch {}
-        setProfileNameStatus('Player name save ho gaya.');
-        showStatus('');
-      } catch (error) {
-        setProfileNameStatus(error.message || 'Player name save nahi hua.', true);
-      } finally {
-        saveButton.disabled = false;
-      }
-    }
 
     async function loadMessages() {
       if (!token || refreshInFlight) return;
@@ -226,8 +155,6 @@
       }
     }
 
-    document.getElementById('saveNameButton').addEventListener('click', savePlayerName);
-
     attachmentTrigger.addEventListener('click', () => attachmentInput.click());
 
     attachmentInput.addEventListener('change', () => {
@@ -280,7 +207,6 @@
       }
     });
 
-    hydrateDisplayName();
     if (token) {
       loadMessages();
       setInterval(loadMessages, 5000);
