@@ -791,7 +791,7 @@
     gameModeOptions.className='game-mode-options';
     gameModeOptions.setAttribute('role','group');
     gameModeOptions.setAttribute('aria-labelledby',gameTypeFieldLabel.id);
-    const gameModeImages={LUDO:'/1.png',POPULAR_LUDO:'/2.png',LUDO_RACE:'/3.png',SNAKE:'/4.png'};
+    const gameModeImages={LUDO:'/icon/ludo_classic_256x256.png',POPULAR_LUDO:'/icon/popular_ludo_256x256.png',LUDO_RACE:'/icon/ludo_race_1_goti_win_256x256.png',SNAKE:'/icon/snake_ladder_256x256.png'};
     Array.from(gameTypeSelect.options).forEach(option=>{const button=document.createElement('button'),image=document.createElement('img');button.type='button';button.className='game-mode-option';button.dataset.gameOption=option.value;button.setAttribute('aria-label',option.textContent);image.src=gameModeImages[option.value];image.alt='';image.setAttribute('aria-hidden','true');button.append(image);button.setAttribute('aria-pressed',String(option.selected));gameModeOptions.append(button)});
     gameTypeFieldLabel.after(gameModeOptions);
     gameTypeSelect.hidden=true;
