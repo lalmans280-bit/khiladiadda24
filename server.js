@@ -516,6 +516,7 @@ async function sendUploadedFile(filename, res, cacheControl = 'private, no-store
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
+app.use('/icon', express.static('icon'));
 
 app.get('/healthz', (req, res) => {
   res.sendStatus(200);
