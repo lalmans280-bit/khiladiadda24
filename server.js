@@ -1530,7 +1530,7 @@ app.get('/api/matches/running', requireUser, async (req, res) => {
     const limit = Number.isInteger(requestedLimit) ? Math.max(1, Math.min(requestedLimit, 20)) : 20;
     const query = { status: 'RUNNING', joiner: { $ne: null } };
     if (gameType !== 'ALL') query.gameType = gameType;
-    const fields = '_id gameType creator joiner amount roomCode joinedAt roomCodeDeadline roomCodeSharedAt creatorStartedAt creatorConfirmedAt joinerConfirmedAt gameStartedAt status updatedAt';
+    const fields = '_id gameType creator joiner amount roomCode joinedAt roomCodeDeadline roomCodeSharedAt creatorStartedAt creatorConfirmedAt joinerConfirmedAt gameStartedAt ludoRace status updatedAt';
     const keepIds = [...new Set(String(req.query.keep || '').split(',').filter(mongoose.Types.ObjectId.isValid))]
       .slice(0, limit)
       .map(id => new mongoose.Types.ObjectId(id));
@@ -1568,7 +1568,7 @@ app.get('/api/matches/running', requireUser, async (req, res) => {
           _id: 1, gameType: 1, creator: 1, joiner: 1, amount: 1, roomCode: 1,
           joinedAt: 1, roomCodeDeadline: 1, roomCodeSharedAt: 1,
           creatorStartedAt: 1, creatorConfirmedAt: 1, joinerConfirmedAt: 1,
-          gameStartedAt: 1, status: 1, updatedAt: 1
+          gameStartedAt: 1, ludoRace: 1, status: 1, updatedAt: 1
         } }
       ])
       : [];
@@ -1596,6 +1596,7 @@ app.get('/api/matches/running', requireUser, async (req, res) => {
         delete visibleMatch.creatorConfirmedAt;
         delete visibleMatch.joinerConfirmedAt;
         delete visibleMatch.gameStartedAt;
+        delete visibleMatch.ludoRace;
       }
       return {
         ...visibleMatch,
@@ -2208,20 +2209,8 @@ app.post('/api/matches/join', requireUser, async (req, res) => {
         joiner: userId,
         status: 'RUNNING',
         joinedAt,
-        ...(isLudoRace ? {
-          gameStartedAt: null,
-          ludoRace: {
-            version: 0,
-            currentTurn: String(match.creator),
-            diceValue: null,
-            legalTokenIndexes: [],
-            tokens: { creator: [-1, -1, -1, -1], joiner: [-1, -1, -1, -1] },
-            winnerId: null,
-            lastDice: null,
-            lastRollUserId: null,
-            lastAction: 'Creator ki turn'
-          }
-        } : { roomCodeDeadline: new Date(Date.now() + 2 * 60 * 1000) }),
+        roomCodeDeadline: new Date(Date.now() + 2 * 60 * 1000),
+        ...(isLudoRace ? { gameStartedAt: null } : {}),
         joinerWinningsUsed: debit.winningsUsed
       } },
       { new: true }
@@ -2238,7 +2227,7 @@ app.post('/api/matches/join', requireUser, async (req, res) => {
       .populate('creator', 'username phone')
       .populate('joiner', 'username phone');
     io.to(matchId).emit('match_updated', populatedMatch);
-    res.json({ message: isLudoRace ? 'Opponent join ho gaya. Ludo Race creator ki turn se shuru hai.' : 'Opponent join ho gaya. Ab creator room code setup karke share karega.', match: populatedMatch });
+    res.json({ message: 'Opponent join ho gaya. Ab creator Ludo King room code setup karke share karega.', match: populatedMatch });
   } catch (err) {
     if (reservationHeld) await releaseActiveBet(userId);
     res.status(500).json({ error: err.message });
@@ -2274,7 +2263,7 @@ app.post('/api/matches/set-room-code', requireUser, async (req, res) => {
     }
 
     const classicRoomCode = String(roomCode || '').trim();
-    if (!['LUDO', 'POPULAR_LUDO', 'SNAKE'].includes(match.gameType) || !/^\d{4,8}$/.test(classicRoomCode)) {
+    if (!['LUDO', 'POPULAR_LUDO', 'LUDO_RACE', 'SNAKE'].includes(match.gameType) || !/^\d{4,8}$/.test(classicRoomCode)) {
       return res.status(400).json({ error: 'Selected game ka 4-8 digit room code dalein' });
     }
 
@@ -2420,7 +2409,7 @@ app.post('/api/matches/submit-result', requireUser, persistUploads(upload.single
         throw error;
       }
 
-      if (match.gameType === 'LUDO_RACE') {
+      if (match.gameType === 'LUDO_RACE' && match.ludoRace?.winnerId) {
         const verifiedWinnerId = String(match.ludoRace?.winnerId || '');
         if (!verifiedWinnerId || verifiedWinnerId !== String(userId) || String(winnerId) !== verifiedWinnerId) {
           const error = new Error('Ludo Race me sirf game se verified winner result submit kar sakta hai');
@@ -2588,14 +2577,14 @@ app.post('/api/matches/submit-result', requireUser, persistUploads(upload.single
     const publicMessage = finalMatch.status === 'COMPLETED'
       ? 'LOSS confirm ho gaya. Winner ko payout credit ho gaya.'
       : finalMatch.status === 'PENDING_RESULT'
-        ? finalMatch.gameType === 'LUDO_RACE'
+        ? finalMatch.gameType === 'LUDO_RACE' && Boolean(finalMatch.ludoRace?.winnerId)
           ? 'Ludo Race screenshot aur verified result admin review ke liye bhej diya gaya.'
           : 'Reports match nahi karte. Admin review ke liye bhej diye gaye.'
         : 'Aapka result submit ho gaya. Dusre player ke result ka wait karein.';
     const adminMessage = finalMatch.status === 'COMPLETED'
       ? `LOSS confirm ho gaya. Winner ko ₹${winAmount} payout aur admin ko ₹${adminCommission} commission credit ho gaya.`
       : finalMatch.status === 'PENDING_RESULT'
-        ? finalMatch.gameType === 'LUDO_RACE'
+        ? finalMatch.gameType === 'LUDO_RACE' && Boolean(finalMatch.ludoRace?.winnerId)
           ? 'Ludo Race ka verified result admin review ke liye bhej diya gaya.'
           : 'Reports match nahi karte. Admin review ke liye bhej diye gaye hain.'
         : 'Aapka result submit ho gaya. Dusre player ke result ka wait karein.';
