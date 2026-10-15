@@ -1,4 +1,4 @@
-require('dotenv').config();
+crequire('dotenv').config();
 const express = require('express');
 const http = require('http');
 const mongoose = require('mongoose');
@@ -516,7 +516,6 @@ async function sendUploadedFile(filename, res, cacheControl = 'private, no-store
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
-app.use('/icon', express.static('icon'));
 
 app.get('/healthz', (req, res) => {
   res.sendStatus(200);
@@ -1452,8 +1451,8 @@ app.post('/api/matches/create', requireUser, async (req, res) => {
   const userId = req.auth.userId;
   const entryAmount = Number(amount);
 
-  if (!Number.isInteger(entryAmount) || entryAmount < 100 || entryAmount > 50000 || (entryAmount - 100) % 50 !== 0) {
-    return res.status(400).json({ error: 'Battle entry ₹100 se ₹50,000 tak ₹50 ke steps mein honi chahiye' });
+  if (!Number.isInteger(entryAmount) || entryAmount < 50 || entryAmount > 50000 || (entryAmount - 50) % 50 !== 0) {
+    return res.status(400).json({ error: 'Battle entry ₹50 se ₹50,000 tak ₹50 ke steps mein honi chahiye' });
   }
   if (!['LUDO', 'POPULAR_LUDO', 'SNAKE', 'LUDO_RACE'].includes(String(gameType || 'LUDO').toUpperCase())) {
     return res.status(400).json({ error: 'Ludo, Popular Ludo, Ludo Race ya Snake game select karein' });
