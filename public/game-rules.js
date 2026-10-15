@@ -66,26 +66,22 @@
     {
       title: '🏁 LUDO RACE – हिंदी नियम',
       rules: [
-        'यह दो खिलाड़ियों का अलग Ludo Race mode है; Ludo Classic, Popular Ludo और Snake पहले की तरह अलग रहते हैं।',
-        'हर खिलाड़ी की 4 गोटियाँ होती हैं और चालें ऐप के अंदर पासे से चलती हैं।',
-        'गोटी घर से निकालने के लिए 6 आना जरूरी है; 6 आने पर खिलाड़ी को एक और turn मिलता है।',
-        'सुरक्षित खाने पर गोटी नहीं कटती; अन्य खाने पर opponent की गोटी कटकर base में वापस जा सकती है।',
-        '<strong>जिस खिलाड़ी की कोई एक गोटी सबसे पहले अपने घर के आखिरी खाने तक पहुँचती है, वही तुरंत winner होता है।</strong>',
-        'गेम शुरू होने से पहले cancel करके refund लिया जा सकता है; पहली dice roll के बाद cancel नहीं होगा।',
-        'Winner को अपनी जीत का screenshot upload करके result admin review के लिए भेजना होगा।',
+        'यह 1 गोटी वाला दो खिलाड़ियों का अलग mode है; game Ludo King app में खेला जाएगा।',
+        'Opponent के join करने के बाद challenge creator Ludo King में room बनाकर 4-8 अंकों का room code share karega।',
+        'Opponent code copy karke Ludo King app में वही room join karega; दोनों उसी room में खेलेंगे।',
+        'Room code share होने से पहले match cancel करके refund लिया जा सकता है।',
+        'Game के बाद winner screenshot upload karke result admin review के लिए भेजे; हारने वाला LOSS report करे।',
         'Payout screenshot और result के admin verification के बाद ही होगा।'
       ]
     },
     {
       title: '🏁 LUDO RACE – English Rules',
       rules: [
-        'This is a separate two-player Ludo Race mode; Ludo Classic, Popular Ludo, and Snake remain unchanged.',
-        'Each player has 4 tokens and takes turns with the in-app dice.',
-        'A 6 is required to bring a token out of base; rolling a 6 grants another turn.',
-        'Tokens are safe on marked safe squares; elsewhere an opponent token may be captured and sent back to base.',
-        '<strong>The first player to move any one token to its final home square wins immediately.</strong>',
-        'A match can be cancelled and refunded before its first dice roll; it cannot be cancelled after play starts.',
-        'The winner must upload a screenshot and submit the result for admin review.',
+        'This is a separate two-player, one-token mode played in the Ludo King app.',
+        'After the opponent joins, the challenger creates a Ludo King room and shares its 4-8 digit room code.',
+        'The opponent copies the code and joins that same room in the Ludo King app; both players play there.',
+        'The match can be cancelled for a refund before the room code is shared.',
+        'After the game, the winner uploads a screenshot for admin review; the losing player submits a LOSS report.',
         'Payout is made only after the screenshot and result are verified by an admin.'
       ]
     },
