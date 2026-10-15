@@ -105,18 +105,18 @@
   const description = form.closest('.panel')?.querySelector('p.muted');
   if (description) description.textContent = '₹500 minimum; ₹100 ke steps mein (₹500, ₹600, ₹700...). Withdraw ke liye approved KYC zaroori hai.';
   const battleDescription = document.querySelector('#view-battles .panel p.muted');
-  if (battleDescription) battleDescription.textContent = 'Minimum entry ₹100 aur wallet balance mein poori entry honi chahiye. Ludo Classic Ludo King app mein khelein; host room code share karega.';
+  if (battleDescription) battleDescription.textContent = 'Minimum entry ₹50 aur wallet balance mein poori entry honi chahiye. Ludo Classic Ludo King app mein khelein; host room code share karega.';
 
   document.addEventListener('click', event => {
     const joinButton = event.target.closest('[data-join]');
     if (joinButton) {
       app.playAlertTone?.();
       const amountText = joinButton.closest('.match')?.querySelector('.amount')?.textContent || '';
-      window.pendingEntryAmount = Number(amountText.replace(/[^0-9]/g, '')) || 100;
+      window.pendingEntryAmount = Number(amountText.replace(/[^0-9]/g, '')) || 50;
     }
   }, true);
   document.addEventListener('submit', event => {
-    if (event.target.id === 'createForm') window.pendingEntryAmount = Number(el('entryAmount').value) || 100;
+    if (event.target.id === 'createForm') window.pendingEntryAmount = Number(el('entryAmount').value) || 50;
   }, true);
 
   form.addEventListener('submit', async event => {
