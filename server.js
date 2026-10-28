@@ -517,10 +517,14 @@ async function sendUploadedFile(filename, res, cacheControl = 'private, no-store
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use((req, res, next) => {
-  if (req.path.toLowerCase() === '/support.html') {
+  const pathname = req.path.toLowerCase();
+  if (pathname === '/support.html' || pathname === '/index.html') {
     res.set('X-Robots-Tag', 'noindex, follow');
   }
   next();
+});
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'home.html'));
 });
 app.use(express.static('public'));
 
