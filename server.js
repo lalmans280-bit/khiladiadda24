@@ -3344,7 +3344,7 @@ app.get('/api/admin/users/:userId/history', requireAdmin, async (req, res) => {
   try {
     const [user, kyc, deposits, withdrawals, matches] = await Promise.all([
       User.findById(userId, 'username phone walletBalance createdAt isBlocked isAdmin isPrimaryAdmin').lean(),
-      Kyc.findOne({ userId }).select('status submittedAt reviewedAt').sort({ createdAt: -1 }).lean(),
+      Kyc.findOne({ userId }).select('status submittedAt reviewedAt rejectionReason aadhaarNumber aadhaarImage').sort({ createdAt: -1 }).lean(),
       Deposit.find({ userId }).select('amount status createdAt updatedAt').sort({ createdAt: -1 }).lean(),
       Withdraw.find({ userId }).select('amount status payoutMethod accountHolderName accountNumber ifscCode upiId createdAt updatedAt').sort({ createdAt: -1 }).lean(),
       Match.find({ $or: [{ creator: userId }, { joiner: userId }] })
