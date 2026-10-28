@@ -55,6 +55,11 @@
     .finance-stat small { display: block; color: #94a3b8; }
     .finance-stat strong { display: block; margin-top: 6px; color: #f8fafc; font-size: 22px; overflow-wrap: anywhere; }
     .player-name-link { padding: 0; border: 0; color: #60a5fa; background: transparent; font: inherit; text-align: left; text-decoration: underline; }
+    .player-id-link { display: block; margin-top: 4px; padding: 0; border: 0; color: #94a3b8; background: transparent; font: 11px monospace; text-align: left; text-decoration: underline; }
+    .player-kyc-status { display: inline-block; padding: 4px 8px; border-radius: 999px; font-size: 12px; font-weight: 700; white-space: nowrap; }
+    .player-kyc-status.not-submitted, .player-kyc-status.rejected { color: #fecaca; background: #7f1d1d; }
+    .player-kyc-status.pending { color: #fde68a; background: #78350f; }
+    .player-kyc-status.approved { color: #bbf7d0; background: #14532d; }
     .player-whatsapp-link { color: #22c55e; text-decoration: underline; cursor: pointer; }
     .history-dialog { width: min(900px, calc(100vw - 28px)); max-height: min(86vh, 900px); overflow: auto; padding: 20px; border: 1px solid rgba(255,255,255,0.16); border-radius: 10px; color: #e5e7eb; background: #111827; }
     .history-dialog::backdrop { background: rgba(0,0,0,0.75); }
@@ -287,7 +292,7 @@
         <span id="playerListSummary" class="muted" aria-live="polite"></span>
       </div>
       <table id="userTable">
-        <tr><th>S.N.</th><th>Player</th><th>Phone</th><th>Wallet</th><th>Monthly rank</th><th>Monthly points</th><th>Joined</th><th>Status</th><th>Admin</th><th>Action</th></tr>
+        <tr><th>S.N.</th><th>Player / ID</th><th>Phone</th><th>Wallet</th><th>Monthly rank</th><th>Monthly points</th><th>Joined</th><th>KYC</th><th>Status</th><th>Admin</th><th>Action</th></tr>
       </table>
     </div>
 
@@ -981,14 +986,14 @@
         : modePlayers;
       document.getElementById('userListTitle').textContent = playerListMode === 'NEW' ? 'New Players · Last 7 Days' : 'All Players & Wallets';
       document.getElementById('playerListSummary').textContent = `${players.length} player${players.length === 1 ? '' : 's'} · Monthly points: 20 per win, 5 per completed game`;
-      table.innerHTML = '<tr><th>S.N.</th><th>Player</th><th>Phone</th><th>Wallet</th><th>Monthly rank</th><th>Monthly points</th><th>Joined</th><th>Status</th><th>Admin</th><th>Action</th></tr>';
+      table.innerHTML = '<tr><th>S.N.</th><th>Player / ID</th><th>Phone</th><th>Wallet</th><th>Monthly rank</th><th>Monthly points</th><th>Joined</th><th>KYC</th><th>Status</th><th>Admin</th><th>Action</th></tr>';
       if (!players.length) {
         const emptyMessage = searchTerm
           ? 'Is search se koi player nahi mila.'
           : playerListMode === 'NEW'
             ? 'Last 7 days mein koi naya player nahi.'
             : 'Player list khali hai.';
-        table.innerHTML += `<tr><td colspan="10" class="empty">${emptyMessage}</td></tr>`;
+        table.innerHTML += `<tr><td colspan="11" class="empty">${emptyMessage}</td></tr>`;
         return;
       }
       players.forEach((u, index) => {
@@ -997,7 +1002,7 @@
         const isAdminUser = Boolean(u.isAdmin) || isPrimary;
         const adminLabel = isPrimary ? 'Primary' : isAdminUser ? 'Admin' : 'User';
         const adminAction = isPrimary ? '<button disabled>Primary admin</button>' : isAdminUser ? `<button class="danger" onclick="toggleAdminStatus('${u._id}', false)">Remove admin</button>` : `<button class="secondary" onclick="toggleAdminStatus('${u._id}', true)">Make admin</button>`;
-        table.innerHTML += `<tr><td>${index + 1}</td><td><button type="button" class="player-name-link" onclick="openPlayerHistory('${u._id}')">${escapeHtml(u.username)}</button></td><td>${playerWhatsAppLink(u.phone)}</td><td>₹${Number(u.walletBalance || 0).toLocaleString('en-IN')}</td><td>${u.monthlyRank || '-'}</td><td><strong>${Number(u.monthlyPoints || 0).toLocaleString('en-IN')}</strong><br><small>${Number(u.monthlyGamesPlayed || 0)} completed games</small></td><td>${new Date(u.createdAt).toLocaleString()}</td><td>${blocked ? 'Blocked' : 'Active'}</td><td>${adminLabel}</td><td><button class="secondary" onclick="openPlayerEditor('${u._id}')">Edit profile</button> <button class="${blocked ? 'unblock-button' : 'block-button'}" onclick="setPlayerBlocked('${u._id}', ${!blocked})">${blocked ? 'Unblock' : 'Block'}</button> ${adminAction}</td></tr>`;
+        table.innerHTML += `<tr><td>${index + 1}</td><td><button type="button" class="player-name-link" onclick="openPlayerHistory('${u._id}')">${escapeHtml(u.username)}</button><button type="button" class="player-id-link" aria-label="View KYC and history for player ${escapeAttribute(u._id)}" onclick="openPlayerHistory('${u._id}')">ID: ${escapeHtml(u._id)}</button></td><td>${playerWhatsAppLink(u.phone)}</td><td>₹${Number(u.walletBalance || 0).toLocaleString('en-IN')}</td><td>${u.monthlyRank || '-'}</td><td><strong>${Number(u.monthlyPoints || 0).toLocaleString('en-IN')}</strong><br><small>${Number(u.monthlyGamesPlayed || 0)} completed games</small></td><td>${new Date(u.createdAt).toLocaleString()}</td><td><span class="player-kyc-status ${u.kycStatus === 'APPROVED' ? 'approved' : u.kycStatus === 'PENDING' ? 'pending' : u.kycStatus === 'REJECTED' ? 'rejected' : 'not-submitted'}">${u.kycStatus === 'APPROVED' ? 'Approved' : u.kycStatus === 'PENDING' ? 'Pending review' : u.kycStatus === 'REJECTED' ? 'Rejected' : 'Not submitted'}</span></td><td>${blocked ? 'Blocked' : 'Active'}</td><td>${adminLabel}</td><td><button class="secondary" onclick="openPlayerEditor('${u._id}')">Edit profile</button> <button class="${blocked ? 'unblock-button' : 'block-button'}" onclick="setPlayerBlocked('${u._id}', ${!blocked})">${blocked ? 'Unblock' : 'Block'}</button> ${adminAction}</td></tr>`;
       });
     }
 
@@ -1404,6 +1409,11 @@
             <div><small>Deposited · approved</small><strong>₹${totalDeposits.toLocaleString('en-IN')}</strong></div>
             <div><small>Withdrawn · paid</small><strong>₹${totalWithdrawals.toLocaleString('en-IN')}</strong></div>
             <div><small>Games played</small><strong>${playedMatches.length} / ${matches.length} total</strong></div>             <div><small>KYC</small><strong>${kyc?.status === 'APPROVED' ? 'Approved' : kyc?.status === 'PENDING' ? 'Pending review' : kyc?.status === 'REJECTED' ? 'Rejected' : 'Not submitted'}</strong></div>
+          </div>
+          <h4>KYC Document</h4>
+          <div class="kyc-history-card">
+            ${kyc?.aadhaarNumber ? `<div><small>Aadhaar</small><strong>XXXX XXXX ${escapeHtml(String(kyc.aadhaarNumber).slice(-4))}</strong></div>` : '<div><small>Aadhaar</small><strong>Not submitted</strong></div>'}
+            ${kyc?.aadhaarImage ? `<div><small>Document</small><strong><a href="/api/admin/uploads/${encodeURIComponent(String(kyc.aadhaarImage).split('/').pop())}" target="_blank" rel="noopener noreferrer">View Aadhaar image</a></strong></div>` : '<div><small>Document</small><strong>Not uploaded</strong></div>'}
           </div>
           <h4>Deposits</h4><table><tr><th>Date</th><th>Amount</th><th>Status</th></tr>${depositRows}</table>
           <h4>Withdrawals</h4><table><tr><th>Date</th><th>Amount</th><th>Method</th><th>Status</th></tr>${withdrawalRows}</table>
