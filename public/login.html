@@ -4,10 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#101713">
+  <meta name="robots" content="noindex,follow">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link rel="manifest" href="/api/site-manifest">
+  <link rel="icon" href="/favicon.ico" sizes="any">
   <link rel="icon" href="/app-icon.svg" type="image/svg+xml">
   <link rel="shortcut icon" href="/app-icon.svg" type="image/svg+xml">
   <link rel="icon" href="/app-icon-192.png" type="image/png" sizes="192x192">
@@ -26,10 +28,19 @@
     .form-hint { margin: 7px 0 22px; color: #0b1b3a; font-size: 14px; line-height: 1.5; text-align: center; }
     label { display: block; margin: 14px 0 6px; color: #0b1b3a; font-size: 13px; }
     input, button { width: 100%; min-height: 48px; margin: 7px 0; padding: 12px; border-radius: 7px; font: inherit; }
-    .login-modes { display: grid; grid-template-columns: 1fr 1fr; gap: 0; margin: 0 0 18px; padding: 4px; border: 1px solid #fff; border-radius: 8px; background: #fff; }
-    .login-modes a { min-height: 42px; display: grid; place-items: center; border-radius: 5px; color: #000; font-size: 14px; font-weight: 900; text-transform: uppercase; text-decoration: none; }
-    .login-modes a:first-child { border-right: 1px solid #000; border-radius: 5px 0 0 5px; }
-    .login-modes a[aria-current="page"] { background: #e5e7eb; color: #000; font-weight: 900; }
+    .login-modes { display: grid; width: max-content; margin: 0 auto 18px; }
+    .login-modes a { min-width: 132px; min-height: 42px; display: grid; place-items: center; border: 1px solid #fff; border-radius: 7px; color: #fff; font-size: 16px; font-weight: 900; text-decoration: none; transition: background-color 0.15s ease, box-shadow 0.15s ease; }
+    .login-modes #playerModeLink { background: #123b27; }
+    #adminModeLink { display: grid; width: 24px; min-height: 24px; margin: 8px auto 0; padding: 0; place-items: center; border: 0; border-radius: 50%; background: transparent; color: #fff; font-size: 13px; line-height: 1; text-decoration: none; }
+    .mode-label { display: inline-flex; gap: 1px; }
+    .login-modes #playerModeLink .mode-letter:nth-child(1) { color: #22d3ee; }
+    .login-modes #playerModeLink .mode-letter:nth-child(2) { color: #facc15; }
+    .login-modes #playerModeLink .mode-letter:nth-child(3) { color: #fb7185; }
+    .login-modes #playerModeLink .mode-letter:nth-child(4) { color: #4ade80; }
+    .login-modes #playerModeLink .mode-letter:nth-child(5) { color: #60a5fa; }
+    .login-modes #playerModeLink .mode-letter:nth-child(6) { color: #f97316; }
+    .login-modes #playerModeLink[aria-current="page"] { background: #14532d; box-shadow: inset 0 0 0 2px #bbf7d0; }
+    #adminModeLink[aria-current="page"] { background: #1e3a8a; box-shadow: inset 0 0 0 1px #bfdbfe; }
     input { border: 1px solid #46594a; background: #101813; color: var(--ink); font-size: 16px; }
     input::placeholder { color: #8f9e92; }
     input:focus-visible, button:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
@@ -49,8 +60,7 @@
     <p class="brand-tagline">PLAY &amp; WIN REAL CASH</p>
     <p class="form-hint" id="formHint" hidden></p>
     <nav class="login-modes" aria-label="Login type">
-      <a id="playerModeLink" href="/login.html">Player</a>
-      <a id="adminModeLink" href="/login.html?admin=1">Admin</a>
+      <a id="playerModeLink" href="/login.html"><span class="mode-label" aria-label="Player"><span class="mode-letter" aria-hidden="true">P</span><span class="mode-letter" aria-hidden="true">l</span><span class="mode-letter" aria-hidden="true">a</span><span class="mode-letter" aria-hidden="true">y</span><span class="mode-letter" aria-hidden="true">e</span><span class="mode-letter" aria-hidden="true">r</span></span></a>
     </nav>
     <form id="phoneForm" novalidate>
       <h2 class="welcome-back">Welcome back</h2>
@@ -70,6 +80,7 @@
       <button id="changePhoneBtn" class="secondary" type="button">Mobile number badlein</button>
     </form>
     <p id="msg" role="status" aria-live="polite" aria-atomic="true"></p>
+    <a id="adminModeLink" href="/login.html?admin=1" aria-label="Admin login" title="Admin login"><span aria-hidden="true">ðŸ‘‘</span></a>
   </div>
 
   <script>
@@ -87,7 +98,7 @@
       if (!next) return '/index.html';
       try {
         const target = new URL(next, location.origin);
-        if (target.origin === location.origin && target.pathname === '/index.html') {
+        if (target.origin === location.origin && ['/index.html', '/support.html'].includes(target.pathname)) {
           return `${target.pathname}${target.search}${target.hash}`;
         }
       } catch {}
