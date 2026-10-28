@@ -1,28 +1,28 @@
 User-agent: Googlebot
 Allow: /$
 Allow: /index.html
+Allow: /home.html
 Allow: /
 Disallow: /api/
 Disallow: /admin.html
-Disallow: /login.html
 Disallow: /deposit.html
 
 User-agent: Google-InspectionTool
 Allow: /$
 Allow: /index.html
+Allow: /home.html
 Allow: /
 Disallow: /api/
 Disallow: /admin.html
-Disallow: /login.html
 Disallow: /deposit.html
 
 User-agent: *
 Allow: /$
 Allow: /index.html
+Allow: /home.html
 Allow: /
 Disallow: /api/
 Disallow: /admin.html
-Disallow: /login.html
 Disallow: /deposit.html
 
 Sitemap: https://khiladiadda24.com/sitemap.xml
