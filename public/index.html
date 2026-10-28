@@ -466,6 +466,21 @@
       document.querySelectorAll('#gamePicker [data-launch-game="LUDO"], #gamePicker [data-launch-game="POPULAR_LUDO"], #gamePicker [data-launch-game="LUDO_RACE"], #gamePicker [data-launch-game="SNAKE"]').forEach(tile => tile.remove());
       const supportImage = document.querySelector('#gamePicker .game-support-banner img');
       if (supportImage) supportImage.src = '/support%20banner.png?v=20261028-support';
+      const cricketTile = document.querySelector('#gamePicker [data-cricket-promo]');
+      const pubgTile = document.querySelector('#gamePicker [data-pubg-promo]');
+      if (cricketTile) cricketTile.classList.add('cricket-game-tile');
+      if (pubgTile) {
+        pubgTile.classList.add('pubg-game-tile');
+        const logo = document.createElement('img');
+        logo.className = 'pubg-game-logo';
+        logo.src = '/pubg.png';
+        logo.alt = '';
+        logo.setAttribute('aria-hidden', 'true');
+        pubgTile.insertBefore(logo, pubgTile.querySelector('strong'));
+      }
+      const gameLogoStyles = document.createElement('style');
+      gameLogoStyles.textContent = '#gamePicker .cricket-game-tile{background:linear-gradient(0deg,#101713df,#1017131a 75%),url("/cricket.png") center/cover no-repeat}#gamePicker .pubg-game-tile{background:linear-gradient(0deg,#101713df,#1017131a 75%),url("/pubg.png") center/cover no-repeat}#gamePicker .pubg-game-logo{position:relative;z-index:1;width:68px;height:68px;border:2px solid #e1bf76;border-radius:8px;object-fit:cover;box-shadow:0 3px 8px #000b}';
+      document.head.append(gameLogoStyles);
     });
   </script>
 </head>
