@@ -31,7 +31,9 @@
     .login-modes { display: flex; align-items: center; gap: 6px; width: max-content; margin: 0 auto 18px; }
     .login-modes a { min-width: 132px; min-height: 42px; display: grid; place-items: center; border: 1px solid #fff; border-radius: 7px; color: #fff; font-size: 16px; font-weight: 900; text-decoration: none; transition: background-color 0.15s ease, box-shadow 0.15s ease; }
     .login-modes #playerModeLink { background: #123b27; }
-    .login-pointer { font-size: 18px; line-height: 1; }
+    .login-pointer { color: #facc15; font-size: 18px; line-height: 1; filter: drop-shadow(0 0 5px #facc15); animation: pointer-blink 1s ease-in-out infinite; }
+    @keyframes pointer-blink { 0%, 100% { opacity: 1; transform: scale(1); filter: drop-shadow(0 0 5px #22d3ee); } 50% { opacity: 0.35; transform: scale(0.88); filter: drop-shadow(0 0 9px #fb7185); } }
+    @media (prefers-reduced-motion: reduce) { .login-pointer { animation: none; } }
     #adminModeLink { display: grid; width: 24px; min-height: 24px; margin: 8px auto 0; padding: 0; place-items: center; border: 0; border-radius: 50%; background: transparent; color: #fff; font-size: 13px; line-height: 1; text-decoration: none; }
     .mode-label { display: inline-flex; gap: 1px; }
     .login-modes #playerModeLink .mode-letter:nth-child(1) { color: #22d3ee; }
