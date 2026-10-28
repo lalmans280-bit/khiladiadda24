@@ -83,11 +83,13 @@
     .support-admin-message.admin { justify-self: end; background: #14532d; }
     .support-admin-message small { display: block; margin-top: 4px; color: #cbd5e1; }
     .support-message-delete { margin-top: 7px; padding: 4px 7px; border: 1px solid #7f1d1d; border-radius: 6px; color: #fecaca; background: #450a0a; font-size: 11px; }
-    .support-admin-attachment { display: block; width: min(100%, 320px); max-height: 240px; margin-top: 8px; border: 1px solid rgba(255,255,255,0.16); border-radius: 8px; object-fit: contain; background: #0f172a; }
+    .support-admin-attachment { display: block; width: min(100%, 320px); max-height: 240px; margin-top: 8px; border: 1px solid rgba(255,255,255,0.16); border-radius: 8px; object-fit: contain; background: #0f172a; cursor: zoom-in; }
     .support-admin-form { display: grid; grid-template-columns: 1fr; gap: 8px; }
     .support-admin-form textarea { width: 100%; padding: 10px; border: 1px solid #475569; border-radius: 7px; color: #fff; background: #0f172a; font: inherit; }
-    .support-admin-form-actions { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 8px; }
-    .support-admin-file { min-width: 0; color: #cbd5e1; font-size: 12px; }
+    .support-admin-form-actions { display: flex; align-items: center; justify-content: flex-end; gap: 8px; }
+    .support-admin-attach { min-height: 40px; padding: 8px 10px; border: 1px solid #475569; border-radius: 8px; color: #e2e8f0; background: #334155; font-size: 13px; }
+    .support-admin-file { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+    .support-admin-file-name { flex: 1; min-width: 0; overflow: hidden; color: #94a3b8; font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
     .leaderboard-settings { display: grid; grid-template-columns: repeat(3, minmax(120px, 1fr)); gap: 10px; }
     .leaderboard-settings label { color: #cbd5e1; font-size: 12px; }
     .leaderboard-prizes { width: 100%; min-height: 90px; padding: 10px; border: 1px solid #475569; border-radius: 7px; color: #fff; background: #0f172a; font: inherit; }
@@ -285,7 +287,7 @@
         <span id="playerListSummary" class="muted" aria-live="polite"></span>
       </div>
       <table id="userTable">
-        <tr><th>S.N.</th><th>Player</th><th>Phone</th><th>Wallet</th><th>Monthly rank</th><th>Monthly points</th><th>Joined</th><th>Status</th><th>Admin</th><th>Action</th></tr>
+        <tr><th>S.N.</th><th>Player</th><th>Phone</th><th>Wallet</th><th>Monthly rank</th><th>Monthly points</th><th>Joined</th><th>KYC</th><th>Status</th><th>Admin</th><th>Action</th></tr>
       </table>
     </div>
 
@@ -317,6 +319,8 @@
           <form id="supportAdminForm" class="support-admin-form">
             <textarea id="supportAdminInput" rows="2" maxlength="1000" placeholder="Player ko reply likhein..." disabled></textarea>
             <div class="support-admin-form-actions">
+              <span id="supportAdminAttachmentName" class="support-admin-file-name">No screenshot selected</span>
+              <button id="supportAdminAttachButton" class="support-admin-attach" type="button" disabled>📎 Attach screenshot</button>
               <input id="supportAdminAttachment" class="support-admin-file" type="file" accept="image/jpeg,image/png,image/webp" aria-label="Reply screenshot attach karein" disabled>
               <button id="supportAdminSend" type="submit" disabled>Send reply</button>
             </div>
@@ -557,7 +561,7 @@
           <div class="finance-stat">
             <small>${adminGameTypeLabel(match.gameType)} · ${escapeHtml(match.status)} · Entry ₹${Number(match.amount).toLocaleString('en-IN')} each</small>
             <strong>${escapeHtml(match.creator?.username || 'Creator')} vs ${escapeHtml(match.joiner?.username || 'Joiner')}</strong>
-            <small>${match.gameType === 'LUDO_RACE' ? 'In-app board' : match.roomCode ? `Room: ${escapeHtml(match.roomCode)}` : 'Room code not shared'} · ${match.gameStartedAt ? 'Game started' : 'Waiting to start'}</small>
+            <small>${match.gameType === 'LUDO_RACE' && match.ludoRace ? 'In-app board' : match.roomCode ? `Room: ${escapeHtml(match.roomCode)}` : 'Room code not shared'} · ${match.gameStartedAt ? 'Game started' : 'Waiting to start'}</small>
             <small>${resultReports}</small>
             <div class="running-overview-proofs">${resultProofs}</div>
             ${adminMatchDecisionControls(match, 'overview-')}
@@ -977,14 +981,14 @@
         : modePlayers;
       document.getElementById('userListTitle').textContent = playerListMode === 'NEW' ? 'New Players · Last 7 Days' : 'All Players & Wallets';
       document.getElementById('playerListSummary').textContent = `${players.length} player${players.length === 1 ? '' : 's'} · Monthly points: 20 per win, 5 per completed game`;
-      table.innerHTML = '<tr><th>S.N.</th><th>Player</th><th>Phone</th><th>Wallet</th><th>Monthly rank</th><th>Monthly points</th><th>Joined</th><th>Status</th><th>Admin</th><th>Action</th></tr>';
+      table.innerHTML = '<tr><th>S.N.</th><th>Player</th><th>Phone</th><th>Wallet</th><th>Monthly rank</th><th>Monthly points</th><th>Joined</th><th>KYC</th><th>Status</th><th>Admin</th><th>Action</th></tr>';
       if (!players.length) {
         const emptyMessage = searchTerm
           ? 'Is search se koi player nahi mila.'
           : playerListMode === 'NEW'
             ? 'Last 7 days mein koi naya player nahi.'
             : 'Player list khali hai.';
-        table.innerHTML += `<tr><td colspan="10" class="empty">${emptyMessage}</td></tr>`;
+        table.innerHTML += `<tr><td colspan="11" class="empty">${emptyMessage}</td></tr>`;
         return;
       }
       players.forEach((u, index) => {
@@ -993,7 +997,7 @@
         const isAdminUser = Boolean(u.isAdmin) || isPrimary;
         const adminLabel = isPrimary ? 'Primary' : isAdminUser ? 'Admin' : 'User';
         const adminAction = isPrimary ? '<button disabled>Primary admin</button>' : isAdminUser ? `<button class="danger" onclick="toggleAdminStatus('${u._id}', false)">Remove admin</button>` : `<button class="secondary" onclick="toggleAdminStatus('${u._id}', true)">Make admin</button>`;
-        table.innerHTML += `<tr><td>${index + 1}</td><td><button type="button" class="player-name-link" onclick="openPlayerHistory('${u._id}')">${escapeHtml(u.username)}</button></td><td>${playerWhatsAppLink(u.phone)}</td><td>₹${Number(u.walletBalance || 0).toLocaleString('en-IN')}</td><td>${u.monthlyRank || '-'}</td><td><strong>${Number(u.monthlyPoints || 0).toLocaleString('en-IN')}</strong><br><small>${Number(u.monthlyGamesPlayed || 0)} completed games</small></td><td>${new Date(u.createdAt).toLocaleString()}</td><td>${blocked ? 'Blocked' : 'Active'}</td><td>${adminLabel}</td><td><button class="secondary" onclick="openPlayerEditor('${u._id}')">Edit profile</button> <button class="${blocked ? 'unblock-button' : 'block-button'}" onclick="setPlayerBlocked('${u._id}', ${!blocked})">${blocked ? 'Unblock' : 'Block'}</button> ${adminAction}</td></tr>`;
+        table.innerHTML += `<tr><td>${index + 1}</td><td><button type="button" class="player-name-link" onclick="openPlayerHistory('${u._id}')">${escapeHtml(u.username)}</button></td><td>${playerWhatsAppLink(u.phone)}</td><td>₹${Number(u.walletBalance || 0).toLocaleString('en-IN')}</td><td>${u.monthlyRank || '-'}</td><td><strong>${Number(u.monthlyPoints || 0).toLocaleString('en-IN')}</strong><br><small>${Number(u.monthlyGamesPlayed || 0)} completed games</small></td><td>${new Date(u.createdAt).toLocaleString()}</td><td>${adminKycStatusLabel(u.kycStatus)}</td><td>${blocked ? 'Blocked' : 'Active'}</td><td>${adminLabel}</td><td><button class="secondary" onclick="openPlayerEditor('${u._id}')">Edit profile</button> <button class="${blocked ? 'unblock-button' : 'block-button'}" onclick="setPlayerBlocked('${u._id}', ${!blocked})">${blocked ? 'Unblock' : 'Block'}</button> ${adminAction}</td></tr>`;
       });
     }
 
@@ -1085,6 +1089,20 @@
     let activeSupportUserId = '';
 
     const adminSupportAttachmentUrls = new Map();
+    const supportAdminAttachment = document.getElementById('supportAdminAttachment');
+    const supportAdminAttachmentName = document.getElementById('supportAdminAttachmentName');
+    document.getElementById('supportAdminAttachButton').addEventListener('click', () => supportAdminAttachment.click());
+    supportAdminAttachment.addEventListener('change', () => {
+      const file = supportAdminAttachment.files[0];
+      if (file && (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type) || file.size > 5 * 1024 * 1024)) {
+        supportAdminAttachment.value = '';
+        supportAdminAttachmentName.textContent = 'No screenshot selected';
+        alert('JPEG, PNG ya WebP screenshot 5 MB ke andar select karein.');
+        return;
+      }
+      supportAdminAttachmentName.textContent = file?.name || 'No screenshot selected';
+      supportAdminAttachmentName.title = file?.name || '';
+    });
 
     async function renderAdminSupportMessages(messages) {
       const container = document.getElementById('supportAdminMessages');
@@ -1112,8 +1130,14 @@
             const image = document.createElement('img');
             image.className = 'support-admin-attachment';
             image.src = objectUrl;
-            image.alt = 'Player attached screenshot';
-            bubble.appendChild(image);
+            image.alt = 'Chat screenshot';
+            const imageLink = document.createElement('a');
+            imageLink.href = objectUrl;
+            imageLink.target = '_blank';
+            imageLink.rel = 'noopener noreferrer';
+            imageLink.setAttribute('aria-label', 'Open full-size chat screenshot');
+            imageLink.appendChild(image);
+            bubble.appendChild(imageLink);
           } catch (error) {
             const attachmentError = document.createElement('small');
             attachmentError.textContent = error.message || 'Screenshot load nahi ho saka.';
@@ -1169,6 +1193,8 @@
             document.getElementById('supportAdminInput').disabled = true;
             document.getElementById('supportAdminAttachment').value = '';
             document.getElementById('supportAdminAttachment').disabled = true;
+            document.getElementById('supportAdminAttachmentName').textContent = 'No screenshot selected';
+            document.getElementById('supportAdminAttachButton').disabled = true;
             document.getElementById('supportAdminSend').disabled = true;
             document.getElementById('supportAdminMessages').innerHTML = '<p class="muted">Conversation kholne ke liye player select karein.</p>';
           }
@@ -1199,6 +1225,8 @@
                 document.getElementById('supportAdminInput').disabled = true;
                 document.getElementById('supportAdminAttachment').value = '';
                 document.getElementById('supportAdminAttachment').disabled = true;
+                document.getElementById('supportAdminAttachmentName').textContent = 'No screenshot selected';
+                document.getElementById('supportAdminAttachButton').disabled = true;
                 document.getElementById('supportAdminSend').disabled = true;
                 document.getElementById('supportAdminMessages').innerHTML = '<p class="muted">Conversation kholne ke liye player select karein.</p>';
               }
@@ -1218,6 +1246,8 @@
             document.getElementById('supportAdminInput').disabled = true;
             document.getElementById('supportAdminAttachment').value = '';
             document.getElementById('supportAdminAttachment').disabled = true;
+            document.getElementById('supportAdminAttachmentName').textContent = 'No screenshot selected';
+            document.getElementById('supportAdminAttachButton').disabled = true;
             document.getElementById('supportAdminSend').disabled = true;
             document.getElementById('supportAdminMessages').innerHTML = '<p class="muted">Conversation kholne ke liye player select karein.</p>';
           }
@@ -1231,6 +1261,7 @@
       activeSupportUserId = userId;
       document.getElementById('supportAdminInput').disabled = false;
       document.getElementById('supportAdminAttachment').disabled = false;
+      document.getElementById('supportAdminAttachButton').disabled = false;
       document.getElementById('supportAdminSend').disabled = false;
       await refreshAdminSupportThread();
       await loadAdminSupportThreads();
@@ -1263,6 +1294,8 @@
         if (!response.ok) throw new Error(data.error || 'Reply send nahi hui.');
         input.value = '';
         document.getElementById('supportAdminAttachment').value = '';
+        supportAdminAttachmentName.textContent = 'No screenshot selected';
+        supportAdminAttachmentName.title = '';
         await Promise.all([refreshAdminSupportThread(), loadAdminSupportThreads()]);
       } catch (error) {
         alert(error.message || 'Reply send nahi hui.');
@@ -1275,6 +1308,15 @@
       return value ? new Date(value).toLocaleString('en-IN') : '-';
     }
 
+    function adminKycStatusLabel(status) {
+      return ({
+        NOT_SUBMITTED: 'Not submitted',
+        PENDING: 'Pending review',
+        APPROVED: 'Approved',
+        REJECTED: 'Rejected'
+      })[status] || 'Unknown';
+    }
+
     function openPlayerEditor(userId) {
       const dialog = document.getElementById('playerHistoryDialog');
       const content = document.getElementById('playerHistoryContent');
@@ -1285,12 +1327,14 @@
           const data = await res.json();
           if (!res.ok) throw new Error(data.error || 'Player profile nahi mili');
           const user = data.user;
+          const kyc = data.kyc || {};
           content.innerHTML = `
             <div class="history-summary">
               <div><small>Selected player</small><strong>${escapeHtml(user.username)}</strong></div>
               <div><small>Phone</small><strong>${escapeHtml(user.phone)}</strong></div>
               <div><small>Wallet</small><strong>₹${Number(user.walletBalance || 0).toLocaleString('en-IN')}</strong></div>
               <div><small>Status</small><strong>${user.isBlocked ? 'Blocked' : 'Active'}</strong></div>
+              <div><small>KYC</small><strong>${adminKycStatusLabel(kyc.status || 'NOT_SUBMITTED')}</strong>${kyc.submittedAt ? `<small>Submitted ${formatHistoryDate(kyc.submittedAt)}</small>` : ''}</div>
             </div>
             <form id="adminPlayerEditForm" class="admin-player-form">
               <div class="field"><label>Username<input name="username" value="${escapeHtml(user.username)}" required></label></div>
@@ -1345,7 +1389,7 @@
             : `Server ne JSON ke badle webpage bheja (HTTP ${res.status}). Backend restart ya redeploy karke dobara try karein.`);
         }
         if (!res.ok) throw new Error(data.error || 'Player history nahi mili');
-        const { user, deposits, withdrawals, matches } = data;
+        const { user, kyc, deposits, withdrawals, matches } = data;
         const approvedDeposits = deposits.filter(item => item.status === 'APPROVED');
         const paidWithdrawals = withdrawals.filter(item => item.status === 'PAID');
         const totalDeposits = approvedDeposits.reduce((total, item) => total + Number(item.amount || 0), 0);
@@ -1367,10 +1411,12 @@
         }).join('') || '<tr><td colspan="6">No game history</td></tr>';
         content.innerHTML = `
           <div class="history-summary">
+            <div><small>Player ID</small><strong>${escapeHtml(user._id)}</strong></div>
             <div><small>Current wallet</small><strong>₹${Number(user.walletBalance).toLocaleString('en-IN')}</strong></div>
             <div><small>Deposited · approved</small><strong>₹${totalDeposits.toLocaleString('en-IN')}</strong></div>
             <div><small>Withdrawn · paid</small><strong>₹${totalWithdrawals.toLocaleString('en-IN')}</strong></div>
             <div><small>Games played</small><strong>${playedMatches.length} / ${matches.length} total</strong></div>
+            <div><small>KYC</small><strong>${adminKycStatusLabel(kyc?.status || 'NOT_SUBMITTED')}</strong>${kyc?.submittedAt ? `<small>Submitted ${formatHistoryDate(kyc.submittedAt)}</small>` : ''}</div>
           </div>
           <h4>Deposits</h4><table><tr><th>Date</th><th>Amount</th><th>Status</th></tr>${depositRows}</table>
           <h4>Withdrawals</h4><table><tr><th>Date</th><th>Amount</th><th>Method</th><th>Status</th></tr>${withdrawalRows}</table>
