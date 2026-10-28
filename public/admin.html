@@ -1378,7 +1378,7 @@
             : `Server ne JSON ke badle webpage bheja (HTTP ${res.status}). Backend restart ya redeploy karke dobara try karein.`);
         }
         if (!res.ok) throw new Error(data.error || 'Player history nahi mili');
-        const { user, deposits, withdrawals, matches } = data;
+        const { user, kyc, deposits, withdrawals, matches } = data;         const kycStatus = kyc?.status || 'NOT_SUBMITTED';
         const approvedDeposits = deposits.filter(item => item.status === 'APPROVED');
         const paidWithdrawals = withdrawals.filter(item => item.status === 'PAID');
         const totalDeposits = approvedDeposits.reduce((total, item) => total + Number(item.amount || 0), 0);
@@ -1403,7 +1403,7 @@
             <div><small>Current wallet</small><strong>₹${Number(user.walletBalance).toLocaleString('en-IN')}</strong></div>
             <div><small>Deposited · approved</small><strong>₹${totalDeposits.toLocaleString('en-IN')}</strong></div>
             <div><small>Withdrawn · paid</small><strong>₹${totalWithdrawals.toLocaleString('en-IN')}</strong></div>
-            <div><small>Games played</small><strong>${playedMatches.length} / ${matches.length} total</strong></div>
+            <div><small>Games played</small><strong>${playedMatches.length} / ${matches.length} total</strong></div>             <div><small>KYC</small><strong>${kyc?.status === 'APPROVED' ? 'Approved' : kyc?.status === 'PENDING' ? 'Pending review' : kyc?.status === 'REJECTED' ? 'Rejected' : 'Not submitted'}</strong></div>
           </div>
           <h4>Deposits</h4><table><tr><th>Date</th><th>Amount</th><th>Status</th></tr>${depositRows}</table>
           <h4>Withdrawals</h4><table><tr><th>Date</th><th>Amount</th><th>Method</th><th>Status</th></tr>${withdrawalRows}</table>
