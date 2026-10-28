@@ -524,7 +524,31 @@ app.use((req, res, next) => {
   next();
 });
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'home.html'));
+  res.sendFile(path.join(__dirname, 'public', 'home.html'), error => {
+    if (!error) return;
+    console.error('Could not serve the public homepage:', error);
+    if (res.headersSent) return;
+    res.status(200).type('html').send(`<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101713">
+  <meta name="description" content="Visit KhiladiAdda24 to explore Ludo Classic, Ludo Race, Snake Battle and the PUBG 2D prototype.">
+  <meta name="robots" content="index,follow">
+  <link rel="canonical" href="https://khiladiadda24.com/">
+  <title>KhiladiAdda24 - Ludo, Snake &amp; Games</title>
+</head>
+<body>
+  <main>
+    <h1>KhiladiAdda24 - Ludo, Snake &amp; Games</h1>
+    <p>Explore Ludo Classic, Ludo Race, Snake Battle and the PUBG 2D prototype.</p>
+    <p><a href="/index.html">Open player app / Sign in</a></p>
+    <p><a href="/support.html">Player support</a></p>
+  </main>
+</body>
+</html>`);
+  });
 });
 app.use(express.static('public'));
 
