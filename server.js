@@ -1458,13 +1458,9 @@ app.get('/api/admin/uploads/:filename', requireAdmin, async (req, res) => {
 // ================= MATCH & TOURNAMENT ROUTES ================= //
 
 app.post('/api/matches/create', requireUser, async (req, res) => {
-  const { amount, gameType } = req.body;
+  const { gameType } = req.body;
   const userId = req.auth.userId;
-  const entryAmount = Number(amount);
-
-  if (!Number.isInteger(entryAmount) || entryAmount < 50 || entryAmount > 50000 || (entryAmount - 50) % 50 !== 0) {
-    return res.status(400).json({ error: 'Battle entry ₹50 se ₹50,000 tak ₹50 ke steps mein honi chahiye' });
-  }
+  const entryAmount = 0;
   if (!['LUDO', 'POPULAR_LUDO', 'SNAKE', 'LUDO_RACE'].includes(String(gameType || 'LUDO').toUpperCase())) {
     return res.status(400).json({ error: 'Ludo, Popular Ludo, Ludo Race ya Snake game select karein' });
   }
@@ -1476,19 +1472,11 @@ app.post('/api/matches/create', requireUser, async (req, res) => {
       return res.status(400).json({ error: 'Ek player ek time par maximum 2 active bets rakh sakta hai' });
     }
 
-    const debit = await debitWalletForEntry(userId, entryAmount);
-    if (!debit) {
-      await releaseActiveBet(userId);
-      reservationHeld = false;
-      return res.status(400).json({ error: 'Balance kam hai. Pehle wallet recharge karein.' });
-    }
-
     let match;
     try {
-      match = await Match.create({ creator: userId, amount: entryAmount, creatorWinningsUsed: debit.winningsUsed, gameType: (gameType || 'LUDO').toUpperCase() });
+      match = await Match.create({ creator: userId, amount: entryAmount, creatorWinningsUsed: 0, gameType: (gameType || 'LUDO').toUpperCase() });
       reservationHeld = false;
     } catch (err) {
-      await refundWalletEntry(userId, entryAmount, debit.winningsUsed);
       await releaseActiveBet(userId);
       reservationHeld = false;
       throw err;
@@ -2194,6 +2182,9 @@ app.post('/api/matches/join', requireUser, async (req, res) => {
     const match = await Match.findById(matchId);
     if (!match || match.status !== 'OPEN') {
       return res.status(400).json({ error: 'Match expire ho chuka hai' });
+    }
+    if (Number(match.amount) > 0) {
+      return res.status(400).json({ error: 'Paid match ab join nahi ho sakta. Creator cancel karke entry refund le sakta hai.' });
     }
 
     if (match.creator.toString() === userId) {
@@ -3285,11 +3276,22 @@ app.get('/api/admin/users', requireAdmin, async (req, res) => {
       User.find({}, 'username phone profileImage walletBalance createdAt isBlocked isAdmin isPrimaryAdmin').sort({ createdAt: -1 }).lean(),
       getMonthlyLeaderboard(new Date(new Date().getFullYear(), new Date().getMonth(), 1), true)
     ]);
+    const kycs = await Kyc.find({ userId: { $in: users.map(user => user._id) } })
+      .select('userId status submittedAt createdAt')
+      .sort({ createdAt: -1 })
+      .lean();
+    const latestKycByUser = new Map();
+    kycs.forEach(kyc => {
+      const userId = String(kyc.userId);
+      if (!latestKycByUser.has(userId)) latestKycByUser.set(userId, kyc);
+    });
     const monthlyStats = new Map(monthlyLeaderboard.map(player => [player.userId, player]));
     const usersWithMonthlyPoints = users.map(user => {
       const monthly = monthlyStats.get(String(user._id));
+      const kyc = latestKycByUser.get(String(user._id));
       return {
         ...user,
+        kycStatus: kyc?.status || 'NOT_SUBMITTED',
         monthlyPoints: monthly?.points || 0,
         monthlyGamesPlayed: monthly?.gamesPlayed || 0,
         monthlyRank: monthly?.rank || null,
@@ -3340,8 +3342,9 @@ app.get('/api/admin/users/:userId/history', requireAdmin, async (req, res) => {
   }
 
   try {
-    const [user, deposits, withdrawals, matches] = await Promise.all([
+    const [user, kyc, deposits, withdrawals, matches] = await Promise.all([
       User.findById(userId, 'username phone walletBalance createdAt isBlocked isAdmin isPrimaryAdmin').lean(),
+      Kyc.findOne({ userId }).select('status submittedAt reviewedAt').sort({ createdAt: -1 }).lean(),
       Deposit.find({ userId }).select('amount status createdAt updatedAt').sort({ createdAt: -1 }).lean(),
       Withdraw.find({ userId }).select('amount status payoutMethod accountHolderName accountNumber ifscCode upiId createdAt updatedAt').sort({ createdAt: -1 }).lean(),
       Match.find({ $or: [{ creator: userId }, { joiner: userId }] })
@@ -3353,7 +3356,7 @@ app.get('/api/admin/users/:userId/history', requireAdmin, async (req, res) => {
         .lean()
     ]);
     if (!user) return res.status(404).json({ error: 'Player nahi mila' });
-    res.json({ user, deposits, withdrawals, matches });
+    res.json({ user, kyc: kyc || { status: 'NOT_SUBMITTED', submittedAt: null, reviewedAt: null }, deposits, withdrawals, matches });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
