@@ -555,7 +555,7 @@ function siteBrandingPayload(settings) {
     homeBannerUrl: brandingImageUrl(settings, 'homeBannerPath', '/banner-ludo-snake.png'),
     ludoBannerUrl: brandingImageUrl(settings, 'ludoBannerPath', '/ludo-classic.png'),
     snakeBannerUrl: brandingImageUrl(settings, 'snakeBannerPath', '/snake-battles-banner.png'),
-    supportBannerUrl: brandingImageUrl(settings, 'supportBannerPath', '/whatsapp-support.png')
+    supportBannerUrl: brandingImageUrl(settings, 'supportBannerPath', '/support-banner.png')
   };
 }
 
@@ -609,7 +609,7 @@ app.get('/api/site-branding/image/:asset', async (req, res) => {
     'home-banner': ['homeBannerPath', '/banner-ludo-snake.png'],
     'ludo-banner': ['ludoBannerPath', '/ludo-classic.png'],
     'snake-banner': ['snakeBannerPath', '/snake-battles-banner.png'],
-    'support-banner': ['supportBannerPath', '/whatsapp-support.png']
+    'support-banner': ['supportBannerPath', '/support-banner.png']
   }[req.params.asset];
   if (!imageSettings) return res.status(404).end();
   try {
