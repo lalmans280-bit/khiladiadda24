@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128" fill="none">
+  <defs>
+    <linearGradient id="badge" x1="20" y1="14" x2="108" y2="114" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#28583D"/>
+      <stop offset="1" stop-color="#12251D"/>
+    </linearGradient>
+    <linearGradient id="bat" x1="27" y1="48" x2="101" y2="102" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFE7A0"/>
+      <stop offset="1" stop-color="#D99A36"/>
+    </linearGradient>
+  </defs>
+  <circle cx="64" cy="64" r="59" fill="url(#badge)" stroke="#F4C84B" stroke-width="4"/>
+  <path d="m31 95 54-55 10 10-55 54-9-9Z" fill="url(#bat)" stroke="#6B4321" stroke-width="3" stroke-linejoin="round"/>
+  <path d="m45 104 54-55 9 9-54 55-9-9Z" fill="url(#bat)" stroke="#6B4321" stroke-width="3" stroke-linejoin="round"/>
+  <path d="m84 47 7-7 11 11-7 7-11-11Zm-39 39 7 7-7 7-7-7 7-7Z" fill="#263238"/>
+  <path d="M53 51h6v42h-6zM64 46h6v47h-6zM75 51h6v42h-6z" fill="#FFF2C6" stroke="#865622" stroke-width="2"/>
+  <path d="M50 47h34v6H50z" fill="#FFF2C6" stroke="#865622" stroke-width="2" stroke-linejoin="round"/>
+</svg>

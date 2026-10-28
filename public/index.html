@@ -467,7 +467,7 @@
       const supportImage = document.querySelector('#gamePicker .game-support-banner img');
       if (supportImage) supportImage.src = '/support%20banner.png?v=20261028-support';
       const cricketTile = document.querySelector('#gamePicker [data-cricket-promo]');
-      const pubgTile = document.querySelector('#gamePicker [data-pubg-promo]');
+      const pubgTile = document.querySelector('#gamePicker [data-pubg-promo], #gamePicker [aria-label*="PUBG"]');
       if (cricketTile) cricketTile.classList.add('cricket-game-tile');
       if (pubgTile) {
         pubgTile.classList.add('pubg-game-tile');
