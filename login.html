@@ -30,8 +30,20 @@
     input, button { width: 100%; min-height: 48px; margin: 7px 0; padding: 12px; border-radius: 7px; font: inherit; }
     .login-modes { display: grid; grid-template-columns: 1fr 1fr; gap: 0; margin: 0 0 18px; padding: 4px; border: 1px solid #fff; border-radius: 8px; background: #fff; }
     .login-modes a { min-height: 42px; display: grid; place-items: center; border-radius: 5px; color: #fff; font-size: 14px; font-weight: 900; text-transform: uppercase; text-decoration: none; transition: background-color 0.15s ease, box-shadow 0.15s ease; }
-    .login-modes #playerModeLink { background: #15803d; }
-    .login-modes #adminModeLink { background: #1d4ed8; }
+    .login-modes #playerModeLink { background: #123b27; }
+    .login-modes #adminModeLink { background: #202b60; }
+    .login-modes .mode-label { display: inline-flex; gap: 1px; }
+    .login-modes #playerModeLink .mode-letter:nth-child(1) { color: #86efac; }
+    .login-modes #playerModeLink .mode-letter:nth-child(2) { color: #67e8f9; }
+    .login-modes #playerModeLink .mode-letter:nth-child(3) { color: #fde047; }
+    .login-modes #playerModeLink .mode-letter:nth-child(4) { color: #4ade80; }
+    .login-modes #playerModeLink .mode-letter:nth-child(5) { color: #38bdf8; }
+    .login-modes #playerModeLink .mode-letter:nth-child(6) { color: #facc15; }
+    .login-modes #adminModeLink .mode-letter:nth-child(1) { color: #93c5fd; }
+    .login-modes #adminModeLink .mode-letter:nth-child(2) { color: #c4b5fd; }
+    .login-modes #adminModeLink .mode-letter:nth-child(3) { color: #f0abfc; }
+    .login-modes #adminModeLink .mode-letter:nth-child(4) { color: #fb7185; }
+    .login-modes #adminModeLink .mode-letter:nth-child(5) { color: #fdba74; }
     .login-modes #playerModeLink[aria-current="page"] { background: #14532d; box-shadow: inset 0 0 0 2px #bbf7d0; }
     .login-modes #adminModeLink[aria-current="page"] { background: #1e3a8a; box-shadow: inset 0 0 0 2px #bfdbfe; }
     .login-modes a:first-child { border-radius: 5px 0 0 5px; }
@@ -55,8 +67,8 @@
     <p class="brand-tagline">PLAY &amp; WIN REAL CASH</p>
     <p class="form-hint" id="formHint" hidden></p>
     <nav class="login-modes" aria-label="Login type">
-      <a id="playerModeLink" href="/login.html">Player</a>
-      <a id="adminModeLink" href="/login.html?admin=1">Admin</a>
+      <a id="playerModeLink" href="/login.html"><span class="mode-label" aria-label="Player"><span class="mode-letter" aria-hidden="true">P</span><span class="mode-letter" aria-hidden="true">l</span><span class="mode-letter" aria-hidden="true">a</span><span class="mode-letter" aria-hidden="true">y</span><span class="mode-letter" aria-hidden="true">e</span><span class="mode-letter" aria-hidden="true">r</span></span></a>
+      <a id="adminModeLink" href="/login.html?admin=1"><span class="mode-label" aria-label="Admin"><span class="mode-letter" aria-hidden="true">A</span><span class="mode-letter" aria-hidden="true">d</span><span class="mode-letter" aria-hidden="true">m</span><span class="mode-letter" aria-hidden="true">i</span><span class="mode-letter" aria-hidden="true">n</span></span></a>
     </nav>
     <form id="phoneForm" novalidate>
       <h2 class="welcome-back">Welcome back</h2>
