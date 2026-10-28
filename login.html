@@ -28,26 +28,19 @@
     .form-hint { margin: 7px 0 22px; color: #0b1b3a; font-size: 14px; line-height: 1.5; text-align: center; }
     label { display: block; margin: 14px 0 6px; color: #0b1b3a; font-size: 13px; }
     input, button { width: 100%; min-height: 48px; margin: 7px 0; padding: 12px; border-radius: 7px; font: inherit; }
-    .login-modes { display: grid; grid-template-columns: 1fr 1fr; gap: 0; margin: 0 0 18px; padding: 4px; border: 1px solid #fff; border-radius: 8px; background: #fff; }
-    .login-modes a { min-height: 42px; display: grid; place-items: center; border-radius: 5px; color: #fff; font-size: 14px; font-weight: 900; text-transform: uppercase; text-decoration: none; transition: background-color 0.15s ease, box-shadow 0.15s ease; }
+    .login-modes { display: grid; grid-template-columns: 1fr; width: 50%; gap: 0; margin: 0 auto 18px; padding: 4px; border: 1px solid #fff; border-radius: 8px; background: #fff; }
+    .login-modes a { min-height: 42px; display: grid; place-items: center; border-radius: 5px; color: #fff; font-size: 16px; font-weight: 900; text-transform: uppercase; text-decoration: none; transition: background-color 0.15s ease, box-shadow 0.15s ease; }
     .login-modes #playerModeLink { background: #123b27; }
-    .login-modes #adminModeLink { background: #202b60; }
-    .login-modes .mode-label { display: inline-flex; gap: 1px; }
-    .login-modes #playerModeLink .mode-letter:nth-child(1) { color: #86efac; }
-    .login-modes #playerModeLink .mode-letter:nth-child(2) { color: #67e8f9; }
-    .login-modes #playerModeLink .mode-letter:nth-child(3) { color: #fde047; }
+    #adminModeLink { display: grid; width: 40px; min-height: 32px; margin: 12px auto 0; padding: 3px; place-items: center; border: 1px solid #49556f; border-radius: 6px; background: #202b60; color: #fff; font-size: 18px; line-height: 1; text-decoration: none; }
+    .mode-label { display: inline-flex; gap: 1px; }
+    .login-modes #playerModeLink .mode-letter:nth-child(1) { color: #22d3ee; }
+    .login-modes #playerModeLink .mode-letter:nth-child(2) { color: #facc15; }
+    .login-modes #playerModeLink .mode-letter:nth-child(3) { color: #fb7185; }
     .login-modes #playerModeLink .mode-letter:nth-child(4) { color: #4ade80; }
-    .login-modes #playerModeLink .mode-letter:nth-child(5) { color: #38bdf8; }
-    .login-modes #playerModeLink .mode-letter:nth-child(6) { color: #facc15; }
-    .login-modes #adminModeLink .mode-letter:nth-child(1) { color: #93c5fd; }
-    .login-modes #adminModeLink .mode-letter:nth-child(2) { color: #c4b5fd; }
-    .login-modes #adminModeLink .mode-letter:nth-child(3) { color: #f0abfc; }
-    .login-modes #adminModeLink .mode-letter:nth-child(4) { color: #fb7185; }
-    .login-modes #adminModeLink .mode-letter:nth-child(5) { color: #fdba74; }
+    .login-modes #playerModeLink .mode-letter:nth-child(5) { color: #60a5fa; }
+    .login-modes #playerModeLink .mode-letter:nth-child(6) { color: #f97316; }
     .login-modes #playerModeLink[aria-current="page"] { background: #14532d; box-shadow: inset 0 0 0 2px #bbf7d0; }
-    .login-modes #adminModeLink[aria-current="page"] { background: #1e3a8a; box-shadow: inset 0 0 0 2px #bfdbfe; }
-    .login-modes a:first-child { border-radius: 5px 0 0 5px; }
-    .login-modes a:last-child { border-radius: 0 5px 5px 0; }
+    #adminModeLink[aria-current="page"] { background: #1e3a8a; box-shadow: inset 0 0 0 1px #bfdbfe; }
     input { border: 1px solid #46594a; background: #101813; color: var(--ink); font-size: 16px; }
     input::placeholder { color: #8f9e92; }
     input:focus-visible, button:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
@@ -68,7 +61,6 @@
     <p class="form-hint" id="formHint" hidden></p>
     <nav class="login-modes" aria-label="Login type">
       <a id="playerModeLink" href="/login.html"><span class="mode-label" aria-label="Player"><span class="mode-letter" aria-hidden="true">P</span><span class="mode-letter" aria-hidden="true">l</span><span class="mode-letter" aria-hidden="true">a</span><span class="mode-letter" aria-hidden="true">y</span><span class="mode-letter" aria-hidden="true">e</span><span class="mode-letter" aria-hidden="true">r</span></span></a>
-      <a id="adminModeLink" href="/login.html?admin=1"><span class="mode-label" aria-label="Admin"><span class="mode-letter" aria-hidden="true">A</span><span class="mode-letter" aria-hidden="true">d</span><span class="mode-letter" aria-hidden="true">m</span><span class="mode-letter" aria-hidden="true">i</span><span class="mode-letter" aria-hidden="true">n</span></span></a>
     </nav>
     <form id="phoneForm" novalidate>
       <h2 class="welcome-back">Welcome back</h2>
@@ -88,6 +80,7 @@
       <button id="changePhoneBtn" class="secondary" type="button">Mobile number badlein</button>
     </form>
     <p id="msg" role="status" aria-live="polite" aria-atomic="true"></p>
+    <a id="adminModeLink" href="/login.html?admin=1" aria-label="Admin login" title="Admin login"><span aria-hidden="true">👑</span></a>
   </div>
 
   <script>
