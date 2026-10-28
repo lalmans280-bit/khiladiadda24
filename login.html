@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#101713">
+  <meta name="robots" content="noindex,follow">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -13,18 +14,14 @@
   <link rel="icon" href="/app-icon-192.png" type="image/png" sizes="192x192">
   <link rel="apple-touch-icon" href="/app-icon-192.png">
   <link rel="mask-icon" href="/app-icon.svg" color="#f4c84b">
-  <title>Login - KhiladiAdda24.com</title>
+  <title>Login</title>
   <style>
     :root { color-scheme: dark; --panel: #19231d; --line: #35483a; --ink: #f3f4ed; --muted: #b4c0b6; --gold: #e7b83f; --error: #ffb4a9; }
     * { box-sizing: border-box; }
     body { min-height: 100vh; min-height: 100dvh; margin: 0; padding: 16px; display: grid; place-items: center; background: #0b1b3a; color: var(--ink); font-family: Arial, sans-serif; }
     .box { width: min(390px, 100%); max-height: calc(100vh - 32px); max-height: calc(100dvh - 32px); overflow-y: auto; padding: 26px; border: 1px solid var(--line); border-radius: 10px; background: #b91c1c; box-shadow: 0 18px 52px #0006; font-weight: 700; }
-    .login-logo-frame { display: grid; place-items: center; width: 112px; height: 92px; margin: 0 auto 14px; padding: 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
-    .login-logo { display: block; width: 100%; height: 100%; object-fit: contain; }
-    h1 { margin: 0; color: #0b1b3a; text-align: center; font-size: 30px; font-weight: 900; }
-    .brand-tagline { margin: 5px 0 18px; color: #0b1b3a; font-size: 11px; font-weight: 800; letter-spacing: 1px; text-align: center; }
-    .trust-badge { display: flex; justify-content: flex-end; margin: 0 0 12px; }
-    .trust-badge > span { display: inline-flex; align-items: center; gap: 5px; padding: 5px 10px; border: 1px solid #ffffffb3; border-radius: 999px; background: #fff; color: #166534; font-size: 10px; font-weight: 900; letter-spacing: .45px; }
+    .login-logo { display: block; width: 128px; height: 128px; margin: 0 auto 14px; object-fit: contain; }
+    .brand-tagline { margin: 0 0 18px; color: #0b1b3a; font-size: 11px; font-weight: 800; letter-spacing: 1px; text-align: center; }
     .welcome-back { margin: 0 0 6px; color: #0b1b3a; font-size: 18px; text-align: center; }
     .security-note { margin: 0 0 12px; color: #0b1b3a; font-size: 12px; text-align: center; }
     .form-hint { margin: 7px 0 22px; color: #0b1b3a; font-size: 14px; line-height: 1.5; text-align: center; }
@@ -49,9 +46,7 @@
 </head>
 <body>
   <div class="box">
-    <div class="trust-badge"><span><span aria-hidden="true">✓</span> 100% TRUSTED WEBSITE</span></div>
-    <div class="login-logo-frame"><img class="login-logo" src="/app-icon-192.png" alt="KhiladiAdda24 app icon"></div>
-    <h1>KhiladiAdda24</h1>
+    <img class="login-logo" src="/app-logo.png?v=20261008-2304" alt="App logo">
     <p class="brand-tagline">PLAY &amp; WIN REAL CASH</p>
     <p class="form-hint" id="formHint" hidden></p>
     <nav class="login-modes" aria-label="Login type">
@@ -93,7 +88,7 @@
       if (!next) return '/index.html';
       try {
         const target = new URL(next, location.origin);
-        if (target.origin === location.origin && target.pathname === '/index.html') {
+        if (target.origin === location.origin && ['/index.html', '/support.html'].includes(target.pathname)) {
           return `${target.pathname}${target.search}${target.hash}`;
         }
       } catch {}
@@ -263,7 +258,6 @@
     }
     fetch('/api/site-branding').then(response => response.ok ? response.json() : null).then(branding => {
       if (!branding) return;
-      const logo = document.querySelector('.login-logo');
       const favicon = document.querySelector('link[rel="icon"]');
       const appleIcon = document.querySelector('link[rel="apple-touch-icon"]');
       if (favicon && branding.appIcon192Url) favicon.href = branding.appIcon192Url;
