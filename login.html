@@ -9,6 +9,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link rel="manifest" href="/api/site-manifest">
+  <link rel="icon" href="/favicon.ico" sizes="any">
   <link rel="icon" href="/app-icon.svg" type="image/svg+xml">
   <link rel="shortcut icon" href="/app-icon.svg" type="image/svg+xml">
   <link rel="icon" href="/app-icon-192.png" type="image/png" sizes="192x192">
@@ -28,9 +29,13 @@
     label { display: block; margin: 14px 0 6px; color: #0b1b3a; font-size: 13px; }
     input, button { width: 100%; min-height: 48px; margin: 7px 0; padding: 12px; border-radius: 7px; font: inherit; }
     .login-modes { display: grid; grid-template-columns: 1fr 1fr; gap: 0; margin: 0 0 18px; padding: 4px; border: 1px solid #fff; border-radius: 8px; background: #fff; }
-    .login-modes a { min-height: 42px; display: grid; place-items: center; border-radius: 5px; color: #000; font-size: 14px; font-weight: 900; text-transform: uppercase; text-decoration: none; }
-    .login-modes a:first-child { border-right: 1px solid #000; border-radius: 5px 0 0 5px; }
-    .login-modes a[aria-current="page"] { background: #e5e7eb; color: #000; font-weight: 900; }
+    .login-modes a { min-height: 42px; display: grid; place-items: center; border-radius: 5px; color: #fff; font-size: 14px; font-weight: 900; text-transform: uppercase; text-decoration: none; transition: background-color 0.15s ease, box-shadow 0.15s ease; }
+    .login-modes #playerModeLink { background: #15803d; }
+    .login-modes #adminModeLink { background: #1d4ed8; }
+    .login-modes #playerModeLink[aria-current="page"] { background: #14532d; box-shadow: inset 0 0 0 2px #bbf7d0; }
+    .login-modes #adminModeLink[aria-current="page"] { background: #1e3a8a; box-shadow: inset 0 0 0 2px #bfdbfe; }
+    .login-modes a:first-child { border-radius: 5px 0 0 5px; }
+    .login-modes a:last-child { border-radius: 0 5px 5px 0; }
     input { border: 1px solid #46594a; background: #101813; color: var(--ink); font-size: 16px; }
     input::placeholder { color: #8f9e92; }
     input:focus-visible, button:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
