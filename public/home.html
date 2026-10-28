@@ -29,6 +29,8 @@
     p{max-width:680px;color:var(--muted)}
     .games{display:flex;flex-wrap:wrap;gap:9px;margin:22px 0}
     .games span{padding:7px 11px;border:1px solid #536a56;border-radius:999px;background:#203129}
+    .support-banner{display:block;margin:22px 0;overflow:hidden;border:1px solid var(--line);border-radius:10px;background:#17231b}
+    .support-banner img{display:block;width:100%;height:auto}
     .actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px}
     .button{display:inline-flex;min-height:46px;align-items:center;justify-content:center;padding:11px 18px;border:1px solid var(--gold);border-radius:9px;color:#1c2419;background:var(--gold);font-weight:800;text-decoration:none}
     .button.secondary{border-color:var(--line);color:var(--ink);background:#1b2922}
@@ -48,11 +50,13 @@
         <span>PUBG 2D Prototype</span>
       </div>
       <p class="note">Cricket Fantasy is a preview and is not currently active. The PUBG prototype is a no-cash demo.</p>
+      <a class="support-banner" href="/support.html" aria-label="WhatsApp and support"><img src="/support-banner.png?v=20261028-support-update" alt="WhatsApp and Support"></a>
       <div class="actions">
         <a class="button" href="/index.html">Open player app / Sign in</a>
         <a class="button secondary" href="/support.html">Player support</a>
       </div>
     </section>
   </main>
+<script>fetch('/api/site-branding').then(response=>response.ok?response.json():null).then(branding=>{if(branding?.supportBannerUrl)document.querySelector('.support-banner img').src=branding.supportBannerUrl}).catch(()=>{});</script>
 </body>
 </html>
