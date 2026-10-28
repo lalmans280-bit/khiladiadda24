@@ -17,75 +17,101 @@
   <link rel="mask-icon" href="/app-icon.svg" color="#f4c84b">
   <title>Login</title>
   <style>
-    :root { color-scheme: dark; --panel: #19231d; --line: #35483a; --ink: #f3f4ed; --muted: #b4c0b6; --gold: #e7b83f; --error: #ffb4a9; }
+    :root { color-scheme: light; --ink: #201918; --muted: #6f6a66; --red: #b20e16; --gold: #ffdc65; --green: #078b37; --line: #e6e2df; --error: #b42318; }
     * { box-sizing: border-box; }
-    body { min-height: 100vh; min-height: 100dvh; margin: 0; padding: 16px; display: grid; place-items: center; background: #0b1b3a; color: var(--ink); font-family: Arial, sans-serif; }
-    .box { position: relative; width: min(390px, 100%); max-height: calc(100vh - 32px); max-height: calc(100dvh - 32px); overflow-y: auto; padding: 26px; border: 1px solid var(--line); border-radius: 10px; background: #b91c1c; box-shadow: 0 18px 52px #0006; font-weight: 700; }
-    .login-logo { display: block; width: 128px; height: 128px; margin: 0 auto 14px; object-fit: contain; }
-    .brand-tagline { margin: 0 0 18px; color: #0b1b3a; font-size: 11px; font-weight: 800; letter-spacing: 1px; text-align: center; }
-    .welcome-back { margin: 0 0 6px; color: #0b1b3a; font-size: 18px; text-align: center; }
-    .security-note { margin: 0 0 12px; color: #0b1b3a; font-size: 12px; text-align: center; }
-    .form-hint { margin: 7px 0 22px; color: #0b1b3a; font-size: 14px; line-height: 1.5; text-align: center; }
-    label { display: block; margin: 14px 0 6px; color: #0b1b3a; font-size: 13px; }
-    input, button { width: 100%; min-height: 48px; margin: 7px 0; padding: 12px; border-radius: 7px; font: inherit; }
-    .login-modes { display: flex; align-items: center; gap: 6px; width: max-content; margin: 0 auto 18px; }
-    .login-modes a { min-width: 132px; min-height: 42px; display: grid; place-items: center; border: 1px solid #fff; border-radius: 7px; color: #fff; font-size: 16px; font-weight: 900; text-decoration: none; transition: background-color 0.15s ease, box-shadow 0.15s ease; }
-    .login-modes #playerModeLink { background: #123b27; }
-    .login-pointer { color: #facc15; font-size: 18px; line-height: 1; filter: drop-shadow(0 0 5px #facc15); animation: pointer-blink 1s ease-in-out infinite; }
-    @keyframes pointer-blink { 0%, 100% { opacity: 1; transform: scale(1); filter: drop-shadow(0 0 5px #22d3ee); } 50% { opacity: 0.35; transform: scale(0.88); filter: drop-shadow(0 0 9px #fb7185); } }
-    @media (prefers-reduced-motion: reduce) { .login-pointer { animation: none; } }
-    #adminModeLink { position: absolute; top: 8px; right: 8px; display: grid; width: 24px; min-height: 24px; padding: 0; place-items: center; border: 0; border-radius: 50%; background: transparent; color: #fff; font-size: 13px; line-height: 1; text-decoration: none; }
-    .mode-label { display: inline-flex; gap: 1px; }
-    .login-modes #playerModeLink .mode-letter:nth-child(1) { color: #22d3ee; }
-    .login-modes #playerModeLink .mode-letter:nth-child(2) { color: #facc15; }
-    .login-modes #playerModeLink .mode-letter:nth-child(3) { color: #fb7185; }
-    .login-modes #playerModeLink .mode-letter:nth-child(4) { color: #4ade80; }
-    .login-modes #playerModeLink .mode-letter:nth-child(5) { color: #60a5fa; }
-    .login-modes #playerModeLink .mode-letter:nth-child(6) { color: #f97316; }
-    .login-modes #playerModeLink[aria-current="page"] { background: #14532d; box-shadow: inset 0 0 0 2px #bbf7d0; }
-    #adminModeLink[aria-current="page"] { background: #1e3a8a; box-shadow: inset 0 0 0 1px #bfdbfe; }
-    input { border: 1px solid #46594a; background: #101813; color: var(--ink); font-size: 16px; }
-    input::placeholder { color: #8f9e92; }
-    input:focus-visible, button:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
-    button { border: 0; background: var(--gold); color: #0b1b3a; font-weight: 700; cursor: pointer; }
-    button.secondary { border: 1px solid var(--line); background: transparent; color: #0b1b3a; }
+    body { min-height: 100vh; min-height: 100dvh; margin: 0; padding: 28px; display: grid; place-items: center; background: radial-gradient(ellipse at 10% 5%, #7c0c13, transparent 40%), linear-gradient(140deg, #21090b, #520b0d 52%, #21090b); color: var(--ink); font-family: Arial, sans-serif; }
+    .login-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(360px, 450px); width: min(1040px, 100%); min-height: min(680px, calc(100dvh - 56px)); overflow: hidden; border: 1px solid #ffd66d78; border-radius: 22px; background: #fff; box-shadow: 0 28px 90px #0008; }
+    .promo-panel { position: relative; display: flex; flex-direction: column; justify-content: space-between; min-height: 620px; overflow: hidden; padding: 0; color: #fff; background: radial-gradient(ellipse at 50% 80%, #f9781b 0, transparent 32%), linear-gradient(155deg, #e32918 0%, #a70f18 42%, #470911 100%); }
+    .promo-panel::before, .promo-panel::after { position: absolute; width: 320px; height: 320px; border: 1px solid #ffdc6540; border-radius: 50%; content: ""; pointer-events: none; }
+    .promo-panel::before { top: 28%; left: -175px; box-shadow: 0 0 0 24px #ffdc6512, 0 0 0 56px #ffdc650a; }
+    .promo-panel::after { right: -210px; bottom: -90px; box-shadow: 0 0 0 24px #ffdc6512, 0 0 0 56px #ffdc650a; }
+    .promo-art { position: relative; z-index: 1; }
+    .promo-art { position: relative; z-index: 1; display: block; width: 100%; height: auto; margin: 0; object-fit: contain; }
+    .box { position: relative; align-self: stretch; width: 100%; overflow-y: auto; padding: clamp(25px, 4vw, 44px); background: #fff; font-weight: 700; }
+    #adminModeLink { position: absolute; top: 17px; right: 19px; display: grid; width: 38px; min-height: 38px; padding: 0; place-items: center; border: 1px solid var(--line); border-radius: 50%; background: #fff; color: #694d13; font-size: 16px; line-height: 1; text-decoration: none; }
+    .login-heading { margin: 0 0 28px; text-align: center; }
+    .login-logo { display: block; width: 88px; height: 88px; margin: 0 auto 12px; object-fit: contain; }
+    .brand-tagline { margin: 0 0 6px; color: var(--red); font-size: 11px; font-weight: 900; letter-spacing: 1.6px; }
+    .welcome-back { margin: 0 0 7px; color: var(--ink); font-size: 25px; }
+    .security-note { margin: 0 0 12px; color: var(--muted); font-size: 12px; text-align: center; }
+    .form-hint { margin: 0 0 18px; padding: 11px 12px; border: 1px solid #f1dfab; border-radius: 9px; color: #624714; background: #fff8e6; font-size: 13px; line-height: 1.5; text-align: center; overflow-wrap: anywhere; }
+    label { display: block; margin: 15px 0 7px; color: #37312d; font-size: 13px; }
+    input, button { width: 100%; min-height: 50px; margin: 7px 0; padding: 12px 14px; border-radius: 9px; font: inherit; }
+    input { border: 1px solid #d5d0ca; background: #fff; color: var(--ink); font-size: 16px; transition: border-color .15s, box-shadow .15s; }
+    input::placeholder { color: #948e87; }
+    input:focus { border-color: var(--red); box-shadow: 0 0 0 3px #b20e1614; }
+    input:focus-visible, button:focus-visible, a:focus-visible { outline: 2px solid #e8ab27; outline-offset: 2px; }
+    button { border: 0; background: linear-gradient(180deg, #0da846, #078331); color: #fff; font-weight: 800; cursor: pointer; box-shadow: 0 5px 12px #087c3030; transition: transform .15s, filter .15s; }
+    button:not(:disabled):hover { transform: translateY(-1px); filter: brightness(1.05); }
+    button.secondary { border: 1px solid #dad5d0; background: #fff; color: #39332e; box-shadow: none; }
     button:disabled { opacity: 0.6; cursor: not-allowed; }
-    #timerText { min-height: 20px; margin: 7px 0; color: #0b1b3a; font-size: 13px; text-align: center; }
-    #msg { min-height: 22px; margin: 12px 0 0; color: #0b1b3a; font-size: 13px; line-height: 1.5; text-align: center; overflow-wrap: anywhere; }
+    .login-modes { display: flex; justify-content: center; margin: -10px 0 22px; }
+    .login-modes a { display: inline-flex; min-height: 34px; align-items: center; justify-content: center; padding: 6px 13px; border: 1px solid #d7e5d9; border-radius: 999px; color: #246236; background: #f1f8f2; font-size: 12px; font-weight: 800; text-decoration: none; }
+    .login-modes #playerModeLink[aria-current="page"] { border-color: #b9d8bd; }
+    .mode-label { display: inline-flex; }
+    .mode-letter { color: inherit !important; }
+    .login-pointer { display: none; }
+    #adminModeLink[aria-current="page"] { border-color: #d3b970; background: #fff8e6; }
+    #timerText { min-height: 20px; margin: 7px 0; color: var(--muted); font-size: 13px; text-align: center; }
+    #msg { min-height: 22px; margin: 12px 0 0; color: #27623a; font-size: 13px; line-height: 1.5; text-align: center; overflow-wrap: anywhere; }
     #msg.error { color: var(--error); }
+    .login-footnote { margin: 18px 0 0; color: var(--muted); font-size: 12px; font-weight: 400; line-height: 1.6; text-align: center; }
+    .login-footnote a { color: #9c1720; font-weight: 700; }
     .hidden { display: none; }
-    @media (max-height: 560px) { body { place-items: start center; } .box { max-height: calc(100vh - 32px); max-height: calc(100dvh - 32px); } }
+    @media (max-width: 760px) {
+      body { display: block; padding: 0; background: #fff; }
+      .login-layout { display: flex; flex-direction: column; width: 100%; min-height: 100dvh; overflow: visible; border: 0; border-radius: 0; box-shadow: none; }
+      .promo-panel { min-height: 0; padding: 0; border-radius: 0 0 25px 25px; }
+      .promo-art { width: 100%; margin: 0; }
+      .box { flex: 1; overflow: visible; padding: 26px 22px 30px; }
+      .login-heading { margin-bottom: 22px; }
+      .login-logo { width: 68px; height: 68px; }
+      #adminModeLink { top: 14px; right: 17px; width: 34px; min-height: 34px; }
+    }
+    @media (max-width: 360px) {
+      .box { padding-inline: 17px; }
+    }
+    @media (max-height: 560px) and (min-width: 761px) { body { padding-block: 12px; } .login-layout { min-height: 0; } .promo-panel { min-height: 560px; } .box { max-height: calc(100dvh - 24px); } }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; } }
   </style>
 </head>
 <body>
-  <div class="box">
-    <a id="adminModeLink" href="/login.html?admin=1" aria-label="Admin login" title="Admin login"><span aria-hidden="true">&#128081;</span></a>
-    <img class="login-logo" src="/app-logo.png?v=20261008-2304" alt="App logo">
-    <p class="brand-tagline">PLAY &amp; WIN REAL CASH</p>
-    <p class="form-hint" id="formHint" hidden></p>
-    <nav class="login-modes" aria-label="Login type">
-      <span class="login-pointer" aria-hidden="true">&#128073;</span>
-      <a id="playerModeLink" href="/login.html"><span class="mode-label" aria-label="Player"><span class="mode-letter" aria-hidden="true">P</span><span class="mode-letter" aria-hidden="true">L</span><span class="mode-letter" aria-hidden="true">A</span><span class="mode-letter" aria-hidden="true">Y</span><span class="mode-letter" aria-hidden="true">E</span><span class="mode-letter" aria-hidden="true">R</span></span></a>
-    </nav>
-    <form id="phoneForm" novalidate>
-      <h2 class="welcome-back">Welcome back</h2>
-      <label for="phone">Mobile number</label>
-      <input type="tel" id="phone" name="phone" placeholder="10 digit mobile number" inputmode="numeric" pattern="[6-9][0-9]{9}" maxlength="10" autocomplete="tel-national" required>
-      <label for="referralCode">Referral ID (optional)</label>
-      <input type="text" id="referralCode" name="referralCode" placeholder="8 character referral ID" maxlength="8" autocomplete="off" autocapitalize="characters">
-      <button id="otpSendBtn" type="submit">Login with OTP</button>
-      <p class="security-note">100% Safe &amp; Secure Platform</p>
-    </form>
-    <form id="otpForm" class="hidden" novalidate>
-      <label for="otp">6-digit OTP</label>
-      <input type="text" id="otp" name="otp" placeholder="SMS mein mila OTP" inputmode="numeric" pattern="[0-9]{4,6}" maxlength="6" autocomplete="off" required>
-      <div id="timerText" aria-live="polite"></div>
-      <button id="otpVerifyBtn" type="submit">Login / Play</button>
-      <button id="otpResendBtn" class="secondary" type="button" disabled>OTP dobara bhejein</button>
-      <button id="changePhoneBtn" class="secondary" type="button">Mobile number badlein</button>
-    </form>
-    <p id="msg" role="status" aria-live="polite" aria-atomic="true"></p>
-  </div>
+  <main class="login-layout">
+    <section class="promo-panel" aria-label="KhiladiAdda24 games">
+      <img class="promo-art" src="/log-banner.png" alt="KhiladiAdda24 welcome bonus and Ludo games">
+    </section>
+    <section class="box" aria-label="Player sign in">
+      <a id="adminModeLink" href="/login.html?admin=1" aria-label="Admin login" title="Admin login"><span aria-hidden="true">&#128081;</span></a>
+      <div class="login-heading">
+        <img class="login-logo" src="/app-logo.png?v=20261008-2304" alt="KhiladiAdda24">
+        <p class="brand-tagline">WELCOME TO KHILADIADDA24</p>
+        <h2 class="welcome-back">Login or register</h2>
+        <p class="security-note">Naye player? Mobile verify karke account banayein.</p>
+      </div>
+      <p class="form-hint" id="formHint" hidden></p>
+      <nav class="login-modes" aria-label="Login type">
+        <a id="playerModeLink" href="/login.html"><span class="mode-label" aria-label="Player">Player account</span></a>
+      </nav>
+      <form id="phoneForm" novalidate>
+        <label for="phone">Mobile number</label>
+        <input type="tel" id="phone" name="phone" placeholder="10 digit mobile number" inputmode="numeric" pattern="[6-9][0-9]{9}" maxlength="10" autocomplete="tel-national" required>
+        <label for="referralCode">Referral ID <span style="color:#827b74;font-weight:400">(optional)</span></label>
+        <input type="text" id="referralCode" name="referralCode" placeholder="8 character referral ID" maxlength="8" autocomplete="off" autocapitalize="characters">
+        <button id="otpSendBtn" type="submit">Continue with mobile &rsaquo;</button>
+        <p class="security-note">A one-time password will be sent to verify your mobile.</p>
+      </form>
+      <form id="otpForm" class="hidden" novalidate>
+        <label for="otp">6-digit OTP</label>
+        <input type="text" id="otp" name="otp" placeholder="SMS mein mila OTP" inputmode="numeric" pattern="[0-9]{4,6}" maxlength="6" autocomplete="one-time-code" required>
+        <div id="timerText" aria-live="polite"></div>
+        <button id="otpVerifyBtn" type="submit">Login / Play</button>
+        <button id="otpResendBtn" class="secondary" type="button" disabled>OTP dobara bhejein</button>
+        <button id="changePhoneBtn" class="secondary" type="button">Mobile number badlein</button>
+      </form>
+      <p id="msg" role="status" aria-live="polite" aria-atomic="true"></p>
+      <p class="login-footnote">Continue karne se pehle hamari <a href="/policy.html">Privacy Policy aur Terms</a> padhein. Kisi madad ke liye <a href="/support.html">Player Support</a> dekhein.</p>
+    </section>
+  </main>
 
   <script>
     let otpTimer = null;
