@@ -12,6 +12,7 @@ const axios = require('axios');
 const jwt = require('jsonwebtoken');
 const { Server } = require('socket.io');
 const { pipeline } = require('stream/promises');
+const PubgPvpService = require('./pubg-pvp');
 
 // Models
 const User = require('./models/user');
@@ -515,6 +516,12 @@ async function sendUploadedFile(filename, res, cacheControl = 'private, no-store
 // Middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use((req, res, next) => {
+  if (req.path.toLowerCase() === '/support.html') {
+    res.set('X-Robots-Tag', 'noindex, follow');
+  }
+  next();
+});
 app.use(express.static('public'));
 
 app.get('/healthz', (req, res) => {
@@ -3558,7 +3565,25 @@ app.post('/api/admin/withdrawal-status', requireAdmin, async (req, res) => {
 });
 
 // Real-time Sockets
+const pubgPvpService = new PubgPvpService(io, async token => {
+  let payload;
+  try {
+    payload = jwt.verify(token, JWT_SECRET);
+  } catch {
+    return null;
+  }
+  if (payload.role !== 'user' || !payload.userId) return null;
+  const user = await findUserById(payload.userId);
+  if (!user) return null;
+  return {
+    id: String(user._id || user.id),
+    name: user.username,
+    blocked: Boolean(user.isBlocked)
+  };
+});
+
 io.on('connection', (socket) => {
+  pubgPvpService.attach(socket);
   socket.on('register_player', async ({ token } = {}) => {
     try {
       const payload = jwt.verify(String(token || ''), JWT_SECRET);
