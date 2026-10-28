@@ -6,6 +6,11 @@
   <meta name="theme-color" content="#101713">
   <meta name="robots" content="noindex,follow">
   <title>Support - KhiladiAdda24</title>
+  <script>
+    if (!localStorage.getItem('token')) {
+      window.location.replace('/login.html?next=%2Fsupport.html');
+    }
+  </script>
   <style>
     :root{color-scheme:dark;font:16px/1.5 Arial,sans-serif;background:#101713;color:#f2f5ef}
     *{box-sizing:border-box}
@@ -87,6 +92,12 @@
           headers: { Authorization: `Bearer ${token}` }
         });
         const data = await response.json();
+        if (response.status === 401 || response.status === 403) {
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+          window.location.replace('/login.html?next=%2Fsupport.html');
+          return;
+        }
         if (!response.ok) throw new Error(data.error || 'Chat load nahi ho saki.');
         messageList.replaceChildren();
         if (!data.messages?.length) {
