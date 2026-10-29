@@ -12,7 +12,7 @@ const siteSettingsSchema = new mongoose.Schema({
   depositUpiId: { type: String, default: '' },
   withdrawalTickerEnabled: { type: Boolean, default: true },
   withdrawalTickerDays: { type: Number, enum: [7, 14, 30], default: 30 },
-  withdrawalTickerMinimumAmount: { type: Number, min: 0, max: 10000000, default: 5000 },
+  withdrawalTickerMinimumAmount: { type: Number, min: 0, max: 10000000, default: 0 },
   withdrawalTickerMaxItems: { type: Number, enum: [5, 10, 20, 30], default: 30 },
   smsApiKey: { type: String, default: '' },
   playerCopy: { type: [playerCopyEntrySchema], default: [] }
