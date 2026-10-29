@@ -851,7 +851,7 @@
       const ticker=document.createElement('div'),tickerLabel=document.createElement('span'),tickerViewport=document.createElement('div'),tickerTrack=document.createElement('div');
       ticker.className='withdraw-live-ticker';ticker.setAttribute('role','status');ticker.setAttribute('aria-live','polite');ticker.setAttribute('aria-label','Sample amounts only; not actual withdrawals');
       tickerLabel.className='withdraw-live-label';tickerLabel.textContent='SAMPLE · NOT REAL PAYOUTS';tickerViewport.className='withdraw-live-viewport';tickerTrack.className='withdraw-live-track';tickerViewport.append(tickerTrack);ticker.append(tickerLabel,tickerViewport);bannerRow.after(ticker);
-      const sampleAmounts=[5500,8600,1200,800,10000,45000,65000,1500,3200,7000,6500,500,600,3100,9000];
+      const sampleAmounts=[5500,8600,1200,800,10000,45000,65000,1500,3200,7000,6500,500,600,3100,9000,6100,8500,15000,3000,50000,4000,7500,1700,2800,2000,8200,13500];
       const refreshSampleWithdrawals=async()=>{
         try{
           const response=await fetch('/api/public/withdrawals/recent',{cache:'no-store'});
