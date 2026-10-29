@@ -518,7 +518,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use((req, res, next) => {
   const pathname = req.path.toLowerCase();
-  if (pathname === '/support.html' || pathname === '/index.html' || pathname === '/login.html') {
+  if (pathname === '/support.html' || pathname === '/index.html') {
     res.set('X-Robots-Tag', 'noindex, follow');
   }
   next();
