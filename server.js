@@ -583,6 +583,36 @@ async function readSiteBranding() {
   return SiteSettings.findById('support-contact').select('brandLogoPath appIcon192Path appIcon512Path homeBannerPath ludoBannerPath snakeBannerPath supportBannerPath').lean();
 }
 
+app.get('/api/public/withdrawals/recent', async (req, res) => {
+  if (mongoose.connection.readyState !== 1) return res.status(503).json({ error: mongoUnavailableMessage() });
+  try {
+    const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+    const withdrawals = await Withdraw.aggregate([
+      { $match: { status: 'PAID', amount: { $gt: 0 }, updatedAt: { $gte: thirtyDaysAgo } } },
+      {
+        $group: {
+          _id: {
+            $dateToString: {
+              format: '%Y-%m-%d',
+              date: '$updatedAt',
+              timezone: 'Asia/Kolkata'
+            }
+          },
+          amount: { $sum: '$amount' }
+        }
+      },
+      { $sort: { _id: -1 } },
+      { $limit: 30 },
+      { $project: { _id: 0, date: '$_id', amount: 1 } }
+    ]);
+    res.set('Cache-Control', 'no-store');
+    res.json({ withdrawals });
+  } catch (err) {
+    console.error('Could not load recent paid withdrawals:', err);
+    res.status(500).json({ error: 'Recent withdrawals could not be loaded' });
+  }
+});
+
 app.get('/api/site-branding', async (req, res) => {
   try {
     res.set('Cache-Control', 'no-cache');
