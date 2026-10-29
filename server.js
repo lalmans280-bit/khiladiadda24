@@ -586,30 +586,56 @@ async function readSiteBranding() {
 app.get('/api/public/withdrawals/recent', async (req, res) => {
   if (mongoose.connection.readyState !== 1) return res.status(503).json({ error: mongoUnavailableMessage() });
   try {
-    const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
-    const withdrawals = await Withdraw.aggregate([
-      { $match: { status: 'PAID', amount: { $gt: 0 }, updatedAt: { $gte: thirtyDaysAgo } } },
-      {
-        $group: {
-          _id: {
-            $dateToString: {
-              format: '%Y-%m-%d',
-              date: '$updatedAt',
-              timezone: 'Asia/Kolkata'
-            }
-          },
-          amount: { $sum: '$amount' }
-        }
-      },
+    const settings = await SiteSettings.findById('support-contact')
+      .select('withdrawalTickerEnabled withdrawalTickerDays withdrawalTickerMinimumAmount withdrawalTickerMaxItems')
+      .lean();
+    const enabled = settings?.withdrawalTickerEnabled !== false;
+    const days = [7, 14, 30].includes(settings?.withdrawalTickerDays) ? settings.withdrawalTickerDays : 30;
+    const minimumAmount = Number.isFinite(settings?.withdrawalTickerMinimumAmount) && settings.withdrawalTickerMinimumAmount >= 0 ? settings.withdrawalTickerMinimumAmount : 5000;
+    const maxItems = [5, 10, 20, 30].includes(settings?.withdrawalTickerMaxItems) ? settings.withdrawalTickerMaxItems : 30;
+    const withdrawals = enabled ? await Withdraw.aggregate([
+      { $match: { status: 'PAID', amount: { $gt: 0, $gte: minimumAmount }, updatedAt: { $gte: new Date(Date.now() - days * 24 * 60 * 60 * 1000) } } },
+      { $group: { _id: { $dateToString: { format: '%Y-%m-%d', date: '$updatedAt', timezone: 'Asia/Kolkata' } }, amount: { $sum: '$amount' } } },
       { $sort: { _id: -1 } },
-      { $limit: 30 },
+      { $limit: maxItems },
       { $project: { _id: 0, date: '$_id', amount: 1 } }
-    ]);
+    ]) : [];
     res.set('Cache-Control', 'no-store');
-    res.json({ withdrawals });
+    res.json({ withdrawals, enabled, days, minimumAmount, maxItems });
   } catch (err) {
     console.error('Could not load recent paid withdrawals:', err);
     res.status(500).json({ error: 'Recent withdrawals could not be loaded' });
+  }
+});
+
+app.get('/api/admin/withdrawal-ticker-settings', requireAdmin, async (req, res) => {
+  if (mongoose.connection.readyState !== 1) return res.status(503).json({ error: mongoUnavailableMessage() });
+  try {
+    const settings = await SiteSettings.findById('support-contact')
+      .select('withdrawalTickerEnabled withdrawalTickerDays withdrawalTickerMinimumAmount withdrawalTickerMaxItems')
+      .lean();
+    res.json({
+      enabled: settings?.withdrawalTickerEnabled !== false,
+      days: [7, 14, 30].includes(settings?.withdrawalTickerDays) ? settings.withdrawalTickerDays : 30,
+      minimumAmount: Number.isFinite(settings?.withdrawalTickerMinimumAmount) && settings.withdrawalTickerMinimumAmount >= 0 ? settings.withdrawalTickerMinimumAmount : 5000,
+      maxItems: [5, 10, 20, 30].includes(settings?.withdrawalTickerMaxItems) ? settings.withdrawalTickerMaxItems : 30
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/admin/withdrawal-ticker-settings', requireAdmin, async (req, res) => {
+  if (mongoose.connection.readyState !== 1) return res.status(503).json({ error: mongoUnavailableMessage() });
+  const { enabled, days, minimumAmount, maxItems } = req.body || {};
+  if (typeof enabled !== 'boolean' || ![7, 14, 30].includes(days) || !Number.isInteger(minimumAmount) || minimumAmount < 0 || minimumAmount > 10000000 || ![5, 10, 20, 30].includes(maxItems)) {
+    return res.status(400).json({ error: 'Ticker settings valid nahi hain.' });
+  }
+  try {
+    await SiteSettings.findByIdAndUpdate('support-contact', { $set: { withdrawalTickerEnabled: enabled, withdrawalTickerDays: days, withdrawalTickerMinimumAmount: minimumAmount, withdrawalTickerMaxItems: maxItems } }, { new: true, upsert: true, runValidators: true, setDefaultsOnInsert: true });
+    res.json({ message: 'Homepage live withdrawal line settings save ho gaye.' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 });
 
