@@ -591,7 +591,7 @@ app.get('/api/public/withdrawals/recent', async (req, res) => {
       .lean();
     const enabled = settings?.withdrawalTickerEnabled !== false;
     const days = [7, 14, 30].includes(settings?.withdrawalTickerDays) ? settings.withdrawalTickerDays : 30;
-    const minimumAmount = Number.isFinite(settings?.withdrawalTickerMinimumAmount) && settings.withdrawalTickerMinimumAmount >= 0 ? settings.withdrawalTickerMinimumAmount : 5000;
+    const minimumAmount = Number.isFinite(settings?.withdrawalTickerMinimumAmount) && settings.withdrawalTickerMinimumAmount >= 0 ? settings.withdrawalTickerMinimumAmount : 0;
     const maxItems = [5, 10, 20, 30].includes(settings?.withdrawalTickerMaxItems) ? settings.withdrawalTickerMaxItems : 30;
     const withdrawals = enabled ? await Withdraw.aggregate([
       { $match: { status: 'PAID', amount: { $gt: 0 }, updatedAt: { $gte: new Date(Date.now() - days * 24 * 60 * 60 * 1000) } } },
@@ -618,7 +618,7 @@ app.get('/api/admin/withdrawal-ticker-settings', requireAdmin, async (req, res) 
     res.json({
       enabled: settings?.withdrawalTickerEnabled !== false,
       days: [7, 14, 30].includes(settings?.withdrawalTickerDays) ? settings.withdrawalTickerDays : 30,
-      minimumAmount: Number.isFinite(settings?.withdrawalTickerMinimumAmount) && settings.withdrawalTickerMinimumAmount >= 0 ? settings.withdrawalTickerMinimumAmount : 5000,
+      minimumAmount: Number.isFinite(settings?.withdrawalTickerMinimumAmount) && settings.withdrawalTickerMinimumAmount >= 0 ? settings.withdrawalTickerMinimumAmount : 0,
       maxItems: [5, 10, 20, 30].includes(settings?.withdrawalTickerMaxItems) ? settings.withdrawalTickerMaxItems : 30
     });
   } catch (err) {
