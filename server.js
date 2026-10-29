@@ -594,8 +594,9 @@ app.get('/api/public/withdrawals/recent', async (req, res) => {
     const minimumAmount = Number.isFinite(settings?.withdrawalTickerMinimumAmount) && settings.withdrawalTickerMinimumAmount >= 0 ? settings.withdrawalTickerMinimumAmount : 5000;
     const maxItems = [5, 10, 20, 30].includes(settings?.withdrawalTickerMaxItems) ? settings.withdrawalTickerMaxItems : 30;
     const withdrawals = enabled ? await Withdraw.aggregate([
-      { $match: { status: 'PAID', amount: { $gt: 0, $gte: minimumAmount }, updatedAt: { $gte: new Date(Date.now() - days * 24 * 60 * 60 * 1000) } } },
+      { $match: { status: 'PAID', amount: { $gt: 0 }, updatedAt: { $gte: new Date(Date.now() - days * 24 * 60 * 60 * 1000) } } },
       { $group: { _id: { $dateToString: { format: '%Y-%m-%d', date: '$updatedAt', timezone: 'Asia/Kolkata' } }, amount: { $sum: '$amount' } } },
+      { $match: { amount: { $gte: minimumAmount } } },
       { $sort: { _id: -1 } },
       { $limit: maxItems },
       { $project: { _id: 0, date: '$_id', amount: 1 } }
