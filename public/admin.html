@@ -378,6 +378,25 @@
     </div>
 
     <div class="card">
+      <h3>Homepage LIVE Withdrawal Line</h3>
+      <p class="muted">Controls which actual admin-paid withdrawals appear in the homepage ticker. Amounts cannot be manually invented or edited.</p>
+      <label><input id="withdrawTickerEnabled" type="checkbox"> Show the live withdrawal line</label>
+      <div class="two">
+        <label for="withdrawTickerDays">Recent period
+          <select id="withdrawTickerDays"><option value="7">7 days</option><option value="14">14 days</option><option value="30">30 days</option></select>
+        </label>
+        <label for="withdrawTickerMinimumAmount">Minimum daily total (₹)
+          <input id="withdrawTickerMinimumAmount" type="number" min="0" max="10000000" step="1">
+        </label>
+        <label for="withdrawTickerMaxItems">Maximum daily totals
+          <select id="withdrawTickerMaxItems"><option value="5">5</option><option value="10">10</option><option value="20">20</option><option value="30">30</option></select>
+        </label>
+      </div>
+      <button id="saveWithdrawTickerSettings" type="button">Save LIVE line settings</button>
+      <p id="withdrawTickerSettingsStatus" class="muted" role="status"></p>
+    </div>
+
+    <div class="card">
       <h3>Complete Game History</h3>
       <table id="historyTable">
         <tr><th>Game</th><th>Players</th><th>Entry</th><th>Status</th><th>Winner / Cancel reason</th><th>Room code</th><th>Proof</th><th>Joined / Started</th></tr>
@@ -705,6 +724,44 @@
       document.getElementById('notificationList').innerHTML = tasks.map(task =>
         `<li><a href="#${task.target}">${task.label}: ${task.count}</a></li>`
       ).join('');
+    }
+
+    async function loadWithdrawTickerSettings() {
+      const status = document.getElementById('withdrawTickerSettingsStatus');
+      try {
+        const res = await adminFetch('/api/admin/withdrawal-ticker-settings');
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Ticker settings load nahi hue.');
+        document.getElementById('withdrawTickerEnabled').checked = data.enabled !== false;
+        document.getElementById('withdrawTickerDays').value = String(data.days);
+        document.getElementById('withdrawTickerMinimumAmount').value = String(data.minimumAmount);
+        document.getElementById('withdrawTickerMaxItems').value = String(data.maxItems);
+        status.textContent = 'Current line uses verified paid withdrawals only.';
+      } catch (error) {
+        status.textContent = error.message || 'Ticker settings load nahi hue.';
+      }
+    }
+
+    async function saveWithdrawTickerSettings() {
+      const status = document.getElementById('withdrawTickerSettingsStatus');
+      const payload = {
+        enabled: document.getElementById('withdrawTickerEnabled').checked,
+        days: Number(document.getElementById('withdrawTickerDays').value),
+        minimumAmount: Number(document.getElementById('withdrawTickerMinimumAmount').value),
+        maxItems: Number(document.getElementById('withdrawTickerMaxItems').value)
+      };
+      try {
+        const res = await adminFetch('/api/admin/withdrawal-ticker-settings', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Ticker settings save nahi hue.');
+        status.textContent = data.message || 'Homepage live withdrawal line update ho gayi.';
+      } catch (error) {
+        status.textContent = error.message || 'Ticker settings save nahi hue.';
+      }
     }
 
     async function loadAnnouncementText() {
@@ -1645,12 +1702,14 @@
     document.getElementById('saveBrandingBtn').addEventListener('click', saveBranding);
     document.getElementById('saveDepositUpiIdBtn').addEventListener('click', saveDepositUpiId);
     document.getElementById('saveLeaderboardSettings').addEventListener('click', saveAdminLeaderboardSettings);
+    document.getElementById('saveWithdrawTickerSettings').addEventListener('click', saveWithdrawTickerSettings);
     document.getElementById('addPlayerCopyRowBtn').addEventListener('click', () => addPlayerCopyRow());
     document.getElementById('savePlayerCopyBtn').addEventListener('click', savePlayerCopy);
     loadSupportNumbers();
     loadBranding();
     loadDepositUpiId();
     loadPlayerCopy();
+    loadWithdrawTickerSettings();
     loadData();
     loadUsers();
     loadAdminLeaderboard();
