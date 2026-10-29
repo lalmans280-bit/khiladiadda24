@@ -526,7 +526,7 @@ app.use((req, res, next) => {
 app.get('/', (req, res) => {
   res.redirect(302, '/login.html?next=%2Findex.html');
 });
-app.use(express.static('public'));
+app.get('/home.html', (req, res) => {   res.redirect(302, '/login.html?next=%2Findex.html'); }); app.use(express.static('public'));
 
 app.get('/healthz', (req, res) => {
   res.sendStatus(200);
