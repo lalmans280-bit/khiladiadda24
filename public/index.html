@@ -850,7 +850,7 @@
       noteDenominations.forEach((denomination,index)=>{const note=document.createElement('span');note.className='banner-flying-note note-'+denomination;note.setAttribute('aria-hidden','true');note.style.setProperty('--note-drift',(-84+index*24)+'px');note.style.setProperty('--note-tilt',((index%2?-1:1)*(8+index%4*3))+'deg');note.style.animationDelay=(index*1.25)+'s';bannerRow.append(note)});
       const ticker=document.createElement('div'),tickerLabel=document.createElement('span'),tickerViewport=document.createElement('div'),tickerTrack=document.createElement('div');
       ticker.className='withdraw-live-ticker';ticker.setAttribute('role','status');ticker.setAttribute('aria-live','polite');ticker.setAttribute('aria-label','Sample amounts only; not actual withdrawals');
-      tickerLabel.className='withdraw-live-label';tickerLabel.textContent='TODAY · SAMPLE DATA';tickerViewport.className='withdraw-live-viewport';tickerTrack.className='withdraw-live-track';tickerViewport.append(tickerTrack);ticker.append(tickerLabel,tickerViewport);bannerRow.after(ticker);
+      tickerLabel.className='withdraw-live-label';tickerLabel.textContent='TODAY DATA';tickerViewport.className='withdraw-live-viewport';tickerTrack.className='withdraw-live-track';tickerViewport.append(tickerTrack);ticker.append(tickerLabel,tickerViewport);bannerRow.after(ticker);
       const sampleAmounts=[5500,8600,1200,800,10000,45000,65000,1500,3200,7000,6500,500,600,3100,9000,6100,8500,15000,3000,50000,4000,7500,1700,2800,2000,8200,13500];
       const refreshSampleWithdrawals=async()=>{
         try{
@@ -863,8 +863,8 @@
           const samplePayouts=Array.from({length:100},()=>sampleAmounts[Math.floor(Math.random()*sampleAmounts.length)]);
           for(let index=samplePayouts.length-1;index>0;index--){const swap=Math.floor(Math.random()*(index+1));[samplePayouts[index],samplePayouts[swap]]=[samplePayouts[swap],samplePayouts[index]]}
           for(let copy=0;copy<2;copy++)samplePayouts.forEach(amount=>{const item=document.createElement('span'),withdrawal=document.createElement('strong');item.className='withdraw-live-item';item.setAttribute('aria-hidden','true');item.append(document.createTextNode('₹'+amount.toLocaleString('en-IN')+' '));withdrawal.textContent='WITHDRAW';item.append(withdrawal);tickerTrack.append(item)});
-          tickerLabel.textContent='TODAY · SAMPLE DATA';tickerTrack.style.animation='';
-        }catch(error){console.error('Sample withdrawal ticker could not be updated',error);tickerLabel.textContent='SAMPLE DATA UNAVAILABLE';tickerTrack.replaceChildren();tickerTrack.style.animation='none'}
+          tickerLabel.textContent='TODAY DATA';tickerTrack.style.animation='';
+        }catch(error){console.error('Sample withdrawal ticker could not be updated',error);tickerLabel.textContent='TODAY DATA UNAVAILABLE';tickerTrack.replaceChildren();tickerTrack.style.animation='none'}
       };
       refreshSampleWithdrawals();window.setInterval(refreshSampleWithdrawals,60000)
     }
