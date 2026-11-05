@@ -21,7 +21,9 @@ const Match = require('./models/match');
 const Deposit = require('./models/deposit');
 const Withdraw = require('./models/withdraw');
 const Kyc = require('./models/kyc');
-const MIN_BATTLE_WALLET_BALANCE = 50;
+const MIN_BATTLE_ENTRY_AMOUNT = 50;
+const MAX_BATTLE_ENTRY_AMOUNT = 50000;
+const MINIMUM_DEPOSIT_AMOUNT = 50;
 const SiteSettings = require('./models/site-settings');
 const MonthlyLeaderboard = require('./models/monthly-leaderboard');
 const SupportMessage = require('./models/support-message');
@@ -1576,7 +1578,10 @@ app.get('/api/admin/uploads/:filename', requireAdmin, async (req, res) => {
 app.post('/api/matches/create', requireUser, async (req, res) => {
   const { gameType } = req.body;
   const userId = req.auth.userId;
-  const entryAmount = 0;
+  const entryAmount = Number(req.body.entryAmount);
+  if (!Number.isInteger(entryAmount) || entryAmount < MIN_BATTLE_ENTRY_AMOUNT || entryAmount > MAX_BATTLE_ENTRY_AMOUNT || entryAmount % MIN_BATTLE_ENTRY_AMOUNT !== 0) {
+    return res.status(400).json({ error: 'Battle entry ₹50 se shuru hoti hai aur ₹50 ke multiples mein honi chahiye.' });
+  }
   if (!['LUDO', 'POPULAR_LUDO', 'SNAKE', 'LUDO_RACE'].includes(String(gameType || 'LUDO').toUpperCase())) {
     return res.status(400).json({ error: 'Ludo, Popular Ludo, Ludo Race ya Snake game select karein' });
   }
@@ -1584,26 +1589,32 @@ app.post('/api/matches/create', requireUser, async (req, res) => {
   let reservationHeld = false;
   try {
     const user = await User.findById(userId).select('walletBalance').lean();
-    if (Number(user?.walletBalance || 0) < MIN_BATTLE_WALLET_BALANCE) {
-      return res.status(400).json({ error: 'Battle create karne ke liye wallet me minimum ₹50 hona zaroori hai. Wallet me amount add karke dobara try karein.' });
+    if (Number(user?.walletBalance || 0) < entryAmount) {
+      return res.status(400).json({ error: `Wallet balance kam hai. Battle entry ₹${entryAmount} hai; pehle wallet me amount add karein.` });
     }
     reservationHeld = await reserveActiveBet(userId);
     if (!reservationHeld) {
       return res.status(400).json({ error: 'Ek player ek time par maximum 2 active bets rakh sakta hai' });
     }
 
-    let match;
-    try {
-      match = await Match.create({ creator: userId, amount: entryAmount, creatorWinningsUsed: 0, gameType: (gameType || 'LUDO').toUpperCase() });
-      reservationHeld = false;
-    } catch (err) {
+    const debit = await debitWalletForEntry(userId, entryAmount);
+    if (!debit) {
       await releaseActiveBet(userId);
       reservationHeld = false;
+      return res.status(400).json({ error: `Wallet balance kam hai. Battle entry ₹${entryAmount} hai; pehle wallet me amount add karein.` });
+    }
+    let match;
+    try {
+      match = await Match.create({ creator: userId, amount: entryAmount, creatorWinningsUsed: debit.winningsUsed, gameType: (gameType || 'LUDO').toUpperCase() });
+    } catch (err) {
+      await refundWalletEntry(userId, entryAmount, debit.winningsUsed);
       throw err;
     }
+    reservationHeld = false;
 
+    io.emit('wallet_updated', { userId: String(debit.user._id), walletBalance: debit.user.walletBalance, amountAdded: -entryAmount });
     io.emit('match_created', match);
-    res.json({ message: 'Challenge created', match });
+    res.json({ message: 'Battle create ho gaya.', match });
   } catch (err) {
     if (reservationHeld) await releaseActiveBet(userId);
     res.status(500).json({ error: err.message });
@@ -1616,7 +1627,7 @@ app.get('/api/matches/open', async (req, res) => {
     return res.status(400).json({ error: 'Game type LUDO, POPULAR_LUDO, LUDO_RACE, SNAKE ya ALL hona chahiye' });
   }
   try {
-    const query = { status: 'OPEN' };
+    const query = { status: 'OPEN', amount: { $gte: MIN_BATTLE_ENTRY_AMOUNT } };
     if (gameType !== 'ALL') query.gameType = gameType;
     const matches = await Match.find(query).populate('creator', 'username profileImage').sort({ updatedAt: -1 });
     res.json(matches);
@@ -2299,16 +2310,16 @@ app.post('/api/matches/join', requireUser, async (req, res) => {
 
   let reservationHeld = false;
   try {
-    const user = await User.findById(userId).select('walletBalance').lean();
-    if (Number(user?.walletBalance || 0) < MIN_BATTLE_WALLET_BALANCE) {
-      return res.status(400).json({ error: 'Battle join karne ke liye wallet me minimum ₹50 hona zaroori hai. Wallet me amount add karke dobara try karein.' });
-    }
     const match = await Match.findById(matchId);
     if (!match || match.status !== 'OPEN') {
       return res.status(400).json({ error: 'Match expire ho chuka hai' });
     }
-    if (Number(match.amount) > 0) {
-      return res.status(400).json({ error: 'Paid match ab join nahi ho sakta. Creator cancel karke entry refund le sakta hai.' });
+    if (Number(match.amount) < MIN_BATTLE_ENTRY_AMOUNT) {
+      return res.status(400).json({ error: 'Free battle join nahi ho sakti. Paid battle select karein.' });
+    }
+    const user = await User.findById(userId).select('walletBalance').lean();
+    if (Number(user?.walletBalance || 0) < Number(match.amount)) {
+      return res.status(400).json({ error: `Wallet balance kam hai. Battle join karne ke liye ₹${match.amount} chahiye.` });
     }
 
     if (match.creator.toString() === userId) {
@@ -2832,8 +2843,8 @@ app.post('/api/matches/cancel', requireUser, async (req, res) => {
 app.get('/api/wallet/generate-qr', requireUser, async (req, res) => {
   const { amount } = req.query;
   const depositAmount = Number(amount);
-  if (!Number.isInteger(depositAmount) || depositAmount < 100 || depositAmount > 1000000) {
-    return res.status(400).json({ error: 'Minimum deposit ₹100 hai' });
+  if (!Number.isInteger(depositAmount) || depositAmount < MINIMUM_DEPOSIT_AMOUNT || depositAmount > 1000000) {
+    return res.status(400).json({ error: `Minimum deposit ₹${MINIMUM_DEPOSIT_AMOUNT} hai` });
   }
   try {
     const settings = mongoose.connection.readyState === 1
@@ -2854,8 +2865,8 @@ app.post('/api/wallet/submit-deposit', requireUser, persistUploads(upload.single
   const { amount, utrNumber } = req.body;
   const userId = req.auth.userId;
   const depositAmount = Number(amount);
-  if (!Number.isInteger(depositAmount) || depositAmount < 100 || depositAmount > 1000000) {
-    return res.status(400).json({ error: 'Minimum deposit ₹100 hai' });
+  if (!Number.isInteger(depositAmount) || depositAmount < MINIMUM_DEPOSIT_AMOUNT || depositAmount > 1000000) {
+    return res.status(400).json({ error: `Minimum deposit ₹${MINIMUM_DEPOSIT_AMOUNT} hai` });
   }
 
   if (!utrNumber || !/^[a-zA-Z0-9]{12,22}$/.test(utrNumber.trim())) {
