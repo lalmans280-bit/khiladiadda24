@@ -1244,7 +1244,7 @@ async function sendSMS(phone, otp) {
     const response = await axios.post('https://api.api-king.com/api/v1/otp/send', {
       number: phone,
       otp,
-      flash: 0
+      template: String(process.env.API_KING_OTP_TEMPLATE || 'login').trim()
     }, {
       headers: {
         Authorization: apiKey,
