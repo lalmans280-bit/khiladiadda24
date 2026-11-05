@@ -15,7 +15,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link rel="manifest" href="/api/site-manifest">
-  <meta name="description" content="KhiladiAdda24 par free Ludo, Snake battles aur Indian Rummy practice khelein.">
+  <meta name="description" content="KhiladiAdda24 par free Ludo aur Snake battles khelein.">
   <meta name="robots" content="noindex,follow">
   <link rel="icon" href="/app-icon-192.png" type="image/png">
   <link rel="shortcut icon" href="/app-icon-192.png" type="image/png">
@@ -26,7 +26,7 @@
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="KhiladiAdda24">
   <meta property="og:title" content="KhiladiAdda24 - Ludo & Snake Games">
-  <meta property="og:description" content="KhiladiAdda24 par free Ludo, Snake battles aur Indian Rummy practice khelein.">
+  <meta property="og:description" content="KhiladiAdda24 par free Ludo aur Snake battles khelein.">
   <meta property="og:url" content="https://khiladiadda24.com/">
   <meta property="og:image" content="https://khiladiadda24.com/app-icon-512.png">
   <meta name="twitter:card" content="summary">
@@ -348,9 +348,6 @@
     #gamePicker [data-cricket-promo]{background:linear-gradient(0deg,#101713df,#1017131a 75%),url('/cricket.png') center/cover no-repeat}
     #gamePicker [data-pubg-promo]{background:linear-gradient(0deg,#101713df,#1017131a 75%),url('/pubg.png') center/cover no-repeat}
     #gamePicker .game-coming-soon-icon{display:none}
-    #gamePicker .rummy-game-tile{display:grid;place-content:center;justify-items:center;gap:5px;border-color:#c49b58;color:#fff4db;background:linear-gradient(145deg,#65442f,#284c43 72%);text-align:center;text-decoration:none}
-    #gamePicker .rummy-game-tile strong{color:#fff4db;font-size:18px}
-    #gamePicker .rummy-mark{display:grid;width:52px;aspect-ratio:1;place-items:center;border:1px solid #e8c67b;border-radius:50%;color:#e8c67b;background:#183c34;font:32px Georgia,serif}
     .cricket-promo-hero{position:relative;isolation:isolate;overflow:hidden;min-height:250px;padding:clamp(22px,5vw,42px);border:1px solid #9b7138;border-radius:14px;background:linear-gradient(90deg,#101713f2 0%,#101713d9 55%,#10171366 100%),url('/cricket.png') center/cover}
     .cricket-promo-hero h1{max-width:640px;margin:12px 0;color:#ffdc7b;font-size:clamp(28px,5vw,42px);line-height:1.1}
     .cricket-promo-hero p{max-width:600px;margin:0;color:#f0eee5}
@@ -494,7 +491,6 @@
         <div class="game-launch" id="gamePicker">
           <button class="game-tile game-tile-image game-coming-soon-tile" type="button" data-cricket-promo aria-label="Cricket fantasy - Coming Soon"><img class="cricket-game-logo" src="/cricket-game-logo.svg" alt=""><span class="game-coming-soon-icon" aria-hidden="true">🏏</span><strong>Cricket Fantasy</strong><span class="game-coming-soon-badge">₹1 LAKH · COMING SOON</span></button>
           <button class="game-tile game-tile-image game-coming-soon-tile" type="button" data-pubg-promo aria-label="PUBG - Coming Soon"><span class="game-coming-soon-icon" aria-hidden="true">🎯</span><strong>PUBG</strong><span class="game-coming-soon-badge">COMING SOON</span></button>
-          <a class="game-tile game-tile-image rummy-game-tile" href="/rummy.html" aria-label="Play free Indian Rummy"><span class="rummy-mark" aria-hidden="true">♠</span><strong>Indian Rummy</strong><span class="game-coming-soon-badge">FREE PRACTICE</span></a>
           <a class="game-support-banner" href="/support.html" aria-label="WhatsApp and support"><img src="/support-banner.png?v=20261028-support-update" alt="WhatsApp and Support"><span class="game-live-badge"><i class="game-live-dot" aria-hidden="true"></i><span class="game-live-text">LIVE</span></span></a>
         </div>
         <div id="gameBattleView" hidden>
@@ -700,7 +696,7 @@
     if(createChallengeButton){createChallengeButton.hidden=false;createChallengeButton.textContent='Create paid battle'}
     if(el('openMatches').previousElementSibling?.textContent.trim()==='Challenger, entry amount aur winning amount dekhein.')el('openMatches').previousElementSibling.remove();
     const freeMatchNotice=el('createForm').previousElementSibling;
-    if(freeMatchNotice)freeMatchNotice.textContent='Every battle has a paid entry starting at ₹50; the entry is deducted from both players’ wallets. The winner gets 95% of the total pool and the admin receives 5% commission.';
+    if(freeMatchNotice)freeMatchNotice.textContent='Minimum ₹50. Multiples of ₹50. Play.';
     const walletDepositAmount=el('depositAmount');
     walletDepositAmount.min='50';
     walletDepositAmount.value='50';
