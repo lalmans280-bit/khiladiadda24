@@ -1247,7 +1247,7 @@ async function sendSMS(phone, otp) {
       flash: 0
     }, {
       headers: {
-        Authorization: `Bearer ${apiKey}`,
+        Authorization: apiKey,
         'Content-Type': 'application/json',
         Accept: 'application/json'
       },
@@ -1320,7 +1320,7 @@ app.post('/api/auth/send-otp', async (req, res) => {
         console.error('OTP record cleanup failed:', cleanupError.code || cleanupError.name || 'UNKNOWN');
       }
       const error = smsResult.reason === 'INVALID_KEY'
-        ? 'API King ne configured API key reject ki. .env me API_KING_API_KEY check karke server restart karein.'
+        ? 'API King ne key reject ki. API King se active SMS API key lein, phir Render Environment me API_KING_API_KEY update karke Save, rebuild, and deploy karein.'
         : smsResult.reason === 'MISSING_OR_PLACEHOLDER_KEY'
           ? 'SMS API key configured nahi hai. .env me API_KING_API_KEY set karke server restart karein.'
           : smsResult.reason === 'ENDPOINT_NOT_FOUND'
