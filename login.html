@@ -187,6 +187,12 @@
       message.classList.toggle('error', isError);
     }
 
+    const openedAsFile = location.protocol === 'file:';
+    if (openedAsFile) {
+      document.getElementById('otpSendBtn').disabled = true;
+      setMessage('Yeh login page file se khula hai. OTP ke liye app ko website ya local server URL se kholein.', true);
+    }
+
     function updateOtpButtons() {
       const waiting = otpCooldown > 0;
       document.getElementById('otpSendBtn').disabled = waiting;
@@ -225,6 +231,7 @@
 
     async function sendOtp(event) {
       event.preventDefault();
+      if (openedAsFile) return;
       const phone = document.getElementById('phone').value.trim();
       const referralCode = document.getElementById('referralCode').value.trim().toUpperCase();
 
@@ -267,6 +274,7 @@
 
     async function verifyOtp(event) {
       event.preventDefault();
+      if (openedAsFile) return;
       const phone = document.getElementById('phone').value.trim();
       const otp = document.getElementById('otp').value.trim();
       if (!/^\d{4,6}$/.test(otp)) {
