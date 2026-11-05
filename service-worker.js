@@ -1,5 +1,5 @@
-const CACHE_NAME = 'khiladiadda24-shell-v37';
-const SHELL_URLS = ['/index.html', '/admin.html', '/login.html', '/app-icon.svg', '/app-icon-192.png', '/app-icon-512.png', '/app-logo.png?v=20261008-2304', '/logo.png', '/cricket.png', '/pubg.png'];
+const CACHE_NAME = 'khiladiadda24-shell-v42';
+const SHELL_URLS = ['/index.html', '/admin.html', '/login.html', '/rummy.html', '/rummy-game.js', '/app-icon.svg', '/app-icon-192.png', '/app-icon-512.png', '/app-logo.png?v=20261008-2304', '/logo.png', '/cricket.png', '/cricket-game-logo.svg', '/pubg.png'];
 
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(SHELL_URLS)));
