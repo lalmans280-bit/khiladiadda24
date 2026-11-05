@@ -13,7 +13,6 @@ const jwt = require('jsonwebtoken');
 const { Server } = require('socket.io');
 const { pipeline } = require('stream/promises');
 const PubgPvpService = require('./pubg-pvp');
-const TeenPattiService = require('./teen-patti-service');
 
 // Models
 const User = require('./models/user');
@@ -3686,26 +3685,8 @@ const pubgPvpService = new PubgPvpService(io, async token => {
     blocked: Boolean(user.isBlocked)
   };
 });
-const teenPattiService = new TeenPattiService(io, async token => {
-  let payload;
-  try {
-    payload = jwt.verify(token, JWT_SECRET);
-  } catch {
-    return null;
-  }
-  if (payload.role !== 'user' || !mongoose.Types.ObjectId.isValid(String(payload.userId || ''))) return null;
-  const user = await findUserById(payload.userId);
-  if (!user) return null;
-  return {
-    id: String(user._id || user.id),
-    name: user.username,
-    blocked: Boolean(user.isBlocked)
-  };
-});
-
 io.on('connection', (socket) => {
   pubgPvpService.attach(socket);
-  teenPattiService.attach(socket);
   socket.on('register_player', async ({ token } = {}) => {
     try {
       const payload = jwt.verify(String(token || ''), JWT_SECRET);
