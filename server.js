@@ -1244,10 +1244,10 @@ async function sendSMS(phone, otp) {
     const response = await axios.post('https://api.api-king.com/api/v1/otp/send', {
       number: phone,
       otp,
-      route: 'sms'
+      flash: 0
     }, {
       headers: {
-        Authorization: apiKey,
+        Authorization: `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
         Accept: 'application/json'
       },
