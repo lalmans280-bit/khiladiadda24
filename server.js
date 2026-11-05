@@ -13,6 +13,7 @@ const jwt = require('jsonwebtoken');
 const { Server } = require('socket.io');
 const { pipeline } = require('stream/promises');
 const PubgPvpService = require('./pubg-pvp');
+const TeenPattiService = require('./teen-patti-service');
 
 // Models
 const User = require('./models/user');
@@ -47,15 +48,18 @@ const RANDOM_PROFILE_IMAGES = ['1.png', '2.png', '3.png', '4.png', '5.png'];
 const LEGACY_DEFAULT_PROFILE_IMAGES = new Set(['avatar-1.jpeg', 'avatar-2.jpeg', 'avatar-3.jpeg']);
 
 function isTestLoginEnabled() {
-  return /^(1|true|yes|on)$/i.test(String(process.env.ALLOW_TEST_LOGIN || '').trim());
+  return process.env.NODE_ENV !== 'production'
+    && /^(1|true|yes|on)$/i.test(String(process.env.ALLOW_TEST_LOGIN || '').trim())
+    && /^[6-9]\d{9}$/.test(normalizePhone(process.env.TEST_LOGIN_PHONE))
+    && /^\d{4,6}$/.test(String(process.env.TEST_LOGIN_OTP || '').trim());
 }
 
 function getConfiguredTestLoginPhone() {
-  return normalizePhone(process.env.TEST_LOGIN_PHONE || '7828189494');
+  return normalizePhone(process.env.TEST_LOGIN_PHONE);
 }
 
 function getConfiguredTestLoginOtp() {
-  return String(process.env.TEST_LOGIN_OTP || '1234').trim();
+  return String(process.env.TEST_LOGIN_OTP || '').trim();
 }
 
 function normalizePhone(phone) {
@@ -526,7 +530,10 @@ app.use((req, res, next) => {
 app.get('/', (req, res) => {
   res.redirect(302, '/login.html?next=%2Findex.html');
 });
-app.get('/home.html', (req, res) => {   res.redirect(302, '/login.html?next=%2Findex.html'); }); app.use(express.static('public'));
+app.get('/home.html', (req, res) => {
+  res.redirect(302, '/login.html?next=%2Findex.html');
+});
+app.use(express.static('public'));
 
 app.get('/healthz', (req, res) => {
   res.sendStatus(200);
@@ -591,11 +598,24 @@ app.get('/api/public/withdrawals/recent', async (req, res) => {
       .lean();
     const enabled = settings?.withdrawalTickerEnabled !== false;
     const days = [7, 14, 30].includes(settings?.withdrawalTickerDays) ? settings.withdrawalTickerDays : 30;
-    const minimumAmount = Number.isFinite(settings?.withdrawalTickerMinimumAmount) && settings.withdrawalTickerMinimumAmount >= 0 ? settings.withdrawalTickerMinimumAmount : 0;
+    const minimumAmount = Number.isFinite(settings?.withdrawalTickerMinimumAmount) && settings.withdrawalTickerMinimumAmount >= 0
+      ? settings.withdrawalTickerMinimumAmount
+      : 0;
     const maxItems = [5, 10, 20, 30].includes(settings?.withdrawalTickerMaxItems) ? settings.withdrawalTickerMaxItems : 30;
     const withdrawals = enabled ? await Withdraw.aggregate([
       { $match: { status: 'PAID', amount: { $gt: 0 }, updatedAt: { $gte: new Date(Date.now() - days * 24 * 60 * 60 * 1000) } } },
-      { $group: { _id: { $dateToString: { format: '%Y-%m-%d', date: '$updatedAt', timezone: 'Asia/Kolkata' } }, amount: { $sum: '$amount' } } },
+      {
+        $group: {
+          _id: {
+            $dateToString: {
+              format: '%Y-%m-%d',
+              date: '$updatedAt',
+              timezone: 'Asia/Kolkata'
+            }
+          },
+          amount: { $sum: '$amount' }
+        }
+      },
       { $match: { amount: { $gte: minimumAmount } } },
       { $sort: { _id: -1 } },
       { $limit: maxItems },
@@ -618,7 +638,9 @@ app.get('/api/admin/withdrawal-ticker-settings', requireAdmin, async (req, res) 
     res.json({
       enabled: settings?.withdrawalTickerEnabled !== false,
       days: [7, 14, 30].includes(settings?.withdrawalTickerDays) ? settings.withdrawalTickerDays : 30,
-      minimumAmount: Number.isFinite(settings?.withdrawalTickerMinimumAmount) && settings.withdrawalTickerMinimumAmount >= 0 ? settings.withdrawalTickerMinimumAmount : 0,
+      minimumAmount: Number.isFinite(settings?.withdrawalTickerMinimumAmount) && settings.withdrawalTickerMinimumAmount >= 0
+        ? settings.withdrawalTickerMinimumAmount
+        : 0,
       maxItems: [5, 10, 20, 30].includes(settings?.withdrawalTickerMaxItems) ? settings.withdrawalTickerMaxItems : 30
     });
   } catch (err) {
@@ -629,11 +651,23 @@ app.get('/api/admin/withdrawal-ticker-settings', requireAdmin, async (req, res) 
 app.post('/api/admin/withdrawal-ticker-settings', requireAdmin, async (req, res) => {
   if (mongoose.connection.readyState !== 1) return res.status(503).json({ error: mongoUnavailableMessage() });
   const { enabled, days, minimumAmount, maxItems } = req.body || {};
-  if (typeof enabled !== 'boolean' || ![7, 14, 30].includes(days) || !Number.isInteger(minimumAmount) || minimumAmount < 0 || minimumAmount > 10000000 || ![5, 10, 20, 30].includes(maxItems)) {
+  if (typeof enabled !== 'boolean'
+    || ![7, 14, 30].includes(days)
+    || !Number.isInteger(minimumAmount) || minimumAmount < 0 || minimumAmount > 10000000
+    || ![5, 10, 20, 30].includes(maxItems)) {
     return res.status(400).json({ error: 'Ticker settings valid nahi hain.' });
   }
   try {
-    await SiteSettings.findByIdAndUpdate('support-contact', { $set: { withdrawalTickerEnabled: enabled, withdrawalTickerDays: days, withdrawalTickerMinimumAmount: minimumAmount, withdrawalTickerMaxItems: maxItems } }, { new: true, upsert: true, runValidators: true, setDefaultsOnInsert: true });
+    await SiteSettings.findByIdAndUpdate(
+      'support-contact',
+      { $set: {
+        withdrawalTickerEnabled: enabled,
+        withdrawalTickerDays: days,
+        withdrawalTickerMinimumAmount: minimumAmount,
+        withdrawalTickerMaxItems: maxItems
+      } },
+      { new: true, upsert: true, runValidators: true, setDefaultsOnInsert: true }
+    );
     res.json({ message: 'Homepage live withdrawal line settings save ho gaye.' });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -866,7 +900,7 @@ app.get('/api/admin/sms-api-key', requireAdmin, async (req, res) => {
   }
   try {
     const settings = await SiteSettings.findById('support-contact').select('smsApiKey').lean();
-    res.json({ configured: Boolean(settings?.smsApiKey || process.env.API_KING_API_KEY) });
+    res.json({ configured: Boolean(settings?.smsApiKey || process.env.API_KING_API_KEY || process.env.SMS_API_KEY) });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -960,6 +994,12 @@ let mongoConnectionError = '';
 function mongoUnavailableMessage() {
   if (/bad auth|authentication failed/i.test(mongoConnectionError)) {
     return 'MongoDB username/password match nahi karte. Atlas DB user ka password .env ke MONGODB_PASSWORD mein set karke server restart karein.';
+  }
+  if (!mongoConnectionUri) {
+    return 'MONGODB_URI configure nahi hai. .env mein apna MongoDB connection string set karein.';
+  }
+  if (['localhost', '127.0.0.1', '::1'].includes(mongoConnectionUri.hostname)) {
+    return 'Local MongoDB connect nahi hai. MongoDB service chalu karein ya .env mein MONGODB_URI sahi karein.';
   }
   return 'MongoDB Atlas connect nahi hai. Server ka public IP Atlas Network Access mein allow karke dobara try karein.';
 }
@@ -1229,7 +1269,7 @@ async function getOtpRecord(phone, otp) {
 
 // Helper: API King OTP SMS Gateway
 async function sendSMS(phone, otp) {
-  let apiKey = String(process.env.API_KING_API_KEY || '').trim();
+  let apiKey = String(process.env.API_KING_API_KEY || process.env.SMS_API_KEY || '').trim();
   if (mongoose.connection.readyState === 1) {
     try {
       const settings = await SiteSettings.findById('support-contact').select('smsApiKey').lean();
@@ -1243,7 +1283,6 @@ async function sendSMS(phone, otp) {
   try {
     const response = await axios.post('https://api.api-king.com/api/v1/otp/send', {
       number: phone,
-      
       template: String(process.env.API_KING_OTP_TEMPLATE || 'login').trim()
     }, {
       headers: {
@@ -1253,6 +1292,7 @@ async function sendSMS(phone, otp) {
       },
       timeout: 30000
     });
+    console.info('API King accepted OTP request:', response.status);
     return { sent: response.status >= 200 && response.status < 300 };
   } catch (err) {
     const status = Number(err.response?.status);
@@ -1294,7 +1334,11 @@ app.post('/api/auth/send-otp', async (req, res) => {
 
   const testLoginPhone = getConfiguredTestLoginPhone();
   const testLoginOtp = getConfiguredTestLoginOtp();
-  const otp = isTestLoginEnabled() && phone === testLoginPhone ? testLoginOtp : Math.floor(100000 + Math.random() * 900000).toString();
+  const isLocalTestLogin = isTestLoginEnabled() && phone === testLoginPhone;
+  if (mongoose.connection.readyState !== 1 && !isLocalTestLogin) {
+    return res.status(503).json({ error: mongoUnavailableMessage() });
+  }
+  const otp = isLocalTestLogin ? testLoginOtp : Math.floor(100000 + Math.random() * 900000).toString();
 
   try {
     const existingUser = await findUserByPhone(phone);
@@ -1304,11 +1348,8 @@ app.post('/api/auth/send-otp', async (req, res) => {
     }
     await saveOtpRecord(phone, otp, { referralCode: existingUser ? '' : referralCode });
 
-    if (isTestLoginEnabled() && phone === testLoginPhone) {
+    if (isLocalTestLogin) {
       return res.json({ message: `Test login enabled. Use OTP ${testLoginOtp}` });
-    }
-    if (mongoose.connection.readyState !== 1) {
-      return res.json({ message: `OTP ready locally. Use OTP ${otp}` });
     }
 
     const smsResult = await sendSMS(phone, otp);
@@ -3645,9 +3686,26 @@ const pubgPvpService = new PubgPvpService(io, async token => {
     blocked: Boolean(user.isBlocked)
   };
 });
+const teenPattiService = new TeenPattiService(io, async token => {
+  let payload;
+  try {
+    payload = jwt.verify(token, JWT_SECRET);
+  } catch {
+    return null;
+  }
+  if (payload.role !== 'user' || !mongoose.Types.ObjectId.isValid(String(payload.userId || ''))) return null;
+  const user = await findUserById(payload.userId);
+  if (!user) return null;
+  return {
+    id: String(user._id || user.id),
+    name: user.username,
+    blocked: Boolean(user.isBlocked)
+  };
+});
 
 io.on('connection', (socket) => {
   pubgPvpService.attach(socket);
+  teenPattiService.attach(socket);
   socket.on('register_player', async ({ token } = {}) => {
     try {
       const payload = jwt.verify(String(token || ''), JWT_SECRET);
