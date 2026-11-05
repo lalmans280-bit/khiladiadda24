@@ -1282,7 +1282,7 @@ async function sendSMS(phone, otp) {
   try {
     const response = await axios.post('https://api.api-king.com/api/v1/otp/send', {
       number: phone,
-      template: String(process.env.API_KING_OTP_TEMPLATE || 'login').trim()
+      otp,       route: 'sms'
     }, {
       headers: {
         Authorization: apiKey,
