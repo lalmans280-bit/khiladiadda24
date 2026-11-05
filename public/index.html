@@ -704,7 +704,7 @@
     const matchSocket=typeof io==='function'?io():null;
     const registerMatchSocket=()=>{if(!matchSocket||!token)return;matchSocket.emit('register_player',{token});const matchId=new URLSearchParams(location.search).get('matchId');if(matchId)matchSocket.emit('join_match_room',{matchId,token})};
     if(matchSocket){matchSocket.on('connect',registerMatchSocket);if(matchSocket.connected)registerMatchSocket();matchSocket.on('match_start_tone',event=>{const starterId=String(event?.startedBy||''),currentUserId=String(player?._id||storedUser?.id||'');if(starterId&&starterId!==currentUserId)window.matchApp?.playAlertTone?.()})}
-    if(matchSocket)matchSocket.on('match_updated',updated=>{const currentMatchId=new URLSearchParams(location.search).get('matchId');if(currentMatchId&&String(updated?._id)===currentMatchId&&window.openMatch)window.openMatch(currentMatchId).then(()=>{if(updated.status!=='COMPLETED')return;const winnerId=String(updated.winner?._id||updated.winner||''),currentUserId=String(player?._id||storedUser?.id||''),isFreeMatch=Number(updated.amount||0)===0;notify(isFreeMatch?'Free match complete. No wallet amount changed.':winnerId===currentUserId?`Admin ne result approve kar diya: Aap WIN hue. ₹${(Number(updated.amount||0)*1.8).toLocaleString('en-IN')} wallet me credit hua.`:'Admin ne result approve kar diya: Is match me aap LOSS hue.')}).catch(error=>notify(error.message,true))});
+    if(matchSocket)matchSocket.on('match_updated',updated=>{const currentMatchId=new URLSearchParams(location.search).get('matchId');if(currentMatchId&&String(updated?._id)===currentMatchId&&window.openMatch)window.openMatch(currentMatchId).then(()=>{if(updated.status!=='COMPLETED')return;const winnerId=String(updated.winner?._id||updated.winner||''),currentUserId=String(player?._id||storedUser?.id||''),isFreeMatch=Number(updated.amount||0)===0;notify(isFreeMatch?'Battle complete. No wallet amount changed.':winnerId===currentUserId?`Admin ne result approve kar diya: Aap WIN hue. ₹${(Number(updated.amount||0)*1.8).toLocaleString('en-IN')} wallet me credit hua.`:'Admin ne result approve kar diya: Is match me aap LOSS hue.')}).catch(error=>notify(error.message,true))});
     if(matchSocket)matchSocket.on('wallet_updated',update=>{const userId=String(player?._id||storedUser?.id||'');if(!userId||String(update?.userId)!==userId||!Number.isFinite(Number(update.walletBalance)))return;if(player)player.walletBalance=Number(update.walletBalance);if(storedUser){storedUser.walletBalance=Number(update.walletBalance);localStorage.setItem('user',JSON.stringify(storedUser))}renderPlayer()});
     if(matchSocket)matchSocket.on('wallet_updated',update=>{const userId=String(player?._id||storedUser?.id||'');if(userId&&String(update?.userId)===userId)loadWalletSummary().catch(()=>{})});
     window.matchSocket=matchSocket;
@@ -730,12 +730,15 @@
     profileShareButton.addEventListener('click',shareWebsiteLink);
     el('copyReferral').after(profileShareButton);
     const createChallengeButton=el('createForm').querySelector('button[type="submit"]');
-    if(createChallengeButton){createChallengeButton.hidden=false;createChallengeButton.textContent='Create free match'}
+    if(createChallengeButton){createChallengeButton.hidden=false;createChallengeButton.textContent='Create paid battle'}
     if(el('openMatches').previousElementSibling?.textContent.trim()==='Challenger, entry amount aur winning amount dekhein.')el('openMatches').previousElementSibling.remove();
     const freeMatchNotice=el('createForm').previousElementSibling;
-    if(freeMatchNotice)freeMatchNotice.textContent='Battle start/join karne ke liye wallet me minimum ₹50 hona zaroori hai. Wallet me amount add karke dobara try karein. Entry fee nahi hai.';
+    if(freeMatchNotice)freeMatchNotice.textContent='Har battle paid hai. Entry ₹50 se shuru hoti hai; dono players ki entry wallet se kategi. Total pool ka 95% winner ko aur 5% admin commission hai.';
+    const walletDepositAmount=el('depositAmount');
+    walletDepositAmount.min='50';
+    walletDepositAmount.value='50';
+    el('qrForm').closest('.panel').querySelector('.muted').textContent='Minimum ₹50. QR se payment ke baad UTR aur screenshot bhejein; admin approval par amount credit hoga.';
     const entryAmountInput=el('entryAmount');
-    entryAmountInput.closest('.two').replaceWith(el('gameType').closest('.field'));
     const openBattlesHeading=document.createElement('h2');
     openBattlesHeading.className='open-battles-image-title home-open-header-title';
     openBattlesHeading.setAttribute('aria-label','My open list');
@@ -1069,7 +1072,7 @@
           renderPlayer();
           const walletBalance=Number(player.walletBalance||0);
           if(walletBalance<requiredAmount){
-            const depositAmount=Math.max(100,requiredAmount-walletBalance);
+            const depositAmount=Math.max(50,requiredAmount-walletBalance);
             window.pendingEntryAmount=requiredAmount;
             el('depositAmount').value=String(depositAmount);
             notify(`₹${requiredAmount} entry ke liye wallet balance kam hai. ₹${depositAmount} recharge karein.`,true);
@@ -1123,13 +1126,15 @@
     el('createForm').addEventListener('submit',async event=>{
       event.preventDefault();
       try{
-        const data=await api('/api/matches/create',{method:'POST',body:JSON.stringify({gameType:el('gameType').value})});
-        notify(data.message||'Free match create ho gaya.');
+        const entryAmount=Number(entryAmountInput.value);
+        window.pendingEntryAmount=entryAmount;
+        const data=await api('/api/matches/create',{method:'POST',body:JSON.stringify({gameType:el('gameType').value,entryAmount})});
+        notify(data.message||'Battle create ho gaya.');
         setView('home');
         await loadOpen();
       }catch(error){showError(error)}
     });
-    el('qrForm').addEventListener('submit',async event=>{event.preventDefault();const amount=Number(el('depositAmount').value);if(!Number.isInteger(amount)||amount<100)return notify('Deposit minimum ₹100 hai.',true);try{const data=await api(`/api/wallet/generate-qr?amount=${encodeURIComponent(amount)}`);el('qrArea').dataset.upiUrl=data.upiUrl||'';el('qrArea').innerHTML=`<img class="qr" src="${data.qrImage}" alt="UPI payment QR"><p class="muted">UPI app se pay karein ya QR download karke scan karein. Balance approval ke baad credit hoga.</p>`;el('depositForm').hidden=false;el('depositForm').dataset.amount=amount;notify('Payment options ready hain.')}catch(error){showError(error)}});
+    el('qrForm').addEventListener('submit',async event=>{event.preventDefault();const amount=Number(el('depositAmount').value);if(!Number.isInteger(amount)||amount<50)return notify('Deposit minimum ₹50 hai.',true);try{const data=await api(`/api/wallet/generate-qr?amount=${encodeURIComponent(amount)}`);el('qrArea').dataset.upiUrl=data.upiUrl||'';el('qrArea').innerHTML=`<img class="qr" src="${data.qrImage}" alt="UPI payment QR"><p class="muted">UPI app se pay karein ya QR download karke scan karein. Balance approval ke baad credit hoga.</p>`;el('depositForm').hidden=false;el('depositForm').dataset.amount=amount;notify('Payment options ready hain.')}catch(error){showError(error)}});
     el('depositForm').addEventListener('submit',async event=>{event.preventDefault();const form=event.currentTarget,body=new FormData(form);body.set('amount',form.dataset.amount);try{const data=await api('/api/wallet/submit-deposit',{method:'POST',body});form.reset();form.hidden=true;el('qrArea').replaceChildren();notify(data.message)}catch(error){showError(error)}});
     el('withdrawForm').addEventListener('submit',async event=>{event.preventDefault();if(!kycApproved)return notify('Aadhaar KYC approve hone ke baad hi withdrawal kar sakte hain.',true);const form=event.currentTarget,amount=Number(form.elements.amount.value);if(!Number.isInteger(amount)||amount<500)return notify('Withdrawal minimum ₹500 hai.',true);try{const data=await api('/api/wallet/withdraw',{method:'POST',body:JSON.stringify({amount,upiId:form.elements.upiId.value.trim()})});form.reset();notify(data.message);await refresh()}catch(error){showError(error)}});
     el('kycForm').addEventListener('submit',async event=>{event.preventDefault();const form=event.currentTarget,number=form.elements.aadhaarNumber.value.replace(/\s/g,'');if(!/^\d{12}$/.test(number))return notify('12 digit Aadhaar number dalein.',true);const body=new FormData(form);body.set('aadhaarNumber',number);try{const data=await api('/api/kyc/submit',{method:'POST',body});form.reset();notify(data.message);await loadKyc()}catch(error){showError(error)}});
