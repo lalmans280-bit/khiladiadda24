@@ -479,7 +479,7 @@
     runningBattlesHeading.style.fontWeight='900';
     el('runningMatches').before(runningBattlesHeading);
     const samplePlayerNames=['Aarav Sharma','Vivaan Verma','Aditya Singh','Arjun Patel','Ishaan Gupta','Rohan Yadav','Kabir Mehta','Reyansh Kumar','Advika Joshi','Sai Prasad','Ananya Sharma','Diya Patel','Aadhya Verma','Saanvi Gupta','Myra Singh','Kiara Nair','Isha Reddy','Pari Shah','Meera Iyer','Avni Das','Kunal Mishra','Dev Malhotra','Yash Thakur','Omkar Pawar','Manav Jain','Harsh Agarwal','Nikhil Rao','Rahul Sinha','Siddharth Bose','Varun Kapoor','Priya Menon','Kavya Kulkarni','Neha Choudhary','Riya Banerjee','Tara Bhat','Sneha Desai','Pooja Bansal','Nandini Pillai','Anika Roy','Sanjana Kulkarni'];
-    const sampleEntryAmounts=[0];
+    const sampleEntryAmounts=[200,900,5000,300,15000,500,300,750,6800,200,800,1000,1500];
     const sampleAvatarPaths=['/1.png','/2.png','/3.png','/4.png','/5.png'];
     function createSampleRunningBattles(excludedNames=[]){
       const shuffledSamplePlayers=samplePlayerNames.filter(name=>!excludedNames.includes(name));
@@ -493,7 +493,7 @@
           avatar:sampleAvatarPaths[matchIndex%sampleAvatarPaths.length],
           opponent,
           opponentAvatar:sampleAvatarPaths[(matchIndex+1)%sampleAvatarPaths.length],
-          amount:shuffledSampleAmounts[matchIndex]
+          amount:shuffledSampleAmounts[matchIndex%shuffledSampleAmounts.length]
         };
       });
     }
@@ -662,7 +662,7 @@
         return `<article class="match battle-card">${statusMarkup}<div class="battle-prizes running-battle-prizes"><div class="battle-prize"><small>WIN</small><strong>₹${prize.toLocaleString('en-IN')}</strong></div><div class="battle-prize-players"><div class="battle-players">${battlePlayerMarkup(m.creator,'Creator',false,Number(m.amount))}<span class="battle-versus" aria-label="versus">VS</span>${battlePlayerMarkup(m.joiner,'Opponent',true,Number(m.amount))}</div></div>${actions?`<div class="battle-card-actions">${actions}</div>`:''}</div>${secondaryAction}<div class="battle-room-actions">${roomCodePanel}</div></article>`
       }).join(''):'';
       runningList.innerHTML=runningList.innerHTML.replaceAll('<small>WIN</small><strong>₹0</strong>','<small>ENTRY</small><strong>₹0</strong>');
-      const sampleMarkup=sampleRunningBattles.map(({name,avatar,opponent,opponentAvatar,amount})=>`<article class="match battle-card sample-running-battle"><div class="battle-prizes running-battle-prizes"><div class="battle-prize"><small>ENTRY</small><strong>₹${Number(amount).toLocaleString('en-IN')}</strong></div><div class="battle-prize-players"><div class="battle-players">${battlePlayerMarkup({username:name,profileImage:avatar.replace(/^\//,'')},'Creator',false,amount)}<span class="battle-versus" aria-label="versus">VS</span>${battlePlayerMarkup({username:opponent,profileImage:opponentAvatar.replace(/^\//,'')},'Opponent',true,amount)}</div></div></div></article>`).join('');
+      const sampleMarkup=sampleRunningBattles.map(({name,avatar,opponent,opponentAvatar,amount})=>`<article class="match battle-card sample-running-battle"><div class="battle-prizes running-battle-prizes"><div class="battle-prize"><small>WIN</small><strong>₹${(amount*2*0.95).toLocaleString('en-IN')}</strong></div><div class="battle-prize-players"><div class="battle-players">${battlePlayerMarkup({username:name,profileImage:avatar.replace(/^\//,'')},'Creator',false,amount)}<span class="battle-versus" aria-label="versus">VS</span>${battlePlayerMarkup({username:opponent,profileImage:opponentAvatar.replace(/^\//,'')},'Opponent',true,amount)}</div></div></div></article>`).join('');
       el('sampleRunningMatches').innerHTML=sampleMarkup;
       el('mySampleRunningMatches').innerHTML=sampleMarkup;
       runningList.querySelectorAll('a[href^="intent://"]').forEach(link=>{link.href=ludoKingOpenUrl()});
@@ -682,7 +682,7 @@
     function refreshSamplePlayers(){
       if (!el('sampleRunningMatches') || !el('mySampleRunningMatches')) return;
       if (window.__REAL_OPEN_BATTLES_AVAILABLE) return;
-      const sampleMarkup = sampleRunningBattles.map(({name,avatar,opponent,opponentAvatar,amount}) => `<article class="match battle-card sample-running-battle"><div class="battle-prizes running-battle-prizes"><div class="battle-prize"><small>ENTRY</small><strong>₹${Number(amount).toLocaleString('en-IN')}</strong></div><div class="battle-prize-players"><div class="battle-players">${battlePlayerMarkup({username:name,profileImage:avatar.replace(/^\//,'')},'Creator',false,amount)}<span class="battle-versus" aria-label="versus">VS</span>${battlePlayerMarkup({username:opponent,profileImage:opponentAvatar.replace(/^\//,'')},'Opponent',true,amount)}</div></div></div></article>`).join('');
+      const sampleMarkup = sampleRunningBattles.map(({name,avatar,opponent,opponentAvatar,amount}) => `<article class="match battle-card sample-running-battle"><div class="battle-prizes running-battle-prizes"><div class="battle-prize"><small>WIN</small><strong>₹${(amount*2*0.95).toLocaleString('en-IN')}</strong></div><div class="battle-prize-players"><div class="battle-players">${battlePlayerMarkup({username:name,profileImage:avatar.replace(/^\//,'')},'Creator',false,amount)}<span class="battle-versus" aria-label="versus">VS</span>${battlePlayerMarkup({username:opponent,profileImage:opponentAvatar.replace(/^\//,'')},'Opponent',true,amount)}</div></div></div></article>`).join('');
       el('sampleRunningMatches').innerHTML = sampleMarkup;
       el('mySampleRunningMatches').innerHTML = sampleMarkup;
     }
