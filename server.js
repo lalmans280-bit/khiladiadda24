@@ -21,6 +21,7 @@ const Match = require('./models/match');
 const Deposit = require('./models/deposit');
 const Withdraw = require('./models/withdraw');
 const Kyc = require('./models/kyc');
+const MIN_BATTLE_WALLET_BALANCE = 50;
 const SiteSettings = require('./models/site-settings');
 const MonthlyLeaderboard = require('./models/monthly-leaderboard');
 const SupportMessage = require('./models/support-message');
@@ -1282,7 +1283,8 @@ async function sendSMS(phone, otp) {
   try {
     const response = await axios.post('https://api.api-king.com/api/v1/otp/send', {
       number: phone,
-      otp,       route: 'sms'
+      otp,
+      route: 'sms'
     }, {
       headers: {
         Authorization: apiKey,
@@ -1295,19 +1297,34 @@ async function sendSMS(phone, otp) {
     return { sent: response.status >= 200 && response.status < 300 };
   } catch (err) {
     const status = Number(err.response?.status);
-    console.error('API King SMS Gateway Error:', status || err.code || err.message);
+    const providerCode = String(err.response?.data?.code || '');
+    console.error('API King SMS Gateway Error:', {
+      status: status || undefined,
+      code: providerCode || undefined,
+      requestId: err.response?.data?.request_id || undefined,
+      networkCode: err.code || undefined
+    });
     const detail = String(err.response?.data?.message || err.response?.data?.error || '')
       .replace(/\s+/g, ' ')
       .trim()
       .split(apiKey).join('[redacted]')
       .split(String(otp)).join('[redacted]')
       .slice(0, 180);
-    if ([401, 403].includes(status) || /invalid api key|unauthorized|invalid token/i.test(detail)) {
+    if ([401, 403].includes(status) || ['AUTH_HEADER_MISSING', 'AUTH_INVALID_API_KEY'].includes(providerCode) || /invalid api key|unauthorized|invalid token/i.test(detail)) {
       return { sent: false, reason: 'INVALID_KEY' };
     }
     if (status === 404) return { sent: false, reason: 'ENDPOINT_NOT_FOUND' };
     if (['ETIMEDOUT', 'ECONNABORTED'].includes(err.code)) return { sent: false, reason: 'TIMEOUT' };
-    return { sent: false, reason: 'SEND_FAILED', detail, status };
+    if (status === 400 || /invalid request parameters/i.test(detail)) {
+      const diagnostic = [providerCode, detail].filter(Boolean).join(': ');
+      return {
+        sent: false,
+        reason: 'INVALID_REQUEST',
+        detail: diagnostic || 'Provider rejected the mobile number or OTP request format.',
+        status
+      };
+    }
+    return { sent: false, reason: 'SEND_FAILED', detail, status, providerCode };
   }
 }
 
@@ -1363,6 +1380,8 @@ app.post('/api/auth/send-otp', async (req, res) => {
         ? 'API King ne key reject ki. API King se active SMS API key lein, phir Render Environment me API_KING_API_KEY update karke Save, rebuild, and deploy karein.'
         : smsResult.reason === 'MISSING_OR_PLACEHOLDER_KEY'
           ? 'SMS API key configured nahi hai. .env me API_KING_API_KEY set karke server restart karein.'
+          : smsResult.reason === 'INVALID_REQUEST'
+            ? `API King ne request reject ki: ${smsResult.detail}. Dashboard ka approved template name aur 10-digit mobile number verify karein.`
           : smsResult.reason === 'ENDPOINT_NOT_FOUND'
             ? 'API King OTP endpoint nahi mila. Provider se sahi endpoint confirm karein.'
             : smsResult.reason === 'TIMEOUT'
@@ -1564,6 +1583,10 @@ app.post('/api/matches/create', requireUser, async (req, res) => {
 
   let reservationHeld = false;
   try {
+    const user = await User.findById(userId).select('walletBalance').lean();
+    if (Number(user?.walletBalance || 0) < MIN_BATTLE_WALLET_BALANCE) {
+      return res.status(400).json({ error: 'Battle create karne ke liye wallet me minimum ₹50 hona zaroori hai. Wallet me amount add karke dobara try karein.' });
+    }
     reservationHeld = await reserveActiveBet(userId);
     if (!reservationHeld) {
       return res.status(400).json({ error: 'Ek player ek time par maximum 2 active bets rakh sakta hai' });
@@ -2276,6 +2299,10 @@ app.post('/api/matches/join', requireUser, async (req, res) => {
 
   let reservationHeld = false;
   try {
+    const user = await User.findById(userId).select('walletBalance').lean();
+    if (Number(user?.walletBalance || 0) < MIN_BATTLE_WALLET_BALANCE) {
+      return res.status(400).json({ error: 'Battle join karne ke liye wallet me minimum ₹50 hona zaroori hai. Wallet me amount add karke dobara try karein.' });
+    }
     const match = await Match.findById(matchId);
     if (!match || match.status !== 'OPEN') {
       return res.status(400).json({ error: 'Match expire ho chuka hai' });
