@@ -345,8 +345,8 @@
     #gamePicker .game-coming-soon-icon{font-size:34px;line-height:1.1}
     #gamePicker .cricket-game-logo{position:relative;z-index:1;width:68px;height:68px;object-fit:contain;filter:drop-shadow(0 3px 8px #000b)}
     #gamePicker .game-coming-soon-badge{position:absolute;right:8px;bottom:8px;left:8px;padding:4px 7px;border:1px solid #f4c84b88;border-radius:999px;color:#ffe18a;background:#101713ed;font:800 10px/1 Arial,sans-serif}
-    #gamePicker .game-coming-soon-tile:nth-child(5){background:linear-gradient(0deg,#101713df,#1017131a 75%),url('/cricket.png') center/cover no-repeat}
-    #gamePicker .game-coming-soon-tile:nth-child(6){background:linear-gradient(0deg,#101713df,#1017131a 75%),url('/pubg.png') center/cover no-repeat}
+    #gamePicker [data-cricket-promo]{background:linear-gradient(0deg,#101713df,#1017131a 75%),url('/cricket.png') center/cover no-repeat}
+    #gamePicker [data-pubg-promo]{background:linear-gradient(0deg,#101713df,#1017131a 75%),url('/pubg.png') center/cover no-repeat}
     #gamePicker .game-coming-soon-icon{display:none}
     #gamePicker .rummy-game-tile{display:grid;place-content:center;justify-items:center;gap:5px;border-color:#c49b58;color:#fff4db;background:linear-gradient(145deg,#65442f,#284c43 72%);text-align:center;text-decoration:none}
     #gamePicker .rummy-game-tile strong{color:#fff4db;font-size:18px}
@@ -391,24 +391,7 @@
     #view-cricket > .panel:nth-child(5) h2{color:#91f0c4}
     #view-cricket .cricket-feed-notice{border-color:#58b7a0;color:#d9fff3;background:linear-gradient(120deg,#17463e,#1e3a53)}
     #view-cricket .cricket-feed-notice strong{color:#8df2ca}
-    .pubg-coming-hero{position:relative;isolation:isolate;display:flex;min-height:280px;flex-direction:column;justify-content:flex-end;align-items:flex-start;gap:12px;overflow:hidden;padding:clamp(22px,5vw,42px);border:1px solid #9a8b62;border-radius:14px;background:linear-gradient(0deg,#101713f5 0%,#101713ad 54%,#10171320 100%),url('/pubg.png') center 38%/cover}
-    .pubg-coming-tag{display:inline-flex;align-items:center;gap:7px;padding:7px 11px;border:1px solid #efc96c88;border-radius:999px;color:#ffe5a0;background:#171810e8;font-size:12px;font-weight:900;letter-spacing:.06em}
-    .pubg-coming-hero h1{max-width:680px;margin:0;color:#ffe28a;font-size:clamp(30px,6vw,48px);line-height:1.05}
-    .pubg-coming-hero p{max-width:620px;margin:0;color:#f5f4eb}
-    .pubg-start-button{margin-top:4px;text-decoration:none}
-    #view-pubg .status.pending{border:1px solid #e6bf66;color:#ffe59b;background:linear-gradient(120deg,#493a20,#352d20)}
-    #view-pubg>.panel:nth-of-type(3){border-color:#5a795b;background:linear-gradient(135deg,#203e31,#263c45 55%,#3b3426)}
-    #view-pubg>.panel:nth-of-type(3) h2{color:#a7f0b5}
-    .pubg-feature-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px;margin-top:12px}
-    .pubg-feature{padding:15px;border:1px solid #72a879;border-radius:10px;color:#f2fff1;background:linear-gradient(145deg,#244b36,#263d3d)}
-    .pubg-feature:nth-child(2){border-color:#d29a58;background:linear-gradient(145deg,#5b4025,#49323b)}
-    .pubg-feature:nth-child(3){border-color:#8399d1;background:linear-gradient(145deg,#303e65,#353252)}
-    .pubg-feature strong{display:block;margin-bottom:5px;color:#b9ffad}
-    .pubg-feature:nth-child(2) strong{color:#ffd096}
-    .pubg-feature:nth-child(3) strong{color:#c6d3ff}
-    .pubg-feature span{color:#f0f3f5}
-    #view-pubg>.panel:last-child{border-color:#987448;color:#ffefcf;background:linear-gradient(120deg,#493620,#353047)}
-    #view-pubg>.panel:last-child strong{color:#ffdc8a}
+    .pubg-coming-soon{max-width:620px;margin:24px auto;text-align:center}
     @media(max-width:520px){.cricket-prize-card{grid-template-columns:minmax(0,1fr) auto;padding:14px}.cricket-prize-medal{font-size:32px}.cricket-promo-hero{min-height:220px}}
     @media(max-width:600px){.top-actions{gap:5px}}
     #view-home>.home-running-battles-panel{border-color:#5f7a9b;background:linear-gradient(125deg,#1b3b30 0%,#1e3a56 52%,#473049 100%);color:#f4f7f5}
@@ -509,9 +492,8 @@
   <main class="shell content"><div id="notice" class="notice" role="status" hidden></div>
       <section class="view" id="view-games">
         <div class="game-launch" id="gamePicker">
-          <button class="game-tile game-tile-image" data-launch-game="SNAKE" aria-label="Snake Battle"><img src="/snake-battles-banner.png" alt="Snake Battle"><span class="game-live-badge"><i class="game-live-dot" aria-hidden="true"></i><span class="game-live-text">LIVE</span></span></button>
           <button class="game-tile game-tile-image game-coming-soon-tile" type="button" data-cricket-promo aria-label="Cricket fantasy - Coming Soon"><img class="cricket-game-logo" src="/cricket-game-logo.svg" alt=""><span class="game-coming-soon-icon" aria-hidden="true">🏏</span><strong>Cricket Fantasy</strong><span class="game-coming-soon-badge">₹1 LAKH · COMING SOON</span></button>
-          <button class="game-tile game-tile-image game-coming-soon-tile" type="button" data-pubg-promo aria-label="PUBG 2D Prototype - Play"><span class="game-coming-soon-icon" aria-hidden="true">🎯</span><strong>PUBG</strong><span class="game-coming-soon-badge">2D PROTOTYPE · PLAY</span></button>
+          <button class="game-tile game-tile-image game-coming-soon-tile" type="button" data-pubg-promo aria-label="PUBG - Coming Soon"><span class="game-coming-soon-icon" aria-hidden="true">🎯</span><strong>PUBG</strong><span class="game-coming-soon-badge">COMING SOON</span></button>
           <a class="game-tile game-tile-image rummy-game-tile" href="/rummy.html" aria-label="Play free Indian Rummy"><span class="rummy-mark" aria-hidden="true">♠</span><strong>Indian Rummy</strong><span class="game-coming-soon-badge">FREE PRACTICE</span></a>
           <a class="game-support-banner" href="/support.html" aria-label="WhatsApp and support"><img src="/support-banner.png?v=20261028-support-update" alt="WhatsApp and Support"><span class="game-live-badge"><i class="game-live-dot" aria-hidden="true"></i><span class="game-live-text">LIVE</span></span></a>
         </div>
@@ -555,24 +537,10 @@
     <section class="view" id="view-pubg">
       <div class="match-head">
         <button class="btn secondary small" type="button" id="backFromPubg">← Games</button>
-        <span class="status pending">2D Prototype</span>
       </div>
-      <div class="pubg-coming-hero">
-        <span class="pubg-coming-tag">🎯 PUBG-STYLE · 2D SOLO PROTOTYPE</span>
-        <h1>Survive karo. Safe zone mein raho. Aakhri tak lado!</h1>
-        <p>Single-player browser prototype khelein: bots se fight karein, med kits uthayein aur shrinking safe zone se bachein. Yeh online multiplayer PUBG nahi hai.</p>
-        <a class="btn pubg-start-button" href="/pubg-game.html">▶ Play 2D Prototype</a>
-      </div>
-      <div class="panel">
-        <h2>Prototype mein</h2>
-        <div class="pubg-feature-grid">
-          <div class="pubg-feature"><strong>⚔️ Bots aur combat</strong><span>Move karein, aim karein aur saamne aane wale bots ko eliminate karein.</span></div>
-          <div class="pubg-feature"><strong>💚 Health aur med kits</strong><span>Damage se bachein aur health kam ho to med kit uthayein.</span></div>
-          <div class="pubg-feature"><strong>🟢 Shrinking safe zone</strong><span>Zone ke andar rahein; bahar rehne par health ghategi.</span></div>
-        </div>
-      </div>
-      <div class="panel">
-        <strong>Prototype status:</strong> Single-player demo hai. Multiplayer, matchmaking, PUBG ke official assets, rewards aur leaderboard is prototype ka hissa nahi hain.
+      <div class="panel pubg-coming-soon">
+        <h1>PUBG Coming Soon</h1>
+        <p class="muted">Yeh game jald hi available hoga.</p>
       </div>
     </section>
     <section class="view active" id="view-home"><div class="panel"><img class="battle-banner" src="/banner-ludo-snake.png" alt="Ludo and Snake Game"><p class="muted">Minimum ₹50. Multiples of ₹50.</p><form id="createForm"><div class="two"><div class="field"><label for="gameType">Game</label><select id="gameType"><option value="LUDO">Ludo Classic</option><option value="POPULAR_LUDO">Popular Ludo</option><option value="LUDO_RACE">Ludo Race — 1 Goti Win</option><option value="SNAKE">Snake</option></select></div><div class="field"><label for="entryAmount">Entry amount (₹)</label><input id="entryAmount" type="number" min="50" max="50000" step="50" value="50" placeholder="e.g. 250" required></div></div><button class="btn" type="submit">Set challenge</button></form></div><div class="panel"><div class="match-head"><button id="refreshOpen" class="btn secondary small">Refresh</button></div><p class="muted">Challenger, entry amount aur winning amount dekhein.</p><div id="openMatches"></div></div><div class="panel"><div id="runningMatches"></div></div></section>
@@ -692,7 +660,6 @@
         ['.battle-banner',branding.homeBannerUrl],
         ['[data-launch-game="LUDO"] img',branding.ludoBannerUrl],
         ['[data-ludo-popular] img',branding.ludoBannerUrl],
-        ['[data-launch-game="SNAKE"] img',branding.snakeBannerUrl],
         ['.game-support-banner img',branding.supportBannerUrl]
       ];
       assets.forEach(([selector,url,attribute='src'])=>{
@@ -733,7 +700,7 @@
     if(createChallengeButton){createChallengeButton.hidden=false;createChallengeButton.textContent='Create paid battle'}
     if(el('openMatches').previousElementSibling?.textContent.trim()==='Challenger, entry amount aur winning amount dekhein.')el('openMatches').previousElementSibling.remove();
     const freeMatchNotice=el('createForm').previousElementSibling;
-    if(freeMatchNotice)freeMatchNotice.textContent='Har battle paid hai. Entry ₹50 se shuru hoti hai; dono players ki entry wallet se kategi. Total pool ka 95% winner ko aur 5% admin commission hai.';
+    if(freeMatchNotice)freeMatchNotice.textContent='Every battle has a paid entry starting at ₹50; the entry is deducted from both players’ wallets. The winner gets 95% of the total pool and the admin receives 5% commission.';
     const walletDepositAmount=el('depositAmount');
     walletDepositAmount.min='50';
     walletDepositAmount.value='50';
