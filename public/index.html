@@ -900,7 +900,7 @@
     if(!token||!storedUser)location.replace(loginUrl());
     function notify(text,error=false){const box=el('notice');box.textContent=text;box.className=`notice${error?' error':''}`;box.hidden=!text;}
     async function api(url,options={}){const headers=new Headers(options.headers||{});headers.set('Authorization',`Bearer ${token}`);if(options.body&&!(options.body instanceof FormData))headers.set('Content-Type','application/json');const response=await fetch(url,{...options,headers});const data=await response.json().catch(()=>({}));if(response.status===401){localStorage.removeItem('token');localStorage.removeItem('user');location.replace(loginUrl());throw new Error('Session expire hua. Dobara login karein.')}if(!response.ok)throw new Error(data.error||'Request complete nahi hui.');return data}
-    const showError=error=>notify(error.message||'Kuch problem hui.',true);
+    const showError=error=>{const message=error.message||'Kuch problem hui.';if(/balance|insufficient|recharge/i.test(message)){const required=Number(window.pendingEntryAmount)||50,balance=Number(player?.walletBalance??storedUser?.walletBalance??0),depositAmount=Math.max(50,required-balance);el('depositAmount').value=String(depositAmount);notify(`Battle ke liye ₹${required} minimum wallet balance chahiye. ₹${depositAmount} deposit karein.`,true);setView('wallet');el('depositAmount').focus();return}notify(message,true)};
     function setView(name){const viewName=name==='battles'||name==='games'?'home':name;document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===`view-${viewName}`||(viewName==='match'&&v.id==='view-home')));document.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===(viewName==='match'?'home':viewName)));el('menu').classList.remove('open');el('menuToggle').setAttribute('aria-expanded','false');clearInterval(battlesPollTimer);if(viewName==='rank')window.scrollTo({top:0,behavior:'smooth'});if(viewName==='wallet'||viewName==='profile')loadKyc().catch(showError);if(viewName==='home')loadMine().catch(showError);if(viewName==='history')loadHistory().catch(showError);loadOpen().catch(showError);battlesPollTimer=setInterval(()=>loadOpen().catch(showError),30000);const chatNavButton=document.getElementById('chatNavButton');if(chatNavButton&&!chatNavButton.dataset.bound){chatNavButton.dataset.bound='true';chatNavButton.addEventListener('click',()=>{window.location.href='/chat.html';})}}
     function renderPlayer(){const name=player?.username||storedUser?.username||'Player',phone=player?.phone||storedUser?.phone||'',balance=Number(player?.walletBalance||0),formatted=`₹ ${balance.toLocaleString('en-IN')}`;['headerBalance','walletBalance','profileBalance'].forEach(id=>el(id).textContent=formatted);el('profileName').textContent=name;el('profilePhone').textContent=phone;el('accountPhone').textContent=phone;el('profileReferralCode').textContent=player?.referralCode||'--';el('username').value=name;const image=player?.profileImage;el('avatar').src=image?(image.startsWith('uploads/')?`/api/profile/image/${encodeURIComponent(image.split('/').pop())}`:`/${image.split('/').map(encodeURIComponent).join('/')}`):'';el('avatar').onerror=()=>el('avatar').removeAttribute('src')}
     async function loadProfile(){const data=await api('/api/profile/me');player=data.user;renderPlayer()}
@@ -954,12 +954,12 @@
     function gameTypeLabel(gameType){return gameType==='LUDO_RACE'?'Ludo Race':gameType==='SNAKE'?'Snake battle':gameType==='POPULAR_LUDO'?'Popular Ludo':'Ludo Classic';}
     function isLudoGame(gameType){return gameType==='LUDO'||gameType==='POPULAR_LUDO'||gameType==='LUDO_RACE';}
     function matchCard(m,mine=false){
-      const entry=Number(m.amount),prize=entry*2*0.95,playerId=String(player?._id||storedUser?.id||''),isOwnOpen=m.status==='OPEN'&&String(m.creator?._id||m.creator)===playerId,legacyPaid=m.status==='OPEN'&&entry>0;
-      const action=isOwnOpen?`<button class="btn danger small" data-cancel-match="${esc(m._id)}">Cancel</button>`:legacyPaid?'<button class="btn secondary small" type="button" disabled>Unavailable</button>':`<button class="btn ${mine?'secondary':'green'} small" data-${mine?'match':'join'}="${esc(m._id)}">${mine?'Details':'PLAY'}</button>`;
-      const status=m.status==='PENDING_RESULT'?'Result review':m.status==='PENDING_CANCELLATION'?'Cancel review':legacyPaid?'Legacy paid match · unavailable':m.status;
+      const entry=Number(m.amount),prize=entry*2*0.95,playerId=String(player?._id||storedUser?.id||''),isOwnOpen=m.status==='OPEN'&&String(m.creator?._id||m.creator)===playerId;
+      const action=isOwnOpen?`<button class="btn danger small" data-cancel-match="${esc(m._id)}">Cancel</button>`:`<button class="btn ${mine?'secondary':'green'} small" data-${mine?'match':'join'}="${esc(m._id)}" ${mine?'':`data-join-amount="${entry}"`}>${mine?'Details':'PLAY'}</button>`;
+      const status=m.status==='PENDING_RESULT'?'Result review':m.status==='PENDING_CANCELLATION'?'Cancel review':m.status;
       const gameLabel=gameTypeLabel(m.gameType||game);
       const playersMarkup=m.joiner?`<div class="battle-players">${battlePlayerMarkup(m.creator,mine?'Creator':'Challenger',false,entry,gameLabel)}<img class="battle-versus battle-versus-image" src="/vs.png" alt="versus">${battlePlayerMarkup(m.joiner,'Opponent',true,entry)}</div>`:`<div class="battle-players battle-players-waiting">${battlePlayerMarkup(m.creator,mine?'Creator':'Challenger',false,entry,gameLabel)}</div>`;
-      const statusMarkup=m.status==='OPEN'?(legacyPaid?`<div class="battle-card-top"><span class="status pending">${esc(status)}</span></div>`:''):`<div class="battle-card-top"><span class="status ${['PENDING_RESULT','PENDING_CANCELLATION'].includes(m.status)?'pending':''}">${esc(status)}</span></div>`;
+      const statusMarkup=m.status==='OPEN'?'':`<div class="battle-card-top"><span class="status ${['PENDING_RESULT','PENDING_CANCELLATION'].includes(m.status)?'pending':''}">${esc(status)}</span></div>`;
       const prizeMarkup=m.status==='OPEN'?'':entry===0?'<div class="battle-prize"><small>ENTRY</small><strong>FREE</strong></div>':`<div class="battle-prize"><small>WIN</small><strong>₹${prize.toLocaleString('en-IN')}</strong></div>`;
       const prizeClass=m.status==='OPEN'?' open-battle-prizes':'';
       return `<article class="match battle-card">${statusMarkup}<div class="battle-prizes${prizeClass}">${prizeMarkup}<div class="battle-prize-players">${playersMarkup}</div><div class="battle-card-actions">${action}</div></div></article>`;
@@ -1104,11 +1104,12 @@
       const join=event.target.closest('[data-join]');
       if(join){
         join.disabled=true;
+        window.pendingEntryAmount=Number(join.dataset.joinAmount)||50;
         try{
           const data=await api('/api/matches/join',{method:'POST',body:JSON.stringify({matchId:join.dataset.join})});
           notify(data.message||'Battle join ho gaya.');
           await Promise.all([loadOpen(),loadMine()]);
-        }catch(error){notify(error.message||'Battle join nahi ho saki.',true);join.disabled=false}
+        }catch(error){showError(error);join.disabled=false}
         return;
       }
       const detail=event.target.closest('[data-match]');
