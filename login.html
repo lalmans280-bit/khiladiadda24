@@ -4,7 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#101713">
-  <meta name="robots" content="noindex,follow">
+  <meta name="robots" content="index,follow">
+  <meta name="description" content="KhiladiAdda24 player login. Sign in or create your account securely with mobile number verification.">
+  <link rel="canonical" href="https://khiladiadda24.com/login.html">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -15,74 +17,144 @@
   <link rel="icon" href="/app-icon-192.png" type="image/png" sizes="192x192">
   <link rel="apple-touch-icon" href="/app-icon-192.png">
   <link rel="mask-icon" href="/app-icon.svg" color="#f4c84b">
-  <title>Login</title>
+  <title>KhiladiAdda24 Login | Player Sign In</title>
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="KhiladiAdda24">
+  <meta property="og:title" content="KhiladiAdda24 Login | Player Sign In">
+  <meta property="og:description" content="Sign in to KhiladiAdda24 or create your player account with mobile number verification.">
+  <meta property="og:url" content="https://khiladiadda24.com/login.html">
   <style>
-    :root { color-scheme: dark; --panel: #19231d; --line: #35483a; --ink: #f3f4ed; --muted: #b4c0b6; --gold: #e7b83f; --error: #ffb4a9; }
+    :root { color-scheme: light; --ink: #201918; --muted: #6f6a66; --red: #b20e16; --gold: #ffdc65; --green: #078b37; --line: #e6e2df; --error: #b42318; }
     * { box-sizing: border-box; }
-    body { min-height: 100vh; min-height: 100dvh; margin: 0; padding: 16px; display: grid; place-items: center; background: #0b1b3a; color: var(--ink); font-family: Arial, sans-serif; }
-    .box { width: min(390px, 100%); max-height: calc(100vh - 32px); max-height: calc(100dvh - 32px); overflow-y: auto; padding: 26px; border: 1px solid var(--line); border-radius: 10px; background: #b91c1c; box-shadow: 0 18px 52px #0006; font-weight: 700; }
-    .login-logo { display: block; width: 128px; height: 128px; margin: 0 auto 14px; object-fit: contain; }
-    .brand-tagline { margin: 0 0 18px; color: #0b1b3a; font-size: 11px; font-weight: 800; letter-spacing: 1px; text-align: center; }
-    .welcome-back { margin: 0 0 6px; color: #0b1b3a; font-size: 18px; text-align: center; }
-    .security-note { margin: 0 0 12px; color: #0b1b3a; font-size: 12px; text-align: center; }
-    .form-hint { margin: 7px 0 22px; color: #0b1b3a; font-size: 14px; line-height: 1.5; text-align: center; }
-    label { display: block; margin: 14px 0 6px; color: #0b1b3a; font-size: 13px; }
-    input, button { width: 100%; min-height: 48px; margin: 7px 0; padding: 12px; border-radius: 7px; font: inherit; }
-    .login-modes { display: grid; width: max-content; margin: 0 auto 18px; }
-    .login-modes a { min-width: 132px; min-height: 42px; display: grid; place-items: center; border: 1px solid #fff; border-radius: 7px; color: #fff; font-size: 16px; font-weight: 900; text-decoration: none; transition: background-color 0.15s ease, box-shadow 0.15s ease; }
-    .login-modes #playerModeLink { background: #123b27; }
-    #adminModeLink { display: grid; width: 24px; min-height: 24px; margin: 8px auto 0; padding: 0; place-items: center; border: 0; border-radius: 50%; background: transparent; color: #fff; font-size: 13px; line-height: 1; text-decoration: none; }
-    .mode-label { display: inline-flex; gap: 1px; }
-    .login-modes #playerModeLink .mode-letter:nth-child(1) { color: #22d3ee; }
-    .login-modes #playerModeLink .mode-letter:nth-child(2) { color: #facc15; }
-    .login-modes #playerModeLink .mode-letter:nth-child(3) { color: #fb7185; }
-    .login-modes #playerModeLink .mode-letter:nth-child(4) { color: #4ade80; }
-    .login-modes #playerModeLink .mode-letter:nth-child(5) { color: #60a5fa; }
-    .login-modes #playerModeLink .mode-letter:nth-child(6) { color: #f97316; }
-    .login-modes #playerModeLink[aria-current="page"] { background: #14532d; box-shadow: inset 0 0 0 2px #bbf7d0; }
-    #adminModeLink[aria-current="page"] { background: #1e3a8a; box-shadow: inset 0 0 0 1px #bfdbfe; }
-    input { border: 1px solid #46594a; background: #101813; color: var(--ink); font-size: 16px; }
-    input::placeholder { color: #8f9e92; }
-    input:focus-visible, button:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
-    button { border: 0; background: var(--gold); color: #0b1b3a; font-weight: 700; cursor: pointer; }
-    button.secondary { border: 1px solid var(--line); background: transparent; color: #0b1b3a; }
+    body { min-height: 100vh; min-height: 100dvh; margin: 0; padding: 28px; display: grid; place-items: center; background: radial-gradient(ellipse at 10% 5%, #7c0c13, transparent 40%), linear-gradient(140deg, #21090b, #520b0d 52%, #21090b); color: var(--ink); font-family: Arial, sans-serif; }
+    .login-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(360px, 450px); width: min(1040px, 100%); min-height: min(680px, calc(100dvh - 56px)); overflow: hidden; border: 1px solid #ffd66d78; border-radius: 22px; background: #fff; box-shadow: 0 28px 90px #0008; }
+    .promo-panel { position: relative; display: flex; flex-direction: column; justify-content: space-between; min-height: 620px; overflow: hidden; padding: 0; color: #fff; background: radial-gradient(ellipse at 50% 30%, #fff08a80 0, #ffb00060 20%, transparent 48%), radial-gradient(ellipse at 50% 80%, #ffb000 0, transparent 38%), linear-gradient(155deg, #ff1744 0%, #f0003a 48%, #ad0039 100%); }
+    .promo-panel::before { position: absolute; z-index: 0; right: 0; bottom: 0; left: 0; height: 48px; background-image: radial-gradient(circle, #fffbd0 0 2px, #ffdc65 3px 4px, transparent 8px), linear-gradient(176deg, transparent 0 44%, #ffdc6580 47%, transparent 51%); background-repeat: repeat-x, no-repeat; background-position: 0 11px, 0 0; background-size: 58px 28px, 100% 36px; content: ""; filter: drop-shadow(0 0 7px #ffe875); pointer-events: none; }
+    .promo-panel::after { position: absolute; z-index: 0; top: 22%; left: 50%; width: min(80%, 420px); height: 240px; border-radius: 50%; background: #ffe15a30; content: ""; filter: blur(38px); pointer-events: none; transform: translateX(-50%); }
+    @keyframes garland-twinkle { 0%, 100% { opacity: .58; filter: drop-shadow(0 0 3px #ffe875); } 50% { opacity: 1; filter: drop-shadow(0 0 11px #fff3a1); } }
+    .fireflies { position: absolute; z-index: 2; inset: 0; overflow: hidden; pointer-events: none; }
+    .firefly { position: absolute; width: 5px; height: 5px; border-radius: 50%; background: #fff8ac; box-shadow: 0 0 7px 2px #fff080, 0 0 16px 5px #ffcf38a0; opacity: .3; }
+    .firefly:nth-child(1) { top: 15%; left: 12%; --drift: 24px -34px; }
+    .firefly:nth-child(2) { top: 23%; left: 81%; --drift: -29px -21px; animation-delay: -1.7s; }
+    .firefly:nth-child(3) { top: 38%; left: 24%; --drift: 32px 18px; animation-delay: -3.2s; }
+    .firefly:nth-child(4) { top: 46%; left: 72%; --drift: -18px 31px; animation-delay: -.8s; }
+    .firefly:nth-child(5) { top: 59%; left: 13%; --drift: 38px -25px; animation-delay: -2.6s; }
+    .firefly:nth-child(6) { top: 67%; left: 86%; --drift: -35px 20px; animation-delay: -4s; }
+    .firefly:nth-child(7) { top: 79%; left: 37%; --drift: 22px -29px; animation-delay: -1.1s; }
+    .firefly:nth-child(8) { top: 31%; left: 51%; --drift: -24px 34px; animation-delay: -3.7s; }
+    @keyframes firefly-drift { 0%, 100% { opacity: .18; transform: translate(0, 0) scale(.7); } 45% { opacity: 1; transform: translate(var(--drift)) scale(1.35); } }
+    @media (prefers-reduced-motion: no-preference) { .promo-panel::before { animation: garland-twinkle 1.4s ease-in-out infinite; } }
+    @media (prefers-reduced-motion: no-preference) { .firefly { animation: firefly-drift 5.2s ease-in-out infinite; } }
+    .promo-art { position: relative; z-index: 1; display: block; width: 100%; height: auto; margin: 0; object-fit: contain; filter: drop-shadow(0 0 12px #fff080) drop-shadow(0 0 26px #ffb000a0); }
+    .flying-note { position: absolute; z-index: 5; top: 72%; left: 50%; width: min(18%, 118px); aspect-ratio: 707 / 282; opacity: 0; background-position: center; background-size: 100% 100%; background-repeat: no-repeat; filter: drop-shadow(0 3px 5px #0008); mix-blend-mode: multiply; pointer-events: none; transform: translate(-50%, 8px) scale(.5); }
+    @keyframes note-rise { 0%, 8% { opacity: 0; transform: translate(-50%, 8px) scale(.5) rotate(0); } 16% { opacity: 1; transform: translate(-50%, 0) scale(.8) rotate(var(--note-tilt)); } 68% { opacity: 1; transform: translate(calc(-50% + var(--note-drift)), -125px) scale(1) rotate(calc(var(--note-tilt) * -1)); } 100% { opacity: 0; transform: translate(calc(-50% + var(--note-drift)), -225px) scale(.75) rotate(var(--note-tilt)); } }
+    .flying-note:nth-of-type(1) { background-image: url("/images.jfif"); --note-drift: -72px; --note-tilt: -14deg; }
+    .flying-note:nth-of-type(2) { background-image: url("/India_new_500_INR,_MG_series,_2016,_obverse.jpg"); --note-drift: -50px; --note-tilt: 10deg; animation-delay: 1s; }
+    .flying-note:nth-of-type(3) { background-image: url("/India,_200_INR,_2018,_obverse.jpg"); --note-drift: -28px; --note-tilt: -8deg; animation-delay: 2s; }
+    .flying-note:nth-of-type(4) { background-image: url("/100_rs_note_obverse.jpg"); --note-drift: -6px; --note-tilt: 13deg; animation-delay: 3s; }
+    .flying-note:nth-of-type(5) { background-image: url("/images.jfif"); --note-drift: 16px; --note-tilt: -11deg; animation-delay: 4s; }
+    .flying-note:nth-of-type(6) { background-image: url("/India_new_500_INR,_MG_series,_2016,_obverse.jpg"); --note-drift: 38px; --note-tilt: 8deg; animation-delay: 5s; }
+    .flying-note:nth-of-type(7) { background-image: url("/India,_200_INR,_2018,_obverse.jpg"); --note-drift: 60px; --note-tilt: -9deg; animation-delay: 6s; }
+    .flying-note:nth-of-type(8) { background-image: url("/100_rs_note_obverse.jpg"); --note-drift: 82px; --note-tilt: 12deg; animation-delay: 7s; }
+    @media (prefers-reduced-motion: no-preference) { .flying-note { animation: note-rise 8s ease-in-out infinite; } }
+    @media (prefers-reduced-motion: reduce) { .flying-note { display: none; } }
+    .box { position: relative; align-self: stretch; width: 100%; overflow-y: auto; padding: clamp(25px, 4vw, 44px); background: #fff; font-weight: 700; }
+    #adminModeLink { position: absolute; top: 17px; right: 19px; display: grid; width: 38px; min-height: 38px; padding: 0; place-items: center; border: 1px solid var(--line); border-radius: 50%; background: #fff; color: #694d13; font-size: 16px; line-height: 1; text-decoration: none; }
+    .login-heading { position: relative; margin: 0 0 28px; text-align: center; }
+    .login-logo { display: block; width: 88px; height: 88px; margin: 0 auto 12px; object-fit: contain; }
+    .brand-tagline { margin: 0 0 6px; color: var(--red); font-size: 11px; font-weight: 900; letter-spacing: 1.6px; }
+    .welcome-back { margin: 0 0 7px; color: var(--ink); font-size: 25px; }
+    .security-note { margin: 0 0 12px; color: var(--muted); font-size: 12px; text-align: center; }
+    .form-hint { margin: 0 0 18px; padding: 11px 12px; border: 1px solid #f1dfab; border-radius: 9px; color: #624714; background: #fff8e6; font-size: 13px; line-height: 1.5; text-align: center; overflow-wrap: anywhere; }
+    label { display: block; margin: 15px 0 7px; color: #37312d; font-size: 13px; }
+    input, button { width: 100%; min-height: 50px; margin: 7px 0; padding: 12px 14px; border-radius: 9px; font: inherit; }
+    input { border: 1px solid #d5d0ca; background: #fff; color: var(--ink); font-size: 16px; transition: border-color .15s, box-shadow .15s; }
+    input::placeholder { color: #948e87; }
+    input:focus { border-color: var(--red); box-shadow: 0 0 0 3px #b20e1614; }
+    input:focus-visible, button:focus-visible, a:focus-visible { outline: 2px solid #e8ab27; outline-offset: 2px; }
+    button { border: 0; background: linear-gradient(180deg, #0da846, #078331); color: #fff; font-weight: 800; cursor: pointer; box-shadow: 0 5px 12px #087c3030; transition: transform .15s, filter .15s; }
+    button:not(:disabled):hover { transform: translateY(-1px); filter: brightness(1.05); }
+    button.secondary { border: 1px solid #dad5d0; background: #fff; color: #39332e; box-shadow: none; }
     button:disabled { opacity: 0.6; cursor: not-allowed; }
-    #timerText { min-height: 20px; margin: 7px 0; color: #0b1b3a; font-size: 13px; text-align: center; }
-    #msg { min-height: 22px; margin: 12px 0 0; color: #0b1b3a; font-size: 13px; line-height: 1.5; text-align: center; overflow-wrap: anywhere; }
+    .login-modes { display: flex; justify-content: center; margin: -10px 0 22px; }
+    .login-modes a { display: inline-flex; min-height: 34px; align-items: center; justify-content: center; padding: 6px 13px; border: 1px solid #d7e5d9; border-radius: 999px; color: #246236; background: #f1f8f2; font-size: 12px; font-weight: 800; text-decoration: none; }
+    .login-modes #playerModeLink[aria-current="page"] { border-color: #b9d8bd; }
+    .mode-label { display: inline-flex; }
+    .mode-letter { color: inherit !important; }
+    .login-pointer { display: none; }
+    #adminModeLink[aria-current="page"] { border-color: #d3b970; background: #fff8e6; }
+    #timerText { min-height: 20px; margin: 7px 0; color: var(--muted); font-size: 13px; text-align: center; }
+    #msg { min-height: 22px; margin: 12px 0 0; color: #27623a; font-size: 13px; line-height: 1.5; text-align: center; overflow-wrap: anywhere; }
     #msg.error { color: var(--error); }
     .hidden { display: none; }
-    @media (max-height: 560px) { body { place-items: start center; } .box { max-height: calc(100vh - 32px); max-height: calc(100dvh - 32px); } }
+    @media (max-width: 760px) {
+      body { display: block; padding: 0; background: #fff; }
+      .login-layout { display: flex; flex-direction: column; width: 100%; min-height: 100dvh; overflow: visible; border: 0; border-radius: 0; box-shadow: none; }
+      .promo-panel { min-height: 0; padding: 0; border-radius: 0 0 25px 25px; }
+      .promo-art { width: 100%; margin: 0; }
+      .box { flex: 1; overflow: visible; padding: 26px 22px 30px; }
+      .login-heading { margin-bottom: 22px; }
+      .login-logo { width: 68px; height: 68px; }
+      #adminModeLink { top: 14px; right: 17px; width: 34px; min-height: 34px; }
+    }
+    @media (max-width: 360px) {
+      .box { padding-inline: 17px; }
+    }
+    @media (max-height: 560px) and (min-width: 761px) { body { padding-block: 12px; } .login-layout { min-height: 0; } .promo-panel { min-height: 560px; } .box { max-height: calc(100dvh - 24px); } }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; } }
   </style>
 </head>
 <body>
-  <div class="box">
-    <img class="login-logo" src="/app-logo.png?v=20261008-2304" alt="App logo">
-    <p class="brand-tagline">PLAY &amp; WIN REAL CASH</p>
-    <p class="form-hint" id="formHint" hidden></p>
-    <nav class="login-modes" aria-label="Login type">
-      <a id="playerModeLink" href="/login.html"><span class="mode-label" aria-label="Player"><span class="mode-letter" aria-hidden="true">P</span><span class="mode-letter" aria-hidden="true">l</span><span class="mode-letter" aria-hidden="true">a</span><span class="mode-letter" aria-hidden="true">y</span><span class="mode-letter" aria-hidden="true">e</span><span class="mode-letter" aria-hidden="true">r</span></span></a>
-    </nav>
-    <form id="phoneForm" novalidate>
-      <h2 class="welcome-back">Welcome back</h2>
-      <label for="phone">Mobile number</label>
-      <input type="tel" id="phone" name="phone" placeholder="10 digit mobile number" inputmode="numeric" pattern="[6-9][0-9]{9}" maxlength="10" autocomplete="tel-national" required>
-      <label for="referralCode">Referral ID (optional)</label>
-      <input type="text" id="referralCode" name="referralCode" placeholder="8 character referral ID" maxlength="8" autocomplete="off" autocapitalize="characters">
-      <button id="otpSendBtn" type="submit">Login with OTP</button>
-      <p class="security-note">100% Safe &amp; Secure Platform</p>
-    </form>
-    <form id="otpForm" class="hidden" novalidate>
-      <label for="otp">6-digit OTP</label>
-      <input type="text" id="otp" name="otp" placeholder="SMS mein mila OTP" inputmode="numeric" pattern="[0-9]{4,6}" maxlength="6" autocomplete="off" required>
-      <div id="timerText" aria-live="polite"></div>
-      <button id="otpVerifyBtn" type="submit">Login / Play</button>
-      <button id="otpResendBtn" class="secondary" type="button" disabled>OTP dobara bhejein</button>
-      <button id="changePhoneBtn" class="secondary" type="button">Mobile number badlein</button>
-    </form>
-    <p id="msg" role="status" aria-live="polite" aria-atomic="true"></p>
-    <a id="adminModeLink" href="/login.html?admin=1" aria-label="Admin login" title="Admin login"><span aria-hidden="true">👑</span></a>
-  </div>
+  <main class="login-layout">
+    <section class="promo-panel" aria-label="KhiladiAdda24 games">
+      <img class="promo-art" src="/login-banner.png" alt="KhiladiAdda24 welcome bonus and Ludo games">
+      <div class="flying-note" aria-hidden="true"></div>
+      <div class="flying-note" aria-hidden="true"></div>
+      <div class="flying-note" aria-hidden="true"></div>
+      <div class="flying-note" aria-hidden="true"></div>
+      <div class="flying-note" aria-hidden="true"></div>
+      <div class="flying-note" aria-hidden="true"></div>
+      <div class="flying-note" aria-hidden="true"></div>
+      <div class="flying-note" aria-hidden="true"></div>
+      <div class="fireflies" aria-hidden="true">
+        <span class="firefly"></span><span class="firefly"></span><span class="firefly"></span><span class="firefly"></span>
+        <span class="firefly"></span><span class="firefly"></span><span class="firefly"></span><span class="firefly"></span>
+      </div>
+    </section>
+    <section class="box" aria-label="Player sign in">
+      <a id="adminModeLink" href="/login.html?admin=1" aria-label="Admin login" title="Admin login"><span aria-hidden="true">&#128081;</span></a>
+      <div class="login-heading">
+        <img class="login-logo" src="/app-logo.png?v=20261008-2304" alt="KhiladiAdda24">
+        <p class="brand-tagline">WELCOME TO KHILADIADDA24</p>
+        <h2 class="welcome-back">Login or register</h2>
+        <p class="security-note">Naye player? Mobile verify karke account banayein.</p>
+      </div>
+      <p class="form-hint" id="formHint" hidden></p>
+      <nav class="login-modes" aria-label="Login type">
+        <a id="playerModeLink" href="/login.html"><span class="mode-label" aria-label="Player">Player account</span></a>
+      </nav>
+      <form id="phoneForm" novalidate>
+        <label for="phone">Mobile number</label>
+        <input type="tel" id="phone" name="phone" placeholder="10 digit mobile number" inputmode="numeric" pattern="[6-9][0-9]{9}" maxlength="10" autocomplete="tel-national" required>
+        <label for="referralCode">Referral ID <span style="color:#827b74;font-weight:400">(optional)</span></label>
+        <input type="text" id="referralCode" name="referralCode" placeholder="8 character referral ID" maxlength="8" autocomplete="off" autocapitalize="characters">
+        <button id="otpSendBtn" type="submit">Continue with mobile &rsaquo;</button>
+        <p class="security-note">A one-time password will be sent to verify your mobile.</p>
+      </form>
+      <form id="otpForm" class="hidden" novalidate>
+        <label for="otp">6-digit OTP</label>
+        <input type="text" id="otp" name="otp" placeholder="SMS mein mila OTP" inputmode="numeric" pattern="[0-9]{4,6}" maxlength="6" autocomplete="one-time-code" required>
+        <div id="timerText" aria-live="polite"></div>
+        <button id="otpVerifyBtn" type="submit">Login / Play</button>
+        <button id="otpResendBtn" class="secondary" type="button" disabled>OTP dobara bhejein</button>
+        <button id="changePhoneBtn" class="secondary" type="button">Mobile number badlein</button>
+      </form>
+      <p id="msg" role="status" aria-live="polite" aria-atomic="true"></p>
+    </section>
+  </main>
 
+  <script>
+  </script>
   <script>
     let otpTimer = null;
     let otpCooldown = 0;
