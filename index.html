@@ -15,19 +15,18 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link rel="manifest" href="/api/site-manifest">
-  <meta name="description" content="KhiladiAdda24 par Ludo Classic, Ludo Race aur Snake Battle games explore karein. Hindi aur English mein gaming aur player support paayein.">
-  <meta name="robots" content="index,follow">
-  <link rel="canonical" href="https://khiladiadda24.com/">
+  <meta name="description" content="KhiladiAdda24 par free Ludo, Snake battles aur Indian Rummy practice khelein.">
+  <meta name="robots" content="noindex,follow">
   <link rel="icon" href="/app-icon-192.png" type="image/png">
   <link rel="shortcut icon" href="/app-icon-192.png" type="image/png">
   <link rel="icon" href="/app-icon-192.png" type="image/png" sizes="192x192">
   <link rel="apple-touch-icon" href="/app-icon-192.png">
   <link rel="mask-icon" href="/app-icon.svg" color="#f4c84b">
-  <title>KhiladiAdda24 - Ludo & Snake Games</title>
+  <title>KhiladiAdda24 Player App</title>
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="KhiladiAdda24">
   <meta property="og:title" content="KhiladiAdda24 - Ludo & Snake Games">
-  <meta property="og:description" content="KhiladiAdda24 par Ludo Classic, Ludo Race aur Snake Battle games explore karein. Hindi aur English mein gaming aur player support paayein.">
+  <meta property="og:description" content="KhiladiAdda24 par free Ludo, Snake battles aur Indian Rummy practice khelein.">
   <meta property="og:url" content="https://khiladiadda24.com/">
   <meta property="og:image" content="https://khiladiadda24.com/app-icon-512.png">
   <meta name="twitter:card" content="summary">
@@ -164,6 +163,22 @@
     .theme-toggle{display:grid;place-items:center;flex:none;width:36px;height:36px;min-height:36px;margin:0;padding:0;border-radius:50%;font-size:17px;line-height:1}
     .battle-banner-row{position:relative;width:100%;aspect-ratio:1983/793;margin-bottom:12px;overflow:hidden;border-radius:8px;background:#101713;cursor:pointer}
     .battle-banner{display:block;width:100%;height:auto;max-height:none;object-fit:contain;border-radius:8px;background:#101713}
+    .banner-flying-note{position:absolute;top:76%;left:50%;z-index:2;width:min(17%,118px);aspect-ratio:707/282;background-position:center;background-size:100% 100%;background-repeat:no-repeat;filter:drop-shadow(0 3px 5px #0008);mix-blend-mode:multiply;opacity:0;pointer-events:none;transform:translate(-50%,0) scale(.5)}
+    @keyframes banner-note-rise{0%,8%{opacity:0;transform:translate(-50%,0) scale(.5) rotate(0)}16%{opacity:1;transform:translate(-50%,-24px) scale(.8) rotate(var(--note-tilt))}68%{opacity:1;transform:translate(calc(-50% + var(--note-drift)),-140px) scale(1) rotate(calc(var(--note-tilt)*-1))}100%{opacity:0;transform:translate(calc(-50% + var(--note-drift)),-220px) scale(.75) rotate(var(--note-tilt))}}
+    .banner-flying-note.note-2000{background-image:url("/images.jfif")}
+    .banner-flying-note.note-500{background-image:url("/India_new_500_INR,_MG_series,_2016,_obverse.jpg")}
+    .banner-flying-note.note-200{background-image:url("/India,_200_INR,_2018,_obverse.jpg")}
+    .banner-flying-note.note-100{background-image:url("/100_rs_note_obverse.jpg")}
+    @media(prefers-reduced-motion:no-preference){.banner-flying-note{animation:banner-note-rise 10s ease-in-out infinite}}
+    @media(prefers-reduced-motion:reduce){.banner-flying-note{display:none}}
+    .withdraw-live-ticker{display:flex;align-items:center;gap:10px;min-width:0;min-height:36px;margin:0 10px 8px;overflow:hidden;border:1px solid var(--line);border-radius:8px;background:var(--panel);color:var(--ink)}
+    .withdraw-live-label{z-index:1;flex:none;padding:0 0 0 10px;color:var(--green);font-size:10px;font-weight:900;letter-spacing:.04em;white-space:nowrap}
+    .withdraw-live-viewport{flex:1;min-width:0;overflow:hidden}
+    .withdraw-live-track{display:flex;width:max-content;animation:withdraw-live-scroll 120s linear infinite}
+    .withdraw-live-item{display:flex;align-items:center;gap:5px;flex:none;padding:0 16px;color:var(--muted);font-size:11px;white-space:nowrap}
+    .withdraw-live-item strong{color:var(--green);font-size:10px}
+    @keyframes withdraw-live-scroll{to{transform:translateX(-50%)}}
+    @media(prefers-reduced-motion:reduce){.withdraw-live-track{animation:none}}
     #view-home > .panel:first-child{padding:0;overflow:hidden;margin-top:0}
     #view-home > .panel:first-child .battle-banner{margin:0;border-radius:10px 10px 0 0}
     #view-home > .panel:first-child > .muted{margin:10px 10px 8px;padding:0}
@@ -333,6 +348,9 @@
     #gamePicker .game-coming-soon-tile:nth-child(5){background:linear-gradient(0deg,#101713df,#1017131a 75%),url('/cricket.png') center/cover no-repeat}
     #gamePicker .game-coming-soon-tile:nth-child(6){background:linear-gradient(0deg,#101713df,#1017131a 75%),url('/pubg.png') center/cover no-repeat}
     #gamePicker .game-coming-soon-icon{display:none}
+    #gamePicker .rummy-game-tile{display:grid;place-content:center;justify-items:center;gap:5px;border-color:#c49b58;color:#fff4db;background:linear-gradient(145deg,#65442f,#284c43 72%);text-align:center;text-decoration:none}
+    #gamePicker .rummy-game-tile strong{color:#fff4db;font-size:18px}
+    #gamePicker .rummy-mark{display:grid;width:52px;aspect-ratio:1;place-items:center;border:1px solid #e8c67b;border-radius:50%;color:#e8c67b;background:#183c34;font:32px Georgia,serif}
     .cricket-promo-hero{position:relative;isolation:isolate;overflow:hidden;min-height:250px;padding:clamp(22px,5vw,42px);border:1px solid #9b7138;border-radius:14px;background:linear-gradient(90deg,#101713f2 0%,#101713d9 55%,#10171366 100%),url('/cricket.png') center/cover}
     .cricket-promo-hero h1{max-width:640px;margin:12px 0;color:#ffdc7b;font-size:clamp(28px,5vw,42px);line-height:1.1}
     .cricket-promo-hero p{max-width:600px;margin:0;color:#f0eee5}
@@ -491,13 +509,11 @@
   <main class="shell content"><div id="notice" class="notice" role="status" hidden></div>
       <section class="view" id="view-games">
         <div class="game-launch" id="gamePicker">
-          <button class="game-tile game-tile-image" data-launch-game="LUDO" aria-label="Ludo Classic"><img src="/ludo-classic.png" alt="Ludo Classic"><span class="game-live-badge"><i class="game-live-dot" aria-hidden="true"></i><span class="game-live-text">LIVE</span></span></button>
-          <button class="game-tile game-tile-image" data-launch-game="POPULAR_LUDO" data-ludo-popular aria-label="Popular Ludo"><img src="/ludo-classic.png" alt="Popular Ludo"><span class="game-live-badge">POPULAR</span></button>
-          <button class="game-tile game-tile-image" data-launch-game="LUDO_RACE" aria-label="Ludo Race"><img src="/ludo-classic.png" alt="Ludo Race"><span class="game-live-badge">NEW</span></button>
           <button class="game-tile game-tile-image" data-launch-game="SNAKE" aria-label="Snake Battle"><img src="/snake-battles-banner.png" alt="Snake Battle"><span class="game-live-badge"><i class="game-live-dot" aria-hidden="true"></i><span class="game-live-text">LIVE</span></span></button>
           <button class="game-tile game-tile-image game-coming-soon-tile" type="button" data-cricket-promo aria-label="Cricket fantasy - Coming Soon"><img class="cricket-game-logo" src="/cricket-game-logo.svg" alt=""><span class="game-coming-soon-icon" aria-hidden="true">🏏</span><strong>Cricket Fantasy</strong><span class="game-coming-soon-badge">₹1 LAKH · COMING SOON</span></button>
           <button class="game-tile game-tile-image game-coming-soon-tile" type="button" data-pubg-promo aria-label="PUBG 2D Prototype - Play"><span class="game-coming-soon-icon" aria-hidden="true">🎯</span><strong>PUBG</strong><span class="game-coming-soon-badge">2D PROTOTYPE · PLAY</span></button>
-          <a class="game-support-banner" href="/support.html" aria-label="WhatsApp and support"><img src="/whatsapp-support.png" alt="WhatsApp and Support"><span class="game-live-badge"><i class="game-live-dot" aria-hidden="true"></i><span class="game-live-text">LIVE</span></span></a>
+          <a class="game-tile game-tile-image rummy-game-tile" href="/rummy.html" aria-label="Play free Indian Rummy"><span class="rummy-mark" aria-hidden="true">♠</span><strong>Indian Rummy</strong><span class="game-coming-soon-badge">FREE PRACTICE</span></a>
+          <a class="game-support-banner" href="/support.html" aria-label="WhatsApp and support"><img src="/support-banner.png?v=20261028-support-update" alt="WhatsApp and Support"><span class="game-live-badge"><i class="game-live-dot" aria-hidden="true"></i><span class="game-live-text">LIVE</span></span></a>
         </div>
         <div id="gameBattleView" hidden>
           <div class="match-head"><div><button class="btn secondary small" id="backToGames">← Games</button><h2 id="gameViewTitle"></h2></div><button id="gameRefreshOpen" class="btn secondary small" type="button">Refresh</button></div>
@@ -676,7 +692,8 @@
         ['.battle-banner',branding.homeBannerUrl],
         ['[data-launch-game="LUDO"] img',branding.ludoBannerUrl],
         ['[data-ludo-popular] img',branding.ludoBannerUrl],
-        ['[data-launch-game="SNAKE"] img',branding.snakeBannerUrl]
+        ['[data-launch-game="SNAKE"] img',branding.snakeBannerUrl],
+        ['.game-support-banner img',branding.supportBannerUrl]
       ];
       assets.forEach(([selector,url,attribute='src'])=>{
         const element=document.querySelector(selector);
@@ -687,7 +704,7 @@
     const matchSocket=typeof io==='function'?io():null;
     const registerMatchSocket=()=>{if(!matchSocket||!token)return;matchSocket.emit('register_player',{token});const matchId=new URLSearchParams(location.search).get('matchId');if(matchId)matchSocket.emit('join_match_room',{matchId,token})};
     if(matchSocket){matchSocket.on('connect',registerMatchSocket);if(matchSocket.connected)registerMatchSocket();matchSocket.on('match_start_tone',event=>{const starterId=String(event?.startedBy||''),currentUserId=String(player?._id||storedUser?.id||'');if(starterId&&starterId!==currentUserId)window.matchApp?.playAlertTone?.()})}
-    if(matchSocket)matchSocket.on('match_updated',updated=>{const currentMatchId=new URLSearchParams(location.search).get('matchId');if(currentMatchId&&String(updated?._id)===currentMatchId&&window.openMatch)window.openMatch(currentMatchId).then(()=>{if(updated.status!=='COMPLETED')return;const winnerId=String(updated.winner?._id||updated.winner||''),currentUserId=String(player?._id||storedUser?.id||'');notify(winnerId===currentUserId?`Admin ne result approve kar diya: Aap WIN hue. ₹${(Number(updated.amount||0)*1.8).toLocaleString('en-IN')} wallet me credit hua.`:'Admin ne result approve kar diya: Is match me aap LOSS hue.')}).catch(error=>notify(error.message,true))});
+    if(matchSocket)matchSocket.on('match_updated',updated=>{const currentMatchId=new URLSearchParams(location.search).get('matchId');if(currentMatchId&&String(updated?._id)===currentMatchId&&window.openMatch)window.openMatch(currentMatchId).then(()=>{if(updated.status!=='COMPLETED')return;const winnerId=String(updated.winner?._id||updated.winner||''),currentUserId=String(player?._id||storedUser?.id||''),isFreeMatch=Number(updated.amount||0)===0;notify(isFreeMatch?'Free match complete. No wallet amount changed.':winnerId===currentUserId?`Admin ne result approve kar diya: Aap WIN hue. ₹${(Number(updated.amount||0)*1.8).toLocaleString('en-IN')} wallet me credit hua.`:'Admin ne result approve kar diya: Is match me aap LOSS hue.')}).catch(error=>notify(error.message,true))});
     if(matchSocket)matchSocket.on('wallet_updated',update=>{const userId=String(player?._id||storedUser?.id||'');if(!userId||String(update?.userId)!==userId||!Number.isFinite(Number(update.walletBalance)))return;if(player)player.walletBalance=Number(update.walletBalance);if(storedUser){storedUser.walletBalance=Number(update.walletBalance);localStorage.setItem('user',JSON.stringify(storedUser))}renderPlayer()});
     if(matchSocket)matchSocket.on('wallet_updated',update=>{const userId=String(player?._id||storedUser?.id||'');if(userId&&String(update?.userId)===userId)loadWalletSummary().catch(()=>{})});
     window.matchSocket=matchSocket;
@@ -713,38 +730,12 @@
     profileShareButton.addEventListener('click',shareWebsiteLink);
     el('copyReferral').after(profileShareButton);
     const createChallengeButton=el('createForm').querySelector('button[type="submit"]');
-    if(createChallengeButton)createChallengeButton.hidden=true;
+    if(createChallengeButton){createChallengeButton.hidden=false;createChallengeButton.textContent='Create free match'}
     if(el('openMatches').previousElementSibling?.textContent.trim()==='Challenger, entry amount aur winning amount dekhein.')el('openMatches').previousElementSibling.remove();
+    const freeMatchNotice=el('createForm').previousElementSibling;
+    if(freeMatchNotice)freeMatchNotice.textContent='Free to play. No entry fee or cash prize.';
     const entryAmountInput=el('entryAmount');
-    const entryAmountControl=document.createElement('div');
-    entryAmountControl.className='entry-amount-control';
-    entryAmountInput.before(entryAmountControl);
-    entryAmountControl.append(entryAmountInput);
-    const setEntryAmountButton=document.createElement('button');
-    setEntryAmountButton.id='setEntryAmount';
-    setEntryAmountButton.className='btn secondary small';
-    setEntryAmountButton.type='button';
-    setEntryAmountButton.textContent='SET';
-    setEntryAmountButton.setAttribute('aria-pressed','false');
-    entryAmountControl.append(setEntryAmountButton);
-    let confirmedEntryAmount=null;
-    entryAmountInput.addEventListener('input',()=>{confirmedEntryAmount=null;setEntryAmountButton.setAttribute('aria-pressed','false')});
-    setEntryAmountButton.addEventListener('click',()=>{
-      const amount=Number(entryAmountInput.value);
-      if(!Number.isInteger(amount)||amount<50||amount>50000||(amount-50)%50!==0)return notify('₹50 se ₹50,000 ke beech ₹50 ke multiples mein amount dalein.',true);
-      confirmedEntryAmount=amount;
-      window.pendingEntryAmount=amount;
-      setEntryAmountButton.setAttribute('aria-pressed','true');
-      setEntryAmountButton.disabled=true;
-      notify(`₹${amount} entry ka Open Battle ban raha hai...`);
-      el('createForm').requestSubmit();
-    });
-    el('createForm').addEventListener('submit',event=>{
-      if(confirmedEntryAmount===Number(entryAmountInput.value))return;
-      event.preventDefault();
-      event.stopImmediatePropagation();
-      notify('Pehle valid entry amount par SET dabayein.',true);
-    });
+    entryAmountInput.closest('.two').replaceWith(el('gameType').closest('.field'));
     const openBattlesHeading=document.createElement('h2');
     openBattlesHeading.className='open-battles-image-title home-open-header-title';
     openBattlesHeading.setAttribute('aria-label','My open list');
@@ -755,7 +746,7 @@
     const languageToggle=document.querySelector('.top-inner .lang-toggle');
     if(languageToggle&&homeMatchHeader)homeMatchHeader.insertBefore(languageToggle,el('refreshOpen'));
     const samplePlayerNames=['Aarav Sharma','Vivaan Verma','Aditya Singh','Arjun Patel','Ishaan Gupta','Rohan Yadav','Kabir Mehta','Reyansh Kumar','Advika Joshi','Sai Prasad','Ananya Sharma','Diya Patel','Aadhya Verma','Saanvi Gupta','Myra Singh','Kiara Nair','Isha Reddy','Pari Shah','Meera Iyer','Avni Das','Kunal Mishra','Dev Malhotra','Yash Thakur','Omkar Pawar','Manav Jain','Harsh Agarwal','Nikhil Rao','Rahul Sinha','Siddharth Bose','Varun Kapoor','Priya Menon','Kavya Kulkarni','Neha Choudhary','Riya Banerjee','Tara Bhat','Sneha Desai','Pooja Bansal','Nandini Pillai','Anika Roy','Sanjana Kulkarni'];
-    const sampleEntryAmounts=[100,150,200,250,300,350,400,450,500,600,700,800,900,1000,1250,1500,2000,2500,3000,5000];
+    const sampleEntryAmounts=Array(20).fill(0);
     const sampleAvatarPaths=['/1.png','/2.png','/3.png','/4.png','/5.png'];
     function createSampleRunningBattles(excludedNames=[]){
       const shuffledSamplePlayers=samplePlayerNames.filter(name=>!excludedNames.includes(name));
@@ -856,7 +847,35 @@
       updateThemeButton();
     });
     const battleBanner=document.querySelector('.battle-banner');
-    if(battleBanner){const bannerRow=document.createElement('div'),liveStatus=document.createElement('span'),liveDot=document.createElement('span'),liveText=document.createElement('span');bannerRow.className='battle-banner-row';bannerRow.setAttribute('role','button');bannerRow.setAttribute('tabindex','0');bannerRow.setAttribute('aria-label','Open Ludo battles');liveStatus.className='banner-live';liveStatus.setAttribute('role','status');liveStatus.setAttribute('aria-label','Live');liveDot.className='banner-live-dot';liveDot.setAttribute('aria-hidden','true');liveText.className='banner-live-text';liveText.textContent='LIVE';liveStatus.append(liveDot,liveText);const openBannerGame=()=>{syncGameSelection('LUDO');el('gamePicker').hidden=true;el('gameBattleView').hidden=false;setView('games')};bannerRow.addEventListener('click',openBannerGame);bannerRow.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();openBannerGame()}});battleBanner.before(bannerRow);bannerRow.append(battleBanner,liveStatus)}
+    if(battleBanner){
+      const bannerRow=document.createElement('div'),liveStatus=document.createElement('span'),liveDot=document.createElement('span'),liveText=document.createElement('span');
+      bannerRow.className='battle-banner-row';bannerRow.setAttribute('role','button');bannerRow.setAttribute('tabindex','0');bannerRow.setAttribute('aria-label','Open Ludo battles');
+      liveStatus.className='banner-live';liveStatus.setAttribute('role','status');liveStatus.setAttribute('aria-label','Live');liveDot.className='banner-live-dot';liveDot.setAttribute('aria-hidden','true');liveText.className='banner-live-text';liveText.textContent='LIVE';liveStatus.append(liveDot,liveText);
+      const openBannerGame=()=>{syncGameSelection('LUDO');el('gamePicker').hidden=true;el('gameBattleView').hidden=false;setView('games')};
+      bannerRow.addEventListener('click',openBannerGame);bannerRow.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();openBannerGame()}});
+      battleBanner.before(bannerRow);bannerRow.append(battleBanner,liveStatus);
+      const noteDenominations=['2000','500','200','100','2000','500','200','100'];
+      noteDenominations.forEach((denomination,index)=>{const note=document.createElement('span');note.className=`banner-flying-note note-${denomination}`;note.setAttribute('aria-hidden','true');note.style.setProperty('--note-drift',`${-84+index*24}px`);note.style.setProperty('--note-tilt',`${(index%2?-1:1)*(8+index%4*3)}deg`);note.style.animationDelay=`${index*1.25}s`;bannerRow.append(note)});
+      const ticker=document.createElement('div'),tickerLabel=document.createElement('span'),tickerViewport=document.createElement('div'),tickerTrack=document.createElement('div');
+      ticker.className='withdraw-live-ticker';ticker.setAttribute('role','status');ticker.setAttribute('aria-live','polite');ticker.setAttribute('aria-label','Today');
+      tickerLabel.className='withdraw-live-label';tickerLabel.textContent='TODAY DATA';tickerViewport.className='withdraw-live-viewport';tickerTrack.className='withdraw-live-track';tickerViewport.append(tickerTrack);ticker.append(tickerLabel,tickerViewport);bannerRow.after(ticker);
+      const sampleAmounts=[5500,8600,1200,800,10000,45000,65000,1500,3200,7000,6500,500,600,3100,9000,6100,8500,15000,3000,50000,4000,7500,1700,2800,2000,8200,13500];
+      const refreshSampleWithdrawals=async()=>{
+        try{
+          const response=await fetch('/api/public/withdrawals/recent',{cache:'no-store'});
+          if(!response.ok)throw new Error('Ticker settings request failed: '+response.status);
+          const data=await response.json();
+          if(typeof data.enabled!=='boolean')throw new Error('Ticker settings response was invalid');
+          if(data.enabled===false){ticker.hidden=true;return}
+          ticker.hidden=false;tickerTrack.replaceChildren();
+          const samplePayouts=Array.from({length:100},()=>sampleAmounts[Math.floor(Math.random()*sampleAmounts.length)]);
+          for(let index=samplePayouts.length-1;index>0;index--){const swap=Math.floor(Math.random()*(index+1));[samplePayouts[index],samplePayouts[swap]]=[samplePayouts[swap],samplePayouts[index]]}
+          for(let copy=0;copy<2;copy++)samplePayouts.forEach(amount=>{const item=document.createElement('span'),withdrawal=document.createElement('strong');item.className='withdraw-live-item';item.setAttribute('aria-hidden','true');item.append(document.createTextNode('₹'+amount.toLocaleString('en-IN')+' '));withdrawal.textContent='WITHDRAW';item.append(withdrawal);tickerTrack.append(item)});
+          tickerLabel.textContent='TODAY DATA';tickerTrack.style.animation='';
+        }catch(error){console.error('Withdrawal ticker could not be updated',error);tickerLabel.textContent='TODAY DATA UNAVAILABLE';tickerTrack.replaceChildren();tickerTrack.style.animation='none'}
+      };
+      refreshSampleWithdrawals();window.setInterval(refreshSampleWithdrawals,60000)
+    }
     const kycPanel=el('kycForm').closest('.panel');
     const profileKycStatus=document.createElement('p');
     profileKycStatus.className='muted';
@@ -878,8 +897,7 @@
     if(!token||!storedUser)location.replace(loginUrl());
     function notify(text,error=false){const box=el('notice');box.textContent=text;box.className=`notice${error?' error':''}`;box.hidden=!text;}
     async function api(url,options={}){const headers=new Headers(options.headers||{});headers.set('Authorization',`Bearer ${token}`);if(options.body&&!(options.body instanceof FormData))headers.set('Content-Type','application/json');const response=await fetch(url,{...options,headers});const data=await response.json().catch(()=>({}));if(response.status===401){localStorage.removeItem('token');localStorage.removeItem('user');location.replace(loginUrl());throw new Error('Session expire hua. Dobara login karein.')}if(!response.ok)throw new Error(data.error||'Request complete nahi hui.');return data}
-    window.pendingEntryAmount=50;
-    const showError=error=>{const message=error.message||'Kuch problem hui.';if(/balance|insufficient|recharge/i.test(message)){const required=Number(window.pendingEntryAmount)||50,balance=Number(player?.walletBalance??storedUser?.walletBalance??0),depositAmount=Math.max(100,required-balance);el('depositAmount').value=String(depositAmount);notify(`₹${required} entry ke liye balance kam hai. ₹${depositAmount} deposit karein.`,true);document.querySelector('.bottom [data-view="wallet"]')?.click();return}notify(message,true)};
+    const showError=error=>notify(error.message||'Kuch problem hui.',true);
     function setView(name){const viewName=name==='battles'||name==='games'?'home':name;document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===`view-${viewName}`||(viewName==='match'&&v.id==='view-home')));document.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===(viewName==='match'?'home':viewName)));el('menu').classList.remove('open');el('menuToggle').setAttribute('aria-expanded','false');clearInterval(battlesPollTimer);if(viewName==='rank')window.scrollTo({top:0,behavior:'smooth'});if(viewName==='wallet'||viewName==='profile')loadKyc().catch(showError);if(viewName==='home')loadMine().catch(showError);if(viewName==='history')loadHistory().catch(showError);loadOpen().catch(showError);battlesPollTimer=setInterval(()=>loadOpen().catch(showError),30000);const chatNavButton=document.getElementById('chatNavButton');if(chatNavButton&&!chatNavButton.dataset.bound){chatNavButton.dataset.bound='true';chatNavButton.addEventListener('click',()=>{window.location.href='/chat.html';})}}
     function renderPlayer(){const name=player?.username||storedUser?.username||'Player',phone=player?.phone||storedUser?.phone||'',balance=Number(player?.walletBalance||0),formatted=`₹ ${balance.toLocaleString('en-IN')}`;['headerBalance','walletBalance','profileBalance'].forEach(id=>el(id).textContent=formatted);el('profileName').textContent=name;el('profilePhone').textContent=phone;el('accountPhone').textContent=phone;el('profileReferralCode').textContent=player?.referralCode||'--';el('username').value=name;const image=player?.profileImage;el('avatar').src=image?(image.startsWith('uploads/')?`/api/profile/image/${encodeURIComponent(image.split('/').pop())}`:`/${image.split('/').map(encodeURIComponent).join('/')}`):'';el('avatar').onerror=()=>el('avatar').removeAttribute('src')}
     async function loadProfile(){const data=await api('/api/profile/me');player=data.user;renderPlayer()}
@@ -921,11 +939,28 @@
     gameTypeSelect.hidden=true;
     function syncGameSelection(gameType){const selectedType=['LUDO','POPULAR_LUDO','LUDO_RACE','SNAKE'].includes(gameType)?gameType:'LUDO';game=selectedType==='SNAKE'?'SNAKE':'LUDO';gameTypeSelect.value=selectedType;gameModeOptions.querySelectorAll('.game-mode-option').forEach(button=>{const selected=button.dataset.gameOption===selectedType;button.classList.toggle('active',selected);button.setAttribute('aria-pressed',String(selected))});document.querySelectorAll('.game-filter').forEach(button=>button.classList.toggle('active',button.dataset.game===game));if(el('gameViewTitle'))el('gameViewTitle').textContent=selectedType==='LUDO_RACE'?'Ludo Race — 1 Goti Win':''}
     syncGameSelection(game);
-    function battlePlayerMarkup(user,role,opponent=false,amount='',gameLabel=''){const username=nameOf(user),profileImage=String(user?.profileImage||'').trim(),imageUrl=profileImage.startsWith('uploads/')?`/api/profile/image/${encodeURIComponent(profileImage.slice('uploads/'.length))}`:profileImage?`/${profileImage.split('/').map(encodeURIComponent).join('/')}`:'',initial=String(username).trim().charAt(0).toUpperCase()||'?';const avatar=imageUrl?`<img class="battle-avatar" src="${esc(imageUrl)}" alt="">`:`<span class="battle-avatar">${esc(initial)}</span>`;const amountMarkup=amount?`<span class="battle-player-amount">₹${Number(amount).toLocaleString('en-IN')}</span>`:'';const gameTag=gameLabel?`<span class="battle-player-game-tag">${esc(gameLabel)}</span>`:'';return `<div class="battle-player${opponent?' battle-player-opponent':''}"><div class="battle-player-main">${avatar}<span class="battle-player-info"><strong class="battle-player-name">${esc(username)}</strong><small class="battle-player-role">${esc(role)}</small>${gameTag}</span></div>${amountMarkup}</div>`}
+    function battlePlayerMarkup(user,role,opponent=false,amount='',gameLabel=''){
+      const username=nameOf(user),profileImage=String(user?.profileImage||'').trim(),imageUrl=profileImage.startsWith('uploads/')?`/api/profile/image/${encodeURIComponent(profileImage.slice('uploads/'.length))}`:profileImage?`/${profileImage.split('/').map(encodeURIComponent).join('/')}`:'',initial=String(username).trim().charAt(0).toUpperCase()||'?';
+      const avatar=imageUrl?`<img class="battle-avatar" src="${esc(imageUrl)}" alt="">`:`<span class="battle-avatar">${esc(initial)}</span>`;
+      const hasAmount=amount!==''&&amount!==null&&amount!==undefined;
+      const amountMarkup=hasAmount?`<span class="battle-player-amount">${Number(amount)===0?'FREE':`₹${Number(amount).toLocaleString('en-IN')}`}</span>`:'';
+      const gameTag=gameLabel?`<span class="battle-player-game-tag">${esc(gameLabel)}</span>`:'';
+      return `<div class="battle-player${opponent?' battle-player-opponent':''}"><div class="battle-player-main">${avatar}<span class="battle-player-info"><strong class="battle-player-name">${esc(username)}</strong><small class="battle-player-role">${esc(role)}</small>${gameTag}</span></div>${amountMarkup}</div>`;
+    }
     renderDemoBattles();
     function gameTypeLabel(gameType){return gameType==='LUDO_RACE'?'Ludo Race':gameType==='SNAKE'?'Snake battle':gameType==='POPULAR_LUDO'?'Popular Ludo':'Ludo Classic';}
     function isLudoGame(gameType){return gameType==='LUDO'||gameType==='POPULAR_LUDO'||gameType==='LUDO_RACE';}
-    function matchCard(m,mine=false){const entry=Number(m.amount),prize=entry*2*0.95,playerId=String(player?._id||storedUser?.id||''),isOwnOpen=m.status==='OPEN'&&String(m.creator?._id||m.creator)===playerId;const action=isOwnOpen?`<button class="btn danger small" data-cancel-match="${esc(m._id)}">Cancel</button>`:`<button class="btn ${mine?'secondary':'green'} small" data-${mine?'match':'join'}="${esc(m._id)}">${mine?'Details':'PLAY'}</button>`;const status=m.status==='PENDING_RESULT'?'Result review':m.status==='PENDING_CANCELLATION'?'Cancel review':m.status;const gameLabel=gameTypeLabel(m.gameType||game);const playersMarkup=m.joiner?`<div class="battle-players">${battlePlayerMarkup(m.creator,mine?'Creator':'Challenger',false,entry,gameLabel)}<img class="battle-versus battle-versus-image" src="/vs.png" alt="versus">${battlePlayerMarkup(m.joiner,'Opponent',true,entry)}</div>`:`<div class="battle-players battle-players-waiting">${battlePlayerMarkup(m.creator,mine?'Creator':'Challenger',false,entry,gameLabel)}</div>`;const statusMarkup=m.status==='OPEN'?'':`<div class="battle-card-top"><span class="status ${['PENDING_RESULT','PENDING_CANCELLATION'].includes(m.status)?'pending':''}">${esc(status)}</span></div>`;const prizeMarkup=m.status==='OPEN'?'':`<div class="battle-prize"><small>WIN</small><strong>₹${prize.toLocaleString('en-IN')}</strong></div>`;const prizeClass=m.status==='OPEN'?' open-battle-prizes':'';return `<article class="match battle-card">${statusMarkup}<div class="battle-prizes${prizeClass}">${prizeMarkup}<div class="battle-prize-players">${playersMarkup}</div><div class="battle-card-actions">${action}</div></div></article>`}
+    function matchCard(m,mine=false){
+      const entry=Number(m.amount),prize=entry*2*0.95,playerId=String(player?._id||storedUser?.id||''),isOwnOpen=m.status==='OPEN'&&String(m.creator?._id||m.creator)===playerId,legacyPaid=m.status==='OPEN'&&entry>0;
+      const action=isOwnOpen?`<button class="btn danger small" data-cancel-match="${esc(m._id)}">Cancel</button>`:legacyPaid?'<button class="btn secondary small" type="button" disabled>Unavailable</button>':`<button class="btn ${mine?'secondary':'green'} small" data-${mine?'match':'join'}="${esc(m._id)}">${mine?'Details':'PLAY'}</button>`;
+      const status=m.status==='PENDING_RESULT'?'Result review':m.status==='PENDING_CANCELLATION'?'Cancel review':legacyPaid?'Legacy paid match · unavailable':m.status;
+      const gameLabel=gameTypeLabel(m.gameType||game);
+      const playersMarkup=m.joiner?`<div class="battle-players">${battlePlayerMarkup(m.creator,mine?'Creator':'Challenger',false,entry,gameLabel)}<img class="battle-versus battle-versus-image" src="/vs.png" alt="versus">${battlePlayerMarkup(m.joiner,'Opponent',true,entry)}</div>`:`<div class="battle-players battle-players-waiting">${battlePlayerMarkup(m.creator,mine?'Creator':'Challenger',false,entry,gameLabel)}</div>`;
+      const statusMarkup=m.status==='OPEN'?(legacyPaid?`<div class="battle-card-top"><span class="status pending">${esc(status)}</span></div>`:''):`<div class="battle-card-top"><span class="status ${['PENDING_RESULT','PENDING_CANCELLATION'].includes(m.status)?'pending':''}">${esc(status)}</span></div>`;
+      const prizeMarkup=m.status==='OPEN'?'':entry===0?'<div class="battle-prize"><small>ENTRY</small><strong>FREE</strong></div>':`<div class="battle-prize"><small>WIN</small><strong>₹${prize.toLocaleString('en-IN')}</strong></div>`;
+      const prizeClass=m.status==='OPEN'?' open-battle-prizes':'';
+      return `<article class="match battle-card">${statusMarkup}<div class="battle-prizes${prizeClass}">${prizeMarkup}<div class="battle-prize-players">${playersMarkup}</div><div class="battle-card-actions">${action}</div></div></article>`;
+    }
     async function loadOpen(){
       const [openData,runningData]=await Promise.all([api('/api/matches/open?gameType=ALL'),api('/api/matches/running?gameType=ALL')]);
       const openMatches=Array.isArray(openData)?openData:openData.matches||[];
@@ -971,8 +1006,8 @@
         const secondaryAction = !inAppRace && m.roomCode && (isCreator || isJoiner) ? `<div class="battle-inline-secondary-action"><button class="btn secondary small" type="button" data-running-result="${esc(m._id)}">Result / screenshot</button>${isLudoGame(m.gameType)?`<a class="btn secondary small ludo-app-button" data-open-ludo="true" href="${ludoKingOpenUrl()}">Open Ludo King App</a>`:''}</div>` : '';
         const roomCodePanel=!inAppRace&&m.roomCode&&(isCreator||isJoiner)?`<div class="battle-room-code-panel"><div class="battle-room-code-box"><input id="runningCode-${esc(m._id)}" value="${esc(m.roomCode)}" readonly><button class="btn secondary small" type="button" data-running-copy="${esc(m._id)}" data-room-code="${esc(m.roomCode)}" data-copy-open-game="${isLudoGame(m.gameType)?'LUDO':''}">Copy</button><span class="battle-room-code-label">Locked</span></div></div>`:'';
         const statusMarkup=isParticipant?`<div class="battle-card-top"><span class="status">${inAppRace?m.gameStartedAt?'Ludo Race is in progress':'Ludo Race ready • creator goes first':m.gameStartedAt?'Game chal raha hai':m.roomCodeSharedAt?'Room code locked • Ludo King mein kheliye':'Opponent joined • room code pending'}</span></div>`:'';
-        const prize=Number(m.amount)*2*0.95;
-        return `<article class="match battle-card">${statusMarkup}<div class="battle-prizes running-battle-prizes"><div class="battle-prize"><small>WIN</small><strong>₹${prize.toLocaleString('en-IN')}</strong></div><div class="battle-prize-players"><div class="battle-players">${battlePlayerMarkup(m.creator,'Creator',false,Number(m.amount))}<img class="battle-versus battle-versus-image" src="/vs.png" alt="versus">${battlePlayerMarkup(m.joiner,'Opponent',true,Number(m.amount))}</div></div>${actions?`<div class="battle-card-actions">${actions}</div>`:''}</div>${secondaryAction}<div class="battle-room-actions">${roomCodePanel}</div></article>`
+        const entry=Number(m.amount),prize=entry*2*0.95;
+        return `<article class="match battle-card">${statusMarkup}<div class="battle-prizes running-battle-prizes"><div class="battle-prize"><small>${entry===0?'ENTRY':'WIN'}</small><strong>${entry===0?'FREE':`₹${prize.toLocaleString('en-IN')}`}</strong></div><div class="battle-prize-players"><div class="battle-players">${battlePlayerMarkup(m.creator,'Creator',false,entry)}<img class="battle-versus battle-versus-image" src="/vs.png" alt="versus">${battlePlayerMarkup(m.joiner,'Opponent',true,entry)}</div></div>${actions?`<div class="battle-card-actions">${actions}</div>`:''}</div>${secondaryAction}<div class="battle-room-actions">${roomCodePanel}</div></article>`
       }).join(''):'';
       runningList.querySelectorAll('[data-running-result]').forEach(button=>button.addEventListener('click',async()=>{
         button.disabled=true;
@@ -985,7 +1020,7 @@
         }catch(error){showError(error)}
         finally{button.disabled=false;button.textContent='Result / screenshot'}
       }));
-      const sampleMarkup=sampleRunningBattles.map(({name,avatar,opponent,opponentAvatar,amount})=>`<article class="match battle-card sample-running-battle"><div class="battle-prizes running-battle-prizes"><div class="battle-prize"><small>WIN</small><strong>₹${(amount*2*0.95).toLocaleString('en-IN')}</strong></div><div class="battle-prize-players"><div class="battle-players">${battlePlayerMarkup({username:name,profileImage:avatar.replace(/^\//,'')},'Creator',false,amount)}<img class="battle-versus battle-versus-image" src="/vs.png" alt="versus">${battlePlayerMarkup({username:opponent,profileImage:opponentAvatar.replace(/^\//,'')},'Opponent',true,amount)}</div></div></div></article>`).join('');
+      const sampleMarkup=sampleRunningBattles.map(({name,avatar,opponent,opponentAvatar,amount})=>`<article class="match battle-card sample-running-battle"><div class="battle-prizes running-battle-prizes"><div class="battle-prize"><small>ENTRY</small><strong>FREE</strong></div><div class="battle-prize-players"><div class="battle-players">${battlePlayerMarkup({username:name,profileImage:avatar.replace(/^\//,'')},'Creator',false,amount)}<img class="battle-versus battle-versus-image" src="/vs.png" alt="versus">${battlePlayerMarkup({username:opponent,profileImage:opponentAvatar.replace(/^\//,'')},'Opponent',true,amount)}</div></div></div></article>`).join('');
       el('sampleRunningMatches').innerHTML=sampleMarkup;
       el('mySampleRunningMatches').innerHTML=sampleMarkup;
       runningList.querySelectorAll('a[href^="intent://"]').forEach(link=>{link.href=ludoKingOpenUrl()});
@@ -1002,12 +1037,12 @@
     async function loadMine(){const container=el('myMatches');if(!container)return;const data=await api('/api/matches/mine'),matches=data.matches||[];container.innerHTML=matches.length?matches.map(m=>matchCard(m,true)).join(''):'<p class="muted">Abhi koi active battle nahi hai.</p>'}
     function refreshSamplePlayers(){
       if(!el('sampleRunningMatches')||!el('mySampleRunningMatches')||window.__REAL_OPEN_BATTLES_AVAILABLE)return;
-      const sampleMarkup=sampleRunningBattles.map(({name,avatar,opponent,opponentAvatar,amount})=>`<article class="match battle-card sample-running-battle"><div class="battle-prizes running-battle-prizes"><div class="battle-prize"><small>WIN</small><strong>₹${(amount*2*0.95).toLocaleString('en-IN')}</strong></div><div class="battle-prize-players"><div class="battle-players">${battlePlayerMarkup({username:name,profileImage:avatar.replace(/^\//,'')},'Creator',false,amount)}<img class="battle-versus battle-versus-image" src="/vs.png" alt="versus">${battlePlayerMarkup({username:opponent,profileImage:opponentAvatar.replace(/^\//,'')},'Opponent',true,amount)}</div></div></div></article>`).join('');
+      const sampleMarkup=sampleRunningBattles.map(({name,avatar,opponent,opponentAvatar,amount})=>`<article class="match battle-card sample-running-battle"><div class="battle-prizes running-battle-prizes"><div class="battle-prize"><small>ENTRY</small><strong>FREE</strong></div><div class="battle-prize-players"><div class="battle-players">${battlePlayerMarkup({username:name,profileImage:avatar.replace(/^\//,'')},'Creator',false,amount)}<img class="battle-versus battle-versus-image" src="/vs.png" alt="versus">${battlePlayerMarkup({username:opponent,profileImage:opponentAvatar.replace(/^\//,'')},'Opponent',true,amount)}</div></div></div></article>`).join('');
       el('sampleRunningMatches').innerHTML=sampleMarkup;
       el('mySampleRunningMatches').innerHTML=sampleMarkup;
     }
     function historyRowMarkup(item){const at=new Date(item.at),time=Number.isNaN(at.getTime())?'Time unavailable':at.toLocaleString('en-IN',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});const statusLabels={PENDING:'Pending',APPROVED:'Approved',REJECTED:'Rejected',PAID:'Paid',OPEN:'Waiting for player',RUNNING:'In progress',PENDING_RESULT:'Result under review',PENDING_CANCELLATION:'Cancellation review',COMPLETED:'Completed',CANCELLED:'Cancelled'};let title='',status=statusLabels[item.status]||item.status,value=`₹${Number(item.amount||0).toLocaleString('en-IN')}`,kind='';if(item.type==='DEPOSIT'){title='Deposit';kind='↓';if(item.status==='APPROVED'){value=`+${value}`;status='Credited'}}else if(item.type==='WITHDRAWAL'){title='Withdrawal';kind='↑';if(['PENDING','PAID'].includes(item.status)){value=`-${value}`;kind='↑'}if(item.status==='PAID')status='Paid'}else{const gameName=item.gameType==='SNAKE'?'Snake Battle':item.gameType==='POPULAR_LUDO'?'Popular Ludo':'Ludo';title=item.result?`${gameName} • ${item.result==='WIN'?'Win':'Loss'}`:`${gameName} • ${status}`;kind=item.gameType==='SNAKE'?'S':item.gameType==='POPULAR_LUDO'?'P':'L';if(item.status==='PENDING_RESULT'&&item.result)status='Result under review';if(item.status==='COMPLETED'&&item.result==='WIN'){value=`+₹${(Number(item.amount||0)*1.8).toLocaleString('en-IN')}`;status='Won';kind='+'}else if(item.status==='COMPLETED'&&item.result==='LOSS'){value=`-₹${Number(item.amount||0).toLocaleString('en-IN')}`;status='Lost';kind='−'}else value=`Entry ₹${Number(item.amount||0).toLocaleString('en-IN')}`}const valueClass=item.type==='DEPOSIT'&&item.status==='APPROVED'||item.type==='GAME'&&item.status==='COMPLETED'&&item.result==='WIN'?'credit':item.type==='WITHDRAWAL'&&item.status!=='REJECTED'||item.type==='GAME'&&item.status==='COMPLETED'&&item.result==='LOSS'?'debit':'';return `<div class="history-row"><div class="history-entry-main"><span class="history-mark" aria-hidden="true">${esc(kind)}</span><span class="history-copy"><strong class="history-title">${esc(title)}</strong><small class="history-meta">${esc(status)} • ${esc(time)}</small></span></div><div class="history-entry-side"><strong class="history-value ${valueClass}">${esc(value)}</strong></div></div>`}
-    async function loadHistory(){const data=await api('/api/wallet/history'),items=data.history||[];el('matchHistory').innerHTML=items.length?items.map(historyRowMarkup).join(''):'<p class="muted">Abhi koi history nahi hai.</p>'}
+    async function loadHistory(){const data=await api('/api/wallet/history'),items=data.history||[];el('matchHistory').innerHTML=items.length?items.map(historyRowMarkup).join('').replaceAll('₹0','FREE'):'<p class="muted">Abhi koi history nahi hai.</p>'}
     async function refresh(){await Promise.all([loadProfile(),loadKyc(),loadMine(),loadWalletSummary()]);if(el('view-home').classList.contains('active'))await loadOpen()}
     const chatNavButton=el('chatNavButton');chatNavButton.dataset.bound='true';chatNavButton.addEventListener('click',()=>{window.location.href='/chat.html'});
     document.addEventListener('click',async event=>{
@@ -1087,18 +1122,12 @@
     function logout(){localStorage.removeItem('token');localStorage.removeItem('user');if(adminPlayerView){localStorage.removeItem('adminToken');localStorage.removeItem('adminUser');sessionStorage.removeItem('adminPlayerView')}location.replace('/login.html')}el('logout').addEventListener('click',logout);el('logoutProfile').addEventListener('click',logout);el('refreshMatches')?.addEventListener('click',()=>location.reload());el('refreshOpen').addEventListener('click',()=>location.reload());
     el('createForm').addEventListener('submit',async event=>{
       event.preventDefault();
-      const amount=Number(entryAmountInput.value);
-      if(!Number.isInteger(amount)||amount<50||amount>50000||(amount-50)%50!==0){notify('₹50 se ₹50,000 ke beech ₹50 ke multiples mein amount dalein.',true);setEntryAmountButton.disabled=false;return}
       try{
-        const data=await api('/api/matches/create',{method:'POST',body:JSON.stringify({amount,gameType:el('gameType').value})});
-        notify(data.message||'Challenge create ho gaya.');
+        const data=await api('/api/matches/create',{method:'POST',body:JSON.stringify({gameType:el('gameType').value})});
+        notify(data.message||'Free match create ho gaya.');
         setView('home');
         await loadOpen();
-      }catch(error){showError(error)}finally{
-        confirmedEntryAmount=null;
-        setEntryAmountButton.setAttribute('aria-pressed','false');
-        setEntryAmountButton.disabled=false;
-      }
+      }catch(error){showError(error)}
     });
     el('qrForm').addEventListener('submit',async event=>{event.preventDefault();const amount=Number(el('depositAmount').value);if(!Number.isInteger(amount)||amount<100)return notify('Deposit minimum ₹100 hai.',true);try{const data=await api(`/api/wallet/generate-qr?amount=${encodeURIComponent(amount)}`);el('qrArea').dataset.upiUrl=data.upiUrl||'';el('qrArea').innerHTML=`<img class="qr" src="${data.qrImage}" alt="UPI payment QR"><p class="muted">UPI app se pay karein ya QR download karke scan karein. Balance approval ke baad credit hoga.</p>`;el('depositForm').hidden=false;el('depositForm').dataset.amount=amount;notify('Payment options ready hain.')}catch(error){showError(error)}});
     el('depositForm').addEventListener('submit',async event=>{event.preventDefault();const form=event.currentTarget,body=new FormData(form);body.set('amount',form.dataset.amount);try{const data=await api('/api/wallet/submit-deposit',{method:'POST',body});form.reset();form.hidden=true;el('qrArea').replaceChildren();notify(data.message)}catch(error){showError(error)}});
@@ -1106,6 +1135,8 @@
     el('kycForm').addEventListener('submit',async event=>{event.preventDefault();const form=event.currentTarget,number=form.elements.aadhaarNumber.value.replace(/\s/g,'');if(!/^\d{12}$/.test(number))return notify('12 digit Aadhaar number dalein.',true);const body=new FormData(form);body.set('aadhaarNumber',number);try{const data=await api('/api/kyc/submit',{method:'POST',body});form.reset();notify(data.message);await loadKyc()}catch(error){showError(error)}});
     el('profileForm').addEventListener('submit',async event=>{event.preventDefault();try{const data=await api('/api/profile/update',{method:'POST',body:new FormData(event.currentTarget)});player=data.user;renderPlayer();notify(data.message)}catch(error){showError(error)}});
     async function openMatch(id){const m=await api(`/api/matches/${encodeURIComponent(id)}`);if(m.gameType==='LUDO_RACE'&&m.ludoRace&&['RUNNING','PENDING_RESULT','COMPLETED','PENDING_CANCELLATION','CANCELLED'].includes(m.status)&&window.renderLudoRaceMatch){await window.renderLudoRaceMatch(m,id);return}const mine=String(player?._id||storedUser?.id||'');const creatorId=String(m.creator?._id||m.creator),joinerId=String(m.joiner?._id||m.joiner),isCreator=creatorId===mine,me=isCreator?m.creator:m.joiner,opponent=isCreator?m.joiner:m.creator;const reasons=[['OPPONENT_NOT_JOINED','Opponent joined nahi hua'],['ROOM_CODE_NOT_SHARED','Room code share nahi hua'],['OPPONENT_NOT_RESPONDING','Opponent reply nahi kar raha'],['WRONG_ROOM_CODE','Galat room code'],['TECHNICAL_ISSUE','Technical issue'],['OTHER','Other']];const running=m.status==='RUNNING';el('matchDetails').innerHTML=`<h2>${m.gameType==='LUDO_RACE'?'🏁 Ludo Race':m.gameType==='SNAKE'?'🐍 Snake':'🎲 Ludo King'} battle • ${esc(m.status)}</h2><div class="grid"><div class="stat"><small>Entry</small><strong>₹${Number(m.amount).toLocaleString('en-IN')}</strong></div><div class="stat"><small>Creator</small><strong>${esc(nameOf(m.creator))}</strong></div><div class="stat"><small>Opponent</small><strong>${esc(nameOf(m.joiner))}</strong></div></div>${m.status==='OPEN'?'<p class="notice warning">Opponent join karte hi match automatically start hoga.</p>':''}${running?`<div class="panel"><h3>Room code</h3>${m.roomCode?`<p class="notice">Code: <strong id="roomCodeText">${esc(m.roomCode)}</strong> <button id="copyRoom" class="btn secondary small">Copy</button></p>`:'<p class="muted">Battle creator room code share karega.</p>'}${isCreator&&!m.roomCode?'<form id="roomForm"><div class="field"><label for="roomCode">4-8 digit room code</label><input id="roomCode" inputmode="numeric" pattern="[0-9]{4,8}" minlength="4" maxlength="8" required></div><button class="btn" type="submit">Room code share karein</button></form>':''}</div>${m.roomCode?`<div class="panel"><h3>Game result</h3><p class="muted">Winner aur screenshot admin verification ke liye bhejein.</p><form id="resultForm"><div class="field"><label for="winner">Winner</label><select id="winner" name="winnerId"><option value="${esc(String(me?._id||me))}">Me: ${esc(nameOf(me))}</option><option value="${esc(String(opponent?._id||opponent))}">Opponent: ${esc(nameOf(opponent))}</option></select></div><div class="field"><label for="resultShot">Result screenshot</label><input id="resultShot" name="screenshot" type="file" accept="image/jpeg,image/png,image/webp" required></div><button class="btn green" type="submit">Result review ke liye bhejein</button></form></div>`:''}`:''}${m.status==='PENDING_RESULT'?'<p class="notice warning">Result admin review mein hai.</p>':''}${['OPEN','RUNNING'].includes(m.status)?`<div class="panel"><h3>Cancel battle</h3><form id="cancelForm"><div class="field"><label for="reason">Cancel reason</label><select id="reason">${reasons.map(([v,l])=>`<option value="${v}">${l}</option>`).join('')}</select></div><button class="btn danger" type="submit">Cancel and refund</button></form></div>`:''}`;setView('match');
+      const entryAmountDisplay=el('matchDetails').querySelector('.stat strong');
+      if(entryAmountDisplay&&Number(m.amount)===0)entryAmountDisplay.textContent='FREE';
       const roomCopy=el('copyRoom');if(isCreator&&roomCopy)roomCopy.remove();if(roomCopy&&isLudoGame(m.gameType))roomCopy.textContent='Copy & Open Ludo King';
       const room=el('roomForm');if(room)room.addEventListener('submit',async event=>{event.preventDefault();try{const data=await api('/api/matches/set-room-code',{method:'POST',body:JSON.stringify({matchId:id,roomCode:el('roomCode').value})});notify(data.message);await openMatch(id)}catch(error){showError(error)}});
       if(roomCopy)roomCopy.addEventListener('click',async()=>{if(isLudoGame(m.gameType)){navigator.clipboard.writeText(m.roomCode).then(()=>notify('Room code copy ho gaya.')).catch(()=>notify(`Room code: ${m.roomCode}`));window.openLudoKingApp();return}try{await navigator.clipboard.writeText(m.roomCode);notify('Room code copy ho gaya.')}catch{notify(`Room code: ${m.roomCode}`)}});
