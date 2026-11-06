@@ -448,6 +448,14 @@
     .bottom button .nav-label,.bottom #chatNavButton .nav-label{font-size:13px}
     @media(max-width:600px){.bottom{grid-template-columns:repeat(5,minmax(0,1fr))}.bottom button .nav-label,.bottom #chatNavButton .nav-label{font-size:11px}}
   </style>
+  <style id="bottomPrimaryNavigation">
+    .bottom{align-items:center;gap:4px;padding:6px 8px}
+    .bottom button[data-view="home"],.bottom button[data-view="wallet"],.bottom button[data-view="profile"],.bottom #chatNavButton{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-width:0;min-height:58px;padding:6px 3px;border:1px solid #ffffff38;border-radius:10px;background:#10231b55;font-weight:800}
+    .bottom button[data-view="home"]>span:first-child,.bottom button[data-view="wallet"]>span:first-child,.bottom button[data-view="profile"]>span:first-child,.bottom #chatNavButton>span:first-child{font-size:22px;line-height:1}
+    .bottom button[data-view="home"] .nav-label,.bottom button[data-view="wallet"] .nav-label,.bottom button[data-view="profile"] .nav-label,.bottom #chatNavButton .nav-label{font-size:12px;line-height:1.1;font-weight:800}
+    .bottom button[data-view="home"].active,.bottom button[data-view="wallet"].active,.bottom button[data-view="profile"].active,.bottom #chatNavButton.active{background:#ffffff24;box-shadow:inset 0 -3px #ffbd59}
+    @media(max-width:600px){.bottom{gap:3px;padding:6px 6px max(6px,env(safe-area-inset-bottom))}.bottom button[data-view="home"],.bottom button[data-view="wallet"],.bottom button[data-view="profile"],.bottom #chatNavButton{min-height:56px;padding:5px 2px}.bottom button[data-view="home"]>span:first-child,.bottom button[data-view="wallet"]>span:first-child,.bottom button[data-view="profile"]>span:first-child,.bottom #chatNavButton>span:first-child{font-size:20px}.bottom button[data-view="home"] .nav-label,.bottom button[data-view="wallet"] .nav-label,.bottom button[data-view="profile"] .nav-label,.bottom #chatNavButton .nav-label{font-size:11px}}
+  </style>
   <style id="ludoAppButtonPalette">
     .ludo-app-button,#view-home>.home-open-battles-panel .battle-card .btn.ludo-app-button,#view-home>.home-running-battles-panel .battle-card .btn.ludo-app-button{border-color:#991f1f;background:#c62828;color:#fff}
     .ludo-app-button:hover,#view-home>.home-open-battles-panel .battle-card .btn.ludo-app-button:hover,#view-home>.home-running-battles-panel .battle-card .btn.ludo-app-button:hover{border-color:#7f1d1d;background:#a91f1f;color:#fff}
