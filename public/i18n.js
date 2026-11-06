@@ -14,6 +14,7 @@
     'Wallet': ['वॉलेट', 'Wallet'],
     'History': ['इतिहास', 'History'],
     'Profile': ['प्रोफ़ाइल', 'Profile'],
+    'Support': ['सहायता', 'Support'],
     'Refresh': ['रीफ़्रेश करें', 'Refresh'],
     'Open battles': ['ओपन बैटल', 'Open battles'],
     'OPEN Battles': ['ओपन बैटल', 'Open battles'],
