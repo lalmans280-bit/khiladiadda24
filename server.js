@@ -25,7 +25,6 @@ const MIN_BATTLE_ENTRY_AMOUNT = 50;
 const MAX_BATTLE_ENTRY_AMOUNT = 50000;
 const MINIMUM_DEPOSIT_AMOUNT = 50;
 const SiteSettings = require('./models/site-settings');
-const MonthlyLeaderboard = require('./models/monthly-leaderboard');
 const SupportMessage = require('./models/support-message');
 
 const app = express();
@@ -1739,219 +1738,6 @@ app.get('/api/matches/running', requireUser, async (req, res) => {
   }
 });
 
-function monthlyLeaderboardId(monthStart) {
-  return `${monthStart.getFullYear()}-${String(monthStart.getMonth() + 1).padStart(2, '0')}`;
-}
-
-function defaultMonthlyPrizes() {
-  const prizes = Array(100).fill(0);
-  [1200, 800, 500, 400, 300, 250, 200, 150, 150, 150].forEach((amount, index) => {
-    prizes[index] = amount;
-  });
-  prizes.fill(10, 10);
-  return prizes;
-}
-
-async function migrateDefaultMonthlyPrizes(monthStart) {
-  const previousDefaults = Array(100).fill(100);
-  [12000, 8000, 5000, 4000, 3000, 2500, 2000, 1500, 1500, 1500].forEach((amount, index) => {
-    previousDefaults[index] = amount;
-  });
-  await MonthlyLeaderboard.updateOne(
-    { _id: monthlyLeaderboardId(monthStart), prizePool: 50000, prizes: previousDefaults },
-    { $set: { prizePool: 5000, prizes: defaultMonthlyPrizes() } }
-  );
-}
-
-async function getMonthlyLeaderboard(monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1), includeAllUsers = false) {
-  const nextMonth = new Date(monthStart.getFullYear(), monthStart.getMonth() + 1, 1);
-  const [matches, settings, allUsers] = await Promise.all([
-    Match.find({
-      status: 'COMPLETED',
-      $or: [
-        { completedAt: { $gte: monthStart, $lt: nextMonth } },
-        { completedAt: { $exists: false }, updatedAt: { $gte: monthStart, $lt: nextMonth } }
-      ]
-    })
-      .select('creator joiner winner completedAt updatedAt createdAt')
-      .populate('creator', 'username profileImage')
-      .populate('joiner', 'username profileImage')
-      .populate('winner', 'username')
-      .lean(),
-    MonthlyLeaderboard.findById(monthlyLeaderboardId(monthStart)).lean(),
-    includeAllUsers ? User.find({}, 'username profileImage').lean() : Promise.resolve([])
-  ]);
-  const pointsPerGame = Number.isFinite(settings?.pointsPerGame) ? settings.pointsPerGame : 5;
-  const winBonus = Number.isFinite(settings?.winBonus) ? settings.winBonus : 15;
-  const prizes = Array.isArray(settings?.prizes) && settings.prizes.length
-    ? [...settings.prizes, ...Array(Math.max(0, 100 - settings.prizes.length)).fill(0)].slice(0, 100)
-    : defaultMonthlyPrizes();
-  const overrides = new Map((settings?.playerOverrides || []).map(item => [String(item.userId), item]));
-  const users = includeAllUsers
-    ? allUsers
-    : overrides.size
-      ? await User.find({ _id: { $in: [...overrides.keys()] } }, 'username profileImage').lean()
-      : [];
-
-  const players = new Map();
-  matches.forEach(match => {
-    [match.creator, match.joiner].filter(Boolean).forEach(player => {
-      const id = String(player._id);
-      const current = players.get(id) || {
-        userId: id,
-        username: player.username || 'Player',
-        profileImage: player.profileImage || '',
-        gamesPlayed: 0,
-        wins: 0,
-        points: 0
-      };
-      current.gamesPlayed += 1;
-      if (match.winner && String(match.winner._id) === id) {
-        current.wins += 1;
-        current.points += pointsPerGame + winBonus;
-      } else {
-        current.points += pointsPerGame;
-      }
-      players.set(id, current);
-    });
-  });
-
-  if (includeAllUsers) {
-    users.forEach(user => {
-      const id = String(user._id);
-      if (!players.has(id)) {
-        players.set(id, {
-          userId: id,
-          username: user.username || 'Player',
-          profileImage: user.profileImage || '',
-          gamesPlayed: 0,
-          wins: 0,
-          points: 0
-        });
-      }
-    });
-  }
-
-  const ranked = [...players.values()].map(player => {
-    const override = overrides.get(player.userId);
-    return {
-      ...player,
-      points: Number.isFinite(override?.points) ? override.points : player.points,
-      pointsOverride: Number.isFinite(override?.points) ? override.points : null,
-      prizeOverride: Number.isFinite(override?.prize) ? override.prize : null
-    };
-  }).sort((a, b) => b.points - a.points || b.wins - a.wins || b.gamesPlayed - a.gamesPlayed || a.username.localeCompare(b.username));
-
-  return ranked.map((player, index) => ({
-    ...player,
-    rank: index + 1,
-    prize: player.prizeOverride === null ? (prizes[index] || 0) : player.prizeOverride
-  }));
-}
-
-app.get('/api/leaderboard/monthly', async (req, res) => {
-  const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
-
-  try {
-    await migrateDefaultMonthlyPrizes(monthStart);
-    const rankings = await getMonthlyLeaderboard(monthStart);
-    const settings = await MonthlyLeaderboard.findById(monthlyLeaderboardId(monthStart)).lean();
-    res.json({
-      month: monthStart.toLocaleString('en-IN', { month: 'long', year: 'numeric' }),
-      prizePool: settings?.prizePool ?? 5000,
-      pointsPerGame: settings?.pointsPerGame ?? 5,
-      winBonus: settings?.winBonus ?? 15,
-      rankings: rankings.slice(0, 100)
-    });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-app.get('/api/admin/leaderboard/monthly', requireAdmin, async (req, res) => {
-  try {
-    const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
-    await migrateDefaultMonthlyPrizes(monthStart);
-    const [settings, rankings] = await Promise.all([
-      MonthlyLeaderboard.findById(monthlyLeaderboardId(monthStart)).lean(),
-      getMonthlyLeaderboard(monthStart, true)
-    ]);
-    res.json({
-      month: monthStart.toLocaleString('en-IN', { month: 'long', year: 'numeric' }),
-      pointsPerGame: settings?.pointsPerGame ?? 5,
-      winBonus: settings?.winBonus ?? 15,
-      prizePool: settings?.prizePool ?? 5000,
-      prizes: settings?.prizes?.length ? settings.prizes : defaultMonthlyPrizes(),
-      rankings
-    });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-app.put('/api/admin/leaderboard/monthly/settings', requireAdmin, async (req, res) => {
-  const pointsPerGame = Number(req.body.pointsPerGame);
-  const winBonus = Number(req.body.winBonus);
-  const prizePool = Number(req.body.prizePool);
-  const prizes = Array.isArray(req.body.prizes) ? req.body.prizes.map(Number) : [];
-  if (![pointsPerGame, winBonus, prizePool].every(value => Number.isInteger(value) && value >= 0)
-    || prizes.length !== 100
-    || prizes.some(value => !Number.isInteger(value) || value < 0)) {
-    return res.status(400).json({ error: 'Points, prize pool aur 100 valid rank prizes enter karein.' });
-  }
-  if (prizes.reduce((total, amount) => total + amount, 0) !== prizePool) {
-    return res.status(400).json({ error: 'Rank 1–100 prizes ka total prize pool ke barabar hona chahiye.' });
-  }
-
-  try {
-    const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
-    const settings = await MonthlyLeaderboard.findByIdAndUpdate(
-      monthlyLeaderboardId(monthStart),
-      { $set: { pointsPerGame, winBonus, prizePool, prizes } },
-      { new: true, upsert: true, runValidators: true, setDefaultsOnInsert: true }
-    );
-    res.json({ message: 'Monthly leaderboard settings save ho gayi.', settings });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-app.put('/api/admin/leaderboard/monthly/player/:userId', requireAdmin, async (req, res) => {
-  const userId = String(req.params.userId || '');
-  const points = req.body.points === '' || req.body.points === null ? null : Number(req.body.points);
-  const prize = req.body.prize === '' || req.body.prize === null ? null : Number(req.body.prize);
-  if (!mongoose.Types.ObjectId.isValid(userId)
-    || (points !== null && (!Number.isInteger(points) || points < 0))
-    || (prize !== null && (!Number.isInteger(prize) || prize < 0))) {
-    return res.status(400).json({ error: 'Valid player, points aur prize amount enter karein.' });
-  }
-
-  try {
-    if (!(await User.exists({ _id: userId }))) return res.status(404).json({ error: 'Player nahi mila.' });
-    const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
-    const leaderboardId = monthlyLeaderboardId(monthStart);
-    await MonthlyLeaderboard.updateOne(
-      { _id: leaderboardId },
-      { $setOnInsert: { pointsPerGame: 5, winBonus: 15, prizePool: 5000, prizes: defaultMonthlyPrizes() } },
-      { upsert: true }
-    );
-    await MonthlyLeaderboard.updateOne(
-      { _id: leaderboardId, 'playerOverrides.userId': userId },
-      { $set: { 'playerOverrides.$.points': points, 'playerOverrides.$.prize': prize } }
-    ).then(async result => {
-      if (!result.matchedCount) {
-        await MonthlyLeaderboard.updateOne(
-          { _id: leaderboardId },
-          { $push: { playerOverrides: { userId, points, prize } } }
-        );
-      }
-    });
-    res.json({ message: 'Player ke monthly points aur prize override save ho gaye.' });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
 function supportMessagePayload(message, viewerRole = 'player') {
   return {
     id: String(message._id),
@@ -3407,10 +3193,9 @@ app.post('/api/admin/review-cancel-request', requireAdmin, async (req, res) => {
 
 app.get('/api/admin/users', requireAdmin, async (req, res) => {
   try {
-    const [users, monthlyLeaderboard] = await Promise.all([
-      User.find({}, 'username phone profileImage walletBalance createdAt isBlocked isAdmin isPrimaryAdmin').sort({ createdAt: -1 }).lean(),
-      getMonthlyLeaderboard(new Date(new Date().getFullYear(), new Date().getMonth(), 1), true)
-    ]);
+    const users = await User.find({}, 'username phone profileImage walletBalance createdAt isBlocked isAdmin isPrimaryAdmin')
+      .sort({ createdAt: -1 })
+      .lean();
     const kycs = await Kyc.find({ userId: { $in: users.map(user => user._id) } })
       .select('userId status submittedAt createdAt')
       .sort({ createdAt: -1 })
@@ -3420,20 +3205,14 @@ app.get('/api/admin/users', requireAdmin, async (req, res) => {
       const userId = String(kyc.userId);
       if (!latestKycByUser.has(userId)) latestKycByUser.set(userId, kyc);
     });
-    const monthlyStats = new Map(monthlyLeaderboard.map(player => [player.userId, player]));
-    const usersWithMonthlyPoints = users.map(user => {
-      const monthly = monthlyStats.get(String(user._id));
+    const usersWithKycStatus = users.map(user => {
       const kyc = latestKycByUser.get(String(user._id));
       return {
         ...user,
-        kycStatus: kyc?.status || 'NOT_SUBMITTED',
-        monthlyPoints: monthly?.points || 0,
-        monthlyGamesPlayed: monthly?.gamesPlayed || 0,
-        monthlyRank: monthly?.rank || null,
-        monthlyPrize: monthly?.prize || 0
+        kycStatus: kyc?.status || 'NOT_SUBMITTED'
       };
     });
-    res.json({ users: usersWithMonthlyPoints });
+    res.json({ users: usersWithKycStatus });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
