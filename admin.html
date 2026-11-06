@@ -64,6 +64,16 @@
     .history-summary small, .history-summary strong { display: block; }
     .history-summary small { color: #94a3b8; }
     .history-summary strong { margin-top: 5px; overflow-wrap: anywhere; }
+    .kyc-history-card { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin: 0 0 22px; padding: 14px; border: 1px solid rgba(251,191,36,0.35); border-radius: 10px; background: rgba(15,23,42,0.7); }
+    .kyc-history-card > div { min-width: 0; }
+    .kyc-history-card small, .kyc-history-card strong { display: block; }
+    .kyc-history-card small { color: #94a3b8; }
+    .kyc-history-card strong { margin-top: 5px; overflow-wrap: anywhere; }
+    .kyc-status-badge { width: fit-content; padding: 5px 9px; border-radius: 999px; }
+    .kyc-status-badge.not-submitted, .kyc-status-badge.rejected { color: #fecaca; background: #7f1d1d; }
+    .kyc-status-badge.pending { color: #fde68a; background: #78350f; }
+    .kyc-status-badge.approved { color: #bbf7d0; background: #14532d; }
+    .kyc-status-badge.unknown { color: #e2e8f0; background: #334155; }
     .history-dialog h4 { margin: 20px 0 8px; color: #fbbf24; }
     .history-dialog table { margin-top: 0; }
     .kyc-edit-dialog { width: min(480px, calc(100vw - 28px)); }
@@ -90,12 +100,7 @@
     .support-admin-attach { min-height: 40px; padding: 8px 10px; border: 1px solid #475569; border-radius: 8px; color: #e2e8f0; background: #334155; font-size: 13px; }
     .support-admin-file { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
     .support-admin-file-name { flex: 1; min-width: 0; overflow: hidden; color: #94a3b8; font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
-    .leaderboard-settings { display: grid; grid-template-columns: repeat(3, minmax(120px, 1fr)); gap: 10px; }
-    .leaderboard-settings label { color: #cbd5e1; font-size: 12px; }
-    .leaderboard-prizes { width: 100%; min-height: 90px; padding: 10px; border: 1px solid #475569; border-radius: 7px; color: #fff; background: #0f172a; font: inherit; }
-    .leaderboard-player-image { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; vertical-align: middle; background: #263449; }
-    .leaderboard-player-input { width: 90px; }
-    @media (max-width: 700px) { .support-admin-layout { grid-template-columns: 1fr; } .leaderboard-settings { grid-template-columns: 1fr; } .support-admin-form { grid-template-columns: 1fr; } }
+    @media (max-width: 700px) { .support-admin-layout { grid-template-columns: 1fr; } .support-admin-form { grid-template-columns: 1fr; } }
     @media (max-width: 600px) { .history-dialog { padding: 14px; } .history-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
     .admin-bottom-nav { position: fixed; z-index: 10; right: 0; bottom: 0; left: 0; display: flex; justify-content: center; gap: 12px; padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); border-top: 1px solid rgba(255,255,255,0.12); background: rgba(15,23,42,0.96); backdrop-filter: blur(12px); }
     .admin-bottom-nav button { min-width: 132px; }
@@ -287,27 +292,9 @@
         <span id="playerListSummary" class="muted" aria-live="polite"></span>
       </div>
       <table id="userTable">
-        <tr><th>S.N.</th><th>Player</th><th>Phone</th><th>Wallet</th><th>Monthly rank</th><th>Monthly points</th><th>Joined</th><th>KYC</th><th>Status</th><th>Admin</th><th>Action</th></tr>
+        <tr><th>S.N.</th><th>Player</th><th>Phone</th><th>Wallet</th><th>Joined</th><th>KYC</th><th>Status</th><th>Admin</th><th>Action</th></tr>
       </table>
     </div>
-
-    <section class="card" aria-labelledby="adminLeaderboardTitle">
-      <h3 id="adminLeaderboardTitle">Monthly Standings & Prize Controls</h3>
-      <p class="muted"><span id="adminLeaderboardMonth">Loading...</span> — har completed game ke points aur rank prizes yahan configure karein. Empty player override se automatic points/prize use honge.</p>
-      <div class="leaderboard-settings">
-        <label>Points per completed game<input id="pointsPerGameInput" type="number" min="0" step="1"></label>
-        <label>Winner bonus points<input id="winBonusInput" type="number" min="0" step="1"></label>
-        <label>Total prize pool (₹)<input id="prizePoolInput" type="number" min="0" step="1"></label>
-      </div>
-      <label for="rankPrizesInput">Rank 1–100 prize amounts (₹), comma/newline separated; use 0 for no prize</label>
-      <textarea id="rankPrizesInput" class="leaderboard-prizes"></textarea>
-      <div class="toolbar" style="margin-top: 10px;"><button id="saveLeaderboardSettings" type="button">Save points & rank prizes</button><span id="leaderboardSettingsStatus" class="muted" aria-live="polite"></span></div>
-      <div style="overflow-x:auto">
-        <table id="adminLeaderboardTable">
-          <tr><th>Rank</th><th>Player</th><th>Points override</th><th>Prize override (₹)</th><th>Games</th><th>Wins</th><th>Action</th></tr>
-        </table>
-      </div>
-    </section>
 
     <section class="card" aria-labelledby="adminSupportChatTitle">
       <h3 id="adminSupportChatTitle">Direct Player Support Chat</h3>
@@ -370,6 +357,25 @@
       <table id="withdrawTable">
         <tr><th>Player</th><th>Amount</th><th>Method</th><th>Payout details</th><th>QR</th><th>Action</th></tr>
       </table>
+    </div>
+
+    <div class="card">
+      <h3>Homepage LIVE Withdrawal Line</h3>
+      <p class="muted">Controls which actual admin-paid withdrawals appear in the homepage ticker. Amounts cannot be manually invented or edited.</p>
+      <label><input id="withdrawTickerEnabled" type="checkbox"> Show the live withdrawal line</label>
+      <div class="two">
+        <label for="withdrawTickerDays">Recent period
+          <select id="withdrawTickerDays"><option value="7">7 days</option><option value="14">14 days</option><option value="30">30 days</option></select>
+        </label>
+        <label for="withdrawTickerMinimumAmount">Minimum daily total (₹)
+          <input id="withdrawTickerMinimumAmount" type="number" min="0" max="10000000" step="1">
+        </label>
+        <label for="withdrawTickerMaxItems">Maximum daily totals
+          <select id="withdrawTickerMaxItems"><option value="5">5</option><option value="10">10</option><option value="20">20</option><option value="30">30</option></select>
+        </label>
+      </div>
+      <button id="saveWithdrawTickerSettings" type="button">Save LIVE line settings</button>
+      <p id="withdrawTickerSettingsStatus" class="muted" role="status"></p>
     </div>
 
     <div class="card">
@@ -444,6 +450,10 @@
 
     function escapeHtml(value) {
       return String(value ?? '').replace(/[&<>"']/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[character]));
+    }
+
+    function escapeAttribute(value) {
+      return escapeHtml(value).replace(/`/g, '&#96;');
     }
 
     function adminGameTypeLabel(gameType) {
@@ -715,6 +725,44 @@
       }
     }
 
+    async function loadWithdrawTickerSettings() {
+      const status = document.getElementById('withdrawTickerSettingsStatus');
+      try {
+        const res = await adminFetch('/api/admin/withdrawal-ticker-settings');
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Ticker settings load nahi hue.');
+        document.getElementById('withdrawTickerEnabled').checked = data.enabled !== false;
+        document.getElementById('withdrawTickerDays').value = String(data.days);
+        document.getElementById('withdrawTickerMinimumAmount').value = String(data.minimumAmount);
+        document.getElementById('withdrawTickerMaxItems').value = String(data.maxItems);
+        status.textContent = 'Current line uses verified paid withdrawals only.';
+      } catch (error) {
+        status.textContent = error.message || 'Ticker settings load nahi hue.';
+      }
+    }
+
+    async function saveWithdrawTickerSettings() {
+      const status = document.getElementById('withdrawTickerSettingsStatus');
+      const payload = {
+        enabled: document.getElementById('withdrawTickerEnabled').checked,
+        days: Number(document.getElementById('withdrawTickerDays').value),
+        minimumAmount: Number(document.getElementById('withdrawTickerMinimumAmount').value),
+        maxItems: Number(document.getElementById('withdrawTickerMaxItems').value)
+      };
+      try {
+        const res = await adminFetch('/api/admin/withdrawal-ticker-settings', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Ticker settings save nahi hue.');
+        status.textContent = data.message || 'Homepage live withdrawal line update ho gayi.';
+      } catch (error) {
+        status.textContent = error.message || 'Ticker settings save nahi hue.';
+      }
+    }
+
     async function saveAnnouncementText() {
       const input = document.getElementById('announcementTextInput');
       const status = document.getElementById('announcementStatus');
@@ -967,9 +1015,7 @@
       const modePlayers = playerListMode === 'NEW'
         ? allPlayers.filter(player => new Date(player.createdAt).getTime() >= newPlayerSince)
         : allPlayers;
-      modePlayers.sort((a, b) => Number(b.monthlyPoints || 0) - Number(a.monthlyPoints || 0)
-        || Number(b.monthlyGamesPlayed || 0) - Number(a.monthlyGamesPlayed || 0)
-        || new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      modePlayers.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
       const searchInput = document.getElementById('playerSearch').value.trim();
       const searchTerm = searchInput.toLocaleLowerCase();
       const searchDigits = searchInput.replace(/\D/g, '');
@@ -980,15 +1026,15 @@
           || (searchDigits && String(player.phone || '').replace(/\D/g, '').includes(searchDigits)))
         : modePlayers;
       document.getElementById('userListTitle').textContent = playerListMode === 'NEW' ? 'New Players · Last 7 Days' : 'All Players & Wallets';
-      document.getElementById('playerListSummary').textContent = `${players.length} player${players.length === 1 ? '' : 's'} · Monthly points: 20 per win, 5 per completed game`;
-      table.innerHTML = '<tr><th>S.N.</th><th>Player</th><th>Phone</th><th>Wallet</th><th>Monthly rank</th><th>Monthly points</th><th>Joined</th><th>KYC</th><th>Status</th><th>Admin</th><th>Action</th></tr>';
+      document.getElementById('playerListSummary').textContent = `${players.length} player${players.length === 1 ? '' : 's'}`;
+      table.innerHTML = '<tr><th>S.N.</th><th>Player</th><th>Phone</th><th>Wallet</th><th>Joined</th><th>KYC</th><th>Status</th><th>Admin</th><th>Action</th></tr>';
       if (!players.length) {
         const emptyMessage = searchTerm
           ? 'Is search se koi player nahi mila.'
           : playerListMode === 'NEW'
             ? 'Last 7 days mein koi naya player nahi.'
             : 'Player list khali hai.';
-        table.innerHTML += `<tr><td colspan="11" class="empty">${emptyMessage}</td></tr>`;
+        table.innerHTML += `<tr><td colspan="9" class="empty">${emptyMessage}</td></tr>`;
         return;
       }
       players.forEach((u, index) => {
@@ -997,93 +1043,8 @@
         const isAdminUser = Boolean(u.isAdmin) || isPrimary;
         const adminLabel = isPrimary ? 'Primary' : isAdminUser ? 'Admin' : 'User';
         const adminAction = isPrimary ? '<button disabled>Primary admin</button>' : isAdminUser ? `<button class="danger" onclick="toggleAdminStatus('${u._id}', false)">Remove admin</button>` : `<button class="secondary" onclick="toggleAdminStatus('${u._id}', true)">Make admin</button>`;
-        table.innerHTML += `<tr><td>${index + 1}</td><td><button type="button" class="player-name-link" onclick="openPlayerHistory('${u._id}')">${escapeHtml(u.username)}</button></td><td>${playerWhatsAppLink(u.phone)}</td><td>₹${Number(u.walletBalance || 0).toLocaleString('en-IN')}</td><td>${u.monthlyRank || '-'}</td><td><strong>${Number(u.monthlyPoints || 0).toLocaleString('en-IN')}</strong><br><small>${Number(u.monthlyGamesPlayed || 0)} completed games</small></td><td>${new Date(u.createdAt).toLocaleString()}</td><td>${adminKycStatusLabel(u.kycStatus)}</td><td>${blocked ? 'Blocked' : 'Active'}</td><td>${adminLabel}</td><td><button class="secondary" onclick="openPlayerEditor('${u._id}')">Edit profile</button> <button class="${blocked ? 'unblock-button' : 'block-button'}" onclick="setPlayerBlocked('${u._id}', ${!blocked})">${blocked ? 'Unblock' : 'Block'}</button> ${adminAction}</td></tr>`;
+        table.innerHTML += `<tr><td>${index + 1}</td><td><button type="button" class="player-name-link" onclick="openPlayerHistory('${u._id}')">${escapeHtml(u.username)}</button></td><td>${playerWhatsAppLink(u.phone)}</td><td>₹${Number(u.walletBalance || 0).toLocaleString('en-IN')}</td><td>${new Date(u.createdAt).toLocaleString()}</td><td>${adminKycStatusLabel(u.kycStatus)}</td><td>${blocked ? 'Blocked' : 'Active'}</td><td>${adminLabel}</td><td><button class="secondary" onclick="openPlayerEditor('${u._id}')">Edit profile</button> <button class="${blocked ? 'unblock-button' : 'block-button'}" onclick="setPlayerBlocked('${u._id}', ${!blocked})">${blocked ? 'Unblock' : 'Block'}</button> ${adminAction}</td></tr>`;
       });
-    }
-
-    function adminProfileImageUrl(profileImage) {
-      const image = String(profileImage || '');
-      if (!image) return '/app-icon-192.png';
-      if (image.startsWith('uploads/')) return `/api/profile/image/${encodeURIComponent(image.split('/').pop())}`;
-      return image.startsWith('/') ? image : `/${image}`;
-    }
-
-    function escapeAttribute(value) {
-      return escapeHtml(value).replace(/`/g, '&#96;');
-    }
-
-    async function loadAdminLeaderboard() {
-      const status = document.getElementById('leaderboardSettingsStatus');
-      try {
-        const response = await adminFetch('/api/admin/leaderboard/monthly', { cache: 'no-store' });
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.error || 'Monthly standings load nahi hui.');
-        document.getElementById('adminLeaderboardMonth').textContent = data.month;
-        document.getElementById('pointsPerGameInput').value = data.pointsPerGame;
-        document.getElementById('winBonusInput').value = data.winBonus;
-        document.getElementById('prizePoolInput').value = data.prizePool;
-        document.getElementById('rankPrizesInput').value = data.prizes.join(', ');
-        const table = document.getElementById('adminLeaderboardTable');
-        table.innerHTML = '<tr><th>Rank</th><th>Player</th><th>Points override</th><th>Prize override (₹)</th><th>Games</th><th>Wins</th><th>Action</th></tr>';
-        data.rankings.forEach(player => {
-          const image = adminProfileImageUrl(player.profileImage);
-          table.insertAdjacentHTML('beforeend', `<tr><td>${player.rank || '-'}</td><td><img class="leaderboard-player-image" src="${escapeAttribute(image)}" alt="" loading="lazy"> ${escapeHtml(player.username)}<br><small>${escapeHtml(player.userId)}</small></td><td><strong>${Number(player.points).toLocaleString('en-IN')} pts</strong><br><input class="leaderboard-player-input" type="number" min="0" step="1" aria-label="Points override for ${escapeAttribute(player.username)}" data-points-for="${escapeAttribute(player.userId)}" value="${player.pointsOverride ?? ''}" placeholder="Automatic"></td><td><strong>₹${Number(player.prize || 0).toLocaleString('en-IN')}</strong><br><input class="leaderboard-player-input" type="number" min="0" step="1" aria-label="Prize override for ${escapeAttribute(player.username)}" data-prize-for="${escapeAttribute(player.userId)}" value="${player.prizeOverride ?? ''}" placeholder="Rank prize"></td><td>${Number(player.gamesPlayed)}</td><td>${Number(player.wins)}</td><td><button type="button" onclick="saveMonthlyPlayer('${escapeAttribute(player.userId)}')">Save player</button></td></tr>`);
-        });
-        status.textContent = `${data.rankings.length} players loaded. Blank override uses automatic game points and rank prize.`;
-      } catch (error) {
-        status.textContent = error.message || 'Monthly standings load nahi hui.';
-      }
-    }
-
-    async function saveAdminLeaderboardSettings() {
-      const status = document.getElementById('leaderboardSettingsStatus');
-      const prizes = document.getElementById('rankPrizesInput').value
-        .split(/[,\n]+/)
-        .map(value => value.trim())
-        .filter(Boolean)
-        .map(Number);
-      const body = {
-        pointsPerGame: Number(document.getElementById('pointsPerGameInput').value),
-        winBonus: Number(document.getElementById('winBonusInput').value),
-        prizePool: Number(document.getElementById('prizePoolInput').value),
-        prizes
-      };
-      if (prizes.length !== 100) {
-        status.textContent = `Rank 1–100 ke liye exactly 100 prize amounts chahiye; abhi ${prizes.length} hain.`;
-        return;
-      }
-      try {
-        const response = await adminFetch('/api/admin/leaderboard/monthly/settings', {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(body)
-        });
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.error || 'Leaderboard settings save nahi hui.');
-        status.textContent = data.message || 'Leaderboard settings save ho gayi.';
-        await Promise.all([loadAdminLeaderboard(), loadUsers()]);
-      } catch (error) {
-        status.textContent = error.message || 'Leaderboard settings save nahi hui.';
-      }
-    }
-
-    async function saveMonthlyPlayer(userId) {
-      const status = document.getElementById('leaderboardSettingsStatus');
-      const points = document.querySelector(`[data-points-for="${CSS.escape(userId)}"]`).value;
-      const prize = document.querySelector(`[data-prize-for="${CSS.escape(userId)}"]`).value;
-      try {
-        const response = await adminFetch(`/api/admin/leaderboard/monthly/player/${encodeURIComponent(userId)}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ points, prize })
-        });
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.error || 'Player ke points/prize save nahi hue.');
-        status.textContent = data.message || 'Player points/prize saved.';
-        await Promise.all([loadAdminLeaderboard(), loadUsers()]);
-      } catch (error) {
-        status.textContent = error.message || 'Player ke points/prize save nahi hue.';
-      }
     }
 
     let activeSupportUserId = '';
@@ -1317,6 +1278,15 @@
       })[status] || 'Unknown';
     }
 
+    function adminKycStatusClass(status) {
+      return ({
+        NOT_SUBMITTED: 'not-submitted',
+        PENDING: 'pending',
+        APPROVED: 'approved',
+        REJECTED: 'rejected'
+      })[status] || 'unknown';
+    }
+
     function openPlayerEditor(userId) {
       const dialog = document.getElementById('playerHistoryDialog');
       const content = document.getElementById('playerHistoryContent');
@@ -1390,6 +1360,7 @@
         }
         if (!res.ok) throw new Error(data.error || 'Player history nahi mili');
         const { user, kyc, deposits, withdrawals, matches } = data;
+        const kycStatus = kyc?.status || 'NOT_SUBMITTED';
         const approvedDeposits = deposits.filter(item => item.status === 'APPROVED');
         const paidWithdrawals = withdrawals.filter(item => item.status === 'PAID');
         const totalDeposits = approvedDeposits.reduce((total, item) => total + Number(item.amount || 0), 0);
@@ -1416,7 +1387,15 @@
             <div><small>Deposited · approved</small><strong>₹${totalDeposits.toLocaleString('en-IN')}</strong></div>
             <div><small>Withdrawn · paid</small><strong>₹${totalWithdrawals.toLocaleString('en-IN')}</strong></div>
             <div><small>Games played</small><strong>${playedMatches.length} / ${matches.length} total</strong></div>
-            <div><small>KYC</small><strong>${adminKycStatusLabel(kyc?.status || 'NOT_SUBMITTED')}</strong>${kyc?.submittedAt ? `<small>Submitted ${formatHistoryDate(kyc.submittedAt)}</small>` : ''}</div>
+          </div>
+          <h4>KYC Verification</h4>
+          <div class="kyc-history-card" aria-label="Player KYC verification details">
+            <div><small>Status</small><strong class="kyc-status-badge ${adminKycStatusClass(kycStatus)}">${adminKycStatusLabel(kycStatus)}</strong></div>
+            <div><small>Submitted</small><strong>${kyc?.submittedAt ? formatHistoryDate(kyc.submittedAt) : 'Not submitted'}</strong></div>
+            <div><small>Reviewed</small><strong>${kyc?.reviewedAt ? formatHistoryDate(kyc.reviewedAt) : 'Not reviewed'}</strong></div>
+            ${kyc?.aadhaarNumber ? `<div><small>Aadhaar</small><strong>XXXX XXXX ${escapeHtml(String(kyc.aadhaarNumber).slice(-4))}</strong></div>` : ''}
+            ${kyc?.aadhaarImage ? `<div><small>Document</small><strong><a href="/api/admin/uploads/${encodeURIComponent(String(kyc.aadhaarImage).split('/').pop())}" target="_blank" rel="noopener noreferrer">View Aadhaar image</a></strong></div>` : ''}
+            ${kycStatus === 'REJECTED' && kyc?.rejectionReason ? `<div><small>Rejection reason</small><strong>${escapeHtml(kyc.rejectionReason)}</strong></div>` : ''}
           </div>
           <h4>Deposits</h4><table><tr><th>Date</th><th>Amount</th><th>Status</th></tr>${depositRows}</table>
           <h4>Withdrawals</h4><table><tr><th>Date</th><th>Amount</th><th>Method</th><th>Status</th></tr>${withdrawalRows}</table>
@@ -1647,7 +1626,7 @@
     document.getElementById('saveSupportNumbersBtn').addEventListener('click', saveSupportNumbers);
     document.getElementById('saveBrandingBtn').addEventListener('click', saveBranding);
     document.getElementById('saveDepositUpiIdBtn').addEventListener('click', saveDepositUpiId);
-    document.getElementById('saveLeaderboardSettings').addEventListener('click', saveAdminLeaderboardSettings);
+    document.getElementById('saveWithdrawTickerSettings').addEventListener('click', saveWithdrawTickerSettings);
     document.getElementById('addPlayerCopyRowBtn').addEventListener('click', () => addPlayerCopyRow());
     document.getElementById('savePlayerCopyBtn').addEventListener('click', savePlayerCopy);
     loadSupportNumbers();
@@ -1655,8 +1634,8 @@
     loadDepositUpiId();
     loadPlayerCopy();
     loadData();
+    loadWithdrawTickerSettings();
     loadUsers();
-    loadAdminLeaderboard();
     loadAdminSupportThreads();
     loadHistory();
     setInterval(loadData, 30000);
