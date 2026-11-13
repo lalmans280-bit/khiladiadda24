@@ -578,7 +578,7 @@
   </script>
   <script src="/socket.io/socket.io.js"></script>
   <script src="/ludo-race.js?v=20260624-one-token-win"></script>
-  <script src="/ludo-score.js?v=20261113-turn-six-wallet-rules"></script>
+  <script src="/ludo-score.js?v=20261114-four-colors-profiles"></script>
   <script>
     const token=localStorage.getItem('token');
     const storedUser=(()=>{try{return JSON.parse(localStorage.getItem('user')||'null')}catch{return null}})();
@@ -961,7 +961,18 @@
     if (insertedContainer) insertedContainer.remove();
     gameTypeFieldContainer.appendChild(gameModeOptions);
     gameTypeSelect=preservedSelect;
-    function syncGameSelection(gameType){const selectedType=['LUDO','POPULAR_LUDO','LUDO_RACE','LUDO_SCORE','SNAKE'].includes(gameType)?gameType:'LUDO';game=selectedType==='SNAKE'?'SNAKE':'LUDO';gameTypeSelect.value=selectedType;gameModeOptions.querySelectorAll('.game-mode-option').forEach(button=>{const selected=button.dataset.gameOption===selectedType;button.classList.toggle('active',selected);button.setAttribute('aria-pressed',String(selected))});document.querySelectorAll('.game-filter').forEach(button=>button.classList.toggle('active',button.dataset.game===game));if(el('gameViewTitle'))el('gameViewTitle').textContent=selectedType==='LUDO_RACE'?'Ludo Race — 1 Goti Win':selectedType==='LUDO_SCORE'?'KhiladiAdda24 Ludo Score':''}
+    const scoreColorField=document.createElement('div');
+    scoreColorField.className='field';
+    scoreColorField.hidden=true;
+    const scoreColorLabel=document.createElement('label');
+    scoreColorLabel.htmlFor='ludoScoreCreatorColor';
+    scoreColorLabel.textContent='Ludo Score mein apna color chunein';
+    const scoreColorSelect=document.createElement('select');
+    scoreColorSelect.id='ludoScoreCreatorColor';
+    [['red','🔴 Lal'],['green','🟢 Hara'],['yellow','🟡 Peela'],['blue','🔵 Neela']].forEach(([value,label])=>{const option=document.createElement('option');option.value=value;option.textContent=label;scoreColorSelect.append(option)});
+    scoreColorField.append(scoreColorLabel,scoreColorSelect);
+    document.querySelector('#createForm .two').after(scoreColorField);
+    function syncGameSelection(gameType){const selectedType=['LUDO','POPULAR_LUDO','LUDO_RACE','LUDO_SCORE','SNAKE'].includes(gameType)?gameType:'LUDO';game=selectedType==='SNAKE'?'SNAKE':'LUDO';gameTypeSelect.value=selectedType;scoreColorField.hidden=selectedType!=='LUDO_SCORE';gameModeOptions.querySelectorAll('.game-mode-option').forEach(button=>{const selected=button.dataset.gameOption===selectedType;button.classList.toggle('active',selected);button.setAttribute('aria-pressed',String(selected))});document.querySelectorAll('.game-filter').forEach(button=>button.classList.toggle('active',button.dataset.game===game));if(el('gameViewTitle'))el('gameViewTitle').textContent=selectedType==='LUDO_RACE'?'Ludo Race — 1 Goti Win':selectedType==='LUDO_SCORE'?'KhiladiAdda24 Ludo Score':''}
     syncGameSelection(game);
     function battlePlayerMarkup(user,role,opponent=false,amount='',gameLabel=''){
       const username=nameOf(user),profileImage=String(user?.profileImage||'').trim(),imageUrl=profileImage.startsWith('uploads/')?`/api/profile/image/${encodeURIComponent(profileImage.slice('uploads/'.length))}`:profileImage?`/${profileImage.split('/').map(encodeURIComponent).join('/')}`:'',initial=String(username).trim().charAt(0).toUpperCase()||'?';
@@ -973,6 +984,15 @@
     }
     renderDemoBattles();
     function gameTypeLabel(gameType){return gameType==='LUDO_SCORE'?'KhiladiAdda24 Ludo Score':gameType==='LUDO_RACE'?'Ludo Race':gameType==='SNAKE'?'Snake battle':gameType==='POPULAR_LUDO'?'Popular Ludo':'Ludo Classic';}
+    function chooseLudoScoreColor(creatorColor){
+      const options=[['red','🔴 Lal'],['green','🟢 Hara'],['yellow','🟡 Peela'],['blue','🔵 Neela']].filter(([color])=>color!==creatorColor);
+      const answer=prompt(`Ludo Score color chunein:\n${options.map(([color,label],index)=>`${index+1}. ${label}`).join('\n')}`,'1');
+      if(answer===null)return null;
+      const selection=answer.trim().toLowerCase();
+      if(!selection)return '';
+      const index=Number(selection)-1;
+      return options[index]?.[0]||options.find(([color,label])=>color===selection||label.toLowerCase().includes(selection))?.[0]||'';
+    }
     function isLudoGame(gameType){return gameType==='LUDO'||gameType==='POPULAR_LUDO'||gameType==='LUDO_RACE'||gameType==='LUDO_SCORE';}
     function matchCard(m,mine=false){
       const entry=Number(m.amount),prize=entry*2*0.95,playerId=String(player?._id||storedUser?.id||''),isOwnOpen=m.status==='OPEN'&&String(m.creator?._id||m.creator)===playerId;
@@ -980,7 +1000,7 @@
         ? m.gameType==='LUDO_SCORE'
           ? `<div class="row"><button class="btn green small" data-match="${esc(m._id)}">Open Ludo Score</button><button class="btn danger small" data-cancel-match="${esc(m._id)}">Cancel</button></div>`
           : `<button class="btn danger small" data-cancel-match="${esc(m._id)}">Cancel</button>`
-        : `<button class="btn ${mine?'secondary':'green'} small" data-${mine?'match':'join'}="${esc(m._id)}" ${mine?'':`data-join-amount="${entry}"`}>${mine?'Details':'PLAY'}</button>`;
+        : `<button class="btn ${mine?'secondary':'green'} small" data-${mine?'match':'join'}="${esc(m._id)}" ${mine?'':`data-join-amount="${entry}"${m.gameType==='LUDO_SCORE'?` data-game-type="LUDO_SCORE" data-score-creator-color="${esc(m.ludoScore?.colors?.creator||'red')}"`:''}`}>${mine?'Details':'PLAY'}</button>`;
       const status=m.status==='PENDING_RESULT'?'Result review':m.status==='PENDING_CANCELLATION'?'Cancel review':m.status;
       const gameLabel=gameTypeLabel(m.gameType||game);
       const playersMarkup=m.joiner?`<div class="battle-players">${battlePlayerMarkup(m.creator,mine?'Creator':'Challenger',false,entry,gameLabel)}<img class="battle-versus battle-versus-image" src="/vs.png" alt="versus">${battlePlayerMarkup(m.joiner,'Opponent',true,entry)}</div>`:`<div class="battle-players battle-players-waiting">${battlePlayerMarkup(m.creator,mine?'Creator':'Challenger',false,entry,gameLabel)}</div>`;
@@ -1128,10 +1148,16 @@
       }
       const join=event.target.closest('[data-join]');
       if(join){
+        let joinerColor='';
+        if(join.dataset.gameType==='LUDO_SCORE'){
+          joinerColor=chooseLudoScoreColor(join.dataset.scoreCreatorColor||'red');
+          if(joinerColor===null)return;
+          if(!joinerColor){notify('Ludo Score mein Lal, Hara, Peela ya Neela mein se alag color chunein.',true);return}
+        }
         join.disabled=true;
         window.pendingEntryAmount=Number(join.dataset.joinAmount)||50;
         try{
-          const data=await api('/api/matches/join',{method:'POST',body:JSON.stringify({matchId:join.dataset.join})});
+          const data=await api('/api/matches/join',{method:'POST',body:JSON.stringify({matchId:join.dataset.join,...(joinerColor?{joinerColor}:{})})});
           notify(data.message||'Battle join ho gaya.');
           await Promise.all([loadOpen(),loadMine()]);
         }catch(error){showError(error);join.disabled=false}
@@ -1154,7 +1180,8 @@
       try{
         const entryAmount=Number(entryAmountInput.value);
         window.pendingEntryAmount=entryAmount;
-        const data=await api('/api/matches/create',{method:'POST',body:JSON.stringify({gameType:el('gameType').value,entryAmount})});
+        const gameType=el('gameType').value;
+        const data=await api('/api/matches/create',{method:'POST',body:JSON.stringify({gameType,entryAmount,...(gameType==='LUDO_SCORE'?{creatorColor:el('ludoScoreCreatorColor').value}:{})})});
         notify(data.message||'Battle create ho gaya.');
         setView('home');
         await loadOpen();
