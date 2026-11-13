@@ -19,6 +19,7 @@
   let activeSignature = '';
   let busy = false;
   let pollErrorShown = false;
+  let latestMatch;
 
   const style = document.createElement('style');
   style.textContent = `
@@ -31,6 +32,8 @@
     .ludo-race-player small{color:var(--muted)}
     .ludo-race-player.creator{border-color:#c65c52}.ludo-race-player.joiner{border-color:#429064}
     .ludo-race-status{margin:8px 0;padding:10px 12px;border:1px solid #405b46;border-radius:9px;background:#1d2d21}
+    .ludo-score-timer{display:inline-grid;place-items:center;min-width:52px;padding:5px 8px;border:1px solid #d7b14e;border-radius:7px;color:#f4d36c;font-weight:800;font-variant-numeric:tabular-nums}
+    .ludo-score-timer.urgent{color:#ff8c78;border-color:#ff8c78}
     .ludo-race-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:10px 0}
     .ludo-race-die{display:grid;place-items:center;min-width:46px;height:46px;border:1px solid #d7b14e;border-radius:10px;background:#f4d36c;color:#352800;font-size:26px;font-weight:800}
     .ludo-race-board{display:grid;grid-template-columns:repeat(15,minmax(0,1fr));width:min(100%,560px);aspect-ratio:1;margin:14px auto;border:3px solid #34483a;border-radius:9px;overflow:hidden;background:#fff}
@@ -68,6 +71,7 @@
 
   function makeMarkup(match, matchId, app) {
     const state = match.ludoRace;
+    const isScoreMode = match.gameType === 'LUDO_SCORE';
     if (!state || !state.tokens) {
       return `<h2>🏁 Ludo Race • ${app.esc(match.status)}</h2><p class="notice error">Ludo Race ki game state available nahi hai. Support se sampark karein.</p>`;
     }
@@ -110,31 +114,34 @@
     }).join('');
     const dieValue = state.diceValue || state.lastDice || '–';
     const stateMessage = winner
-      ? `🏆 ${app.esc(winnerName)} winner hain — inki ek goti ghar pahunch gayi.`
+      ? `🏆 ${app.esc(winnerName)} winner hain — ${isScoreMode ? 'charon gotiyan ghar pahunch gayi.' : 'inki ek goti ghar pahunch gayi.'}`
       : ownTurn
         ? state.diceValue ? `${state.diceValue} aaya — chamakti goti chunein.` : 'Aapki turn hai — dice roll karein.'
         : `${app.esc(ownTurnName)} ki turn hai. Board live update hota rahega.`;
     const resultSection = match.status === 'PENDING_RESULT'
-      ? '<p class="notice warning">Winner ka screenshot admin verification ke liye bhej diya gaya hai. Admin review ka wait karein.</p>'
+      ? `<p class="notice warning">Winner ka screenshot admin verification ke liye bhej diya gaya hai. Admin review ka wait karein.${match.resultSubmittedAt ? `<br><small>Submitted: ${app.esc(new Date(match.resultSubmittedAt).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }))} IST</small>` : ''}</p>`
       : match.status === 'COMPLETED'
         ? `<p class="notice">Match complete${match.winner ? ` — winner: ${app.esc(app.nameOf(match.winner))}` : ''}.</p>`
         : winner === myId
-          ? `<form class="ludo-race-proof" id="ludoRaceProof"><p class="muted">Apni win ka screenshot upload karke result admin review ke liye bhejein.</p><div class="field"><label for="ludoRaceScreenshot">Win screenshot</label><input id="ludoRaceScreenshot" name="screenshot" type="file" accept="image/jpeg,image/png,image/webp" required></div><button class="btn green" type="submit">Win screenshot bhejein</button></form>`
+          ? `<form class="ludo-race-proof" id="ludoRaceProof"><p class="muted">Apni win ka screenshot upload karke result admin review ke liye bhejein.</p><div class="field"><label for="ludoRaceScreenshot">Win screenshot</label><input id="ludoRaceScreenshot" name="screenshot" type="file" accept="image/jpeg,image/png,image/webp" required></div>${isScoreMode ? '<div class="ludo-race-actions"><button class="btn secondary small" type="button" id="shareLudoProof">WhatsApp par screenshot bhejein</button></div>' : ''}<button class="btn green" type="submit">Win screenshot bhejein</button></form>`
           : winner
             ? '<p class="notice warning">Winner screenshot upload karke result admin review ke liye bhejega.</p>'
             : '';
     const cancelSection = match.status === 'RUNNING' && Number(state.version || 0) === 0
       ? '<form id="ludoRaceCancel" class="ludo-race-actions"><button class="btn danger small" type="submit">Pehli dice roll se pehle cancel/refund</button></form>'
       : '';
-    return `<h2>🏁 Ludo Race • ${app.esc(match.status)}</h2>
+    const gameTitle = isScoreMode ? 'KhiladiAdda24 Ludo Score' : 'Ludo Race';
+    const creatorScore = Number(state.scores?.creator ?? (state.tokens.creator.filter(value => value === 57).length * 250));
+    const joinerScore = Number(state.scores?.joiner ?? (state.tokens.joiner.filter(value => value === 57).length * 250));
+    return `<h2>🏁 ${gameTitle} • ${app.esc(match.status)}</h2>
       <div class="grid"><div class="stat"><small>Entry</small><strong>₹${Number(match.amount).toLocaleString('en-IN')}</strong></div>
       <div class="stat"><small>Creator</small><strong>${app.esc(app.nameOf(match.creator))}</strong></div>
       <div class="stat"><small>Opponent</small><strong>${app.esc(app.nameOf(match.joiner))}</strong></div></div>
       <div class="panel ludo-race-panel" id="ludoRacePanel">
-        <div class="ludo-race-head"><h3>4 Gotiyan • Pehli Goti Ghar = Win</h3><span class="muted">Red: creator · Green: opponent</span></div>
+        <div class="ludo-race-head"><h3>${isScoreMode ? '4 Gotiyan • 1000 Score • 4 Ghar = Win' : '4 Gotiyan • Pehli Goti Ghar = Win'}</h3><span class="muted">Red: creator · Green: opponent</span>${isScoreMode && !winner ? '<span id="ludoScoreTimer" class="ludo-score-timer" aria-live="polite">20s</span>' : ''}</div>
         <div class="ludo-race-score">
-          <div class="ludo-race-player creator"><strong>🔴 ${app.esc(app.nameOf(match.creator))}</strong><small>${(state.tokens.creator || []).filter(value => value === 57).length}/4 ghar pahunchi</small></div>
-          <div class="ludo-race-player joiner"><strong>🟢 ${app.esc(app.nameOf(match.joiner))}</strong><small>${(state.tokens.joiner || []).filter(value => value === 57).length}/4 ghar pahunchi</small></div>
+          <div class="ludo-race-player creator"><strong>🔴 ${app.esc(app.nameOf(match.creator))}</strong><small>${isScoreMode ? `${creatorScore}/1000 score · ` : ''}${(state.tokens.creator || []).filter(value => value === 57).length}/4 ghar pahunchi</small></div>
+          <div class="ludo-race-player joiner"><strong>🟢 ${app.esc(app.nameOf(match.joiner))}</strong><small>${isScoreMode ? `${joinerScore}/1000 score · ` : ''}${(state.tokens.joiner || []).filter(value => value === 57).length}/4 ghar pahunchi</small></div>
         </div>
         <div class="ludo-race-status" aria-live="polite">${stateMessage}${state.lastAction ? `<br><small>${app.esc(state.lastAction)}</small>` : ''}</div>
         <div class="ludo-race-actions"><span class="ludo-race-die" aria-label="Dice">${dieValue}</span><button type="button" class="btn" id="ludoRaceRoll" ${!ownTurn || state.diceValue || winner || busy ? 'disabled' : ''}>Dice roll</button><span class="muted">${ownTurn ? 'Apni turn' : 'Opponent ki turn'}</span></div>
@@ -150,12 +157,19 @@
     activeMatchId = String(matchId);
     activeSignature = '';
     pollErrorShown = false;
+    latestMatch = match;
+    if (window.__ludoRaceCountdownTimer) clearInterval(window.__ludoRaceCountdownTimer);
 
     const renderState = currentMatch => {
       if (activeMatchId !== String(matchId)) return;
+      latestMatch = currentMatch;
       const signature = `${currentMatch.status}:${currentMatch.ludoRace?.version}:${currentMatch.ludoRace?.winnerId || ''}:${currentMatch.proofScreenshot || ''}:${app.nameOf(currentMatch.creator)}:${app.nameOf(currentMatch.joiner)}`;
       if (signature === activeSignature) return;
       activeSignature = signature;
+      if (currentMatch.ludoRace?.winnerId && window.__ludoRaceCountdownTimer) {
+        clearInterval(window.__ludoRaceCountdownTimer);
+        window.__ludoRaceCountdownTimer = null;
+      }
       app.el('matchDetails').innerHTML = makeMarkup(currentMatch, matchId, app);
       app.setView('match');
       const rollButton = document.getElementById('ludoRaceRoll');
@@ -188,14 +202,92 @@
         }
       }));
       const proofForm = document.getElementById('ludoRaceProof');
+      const screenshotInput = proofForm?.querySelector('#ludoRaceScreenshot');
+      let timestampedProofFile;
+      async function makeTimestampedScreenshot() {
+        const file = screenshotInput?.files?.[0];
+        if (!file) throw new Error('Pehle win screenshot select karein.');
+        if (!/^image\/(jpeg|png|webp)$/.test(file.type)) throw new Error('JPG, PNG ya WebP screenshot select karein.');
+        const image = await createImageBitmap(file);
+        const scale = Math.min(1, 1600 / Math.max(image.width, image.height));
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.max(1, Math.round(image.width * scale));
+        canvas.height = Math.max(1, Math.round(image.height * scale));
+        const context = canvas.getContext('2d');
+        context.drawImage(image, 0, 0, canvas.width, canvas.height);
+        image.close();
+        const footerHeight = Math.max(48, Math.round(canvas.width * 0.055));
+        context.fillStyle = '#101713';
+        context.fillRect(0, canvas.height - footerHeight, canvas.width, footerHeight);
+        context.fillStyle = '#f4f6ed';
+        context.font = `bold ${Math.max(14, Math.round(canvas.width * 0.025))}px Arial`;
+        const timestamp = new Intl.DateTimeFormat('en-IN', { dateStyle: 'medium', timeStyle: 'medium', timeZone: 'Asia/Kolkata' }).format(new Date());
+        context.fillText(`KhiladiAdda24 Ludo Score · ${timestamp} IST`, 12, canvas.height - Math.round(footerHeight * 0.36));
+        let blob;
+        for (const quality of [0.88, 0.76, 0.64]) {
+          blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', quality));
+          if (blob?.size <= 5 * 1024 * 1024) break;
+        }
+        if (!blob || blob.size > 5 * 1024 * 1024) throw new Error('Screenshot 5 MB se chhota nahi ban saka. Chhoti image select karein.');
+        return new File([blob], `khiladiadda24-ludo-score-${Date.now()}.jpg`, { type: 'image/jpeg' });
+      }
+      const shareProofButton = proofForm?.querySelector('#shareLudoProof');
+      let adminWhatsappNumber = '';
+      if (shareProofButton) {
+        shareProofButton.disabled = true;
+        app.api('/api/site-support').then(contacts => {
+          adminWhatsappNumber = String(contacts.whatsappNumber || '').replace(/\D/g, '');
+          if (adminWhatsappNumber.length === 10) adminWhatsappNumber = `91${adminWhatsappNumber}`;
+          if (!/^91[6-9]\d{9}$/.test(adminWhatsappNumber)) adminWhatsappNumber = '';
+        }).catch(() => {});
+        screenshotInput.addEventListener('change', async () => {
+          timestampedProofFile = null;
+          shareProofButton.disabled = true;
+          if (!screenshotInput.files[0]) return;
+          try {
+            timestampedProofFile = await makeTimestampedScreenshot();
+            shareProofButton.disabled = false;
+          } catch (error) {
+            app.notify(error.message || 'Screenshot taiyaar nahi hua.', true);
+          }
+        });
+      }
+      if (shareProofButton) shareProofButton.addEventListener('click', async () => {
+        shareProofButton.disabled = true;
+        try {
+          const file = timestampedProofFile;
+          if (!file) throw new Error('Screenshot select karke taiyaar hone ka wait karein.');
+          const shareText = `KhiladiAdda24 Ludo Score winning screenshot · ${app.nameOf(currentMatch.creator)} vs ${app.nameOf(currentMatch.joiner)} · Winner: ${app.nameOf(app.getPlayer() || app.getUser())} · Score: 1000/1000 · ${new Intl.DateTimeFormat('en-IN', { dateStyle: 'medium', timeStyle: 'medium', timeZone: 'Asia/Kolkata' }).format(new Date())} IST${adminWhatsappNumber ? ` · Admin WhatsApp: +${adminWhatsappNumber}` : ''}`;
+          if (navigator.share && navigator.canShare?.({ files: [file] })) {
+            await navigator.share({ title: 'KhiladiAdda24 Ludo Score', text: shareText, files: [file] });
+          } else {
+            const downloadUrl = URL.createObjectURL(file);
+            const downloadLink = document.createElement('a');
+            downloadLink.href = downloadUrl;
+            downloadLink.download = file.name;
+            downloadLink.click();
+            setTimeout(() => URL.revokeObjectURL(downloadUrl), 30000);
+            const whatsappUrl = adminWhatsappNumber
+              ? `https://wa.me/${adminWhatsappNumber}?text=${encodeURIComponent(shareText)}`
+              : `https://wa.me/?text=${encodeURIComponent(shareText)}`;
+            window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
+            app.notify('Timestamp wala screenshot download hua. WhatsApp chat mein ise attach karke bhejein.');
+          }
+        } catch (error) {
+          if (error.name !== 'AbortError') app.notify(error.message || 'Screenshot share nahi ho saka.', true);
+        } finally {
+          shareProofButton.disabled = false;
+        }
+      });
       if (proofForm) proofForm.addEventListener('submit', async event => {
         event.preventDefault();
-        const body = new FormData(proofForm);
-        body.set('matchId', matchId);
-        body.set('winnerId', String(currentMatch.ludoRace.winnerId));
         const submitButton = proofForm.querySelector('button[type="submit"]');
         submitButton.disabled = true;
         try {
+          const body = new FormData(proofForm);
+          body.set('matchId', matchId);
+          body.set('winnerId', String(currentMatch.ludoRace.winnerId));
+          body.set('screenshot', timestampedProofFile || await makeTimestampedScreenshot());
           const result = await app.api('/api/matches/submit-result', { method: 'POST', body });
           app.notify(result.message);
           renderState(result.match);
@@ -225,6 +317,18 @@
     };
 
     renderState(match);
+    if (match.gameType === 'LUDO_SCORE') {
+      const updateCountdown = () => {
+        const timer = document.getElementById('ludoScoreTimer');
+        if (!timer) return;
+        const deadline = new Date(latestMatch?.ludoRace?.turnDeadlineAt || 0).getTime();
+        const remaining = Math.max(0, Math.ceil((deadline - Date.now()) / 1000));
+        timer.textContent = `${remaining}s`;
+        timer.classList.toggle('urgent', remaining <= 5);
+      };
+      updateCountdown();
+      window.__ludoRaceCountdownTimer = setInterval(updateCountdown, 250);
+    }
     window.__ludoRaceTimer = setInterval(async () => {
       if (activeMatchId !== String(matchId)) return;
       try {
