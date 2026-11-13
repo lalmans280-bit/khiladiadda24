@@ -13,6 +13,7 @@ const jwt = require('jsonwebtoken');
 const { Server } = require('socket.io');
 const { pipeline } = require('stream/promises');
 const PubgPvpService = require('./pubg-pvp');
+const { nextSixStreak, scoreAfterTimeout, scoresAfterMove } = require('./lib/ludo-score-rules');
 
 // Models
 const User = require('./models/user');
@@ -2080,6 +2081,36 @@ app.post('/api/matches/ludo-race/move', requireUser, async (req, res) => {
 
 const ludoScoreTurnDuration = 20 * 1000;
 
+function createLudoScoreState(creatorId, startedAt = new Date()) {
+  return {
+    version: 0,
+    tokens: { creator: [-1, -1, -1, -1], joiner: [-1, -1, -1, -1] },
+    currentTurn: String(creatorId),
+    diceValue: null,
+    legalTokenIndexes: [],
+    winnerId: null,
+    turnDeadlineAt: new Date(startedAt.getTime() + ludoScoreTurnDuration),
+    rollCount: 0,
+    scores: { creator: 0, joiner: 0 },
+    consecutiveSixes: 0
+  };
+}
+
+async function ensureLudoScoreState(match) {
+  if (!match || match.gameType !== 'LUDO_SCORE' || match.status !== 'RUNNING' || match.ludoScore) return match;
+  const updated = await Match.findOneAndUpdate(
+    {
+      _id: match._id,
+      gameType: 'LUDO_SCORE',
+      status: 'RUNNING',
+      $or: [{ ludoScore: { $exists: false } }, { ludoScore: null }]
+    },
+    { $set: { ludoScore: createLudoScoreState(match.creator) } },
+    { new: true }
+  );
+  return updated || Match.findById(match._id);
+}
+
 async function expireLudoScoreTurn(match) {
   const state = match?.ludoScore;
   const deadline = state?.turnDeadlineAt ? new Date(state.turnDeadlineAt).getTime() : 0;
@@ -2091,8 +2122,10 @@ async function expireLudoScoreTurn(match) {
     currentTurn: nextTurn,
     diceValue: null,
     legalTokenIndexes: [],
+    scores: scoreAfterTimeout(state, String(state.currentTurn) === String(match.creator) ? 'creator' : 'joiner'),
+    consecutiveSixes: 0,
     turnDeadlineAt: new Date(Date.now() + ludoScoreTurnDuration),
-    lastAction: '20 second timer khatam; turn opponent ko mili'
+    lastAction: '20 second timeout; 100 score minus aur turn opponent ko mili'
   };
   const updated = await Match.findOneAndUpdate(
     { _id: match._id, status: 'RUNNING', 'ludoScore.version': Number(state.version || 0), 'ludoScore.currentTurn': String(state.currentTurn), 'ludoScore.turnDeadlineAt': state.turnDeadlineAt, 'ludoScore.winnerId': null },
@@ -2115,7 +2148,7 @@ app.post('/api/matches/ludo-score/roll', requireUser, async (req, res) => {
     const activeMatch = await expireLudoScoreTurn(match);
     if (!activeMatch) return res.status(404).json({ error: 'Match nahi mila' });
     const state = activeMatch.ludoScore;
-    if (String(state.currentTurn) !== userId) return res.json({ message: '20 second timer khatam; ab opponent ki turn hai.', match: activeMatch });
+    if (String(state.currentTurn) !== userId) return res.json({ message: '20 second timer khatam; 100 score minus hua aur ab opponent ki turn hai.', match: activeMatch });
     if (state.winnerId) return res.status(400).json({ error: 'Ludo Score ka winner tay ho chuka hai' });
     if (state.diceValue !== null && state.diceValue !== undefined) return res.status(400).json({ error: 'Pehle dice ka token move karein' });
 
@@ -2123,18 +2156,23 @@ app.post('/api/matches/ludo-score/roll', requireUser, async (req, res) => {
     const side = ludoRaceSide(match, userId);
     const legalTokenIndexes = ludoRaceLegalTokens(state.tokens[side], diceValue);
     const noLegalMove = legalTokenIndexes.length === 0;
-    const nextTurn = noLegalMove && diceValue !== 6
-      ? String(state.currentTurn) === String(match.creator) ? String(match.joiner) : String(match.creator)
-      : userId;
+    const opponentId = String(state.currentTurn) === String(match.creator) ? String(match.joiner) : String(match.creator);
+    const sixStreak = nextSixStreak(state, diceValue, opponentId);
+    const nextTurn = sixStreak.forfeited
+      ? sixStreak.nextTurn
+      : noLegalMove && diceValue !== 6 ? opponentId : userId;
     const nextState = {
       ...state,
       version: Number(state.version || 0) + 1,
       rollCount: Number(state.rollCount || 0) + 1,
       lastDice: diceValue,
       lastRollUserId: userId,
-      lastAction: noLegalMove ? `${diceValue} aaya; koi legal move nahi` : `${diceValue} aaya`,
-      diceValue: noLegalMove ? null : diceValue,
-      legalTokenIndexes: noLegalMove ? [] : legalTokenIndexes,
+      lastAction: sixStreak.forfeited
+        ? 'Lagatar teesra 6; is roll par move nahi, turn opponent ko mili'
+        : noLegalMove ? `${diceValue} aaya; koi legal move nahi` : `${diceValue} aaya`,
+      diceValue: noLegalMove || sixStreak.forfeited ? null : diceValue,
+      legalTokenIndexes: noLegalMove || sixStreak.forfeited ? [] : legalTokenIndexes,
+      consecutiveSixes: sixStreak.consecutiveSixes,
       currentTurn: nextTurn,
       turnDeadlineAt: new Date(Date.now() + ludoScoreTurnDuration)
     };
@@ -2145,7 +2183,10 @@ app.post('/api/matches/ludo-score/roll', requireUser, async (req, res) => {
     );
     if (!updated) return res.status(409).json({ error: 'Game state update ho gaya. Refresh karke dobara try karein.' });
     io.to(String(matchId)).emit('match_updated', updated);
-    res.json({ message: noLegalMove ? `${diceValue} aaya; move nahi tha, ab opponent ki turn hai.` : `${diceValue} aaya. Apni goti select karein.`, match: updated });
+    const message = sixStreak.forfeited
+      ? 'Lagatar teesra 6 aaya; move cancel, ab opponent ki turn.'
+      : noLegalMove ? `${diceValue} aaya; move nahi tha${diceValue === 6 ? ', dobara dice roll karein.' : ', ab opponent ki turn.'}` : `${diceValue} aaya. Apni goti select karein.`;
+    res.json({ message, match: updated });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -2157,71 +2198,146 @@ app.post('/api/matches/ludo-score/move', requireUser, async (req, res) => {
   if (!Number.isInteger(tokenIndex) || tokenIndex < 0 || tokenIndex > 3) {
     return res.status(400).json({ error: 'Sahi goti select karein' });
   }
+  const userId = String(req.auth.userId);
+  const session = await mongoose.startSession();
+  let updated;
+  let creditedWinner;
+  let creditedAdmin;
+  let winAmount = 0;
+  let adminCommission = 0;
   try {
-    const match = await Match.findById(matchId);
+    let match = await Match.findById(matchId);
     if (!match || match.gameType !== 'LUDO_SCORE' || match.status !== 'RUNNING' || !match.ludoScore) {
       return res.status(400).json({ error: 'Ludo Score match active nahi hai' });
     }
-    const userId = String(req.auth.userId);
     if (!isMatchPlayer(match, userId)) return res.status(403).json({ error: 'Sirf match ke players goti chala sakte hain' });
-    const activeMatch = await expireLudoScoreTurn(match);
-    if (!activeMatch) return res.status(404).json({ error: 'Match nahi mila' });
-    const state = activeMatch.ludoScore;
-    if (String(state.currentTurn) !== userId) return res.json({ message: '20 second timer khatam; ab opponent ki turn hai.', match: activeMatch });
+    match = await expireLudoScoreTurn(match);
+    if (!match) return res.status(404).json({ error: 'Match nahi mila' });
+    const state = match.ludoScore;
+    if (String(state.currentTurn) !== userId) return res.json({ message: '20 second timer khatam; 100 score minus hua aur ab opponent ki turn hai.', match });
     if (state.winnerId) return res.status(400).json({ error: 'Ludo Score ka winner tay ho chuka hai' });
     if (!Array.isArray(state.legalTokenIndexes) || !state.legalTokenIndexes.includes(tokenIndex)) {
       return res.status(400).json({ error: 'Is goti ki abhi legal move nahi hai' });
     }
 
-    const side = ludoRaceSide(match, userId);
-    const opponentSide = side === 'creator' ? 'joiner' : 'creator';
-    const diceValue = Number(state.diceValue);
-    const tokens = { creator: [...state.tokens.creator], joiner: [...state.tokens.joiner] };
-    const oldProgress = tokens[side][tokenIndex];
-    const newProgress = oldProgress === -1 ? 0 : oldProgress + diceValue;
-    tokens[side][tokenIndex] = newProgress;
-    let captured = false;
-    if (newProgress <= 51) {
-      const trackIndex = ludoRacePosition(side, newProgress);
-      if (!ludoRaceSafeTrackIndexes.has(trackIndex)) {
-        tokens[opponentSide] = tokens[opponentSide].map(progress => {
-          if (progress >= 0 && progress <= 51 && ludoRacePosition(opponentSide, progress) === trackIndex) {
-            captured = true;
-            return -1;
-          }
-          return progress;
-        });
+    const players = [match.creator, match.joiner].filter(Boolean);
+    await Promise.all(players.map(ensureWinningsBalance));
+    await session.withTransaction(async () => {
+      creditedWinner = null;
+      creditedAdmin = null;
+      winAmount = 0;
+      adminCommission = 0;
+      const currentMatch = await Match.findOne({ _id: matchId, gameType: 'LUDO_SCORE', status: 'RUNNING' }).session(session);
+      if (!currentMatch || !isMatchPlayer(currentMatch, userId)) {
+        const error = new Error('Game state update ho gaya. Refresh karke dobara try karein.');
+        error.statusCode = 409;
+        throw error;
       }
-    }
+      const currentState = currentMatch.ludoScore;
+      if (String(currentState.currentTurn) !== userId || !Array.isArray(currentState.legalTokenIndexes) || !currentState.legalTokenIndexes.includes(tokenIndex)) {
+        const error = new Error('Game state update ho gaya. Refresh karke dobara try karein.');
+        error.statusCode = 409;
+        throw error;
+      }
+      const side = ludoRaceSide(currentMatch, userId);
+      const opponentSide = side === 'creator' ? 'joiner' : 'creator';
+      const diceValue = Number(currentState.diceValue);
+      const tokens = { creator: [...currentState.tokens.creator], joiner: [...currentState.tokens.joiner] };
+      const oldProgress = tokens[side][tokenIndex];
+      const newProgress = oldProgress === -1 ? 0 : oldProgress + diceValue;
+      tokens[side][tokenIndex] = newProgress;
+      let captured = false;
+      if (newProgress <= 51) {
+        const trackIndex = ludoRacePosition(side, newProgress);
+        if (!ludoRaceSafeTrackIndexes.has(trackIndex)) {
+          tokens[opponentSide] = tokens[opponentSide].map(progress => {
+            if (progress >= 0 && progress <= 51 && ludoRacePosition(opponentSide, progress) === trackIndex) {
+              captured = true;
+              return -1;
+            }
+            return progress;
+          });
+        }
+      }
 
-    const won = tokens[side].every(progress => progress === 57);
-    const nextTurn = won || diceValue === 6 ? userId : String(match.creator) === userId ? String(match.joiner) : String(match.creator);
-    const nextState = {
-      ...state,
-      version: Number(state.version || 0) + 1,
-      tokens,
-      scores: {
-        creator: tokens.creator.filter(progress => progress === 57).length * 250,
-        joiner: tokens.joiner.filter(progress => progress === 57).length * 250
-      },
-      diceValue: null,
-      legalTokenIndexes: [],
-      winnerId: won ? userId : null,
-      currentTurn: nextTurn,
-      turnDeadlineAt: new Date(Date.now() + ludoScoreTurnDuration),
-      ...(won ? { winnerAt: new Date() } : {}),
-      lastAction: won ? 'Charon gotiyan ghar pahunch gayi — winner!' : captured ? 'Opponent ki goti capture hui' : 'Goti chal di'
-    };
-    const updated = await Match.findOneAndUpdate(
-      { _id: matchId, status: 'RUNNING', 'ludoScore.version': Number(state.version || 0), 'ludoScore.currentTurn': userId, 'ludoScore.diceValue': diceValue, 'ludoScore.winnerId': null, 'ludoScore.turnDeadlineAt': { $gt: new Date() } },
-      { $set: { ludoScore: nextState } },
-      { new: true }
-    );
-    if (!updated) return res.status(409).json({ error: 'Game state update ho gaya. Refresh karke dobara try karein.' });
+      const won = tokens[side].every(progress => progress === 57);
+      const nextTurn = won || diceValue === 6 ? userId : String(currentMatch.creator) === userId ? String(currentMatch.joiner) : String(currentMatch.creator);
+      const nextState = {
+        ...currentState,
+        version: Number(currentState.version || 0) + 1,
+        tokens,
+        scores: scoresAfterMove(currentState, tokens),
+        diceValue: null,
+        legalTokenIndexes: [],
+        winnerId: won ? userId : null,
+        currentTurn: nextTurn,
+        turnDeadlineAt: new Date(Date.now() + ludoScoreTurnDuration),
+        ...(won ? { winnerAt: new Date() } : {}),
+        lastAction: won ? 'Charon gotiyan ghar pahunch gayi — winner!' : captured ? 'Opponent ki goti capture hui' : 'Goti chal di'
+      };
+      const movedMatch = await Match.findOneAndUpdate(
+        {
+          _id: matchId,
+          status: 'RUNNING',
+          'ludoScore.version': Number(currentState.version || 0),
+          'ludoScore.currentTurn': userId,
+          'ludoScore.diceValue': diceValue,
+          'ludoScore.winnerId': null,
+          'ludoScore.turnDeadlineAt': { $gt: new Date() }
+        },
+        { $set: { ludoScore: nextState, ...(won ? { winner: userId, status: 'COMPLETED', completedAt: new Date() } : {}) } },
+        { new: true, session }
+      );
+      if (!movedMatch) throw new Error('Game state update ho gaya. Refresh karke dobara try karein.');
+
+      if (won) {
+        const totalPool = Number(movedMatch.amount) * 2;
+        winAmount = totalPool * 0.95;
+        adminCommission = totalPool * 0.05;
+        movedMatch.ludoScore = { ...nextState, payoutAmount: winAmount, adminCommission };
+        creditedWinner = await User.findOneAndUpdate(
+          { _id: userId },
+          { $inc: { walletBalance: winAmount, winningsBalance: winAmount } },
+          { new: true, session }
+        );
+        if (!creditedWinner) throw new Error('Winner user nahi mila; payout complete nahi hua.');
+        const primaryAdmin = await ensurePrimaryAdminUser();
+        if (primaryAdmin) {
+          creditedAdmin = await User.findOneAndUpdate(
+            { _id: primaryAdmin._id },
+            { $inc: { walletBalance: adminCommission } },
+            { new: true, session }
+          );
+        }
+        await movedMatch.save({ session });
+        await releaseMatchBetSlots(movedMatch, session);
+      }
+      updated = movedMatch;
+    });
+
+    if (creditedWinner) {
+      io.emit('wallet_updated', {
+        userId: String(creditedWinner._id),
+        walletBalance: creditedWinner.walletBalance,
+        amountAdded: winAmount
+      });
+    }
+    if (creditedAdmin) {
+      io.emit('wallet_updated', {
+        userId: String(creditedAdmin._id),
+        walletBalance: creditedAdmin.walletBalance,
+        amountAdded: adminCommission
+      });
+    }
     io.to(String(matchId)).emit('match_updated', updated);
-    res.json({ message: won ? 'Aapki charon gotiyan ghar pahunch gayi — aap winner hain! Screenshot upload karke result bhejein.' : captured ? 'Opponent ki goti capture hui.' : 'Goti chal di.', match: updated });
+    const message = creditedWinner
+      ? `Aap jeet gaye! ₹${winAmount.toLocaleString('en-IN')} wallet me automatic credit hua.`
+      : updated.ludoScore.lastAction === 'Opponent ki goti capture hui' ? 'Opponent ki goti capture hui.' : 'Goti chal di.';
+    res.json({ message, match: updated });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(err.statusCode || (err.message.includes('Game state update') ? 409 : 500)).json({ error: err.message });
+  } finally {
+    await session.endSession();
   }
 });
 
@@ -2230,6 +2346,7 @@ app.get('/api/matches/:matchId', requireUser, async (req, res) => {
     let match = await Match.findById(req.params.matchId);
     if (!match) return res.status(404).json({ error: 'Match nahi mila' });
     if (!isMatchPlayer(match, req.auth.userId)) return res.status(403).json({ error: 'Sirf match ke players details dekh sakte hain' });
+    match = await ensureLudoScoreState(match);
     match = await expireLudoScoreTurn(match);
     if (!match) return res.status(404).json({ error: 'Match nahi mila' });
     await match.populate('creator', 'username phone');
@@ -2285,17 +2402,7 @@ app.post('/api/matches/join', requireUser, async (req, res) => {
         joinedAt,
         roomCodeDeadline: new Date(Date.now() + 2 * 60 * 1000),
         ...(isLudoRace ? { gameStartedAt: null } : {}),
-        ...(match.gameType === 'LUDO_SCORE' ? { ludoScore: {
-          version: 0,
-          tokens: { creator: [-1, -1, -1, -1], joiner: [-1, -1, -1, -1] },
-          currentTurn: String(match.creator),
-          diceValue: null,
-          legalTokenIndexes: [],
-          winnerId: null,
-          turnDeadlineAt: new Date(joinedAt.getTime() + ludoScoreTurnDuration),
-          rollCount: 0,
-          scores: { creator: 0, joiner: 0 }
-        } } : {}),
+        ...(match.gameType === 'LUDO_SCORE' ? { ludoScore: createLudoScoreState(match.creator, joinedAt) } : {}),
         joinerWinningsUsed: debit.winningsUsed
       } },
       { new: true }
