@@ -2139,7 +2139,7 @@ async function expireLudoScoreTurn(match) {
 app.post('/api/matches/ludo-score/roll', requireUser, async (req, res) => {
   const { matchId } = req.body;
   try {
-    const match = await Match.findById(matchId);
+    let match = await ensureLudoScoreState(await Match.findById(matchId));
     if (!match || match.gameType !== 'LUDO_SCORE' || match.status !== 'RUNNING' || !match.ludoScore) {
       return res.status(400).json({ error: 'Ludo Score match active nahi hai' });
     }
@@ -2206,7 +2206,7 @@ app.post('/api/matches/ludo-score/move', requireUser, async (req, res) => {
   let winAmount = 0;
   let adminCommission = 0;
   try {
-    let match = await Match.findById(matchId);
+    let match = await ensureLudoScoreState(await Match.findById(matchId));
     if (!match || match.gameType !== 'LUDO_SCORE' || match.status !== 'RUNNING' || !match.ludoScore) {
       return res.status(400).json({ error: 'Ludo Score match active nahi hai' });
     }
