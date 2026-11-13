@@ -6,13 +6,11 @@
     [10, 8], [11, 8], [12, 8], [13, 8], [14, 8], [14, 7], [14, 6], [13, 6], [12, 6], [11, 6],
     [10, 6], [9, 6], [8, 5], [8, 4], [8, 3], [8, 2], [8, 1], [8, 0], [7, 0], [6, 0]
   ];
-  const homePaths = {
-    creator: [[7, 1], [7, 2], [7, 3], [7, 4], [7, 5], [7, 6]],
-    joiner: [[8, 13], [8, 12], [8, 11], [8, 10], [8, 9], [8, 8]]
-  };
-  const baseSlots = {
-    creator: [[1, 1], [1, 4], [4, 1], [4, 4]],
-    joiner: [[10, 10], [10, 13], [13, 10], [13, 13]]
+  const colors = {
+    red: { startIndex: 0, homePath: [[7, 1], [7, 2], [7, 3], [7, 4], [7, 5]], finish: [7, 7], baseSlots: [[1, 1], [1, 4], [4, 1], [4, 4]], yard: [0, 5, 0, 5], name: 'Lal', symbol: '🔴' },
+    green: { startIndex: 26, homePath: [[8, 13], [8, 12], [8, 11], [8, 10], [8, 9]], finish: [7, 7], baseSlots: [[10, 10], [10, 13], [13, 10], [13, 13]], yard: [9, 14, 9, 14], name: 'Hara', symbol: '🟢' },
+    yellow: { startIndex: 13, homePath: [[1, 7], [2, 7], [3, 7], [4, 7], [5, 7]], finish: [7, 7], baseSlots: [[1, 10], [1, 13], [4, 10], [4, 13]], yard: [0, 5, 9, 14], name: 'Peela', symbol: '🟡' },
+    blue: { startIndex: 39, homePath: [[13, 7], [12, 7], [11, 7], [10, 7], [9, 7]], finish: [7, 7], baseSlots: [[10, 1], [10, 4], [13, 1], [13, 4]], yard: [9, 14, 0, 5], name: 'Neela', symbol: '🔵' }
   };
   const safeTrack = new Set([0, 8, 13, 21, 26, 34, 39, 47]);
   let activeMatchId = '';
@@ -26,10 +24,21 @@
     .ludo-score-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
     .ludo-score-head h3{margin:0}
     .ludo-score-players{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}
-    .ludo-score-player{padding:9px 11px;border:1px solid #405247;border-radius:10px;background:linear-gradient(135deg,#24382a,#1b2a20)}
-    .ludo-score-player strong{display:block}
+    .ludo-score-player{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:8px;min-width:0;padding:9px 11px;border:1px solid #405247;border-radius:10px;background:linear-gradient(135deg,#24382a,#1b2a20)}
+    .ludo-score-player-main{display:flex;align-items:center;gap:8px;min-width:0}
+    .ludo-score-avatar,.ludo-score-avatar-fallback{display:grid;place-items:center;width:40px;height:40px;flex:none;border:2px solid #d5c16b;border-radius:50%;object-fit:cover;color:#fff;background:#304336;font-size:16px;font-weight:900}
+    .ludo-score-player-copy{min-width:0}
+    .ludo-score-player-copy strong{display:block;overflow-wrap:anywhere}
+    .ludo-score-player-copy small{color:var(--muted)}
     .ludo-score-player small{color:var(--muted)}
     .ludo-score-player.creator{border-color:#e16a5d}.ludo-score-player.joiner{border-color:#4bc174}
+    .ludo-score-player.red{border-color:#e16a5d}.ludo-score-player.green{border-color:#4bc174}
+    .ludo-score-player.yellow{border-color:#d4b333}.ludo-score-player.blue{border-color:#5a82c7}
+    .ludo-score-turn-control{display:flex;align-items:center;gap:7px}
+    .ludo-score-turn-control .ludo-score-dice-box{padding:5px 7px;gap:3px}
+    .ludo-score-turn-control .ludo-score-die{width:42px;height:42px;min-width:42px;padding:5px;border-radius:11px}
+    .ludo-score-turn-control .ludo-score-die-pip{width:7px;height:7px}
+    .ludo-score-turn-control .ludo-score-roll{min-height:36px;padding:6px 9px}
     .ludo-score-status{margin:8px 0;padding:10px 12px;border:1px solid #405b46;border-radius:10px;background:#1d2d21}
     .ludo-score-timer{display:inline-grid;place-items:center;min-width:52px;padding:5px 8px;border:1px solid #d7b14e;border-radius:7px;color:#f4d36c;font-weight:800;font-variant-numeric:tabular-nums}
     .ludo-score-timer.urgent{color:#ff8c78;border-color:#ff8c78}
@@ -46,22 +55,25 @@
     .ludo-score-board{display:grid;grid-template-columns:repeat(15,minmax(0,1fr));width:min(100%,560px);aspect-ratio:1;margin:14px auto;border:3px solid #f0c34f;border-radius:12px;overflow:hidden;background:#fff;box-shadow:0 8px 24px #0006}
     .score-cell{position:relative;display:flex;align-items:center;justify-content:center;min-width:0;min-height:0;border:1px solid #dce5de;background:#f8faf8}
     .score-cell-track{background:#fff}.score-cell-safe::after{content:'★';position:absolute;color:#b89637;font-size:clamp(6px,1.8vw,15px);pointer-events:none}
-    .score-cell-yard-creator{background:linear-gradient(135deg,#ffded8,#ffc6bf)}.score-cell-yard-joiner{background:linear-gradient(135deg,#def7e4,#c0ebce)}
-    .score-cell-start-creator,.score-cell-home-creator{background:#f27569}
-    .score-cell-start-joiner,.score-cell-home-joiner{background:#58bd75}
-    .score-cell-base-creator,.score-cell-base-joiner{margin:3px;border:2px solid #fff;border-radius:50%;background:#fff}
-    .score-cell-base-creator{box-shadow:inset 0 0 0 2px #c94f46}.score-cell-base-joiner{box-shadow:inset 0 0 0 2px #32834e}
+    .score-cell-yard-red{background:linear-gradient(135deg,#ffded8,#ffc6bf)}.score-cell-yard-green{background:linear-gradient(135deg,#def7e4,#c0ebce)}
+    .score-cell-yard-yellow{background:linear-gradient(135deg,#fff3c4,#f5e29b)}.score-cell-yard-blue{background:linear-gradient(135deg,#dce8ff,#bdcff4)}
+    .score-cell-start-red,.score-cell-home-red{background:#f27569}.score-cell-start-green,.score-cell-home-green{background:#58bd75}
+    .score-cell-start-yellow,.score-cell-home-yellow{background:#f0d45b}.score-cell-start-blue,.score-cell-home-blue{background:#6f96da}
+    .score-cell-base-red,.score-cell-base-green,.score-cell-base-yellow,.score-cell-base-blue{margin:3px;border:2px solid #fff;border-radius:50%;background:#fff}
+    .score-cell-base-red{box-shadow:inset 0 0 0 2px #c94f46}.score-cell-base-green{box-shadow:inset 0 0 0 2px #32834e}
+    .score-cell-base-yellow{box-shadow:inset 0 0 0 2px #b79412}.score-cell-base-blue{box-shadow:inset 0 0 0 2px #416ba8}
     .score-cell-center{background:conic-gradient(#c95950 0deg 90deg,#e3c24b 90deg 180deg,#499565 180deg 270deg,#4d76b2 270deg)}
     .score-token-stack{position:relative;z-index:1;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:1px;max-width:100%}
     .score-token{display:grid;place-items:center;width:clamp(11px,3.3vw,24px);height:clamp(11px,3.3vw,24px);padding:0;border:2px solid #fff;border-radius:50%;box-shadow:0 1px 3px #0007;color:#fff;font-size:clamp(7px,1.5vw,11px);font-weight:800}
-    .score-token.creator{background:#c94f46}.score-token.joiner{background:#32834e}
+    .score-token.creator,.score-token.red{background:#c94f46}.score-token.joiner,.score-token.green{background:#32834e}
+    .score-token.yellow{background:#b79412}.score-token.blue{background:#416ba8}
     .score-token.selectable{outline:2px solid #f0c85b;cursor:pointer;animation:score-pulse 1.1s infinite alternate}
     .score-token:disabled{cursor:default;opacity:1}
     .ludo-score-proof{max-width:560px;margin:12px auto 0}
     .ludo-score-proof input{width:100%}
     @keyframes ludo-die-pop{from{transform:rotate(-12deg) scale(.8)}to{transform:rotate(-4deg) scale(1)}}
     @keyframes score-pulse{to{transform:scale(1.13)}}
-    @media(max-width:520px){.ludo-score-board{border-width:2px}.ludo-score-player{padding:7px;font-size:13px}.ludo-score-die{width:52px;height:52px;min-width:52px}.ludo-score-rule-pill{font-size:11px}}
+    @media(max-width:520px){.ludo-score-board{border-width:2px}.ludo-score-players{grid-template-columns:1fr}.ludo-score-player{padding:7px;font-size:13px}.ludo-score-die{width:52px;height:52px;min-width:52px}.ludo-score-rule-pill{font-size:11px}}
   `;
   document.head.append(style);
 
@@ -69,13 +81,29 @@
     return String(user?._id || user?.id || user || '');
   }
 
-  function positionFor(side, progress, tokenIndex) {
-    if (progress < 0) return [baseSlots[side][tokenIndex]];
+  function avatarMarkup(user, app) {
+    const username = String(app.nameOf(user) || 'Player');
+    const initial = username.trim().charAt(0).toUpperCase() || '?';
+    const profileImage = String(user?.profileImage || '').trim();
+    const imageUrl = profileImage.startsWith('uploads/')
+      ? `/api/profile/image/${encodeURIComponent(profileImage.slice('uploads/'.length))}`
+      : profileImage
+        ? `/${profileImage.split('/').map(encodeURIComponent).join('/')}`
+        : '';
+    return imageUrl
+      ? `<img class="ludo-score-avatar" src="${app.esc(imageUrl)}" alt="${app.esc(username)} profile picture" data-score-avatar data-initial="${app.esc(initial)}">`
+      : `<span class="ludo-score-avatar-fallback" aria-hidden="true">${app.esc(initial)}</span>`;
+  }
+
+  function positionFor(color, progress, tokenIndex) {
+    const config = colors[color] || colors.red;
+    if (progress < 0) return [config.baseSlots[tokenIndex]];
     if (progress <= 51) {
-      const trackIndex = side === 'creator' ? progress : (progress + 26) % 52;
+      const trackIndex = (config.startIndex + progress) % 52;
       return [track[trackIndex]];
     }
-    return [homePaths[side][progress - 52]];
+    if (progress <= 56) return [config.homePath[progress - 52]];
+    return [config.finish];
   }
 
   function diceMarkup(value) {
@@ -123,9 +151,10 @@
   }
 
   function makeMarkup(match, app) {
-    const state = match.ludoScore || (['OPEN', 'CANCELLED'].includes(match.status) ? {
+    const state = match.ludoScore?.tokens ? match.ludoScore : (['OPEN', 'CANCELLED'].includes(match.status) ? {
       tokens: { creator: [-1, -1, -1, -1], joiner: [-1, -1, -1, -1] },
       scores: { creator: 0, joiner: 0 },
+      colors: match.ludoScore?.colors || {},
       currentTurn: idOf(match.creator),
       legalTokenIndexes: [],
       diceValue: null
@@ -136,7 +165,12 @@
     const joinerId = idOf(match.joiner);
     const joinerName = match.joiner ? app.nameOf(match.joiner) : 'Pratidvandvi';
     const mySide = creatorId === myId ? 'creator' : 'joiner';
+    const playerColors = {
+      creator: colors[state.colors?.creator] ? state.colors.creator : 'red',
+      joiner: colors[state.colors?.joiner] ? state.colors.joiner : 'green'
+    };
     const ownTurn = match.status === 'RUNNING' && String(state.currentTurn) === myId && !state.winnerId;
+    const turnSide = String(state.currentTurn) === creatorId ? 'creator' : 'joiner';
     const legalTokens = ownTurn && Array.isArray(state.legalTokenIndexes) ? state.legalTokenIndexes : [];
     const winner = state.winnerId ? String(state.winnerId) : '';
     const winnerName = winner ? app.nameOf(winner === creatorId ? match.creator : match.joiner) : '';
@@ -150,22 +184,24 @@
         classes.push('score-cell-track');
         if (safeTrack.has(trackIndex)) classes.push('score-cell-safe');
       }
-      for (const side of ['creator', 'joiner']) {
-        if (side === 'creator' && row < 6 && col < 6) classes.push('score-cell-yard-creator');
-        if (side === 'joiner' && row > 8 && col > 8) classes.push('score-cell-yard-joiner');
-        if (trackIndex === (side === 'creator' ? 0 : 26)) classes.push(`score-cell-start-${side}`);
-        if (homePaths[side].some(([homeRow, homeCol]) => homeRow === row && homeCol === col)) classes.push(`score-cell-home-${side}`);
-        if (baseSlots[side].some(([baseRow, baseCol]) => baseRow === row && baseCol === col)) classes.push(`score-cell-base-${side}`, 'score-cell-base-inner');
+      for (const color of Object.keys(colors)) {
+        const config = colors[color];
+        const [yardRowStart, yardRowEnd, yardColStart, yardColEnd] = config.yard;
+        if (row >= yardRowStart && row <= yardRowEnd && col >= yardColStart && col <= yardColEnd) classes.push(`score-cell-yard-${color}`);
+        if (trackIndex === config.startIndex) classes.push(`score-cell-start-${color}`);
+        if (config.homePath.some(([homeRow, homeCol]) => homeRow === row && homeCol === col)) classes.push(`score-cell-home-${color}`);
+        if (config.baseSlots.some(([baseRow, baseCol]) => baseRow === row && baseCol === col)) classes.push(`score-cell-base-${color}`, 'score-cell-base-inner');
       }
       if (row === 7 && col === 7) classes.push('score-cell-center');
       const tokensHere = [];
       for (const side of ['creator', 'joiner']) {
         (state.tokens[side] || []).forEach((progress, tokenIndex) => {
-          if (!positionFor(side, progress, tokenIndex).some(([tokenRow, tokenCol]) => tokenRow === row && tokenCol === col)) return;
+          const color = playerColors[side];
+          if (!positionFor(color, progress, tokenIndex).some(([tokenRow, tokenCol]) => tokenRow === row && tokenCol === col)) return;
           const canMove = side === mySide && ownTurn && legalTokens.includes(tokenIndex);
-          const label = `${side === 'creator' ? 'Red' : 'Green'} token ${tokenIndex + 1}`;
+          const label = `${colors[color].name} token ${tokenIndex + 1}`;
           const locked = progress === -1 && !canMove;
-          tokensHere.push(`<button type="button" class="score-token ${side}${canMove ? ' selectable' : ''}" data-score-token="${tokenIndex}" aria-label="${label}${canMove ? ', select to move' : locked ? ', ghar mein band; 6 chahiye' : ''}"${locked ? ' title="Ghar se kholne ke liye 6 chahiye"' : ''} ${canMove ? '' : 'disabled'}>${tokenIndex + 1}</button>`);
+          tokensHere.push(`<button type="button" class="score-token ${color}${canMove ? ' selectable' : ''}" data-score-token="${tokenIndex}" aria-label="${label}${canMove ? ', select to move' : locked ? ', ghar mein band; 6 chahiye' : ''}"${locked ? ' title="Ghar se kholne ke liye 6 chahiye"' : ''} ${canMove ? '' : 'disabled'}>${tokenIndex + 1}</button>`);
         });
       }
       return `<div class="${classes.join(' ')}" style="grid-row:${row + 1};grid-column:${col + 1}">${tokensHere.length ? `<div class="score-token-stack">${tokensHere.join('')}</div>` : ''}</div>`;
@@ -173,6 +209,20 @@
     const creatorScore = Number(state.scores?.creator ?? state.tokens.creator.filter(value => value === 57).length * 250);
     const joinerScore = Number(state.scores?.joiner ?? state.tokens.joiner.filter(value => value === 57).length * 250);
     const dieValue = state.diceValue || state.lastDice || '–';
+    const playerCard = (side, user) => {
+      const color = playerColors[side];
+      const playerScore = side === 'creator' ? creatorScore : joinerScore;
+      const homeCount = (state.tokens[side] || []).filter(value => value === 57).length;
+      const turnControl = match.status === 'RUNNING' && side === turnSide
+        ? `<div class="ludo-score-turn-control"><div class="ludo-score-dice-box"><span class="ludo-score-dice-label">DICE</span>${diceMarkup(dieValue)}</div><button type="button" class="btn ludo-score-roll" id="ludoScoreRoll" ${!ownTurn || state.diceValue || busy ? 'disabled' : ''}>Roll</button></div>`
+        : '';
+      return `<div class="ludo-score-player ${color}">
+        <div class="ludo-score-player-main">${avatarMarkup(user, app)}<div class="ludo-score-player-copy">
+          <strong>${app.esc(app.nameOf(user))}</strong>
+          <small>${colors[color].symbol} ${colors[color].name} · ${playerScore}/1000 points · ${homeCount}/4 ghar</small>
+        </div></div>${turnControl}
+      </div>`;
+    };
     const statusText = match.status === 'OPEN'
       ? 'Pratidvandvi ka intezar hai — join karte hi yahin game shuru hoga.'
       : match.status === 'CANCELLED'
@@ -199,14 +249,14 @@
       <div class="stat"><small>Creator</small><strong>${app.esc(app.nameOf(match.creator))}</strong></div>
       <div class="stat"><small>Opponent</small><strong>${app.esc(joinerName)}</strong></div></div>
       <div class="panel ludo-score-panel">
-        <div class="ludo-score-head"><h3>Ludo board • 4 gotiyan • 4 ghar = jeet</h3>${match.status === 'RUNNING' && !winner ? '<span id="ludoScoreTimer" class="ludo-score-timer" aria-live="polite">20s</span>' : ''}</div>
+        <div class="ludo-score-head"><h3>Ludo board • 4 rang • 4 gotiyan = jeet</h3><span class="muted">57 khane · 6 par hi goti khulegi</span>${match.status === 'RUNNING' && !winner ? '<span id="ludoScoreTimer" class="ludo-score-timer" aria-live="polite">20s</span>' : ''}</div>
         <div class="ludo-score-players">
-          <div class="ludo-score-player creator"><strong>🔴 ${app.esc(app.nameOf(match.creator))}</strong><small>${creatorScore}/1000 points · ${state.tokens.creator.filter(value => value === 57).length}/4 ghar</small></div>
-          <div class="ludo-score-player joiner"><strong>🟢 ${app.esc(joinerName)}</strong><small>${joinerScore}/1000 points · ${state.tokens.joiner.filter(value => value === 57).length}/4 ghar</small></div>
+          ${playerCard('creator', match.creator)}
+          ${playerCard('joiner', match.joiner || { username: joinerName })}
         </div>
         <p class="muted">Ghar ki goti sirf 6 aane par khulegi; ghar pahunchne ke liye exact roll chahiye, extra number par move nahi hoga. Dice roll aur goti move 20 second mein karein; timeout par 100 points minus. Lagatar teesra 6 aane par turn opponent ko milegi.</p>
         <div class="ludo-score-status" aria-live="polite">${statusText}${state.lastAction ? `<br><small>${app.esc(state.lastAction)}</small>` : ''}</div>
-        <div class="ludo-score-actions"><div class="ludo-score-dice-box"><span class="ludo-score-dice-label">DICE</span>${diceMarkup(dieValue)}</div><button type="button" class="btn ludo-score-roll" id="ludoScoreRoll" ${!ownTurn || state.diceValue || busy ? 'disabled' : ''}>🎲 Dice ghumayein</button><span class="ludo-score-rule-pill">🔒 6 par hi goti khulegi</span><span class="muted">${match.status === 'OPEN' ? 'Opponent ke join karne par dice unlock hoga' : ownTurn ? 'Apni turn' : 'Opponent ki turn'}</span></div>
+        <div class="ludo-score-actions"><span class="ludo-score-rule-pill">🔒 6 par hi goti khulegi</span><span class="muted">${match.status === 'OPEN' ? 'Opponent ke join karne par dice unlock hoga' : ownTurn ? 'Apni turn' : 'Opponent ki turn'}</span></div>
         <div class="ludo-score-board" role="grid" aria-label="KhiladiAdda24 Ludo Score board">${cells}</div>
         ${resultMarkup}${cancelMarkup}
       </div>`;
@@ -224,11 +274,18 @@
     const renderState = currentMatch => {
       if (activeMatchId !== String(matchId)) return;
       latestMatch = currentMatch;
-      const signature = `${currentMatch.status}:${currentMatch.ludoScore?.version}:${currentMatch.ludoScore?.winnerId || ''}:${currentMatch.proofScreenshot || ''}:${currentMatch.resultSubmittedAt || ''}`;
+      const signature = `${currentMatch.status}:${currentMatch.ludoScore?.version}:${currentMatch.ludoScore?.winnerId || ''}:${currentMatch.proofScreenshot || ''}:${currentMatch.resultSubmittedAt || ''}:${currentMatch.ludoScore?.colors?.creator || ''}:${currentMatch.ludoScore?.colors?.joiner || ''}:${currentMatch.creator?.profileImage || ''}:${currentMatch.joiner?.profileImage || ''}`;
       if (signature === activeSignature) return;
       activeSignature = signature;
       app.el('matchDetails').innerHTML = makeMarkup(currentMatch, app);
       app.setView('match');
+      document.querySelectorAll('[data-score-avatar]').forEach(image => image.addEventListener('error', () => {
+        const fallback = document.createElement('span');
+        fallback.className = 'ludo-score-avatar-fallback';
+        fallback.setAttribute('aria-hidden', 'true');
+        fallback.textContent = image.dataset.initial || '?';
+        image.replaceWith(fallback);
+      }, { once: true }));
       const rollButton = document.getElementById('ludoScoreRoll');
       if (rollButton) rollButton.addEventListener('click', async () => {
         busy = true;
