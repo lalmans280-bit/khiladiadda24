@@ -426,14 +426,15 @@
     #view-home>.home-open-battles-panel .match-head h2,#view-home>.home-running-battles-panel>h2{display:block;margin:0;padding:0;border:0;border-radius:0;color:inherit;background:transparent;font-size:16px;line-height:1.2}
     html[data-theme="night"] .battle-prizes.open-battle-prizes .battle-player-amount{font-size:14px}
     .game-mode-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:7px}
-    .game-mode-option{display:flex;align-items:center;gap:8px;min-height:62px;padding:6px 8px;border:2px solid transparent;border-radius:9px;font:900 13px/1.2 "Trebuchet MS",Verdana,sans-serif;text-align:left;text-transform:uppercase;transition:transform .15s,box-shadow .15s}
-    .game-mode-option img{width:46px;height:46px;flex:none;border-radius:6px;object-fit:cover}
+    .game-mode-option{display:grid;place-items:center;min-height:72px;padding:6px;border:2px solid transparent;border-radius:9px;transition:transform .15s,box-shadow .15s}
+    .game-mode-option img{width:54px;height:54px;flex:none;border-radius:6px;object-fit:contain}
     .game-mode-option:hover{transform:translateY(-1px)}
     .game-mode-option:focus-visible{outline:3px solid #172018;outline-offset:2px}
     .game-mode-option[data-game-option="LUDO"]{border-color:#86c995;color:#174b2b;background:#dcfce7}
     .game-mode-option[data-game-option="POPULAR_LUDO"]{border-color:#82aee8;color:#1e3a8a;background:#dbeafe}
     .game-mode-option[data-game-option="LUDO_RACE"]{border-color:#e4b84b;color:#78350f;background:#fef3c7}
     .game-mode-option[data-game-option="LUDO_SCORE"]{border-color:#e27a53;color:#78351f;background:#fff0e8}
+    .game-mode-option[data-game-option="LUDO_SCORE"]{justify-content:center}
     .game-mode-option[data-game-option="SNAKE"]{border-color:#c89ae0;color:#581c87;background:#f3e8ff}
     .game-mode-option.active{box-shadow:inset 0 0 0 2px currentColor}
     @media(max-width:600px){.battle-prizes.open-battle-prizes .battle-player-name{font-size:10px}html[data-theme="night"] .battle-prizes.open-battle-prizes .battle-player-amount{font-size:12px}html[data-theme="day"] .battle-prizes.open-battle-prizes .battle-player-amount{font-size:12px}}
@@ -501,7 +502,7 @@
   <main class="shell content"><div id="notice" class="notice" role="status" hidden></div>
       <section class="view" id="view-games">
         <div class="game-launch" id="gamePicker">
-          <button class="game-tile score-game-tile" type="button" data-launch-game="LUDO_SCORE" aria-label="KhiladiAdda24 Ludo Score" title="KhiladiAdda24 Ludo Score"><img class="score-game-art" src="/app-icon-192.png" alt=""></button>
+          <button class="game-tile score-game-tile" type="button" data-launch-game="LUDO_SCORE" aria-label="KhiladiAdda24 Ludo Score"><img class="score-game-art" src="/app-icon-192.png" alt=""></button>
           <button class="game-tile game-tile-image game-coming-soon-tile" type="button" data-cricket-promo aria-label="Cricket fantasy - Coming Soon"><img class="cricket-game-logo" src="/cricket-game-logo.svg" alt=""><span class="game-coming-soon-icon" aria-hidden="true">🏏</span><strong>Cricket Fantasy</strong><span class="game-coming-soon-badge">₹1 LAKH · COMING SOON</span></button>
           <button class="game-tile game-tile-image game-coming-soon-tile" type="button" data-pubg-promo aria-label="PUBG - Coming Soon"><span class="game-coming-soon-icon" aria-hidden="true">🎯</span><strong>PUBG</strong><span class="game-coming-soon-badge">COMING SOON</span></button>
           <a class="game-support-banner" href="/support.html" aria-label="WhatsApp and support"><img src="/support-banner.png?v=20261028-support-update" alt="WhatsApp and Support"><span class="game-live-badge"><i class="game-live-dot" aria-hidden="true"></i><span class="game-live-text">LIVE</span></span></a>
@@ -914,9 +915,8 @@
     gameModeOptions.className='game-mode-options';
     gameModeOptions.setAttribute('role','group');
     gameModeOptions.setAttribute('aria-labelledby',gameTypeFieldLabel.id);
-    const gameModeImages={LUDO:'/ludo_classic_256x256.png',POPULAR_LUDO:'/popular_ludo_256x256.png',LUDO_RACE:'/ludo_race_1_goti_win_256x256.png',LUDO_SCORE:'/ludo_classic_256x256.png',SNAKE:'/snake_ladder_256x256.png'};
-    const gameModeLabels={LUDO:'Ludo Classic',POPULAR_LUDO:'Popular Ludo',LUDO_RACE:'Ludo Race — 1 Goti Win',LUDO_SCORE:'Ludo Score',SNAKE:'Snake'};
-    Array.from(gameTypeSelect.options).forEach(option=>{const button=document.createElement('button'),image=document.createElement('img'),label=document.createElement('span');button.type='button';button.className='game-mode-option';button.dataset.gameOption=option.value;button.setAttribute('aria-label',option.textContent);image.src=gameModeImages[option.value];image.alt='';image.setAttribute('aria-hidden','true');label.textContent=gameModeLabels[option.value]||option.textContent;button.append(image,label);button.setAttribute('aria-pressed',String(option.selected));gameModeOptions.append(button)});
+    const gameModeImages={LUDO:'/ludo_classic_256x256.png',POPULAR_LUDO:'/popular_ludo_256x256.png',LUDO_RACE:'/ludo_race_1_goti_win_256x256.png',LUDO_SCORE:'/app-icon-192.png',SNAKE:'/snake_ladder_256x256.png'};
+    Array.from(gameTypeSelect.options).forEach(option=>{const button=document.createElement('button'),image=document.createElement('img');button.type='button';button.className='game-mode-option';button.dataset.gameOption=option.value;button.setAttribute('aria-label',option.textContent);image.src=gameModeImages[option.value];image.alt='';image.setAttribute('aria-hidden','true');button.append(image);button.setAttribute('aria-pressed',String(option.selected));gameModeOptions.append(button)});
     gameTypeFieldLabel.after(gameModeOptions);
     gameTypeSelect.hidden=true;
     function syncGameSelection(gameType){const selectedType=['LUDO','POPULAR_LUDO','LUDO_RACE','LUDO_SCORE','SNAKE'].includes(gameType)?gameType:'LUDO';game=selectedType==='SNAKE'?'SNAKE':'LUDO';gameTypeSelect.value=selectedType;gameModeOptions.querySelectorAll('.game-mode-option').forEach(button=>{const selected=button.dataset.gameOption===selectedType;button.classList.toggle('active',selected);button.setAttribute('aria-pressed',String(selected))});document.querySelectorAll('.game-filter').forEach(button=>button.classList.toggle('active',button.dataset.game===game));if(el('gameViewTitle'))el('gameViewTitle').textContent=selectedType==='LUDO_RACE'?'Ludo Race — 1 Goti Win':selectedType==='LUDO_SCORE'?'KhiladiAdda24 Ludo Score':''}
