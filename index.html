@@ -567,6 +567,7 @@
   </script>
   <script src="/socket.io/socket.io.js"></script>
   <script src="/ludo-race.js?v=20260624-one-token-win"></script>
+  <script src="/ludo-score.js?v=20261113-score-mode"></script>
   <script>
     const token=localStorage.getItem('token');
     const storedUser=(()=>{try{return JSON.parse(localStorage.getItem('user')||'null')}catch{return null}})();
@@ -964,7 +965,7 @@
         const isParticipant=typeof m.viewerIsParticipant==='boolean'?m.viewerIsParticipant:[m.creator,m.joiner].some(participant=>matchPlayerId(participant)===currentPlayerId);
         const isCreator=typeof m.viewerIsCreator==='boolean'?m.viewerIsCreator:matchPlayerId(m.creator)===currentPlayerId;
         const isJoiner=isParticipant&&!isCreator;
-        const inAppRace=['LUDO_RACE','LUDO_SCORE'].includes(m.gameType)&&Boolean(m.ludoRace);
+        const inAppRace=m.gameType==='LUDO_RACE'&&Boolean(m.ludoRace)||m.gameType==='LUDO_SCORE'&&Boolean(m.ludoScore);
         let actions='';
         if(inAppRace&&isParticipant){
           actions=`<div class="row"><button class="btn green small" type="button" data-match="${esc(m._id)}">${m.gameType==='LUDO_SCORE'?'Play Ludo Score':'Open Ludo Race'}</button>${!m.gameStartedAt?`<button class="btn danger small" data-running-cancel="${esc(m._id)}" data-room-code-shared="0">Cancel before first roll</button>`:''}</div>`;
@@ -1126,7 +1127,7 @@
     window.openMatchPage=(id,stage,showResult=false)=>{const url=new URL('/index.html',location.origin);url.searchParams.set('matchId',id);if(stage)url.searchParams.set('stage',stage);if(showResult)url.searchParams.set('showResult','1');history.pushState({matchId:id},'',url);return window.openMatch(id)};
     window.matchApp={api,el,notify,esc,nameOf,setView,refresh,getPlayer:()=>player,getUser:()=>storedUser};
     const openMatchWithScoreMode=window.openMatch;
-    window.openMatch=async id=>{const match=await api(`/api/matches/${encodeURIComponent(id)}`);if(match.gameType==='LUDO_SCORE'&&match.ludoRace&&['RUNNING','PENDING_RESULT','COMPLETED','PENDING_CANCELLATION','CANCELLED'].includes(match.status)&&window.renderLudoRaceMatch)return window.renderLudoRaceMatch(match,id);return openMatchWithScoreMode(id)};
+    window.openMatch=async id=>{const match=await api(`/api/matches/${encodeURIComponent(id)}`);if(match.gameType==='LUDO_SCORE'&&match.ludoScore&&['RUNNING','PENDING_RESULT','COMPLETED','PENDING_CANCELLATION','CANCELLED'].includes(match.status)&&window.renderLudoScoreMatch)return window.renderLudoScoreMatch(match,id);return openMatchWithScoreMode(id)};
     refresh().catch(showError);battlesPollTimer=setInterval(()=>loadOpen().catch(showError),10000);setInterval(refreshSamplePlayers,10*1000);setInterval(()=>{if(el('view-profile').classList.contains('active'))loadWalletSummary().catch(showError)},10000);const initialMatchId=new URLSearchParams(location.search).get('matchId');if(initialMatchId)window.openMatch(initialMatchId).catch(showError);
   </script>
     <script src="/match-flow.js?v=20260929-reason-required-roomcode-cancel"></script>
