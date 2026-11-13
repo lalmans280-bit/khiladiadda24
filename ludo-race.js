@@ -119,7 +119,7 @@
       : match.status === 'COMPLETED'
         ? `<p class="notice">Match complete${match.winner ? ` — winner: ${app.esc(app.nameOf(match.winner))}` : ''}.</p>`
         : winner === myId
-          ? `<form class="ludo-race-proof" id="ludoRaceProof"><p class="muted">Apni win ka screenshot upload karke result admin review ke liye bhejein.</p><div class="field"><label for="ludoRaceScreenshot">Win screenshot</label><input id="ludoRaceScreenshot" name="screenshot" type="file" accept="image/jpeg,image/png,image/webp" required></div><button class="btn green" type="submit">Win screenshot bhejein</button></form>`
+          ? '<form class="ludo-race-proof" id="ludoRaceProof"><p class="muted">Apni win ka screenshot upload karke result admin review ke liye bhejein.</p><div class="field"><label for="ludoRaceScreenshot">Win screenshot</label><input id="ludoRaceScreenshot" name="screenshot" type="file" accept="image/jpeg,image/png,image/webp" required></div><button class="btn green" type="submit">Win screenshot bhejein</button></form>'
           : winner
             ? '<p class="notice warning">Winner screenshot upload karke result admin review ke liye bhejega.</p>'
             : '';
