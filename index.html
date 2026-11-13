@@ -503,7 +503,7 @@
   <main class="shell content"><div id="notice" class="notice" role="status" hidden></div>
       <section class="view" id="view-games">
         <div class="game-launch" id="gamePicker">
-          <button class="game-tile score-game-tile" type="button" data-launch-game="LUDO_SCORE" aria-label="KhiladiAdda24 Ludo Score"><img class="score-game-art" src="/app-icon-192.png" alt=""></button>
+          <button class="game-tile score-game-tile" type="button" data-launch-game="LUDO_SCORE" aria-label="KhiladiAdda24 Ludo Score"><img class="score-game-art" src="/app-icon-192.png?v=20261113-ludo-score-app-icon" alt=""></button>
           <button class="game-tile game-tile-image game-coming-soon-tile" type="button" data-cricket-promo aria-label="Cricket fantasy - Coming Soon"><img class="cricket-game-logo" src="/cricket-game-logo.svg" alt=""><span class="game-coming-soon-icon" aria-hidden="true">🏏</span><strong>Cricket Fantasy</strong><span class="game-coming-soon-badge">₹1 LAKH · COMING SOON</span></button>
           <button class="game-tile game-tile-image game-coming-soon-tile" type="button" data-pubg-promo aria-label="PUBG - Coming Soon"><span class="game-coming-soon-icon" aria-hidden="true">🎯</span><strong>PUBG</strong><span class="game-coming-soon-badge">COMING SOON</span></button>
           <a class="game-support-banner" href="/support.html" aria-label="WhatsApp and support"><img src="/support-banner.png?v=20261028-support-update" alt="WhatsApp and Support"><span class="game-live-badge"><i class="game-live-dot" aria-hidden="true"></i><span class="game-live-text">LIVE</span></span></a>
@@ -909,21 +909,44 @@
     function ludoKingOpenUrl(){const fallback=encodeURIComponent('https://play.google.com/store/apps/details?id=com.ludo.king');return `intent://#Intent;action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;package=com.ludo.king;S.browser_fallback_url=${fallback};end`}
     window.ludoKingOpenUrl=ludoKingOpenUrl;
     window.openLudoKingApp=()=>{window.location.href=ludoKingOpenUrl()};
-    const gameTypeSelect=el('gameType'),gameTypeFieldLabel=document.querySelector('label[for="gameType"]'),gameModeOptions=document.createElement('div');
-    gameTypeFieldLabel.hidden=true;
-    gameTypeFieldLabel.style.display='none';
-    gameTypeSelect.hidden=true;
-    gameTypeSelect.setAttribute('aria-hidden','true');
-    gameTypeSelect.style.display='none';
-    const ludoScoreOption=document.createElement('option');ludoScoreOption.value='LUDO_SCORE';ludoScoreOption.textContent='KhiladiAdda24 Ludo Score';gameTypeSelect.append(ludoScoreOption);
-    gameTypeFieldLabel.id='gameTypeLabel';
-    gameTypeFieldLabel.removeAttribute('for');
+    const gameTypeSelect=el('gameType'),gameTypeFieldLabel=document.querySelector('label[for="gameType"]');
+    if (gameTypeFieldLabel) gameTypeFieldLabel.remove();
+    if (gameTypeSelect) gameTypeSelect.remove();
+    const gameModeOptions=document.createElement('div');
+    const gameTypeFieldContainer = document.querySelector('#createForm .field') || document.body;
+    const ludoScoreOption=document.createElement('option');
+    const scoreAppIcon = '/app-icon-192.png?v=20261113-ludo-score-app-icon';
+    const preservedSelect = document.createElement('select');
+    preservedSelect.id='gameType';
+    preservedSelect.hidden=true;
+    preservedSelect.setAttribute('aria-hidden','true');
+    preservedSelect.style.display='none';
+    preservedSelect.style.position='absolute';
+    preservedSelect.style.left='-9999px';
+    [
+      {value:'LUDO',label:'Ludo Classic'},
+      {value:'POPULAR_LUDO',label:'Popular Ludo'},
+      {value:'LUDO_RACE',label:'Ludo Race — 1 Goti Win'},
+      {value:'LUDO_SCORE',label:'KhiladiAdda24 Ludo Score'},
+      {value:'SNAKE',label:'Snake'}
+    ].forEach(({value,label})=>{const option=document.createElement('option');option.value=value;option.textContent=label;preservedSelect.append(option)});
+    const gameTypeFieldLabelId = 'gameTypeLabel';
+    const hiddenLabel = document.createElement('label');
+    hiddenLabel.id = gameTypeFieldLabelId;
+    hiddenLabel.htmlFor = 'gameType';
+    hiddenLabel.hidden = true;
+    hiddenLabel.style.display = 'none';
+    hiddenLabel.textContent = 'Game';
+    gameTypeFieldContainer.appendChild(hiddenLabel);
+    gameTypeFieldContainer.appendChild(preservedSelect);
     gameModeOptions.className='game-mode-options';
     gameModeOptions.setAttribute('role','group');
-    gameModeOptions.setAttribute('aria-labelledby',gameTypeFieldLabel.id);
-    const gameModeImages={LUDO:'/ludo_classic_256x256.png',POPULAR_LUDO:'/popular_ludo_256x256.png',LUDO_RACE:'/ludo_race_1_goti_win_256x256.png',LUDO_SCORE:'/app-icon-192.png',SNAKE:'/snake_ladder_256x256.png'};
-    Array.from(gameTypeSelect.options).forEach(option=>{const button=document.createElement('button'),image=document.createElement('img');button.type='button';button.className='game-mode-option';button.dataset.gameOption=option.value;button.setAttribute('aria-label',option.textContent);image.src=gameModeImages[option.value];image.alt='';image.setAttribute('aria-hidden','true');button.append(image);button.setAttribute('aria-pressed',String(option.selected));gameModeOptions.append(button)});
-    gameTypeFieldLabel.after(gameModeOptions);
+    gameModeOptions.setAttribute('aria-labelledby',gameTypeFieldLabelId);
+    const gameModeImages={LUDO:'/ludo_classic_256x256.png',POPULAR_LUDO:'/popular_ludo_256x256.png',LUDO_RACE:'/ludo_race_1_goti_win_256x256.png',LUDO_SCORE:scoreAppIcon,SNAKE:'/snake_ladder_256x256.png'};
+    Array.from(preservedSelect.options).forEach(option=>{const button=document.createElement('button'),image=document.createElement('img');button.type='button';button.className='game-mode-option';button.dataset.gameOption=option.value;button.setAttribute('aria-label',option.textContent);image.src=option.value==='LUDO_SCORE'?scoreAppIcon:gameModeImages[option.value];image.alt='';image.setAttribute('aria-hidden','true');button.append(image);button.setAttribute('aria-pressed',String(option.selected));gameModeOptions.append(button)});
+    const insertedContainer = gameTypeFieldContainer.querySelector('.game-mode-options');
+    if (insertedContainer) insertedContainer.remove();
+    gameTypeFieldContainer.appendChild(gameModeOptions);
     function syncGameSelection(gameType){const selectedType=['LUDO','POPULAR_LUDO','LUDO_RACE','LUDO_SCORE','SNAKE'].includes(gameType)?gameType:'LUDO';game=selectedType==='SNAKE'?'SNAKE':'LUDO';gameTypeSelect.value=selectedType;gameModeOptions.querySelectorAll('.game-mode-option').forEach(button=>{const selected=button.dataset.gameOption===selectedType;button.classList.toggle('active',selected);button.setAttribute('aria-pressed',String(selected))});document.querySelectorAll('.game-filter').forEach(button=>button.classList.toggle('active',button.dataset.game===game));if(el('gameViewTitle'))el('gameViewTitle').textContent=selectedType==='LUDO_RACE'?'Ludo Race — 1 Goti Win':selectedType==='LUDO_SCORE'?'KhiladiAdda24 Ludo Score':''}
     syncGameSelection(game);
     function battlePlayerMarkup(user,role,opponent=false,amount='',gameLabel=''){
