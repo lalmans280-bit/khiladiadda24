@@ -13,7 +13,7 @@ const jwt = require('jsonwebtoken');
 const { Server } = require('socket.io');
 const { pipeline } = require('stream/promises');
 const PubgPvpService = require('./pubg-pvp');
-const { nextSixStreak, scoreAfterTimeout, scoresAfterMove } = require('./lib/ludo-score-rules');
+const { legalTokenIndexesForRoll, nextLudoTokenProgress, nextSixStreak, scoreAfterTimeout, scoresAfterMove } = require('./lib/ludo-score-rules');
 
 // Models
 const User = require('./models/user');
@@ -1958,13 +1958,6 @@ function ludoRacePosition(side, progress) {
   return ludoRaceHomePaths[side][progress - 52] || null;
 }
 
-function ludoRaceLegalTokens(tokens, diceValue) {
-  return tokens
-    .map((progress, index) => ({ progress, index }))
-    .filter(({ progress }) => progress === -1 ? diceValue === 6 : progress + diceValue <= 57)
-    .map(({ index }) => index);
-}
-
 app.post('/api/matches/ludo-race/roll', requireUser, async (req, res) => {
   const { matchId } = req.body;
   try {
@@ -1981,7 +1974,7 @@ app.post('/api/matches/ludo-race/roll', requireUser, async (req, res) => {
 
     const diceValue = crypto.randomInt(1, 7);
     const side = ludoRaceSide(match, userId);
-    const legalTokenIndexes = ludoRaceLegalTokens(state.tokens[side], diceValue);
+    const legalTokenIndexes = legalTokenIndexesForRoll(state.tokens[side], diceValue);
     const noLegalMove = legalTokenIndexes.length === 0;
     const nextState = {
       ...state,
@@ -2035,7 +2028,8 @@ app.post('/api/matches/ludo-race/move', requireUser, async (req, res) => {
     const diceValue = Number(state.diceValue);
     const tokens = { creator: [...state.tokens.creator], joiner: [...state.tokens.joiner] };
     const oldProgress = tokens[side][tokenIndex];
-    const newProgress = oldProgress === -1 ? 0 : oldProgress + diceValue;
+    const newProgress = nextLudoTokenProgress(oldProgress, diceValue);
+    if (newProgress === null) return res.status(400).json({ error: 'Is goti ki legal move nahi hai' });
     tokens[side][tokenIndex] = newProgress;
     let captured = false;
 
@@ -2154,7 +2148,7 @@ app.post('/api/matches/ludo-score/roll', requireUser, async (req, res) => {
 
     const diceValue = crypto.randomInt(1, 7);
     const side = ludoRaceSide(match, userId);
-    const legalTokenIndexes = ludoRaceLegalTokens(state.tokens[side], diceValue);
+    const legalTokenIndexes = legalTokenIndexesForRoll(state.tokens[side], diceValue);
     const noLegalMove = legalTokenIndexes.length === 0;
     const opponentId = String(state.currentTurn) === String(match.creator) ? String(match.joiner) : String(match.creator);
     const sixStreak = nextSixStreak(state, diceValue, opponentId);
@@ -2244,7 +2238,12 @@ app.post('/api/matches/ludo-score/move', requireUser, async (req, res) => {
       const diceValue = Number(currentState.diceValue);
       const tokens = { creator: [...currentState.tokens.creator], joiner: [...currentState.tokens.joiner] };
       const oldProgress = tokens[side][tokenIndex];
-      const newProgress = oldProgress === -1 ? 0 : oldProgress + diceValue;
+      const newProgress = nextLudoTokenProgress(oldProgress, diceValue);
+      if (newProgress === null) {
+        const error = new Error('Game state update ho gaya. Refresh karke dobara try karein.');
+        error.statusCode = 409;
+        throw error;
+      }
       tokens[side][tokenIndex] = newProgress;
       let captured = false;
       if (newProgress <= 51) {
