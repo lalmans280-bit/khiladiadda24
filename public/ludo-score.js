@@ -38,11 +38,12 @@
     .ludo-score-board{display:grid;grid-template-columns:repeat(15,minmax(0,1fr));width:min(100%,560px);aspect-ratio:1;margin:14px auto;border:3px solid #34483a;border-radius:8px;overflow:hidden;background:#fff}
     .score-cell{position:relative;display:flex;align-items:center;justify-content:center;min-width:0;min-height:0;border:1px solid #e1e7e2;background:#f8faf8}
     .score-cell-track{background:#fff}.score-cell-safe::after{content:'★';position:absolute;color:#b89637;font-size:clamp(6px,1.8vw,15px);pointer-events:none}
-    .score-cell-start-creator,.score-cell-home-creator{background:#f4b7b1}
-    .score-cell-start-joiner,.score-cell-home-joiner{background:#a9dbbb}
-    .score-cell-base-creator{background:#f8d9d5}.score-cell-base-joiner{background:#d8f0df}
+    .score-cell-yard-creator{background:#f3c4c0}.score-cell-yard-joiner{background:#c8e8d2}
+    .score-cell-start-creator,.score-cell-home-creator{background:#e77f77}
+    .score-cell-start-joiner,.score-cell-home-joiner{background:#70ba86}
+    .score-cell-base-creator,.score-cell-base-joiner{margin:3px;border:2px solid #fff;border-radius:50%;background:#fff}
+    .score-cell-base-creator{box-shadow:inset 0 0 0 2px #c94f46}.score-cell-base-joiner{box-shadow:inset 0 0 0 2px #32834e}
     .score-cell-center{background:conic-gradient(#c95950 0deg 90deg,#e3c24b 90deg 180deg,#499565 180deg 270deg,#4d76b2 270deg)}
-    .score-cell-base-creator.score-cell-base-inner,.score-cell-base-joiner.score-cell-base-inner{box-shadow:inset 0 0 0 2px #fff}
     .score-token-stack{position:relative;z-index:1;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:1px;max-width:100%}
     .score-token{display:grid;place-items:center;width:clamp(11px,3.3vw,24px);height:clamp(11px,3.3vw,24px);padding:0;border:2px solid #fff;border-radius:50%;box-shadow:0 1px 3px #0007;color:#fff;font-size:clamp(7px,1.5vw,11px);font-weight:800}
     .score-token.creator{background:#c94f46}.score-token.joiner{background:#32834e}
@@ -96,17 +97,24 @@
   }
 
   function makeMarkup(match, app) {
-    const state = match.ludoScore;
+    const state = match.ludoScore || (['OPEN', 'CANCELLED'].includes(match.status) ? {
+      tokens: { creator: [-1, -1, -1, -1], joiner: [-1, -1, -1, -1] },
+      scores: { creator: 0, joiner: 0 },
+      currentTurn: idOf(match.creator),
+      legalTokenIndexes: [],
+      diceValue: null
+    } : null);
     if (!state?.tokens) return `<h2>🏆 KhiladiAdda24 Ludo Score</h2><p class="notice error">Ludo Score game state available nahi hai. Support se sampark karein.</p>`;
     const myId = idOf(app.getPlayer() || app.getUser());
     const creatorId = idOf(match.creator);
     const joinerId = idOf(match.joiner);
+    const joinerName = match.joiner ? app.nameOf(match.joiner) : 'Pratidvandvi';
     const mySide = creatorId === myId ? 'creator' : 'joiner';
-    const ownTurn = String(state.currentTurn) === myId && !state.winnerId;
+    const ownTurn = match.status === 'RUNNING' && String(state.currentTurn) === myId && !state.winnerId;
     const legalTokens = ownTurn && Array.isArray(state.legalTokenIndexes) ? state.legalTokenIndexes : [];
     const winner = state.winnerId ? String(state.winnerId) : '';
     const winnerName = winner ? app.nameOf(winner === creatorId ? match.creator : match.joiner) : '';
-    const ownTurnName = String(state.currentTurn) === creatorId ? app.nameOf(match.creator) : app.nameOf(match.joiner);
+    const ownTurnName = String(state.currentTurn) === creatorId ? app.nameOf(match.creator) : joinerName;
     const cells = Array.from({ length: 225 }, (_, index) => {
       const row = Math.floor(index / 15);
       const col = index % 15;
@@ -117,11 +125,13 @@
         if (safeTrack.has(trackIndex)) classes.push('score-cell-safe');
       }
       for (const side of ['creator', 'joiner']) {
+        if (side === 'creator' && row < 6 && col < 6) classes.push('score-cell-yard-creator');
+        if (side === 'joiner' && row > 8 && col > 8) classes.push('score-cell-yard-joiner');
         if (trackIndex === (side === 'creator' ? 0 : 26)) classes.push(`score-cell-start-${side}`);
         if (homePaths[side].some(([homeRow, homeCol]) => homeRow === row && homeCol === col)) classes.push(`score-cell-home-${side}`);
         if (baseSlots[side].some(([baseRow, baseCol]) => baseRow === row && baseCol === col)) classes.push(`score-cell-base-${side}`, 'score-cell-base-inner');
       }
-      if (row >= 6 && row <= 8 && col >= 6 && col <= 8) classes.push('score-cell-center');
+      if (row === 7 && col === 7) classes.push('score-cell-center');
       const tokensHere = [];
       for (const side of ['creator', 'joiner']) {
         (state.tokens[side] || []).forEach((progress, tokenIndex) => {
@@ -136,7 +146,11 @@
     const creatorScore = Number(state.scores?.creator ?? state.tokens.creator.filter(value => value === 57).length * 250);
     const joinerScore = Number(state.scores?.joiner ?? state.tokens.joiner.filter(value => value === 57).length * 250);
     const dieValue = state.diceValue || state.lastDice || '–';
-    const statusText = winner
+    const statusText = match.status === 'OPEN'
+      ? 'Pratidvandvi ka intezar hai — join karte hi yahin game shuru hoga.'
+      : match.status === 'CANCELLED'
+        ? 'Yeh battle cancel ho chuki hai.'
+      : winner
       ? `🏆 ${app.esc(winnerName)} winner hain — charon gotiyan ghar pahunch gayi.`
       : ownTurn
         ? state.diceValue ? `${state.diceValue} aaya — apni goti chunein.` : 'Aapki turn hai — dice roll karein.'
@@ -144,7 +158,7 @@
     const resultMarkup = match.status === 'PENDING_RESULT'
       ? `<p class="notice warning">Screenshot admin review ke liye bhej diya gaya hai.${match.resultSubmittedAt ? `<br><small>Submitted: ${app.esc(new Date(match.resultSubmittedAt).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }))} IST</small>` : ''}</p>`
       : match.status === 'COMPLETED'
-        ? `<p class="notice">Match complete${match.winner ? ` — winner: ${app.esc(app.nameOf(match.winner))}` : ''}.</p>`
+        ? `<p class="notice">Game complete${match.winner ? ` — winner: ${app.esc(app.nameOf(match.winner))}` : ''}.${state.payoutAmount ? ` ₹${Number(state.payoutAmount).toLocaleString('en-IN')} winner ke wallet me automatically credit hue.` : ''}</p>`
         : winner === myId
           ? '<form class="ludo-score-proof" id="ludoScoreProof"><p class="muted">Apni win ka screenshot admin review ke liye upload karein.</p><div class="field"><label for="ludoScoreScreenshot">Win screenshot</label><input id="ludoScoreScreenshot" type="file" accept="image/jpeg,image/png,image/webp" required></div><div class="ludo-score-actions"><button class="btn secondary small" id="shareLudoScoreProof" type="button" disabled>WhatsApp par screenshot bhejein</button><button class="btn green" type="submit">Win screenshot bhejein</button></div></form>'
           : winner
@@ -156,15 +170,16 @@
     return `<h2>🏆 KhiladiAdda24 Ludo Score • ${app.esc(match.status)}</h2>
       <div class="grid"><div class="stat"><small>Entry</small><strong>₹${Number(match.amount).toLocaleString('en-IN')}</strong></div>
       <div class="stat"><small>Creator</small><strong>${app.esc(app.nameOf(match.creator))}</strong></div>
-      <div class="stat"><small>Opponent</small><strong>${app.esc(app.nameOf(match.joiner))}</strong></div></div>
+      <div class="stat"><small>Opponent</small><strong>${app.esc(joinerName)}</strong></div></div>
       <div class="panel ludo-score-panel">
-        <div class="ludo-score-head"><h3>4 Gotiyan • 1000 Score • 4 Ghar = Win</h3>${!winner ? '<span id="ludoScoreTimer" class="ludo-score-timer" aria-live="polite">20s</span>' : ''}</div>
+        <div class="ludo-score-head"><h3>Ludo board • 4 gotiyan • 4 ghar = jeet</h3>${match.status === 'RUNNING' && !winner ? '<span id="ludoScoreTimer" class="ludo-score-timer" aria-live="polite">20s</span>' : ''}</div>
         <div class="ludo-score-players">
-          <div class="ludo-score-player creator"><strong>🔴 ${app.esc(app.nameOf(match.creator))}</strong><small>${creatorScore}/1000 score · ${state.tokens.creator.filter(value => value === 57).length}/4 ghar</small></div>
-          <div class="ludo-score-player joiner"><strong>🟢 ${app.esc(app.nameOf(match.joiner))}</strong><small>${joinerScore}/1000 score · ${state.tokens.joiner.filter(value => value === 57).length}/4 ghar</small></div>
+          <div class="ludo-score-player creator"><strong>🔴 ${app.esc(app.nameOf(match.creator))}</strong><small>${creatorScore}/1000 points · ${state.tokens.creator.filter(value => value === 57).length}/4 ghar</small></div>
+          <div class="ludo-score-player joiner"><strong>🟢 ${app.esc(joinerName)}</strong><small>${joinerScore}/1000 points · ${state.tokens.joiner.filter(value => value === 57).length}/4 ghar</small></div>
         </div>
+        <p class="muted">Dice roll aur goti move 20 second mein karein; timeout par 100 points minus. Lagatar teesra 6 aane par turn opponent ko milegi.</p>
         <div class="ludo-score-status" aria-live="polite">${statusText}${state.lastAction ? `<br><small>${app.esc(state.lastAction)}</small>` : ''}</div>
-        <div class="ludo-score-actions"><span class="ludo-score-die" aria-label="Dice">${dieValue}</span><button type="button" class="btn" id="ludoScoreRoll" ${!ownTurn || state.diceValue || busy ? 'disabled' : ''}>Dice roll</button><span class="muted">${ownTurn ? 'Apni turn' : 'Opponent ki turn'}</span></div>
+        <div class="ludo-score-actions"><span class="ludo-score-die" aria-label="Dice">${dieValue}</span><button type="button" class="btn" id="ludoScoreRoll" ${!ownTurn || state.diceValue || busy ? 'disabled' : ''}>Dice roll</button><span class="muted">${match.status === 'OPEN' ? 'Opponent ke join karne par dice unlock hoga' : ownTurn ? 'Apni turn' : 'Opponent ki turn'}</span></div>
         <div class="ludo-score-board" role="grid" aria-label="KhiladiAdda24 Ludo Score board">${cells}</div>
         ${resultMarkup}${cancelMarkup}
       </div>`;
