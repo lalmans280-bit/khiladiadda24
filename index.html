@@ -348,6 +348,8 @@
     #gamePicker [data-cricket-promo]{background:linear-gradient(0deg,#101713df,#1017131a 75%),url('/cricket.png') center/cover no-repeat}
     #gamePicker [data-pubg-promo]{background:linear-gradient(0deg,#101713df,#1017131a 75%),url('/pubg.png') center/cover no-repeat}
     #gamePicker .game-coming-soon-icon{display:none}
+    #gamePicker .score-game-tile{justify-content:center;padding:8px}
+    #gamePicker .score-game-art{display:block;width:76px;height:76px;flex:none;object-fit:contain}
     .cricket-promo-hero{position:relative;isolation:isolate;overflow:hidden;min-height:250px;padding:clamp(22px,5vw,42px);border:1px solid #9b7138;border-radius:14px;background:linear-gradient(90deg,#101713f2 0%,#101713d9 55%,#10171366 100%),url('/cricket.png') center/cover}
     .cricket-promo-hero h1{max-width:640px;margin:12px 0;color:#ffdc7b;font-size:clamp(28px,5vw,42px);line-height:1.1}
     .cricket-promo-hero p{max-width:600px;margin:0;color:#f0eee5}
@@ -499,6 +501,7 @@
   <main class="shell content"><div id="notice" class="notice" role="status" hidden></div>
       <section class="view" id="view-games">
         <div class="game-launch" id="gamePicker">
+          <button class="game-tile score-game-tile" type="button" data-launch-game="LUDO_SCORE" aria-label="KhiladiAdda24 Ludo Score" title="KhiladiAdda24 Ludo Score"><img class="score-game-art" src="/app-icon-192.png" alt=""></button>
           <button class="game-tile game-tile-image game-coming-soon-tile" type="button" data-cricket-promo aria-label="Cricket fantasy - Coming Soon"><img class="cricket-game-logo" src="/cricket-game-logo.svg" alt=""><span class="game-coming-soon-icon" aria-hidden="true">🏏</span><strong>Cricket Fantasy</strong><span class="game-coming-soon-badge">₹1 LAKH · COMING SOON</span></button>
           <button class="game-tile game-tile-image game-coming-soon-tile" type="button" data-pubg-promo aria-label="PUBG - Coming Soon"><span class="game-coming-soon-icon" aria-hidden="true">🎯</span><strong>PUBG</strong><span class="game-coming-soon-badge">COMING SOON</span></button>
           <a class="game-support-banner" href="/support.html" aria-label="WhatsApp and support"><img src="/support-banner.png?v=20261028-support-update" alt="WhatsApp and Support"><span class="game-live-badge"><i class="game-live-dot" aria-hidden="true"></i><span class="game-live-text">LIVE</span></span></a>
@@ -911,8 +914,8 @@
     gameModeOptions.className='game-mode-options';
     gameModeOptions.setAttribute('role','group');
     gameModeOptions.setAttribute('aria-labelledby',gameTypeFieldLabel.id);
-    const gameModeImages={LUDO:'/ludo_classic_256x256.png',POPULAR_LUDO:'/popular_ludo_256x256.png',LUDO_RACE:'/ludo_race_1_goti_win_256x256.png',LUDO_SCORE:'/ludo_race_1_goti_win_256x256.png',SNAKE:'/snake_ladder_256x256.png'};
-    const gameModeLabels={LUDO:'Ludo Classic',POPULAR_LUDO:'Popular Ludo',LUDO_RACE:'Ludo Race',LUDO_SCORE:'Ludo Score',SNAKE:'Snake'};
+    const gameModeImages={LUDO:'/ludo_classic_256x256.png',POPULAR_LUDO:'/popular_ludo_256x256.png',LUDO_RACE:'/ludo_race_1_goti_win_256x256.png',LUDO_SCORE:'/ludo_classic_256x256.png',SNAKE:'/snake_ladder_256x256.png'};
+    const gameModeLabels={LUDO:'Ludo Classic',POPULAR_LUDO:'Popular Ludo',LUDO_RACE:'Ludo Race — 1 Goti Win',LUDO_SCORE:'Ludo Score',SNAKE:'Snake'};
     Array.from(gameTypeSelect.options).forEach(option=>{const button=document.createElement('button'),image=document.createElement('img'),label=document.createElement('span');button.type='button';button.className='game-mode-option';button.dataset.gameOption=option.value;button.setAttribute('aria-label',option.textContent);image.src=gameModeImages[option.value];image.alt='';image.setAttribute('aria-hidden','true');label.textContent=gameModeLabels[option.value]||option.textContent;button.append(image,label);button.setAttribute('aria-pressed',String(option.selected));gameModeOptions.append(button)});
     gameTypeFieldLabel.after(gameModeOptions);
     gameTypeSelect.hidden=true;
