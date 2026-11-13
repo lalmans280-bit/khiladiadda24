@@ -4,7 +4,8 @@
   "description": "Real Money Ludo & Snake Tournament App",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "test:ludo-score": "node --test test/ludo-score-rules.test.js"
   },
   "dependencies": {
     "axios": "^1.6.0",
