@@ -431,6 +431,7 @@
     .game-mode-option[data-game-option="LUDO"]{border-color:#86c995;color:#174b2b;background:#dcfce7}
     .game-mode-option[data-game-option="POPULAR_LUDO"]{border-color:#82aee8;color:#1e3a8a;background:#dbeafe}
     .game-mode-option[data-game-option="LUDO_RACE"]{border-color:#e4b84b;color:#78350f;background:#fef3c7}
+    .game-mode-option[data-game-option="LUDO_SCORE"]{border-color:#e27a53;color:#78351f;background:#fff0e8}
     .game-mode-option[data-game-option="SNAKE"]{border-color:#c89ae0;color:#581c87;background:#f3e8ff}
     .game-mode-option.active{box-shadow:inset 0 0 0 2px currentColor}
     @media(max-width:600px){.battle-prizes.open-battle-prizes .battle-player-name{font-size:10px}html[data-theme="night"] .battle-prizes.open-battle-prizes .battle-player-amount{font-size:12px}html[data-theme="day"] .battle-prizes.open-battle-prizes .battle-player-amount{font-size:12px}}
@@ -911,7 +912,8 @@
     gameModeOptions.setAttribute('role','group');
     gameModeOptions.setAttribute('aria-labelledby',gameTypeFieldLabel.id);
     const gameModeImages={LUDO:'/ludo_classic_256x256.png',POPULAR_LUDO:'/popular_ludo_256x256.png',LUDO_RACE:'/ludo_race_1_goti_win_256x256.png',LUDO_SCORE:'/ludo_race_1_goti_win_256x256.png',SNAKE:'/snake_ladder_256x256.png'};
-    Array.from(gameTypeSelect.options).forEach(option=>{const button=document.createElement('button'),image=document.createElement('img');button.type='button';button.className='game-mode-option';button.dataset.gameOption=option.value;button.setAttribute('aria-label',option.textContent);image.src=gameModeImages[option.value];image.alt='';image.setAttribute('aria-hidden','true');button.append(image);button.setAttribute('aria-pressed',String(option.selected));gameModeOptions.append(button)});
+    const gameModeLabels={LUDO:'Ludo Classic',POPULAR_LUDO:'Popular Ludo',LUDO_RACE:'Ludo Race',LUDO_SCORE:'Ludo Score',SNAKE:'Snake'};
+    Array.from(gameTypeSelect.options).forEach(option=>{const button=document.createElement('button'),image=document.createElement('img'),label=document.createElement('span');button.type='button';button.className='game-mode-option';button.dataset.gameOption=option.value;button.setAttribute('aria-label',option.textContent);image.src=gameModeImages[option.value];image.alt='';image.setAttribute('aria-hidden','true');label.textContent=gameModeLabels[option.value]||option.textContent;button.append(image,label);button.setAttribute('aria-pressed',String(option.selected));gameModeOptions.append(button)});
     gameTypeFieldLabel.after(gameModeOptions);
     gameTypeSelect.hidden=true;
     function syncGameSelection(gameType){const selectedType=['LUDO','POPULAR_LUDO','LUDO_RACE','LUDO_SCORE','SNAKE'].includes(gameType)?gameType:'LUDO';game=selectedType==='SNAKE'?'SNAKE':'LUDO';gameTypeSelect.value=selectedType;gameModeOptions.querySelectorAll('.game-mode-option').forEach(button=>{const selected=button.dataset.gameOption===selectedType;button.classList.toggle('active',selected);button.setAttribute('aria-pressed',String(selected))});document.querySelectorAll('.game-filter').forEach(button=>button.classList.toggle('active',button.dataset.game===game));if(el('gameViewTitle'))el('gameViewTitle').textContent=selectedType==='LUDO_RACE'?'Ludo Race — 1 Goti Win':selectedType==='LUDO_SCORE'?'KhiladiAdda24 Ludo Score':''}
