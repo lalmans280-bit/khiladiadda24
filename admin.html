@@ -457,7 +457,7 @@
     }
 
     function adminGameTypeLabel(gameType) {
-      return gameType === 'LUDO_RACE' ? 'Ludo Race' : gameType === 'POPULAR_LUDO' ? 'Popular Ludo' : gameType === 'SNAKE' ? 'Snake' : 'Ludo Classic';
+      return gameType === 'LUDO_SCORE' ? 'KhiladiAdda24 Ludo Score' : gameType === 'LUDO_RACE' ? 'Ludo Race' : gameType === 'POPULAR_LUDO' ? 'Popular Ludo' : gameType === 'SNAKE' ? 'Snake' : 'Ludo Classic';
     }
 
     function playerWhatsAppLink(phone) {
@@ -571,7 +571,8 @@
           <div class="finance-stat">
             <small>${adminGameTypeLabel(match.gameType)} · ${escapeHtml(match.status)} · Entry ₹${Number(match.amount).toLocaleString('en-IN')} each</small>
             <strong>${escapeHtml(match.creator?.username || 'Creator')} vs ${escapeHtml(match.joiner?.username || 'Joiner')}</strong>
-            <small>${match.gameType === 'LUDO_RACE' && match.ludoRace ? 'In-app board' : match.roomCode ? `Room: ${escapeHtml(match.roomCode)}` : 'Room code not shared'} · ${match.gameStartedAt ? 'Game started' : 'Waiting to start'}</small>
+            <small>${['LUDO_RACE', 'LUDO_SCORE'].includes(match.gameType) && match.ludoRace ? 'In-app board' : match.roomCode ? `Room: ${escapeHtml(match.roomCode)}` : 'Room code not shared'} · ${match.gameStartedAt ? 'Game started' : 'Waiting to start'}</small>
+            ${match.resultSubmittedAt ? `<small>Screenshot submitted: ${escapeHtml(new Date(match.resultSubmittedAt).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }))} IST</small>` : ''}
             <small>${resultReports}</small>
             <div class="running-overview-proofs">${resultProofs}</div>
             ${adminMatchDecisionControls(match, 'overview-')}
