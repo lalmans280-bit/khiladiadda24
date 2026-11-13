@@ -427,8 +427,13 @@
     html[data-theme="night"] .battle-prizes.open-battle-prizes .battle-player-amount{font-size:14px}
     .game-mode-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:7px}
     .game-mode-option{display:grid;place-items:center;min-height:72px;padding:6px;border:2px solid transparent;border-radius:9px;transition:transform .15s,box-shadow .15s}
-    .game-mode-option img{display:block;width:56px;height:56px;max-width:100%;flex:none;border-radius:6px;object-fit:contain}
-    .game-mode-option[data-game-option="LUDO_SCORE"] img{width:58px;height:58px}
+    .game-mode-art{position:relative;display:block;width:56px;height:56px;overflow:hidden;flex:none;border-radius:6px}
+    .game-mode-art img{position:absolute;display:block;max-width:none;border-radius:0;object-fit:fill}
+    .game-mode-art--classic img{top:0;left:-13px;width:82px;height:82px}
+    .game-mode-art--popular img{top:0;left:-20px;width:96px;height:96px}
+    .game-mode-art--race img{top:-34px;left:-17px;width:90px;height:90px}
+    .game-mode-art--score img{top:0;left:-34px;width:124px;height:124px}
+    .game-mode-art--snake img{top:0;left:0;width:56px;height:56px}
     .game-mode-option:hover{transform:translateY(-1px)}
     .game-mode-option:focus-visible{outline:3px solid #172018;outline-offset:2px}
     .game-mode-option[data-game-option="LUDO"]{border-color:#86c995;color:#174b2b;background:#dcfce7}
@@ -943,7 +948,14 @@
     gameModeOptions.setAttribute('role','group');
     gameModeOptions.setAttribute('aria-labelledby',gameTypeFieldLabelId);
     const gameModeImages={LUDO:'/ludo_classic_256x256.png',POPULAR_LUDO:'/popular_ludo_256x256.png',LUDO_RACE:'/ludo_race_1_goti_win_256x256.png',LUDO_SCORE:scoreAppIcon,SNAKE:'/snake_ladder_256x256.png'};
-    Array.from(preservedSelect.options).forEach(option=>{const button=document.createElement('button'),image=document.createElement('img');button.type='button';button.className='game-mode-option';button.dataset.gameOption=option.value;button.setAttribute('aria-label',option.textContent);image.src=option.value==='LUDO_SCORE'?scoreAppIcon:gameModeImages[option.value];image.alt='';image.setAttribute('aria-hidden','true');button.append(image);button.setAttribute('aria-pressed',String(option.selected));gameModeOptions.append(button)});
+    const gameModeArtClasses={LUDO:'classic',POPULAR_LUDO:'popular',LUDO_RACE:'race',LUDO_SCORE:'score',SNAKE:'snake'};
+    Array.from(preservedSelect.options).forEach(option=>{
+      const button=document.createElement('button'),art=document.createElement('span'),image=document.createElement('img');
+      button.type='button';button.className='game-mode-option';button.dataset.gameOption=option.value;button.setAttribute('aria-label',option.textContent);
+      art.className=`game-mode-art game-mode-art--${gameModeArtClasses[option.value]}`;
+      image.src=gameModeImages[option.value];image.alt='';image.setAttribute('aria-hidden','true');art.append(image);button.append(art);
+      button.setAttribute('aria-pressed',String(option.selected));gameModeOptions.append(button)
+    });
     const insertedContainer = gameTypeFieldContainer.querySelector('.game-mode-options');
     if (insertedContainer) insertedContainer.remove();
     gameTypeFieldContainer.appendChild(gameModeOptions);
