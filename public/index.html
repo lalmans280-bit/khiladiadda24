@@ -483,6 +483,10 @@
       document.getElementById('accentPalette').disabled = savedTheme !== 'night';
     } catch {}
   </script>
+  <style>
+    body{padding-top:122px}
+    .topbar .nav{display:flex!important}
+  </style>
 </head>
 <body>
   <header class="topbar"><div class="top-inner"><button class="icon" id="menuToggle" aria-label="Menu" aria-expanded="false">☰</button><a class="brand" href="#home" aria-label="Home"><img class="app-brand-logo" src="/app-logo.png" alt="" aria-hidden="true"><span class="brand-copy"><span class="brand-main"><span>PLAY</span><span>•</span><span>BATTLE</span><span class="brand-win">WIN</span></span><small class="brand-tagline">OPEN 24/7 WITHDRAW</small></span></a><div class="top-actions"><div class="lang-toggle" aria-label="Language selector"><button class="lang-btn active" type="button" data-lang-toggle="hi">HI</button><button class="lang-btn" type="button" data-lang-toggle="en">EN</button></div><span class="balance" id="headerBalance">₹ --</span></div></div><div class="menu" id="menu"><button data-view="profile" data-i18n-key="menuProfile">👤 My profile</button><button data-view="home" data-i18n-key="menuHome">🏆 Win cash</button><button data-view="wallet" data-i18n-key="menuWallet">👛 My wallet</button><button data-view="history" data-i18n-key="menuHistory">📜 History</button><button data-menu-action="referral" data-i18n-key="menuReferral">🎁 Refer and earn</button><button data-menu-action="notifications" data-i18n-key="menuNotifications">🔔 Notification</button><a href="/support.html" data-i18n-key="supportLink">🛟 Support</a><a href="/policy.html" data-i18n-key="policyLink">📄 All policies</a><button class="menu-logout" id="logout" data-i18n-key="logout">🚪 Logout</button></div><nav class="nav"><button class="active" data-view="home" data-i18n-key="navHome">Home</button><button data-view="games" data-i18n-key="navGames">Games</button><button data-view="wallet" data-i18n-key="navWallet">Wallet</button><button data-view="profile" data-i18n-key="navProfile">Profile</button></nav></header>
