@@ -2272,7 +2272,6 @@ app.get('/api/matches/:matchId', requireUser, async (req, res) => {
     if (!match) return res.status(404).json({ error: 'Match nahi mila' });
     if (match.gameType === 'LUDO_SCORE') return res.status(400).json({ error: 'Ludo Score game ab available nahi hai.' });
     if (!isMatchPlayer(match, req.auth.userId)) return res.status(403).json({ error: 'Sirf match ke players details dekh sakte hain' });
-    match = await ensureLudoRaceState(match);
     match = await ensureLudoScoreState(match);
     match = await expireLudoScoreTurn(match);
     if (!match) return res.status(404).json({ error: 'Match nahi mila' });
