@@ -1159,7 +1159,8 @@
         try{
           const data=await api('/api/matches/join',{method:'POST',body:JSON.stringify({matchId:join.dataset.join,...(joinerColor?{joinerColor}:{})})});
           notify(data.message||'Battle join ho gaya.');
-          await Promise.all([loadOpen(),loadMine()]);
+          if(join.dataset.gameType==='LUDO_SCORE')await window.openMatchPage(data.match._id,'details');
+          else await Promise.all([loadOpen(),loadMine()]);
         }catch(error){showError(error);join.disabled=false}
         return;
       }
@@ -1183,6 +1184,10 @@
         const gameType=el('gameType').value;
         const data=await api('/api/matches/create',{method:'POST',body:JSON.stringify({gameType,entryAmount,...(gameType==='LUDO_SCORE'?{creatorColor:el('ludoScoreCreatorColor').value}:{})})});
         notify(data.message||'Battle create ho gaya.');
+        if(gameType==='LUDO_SCORE'){
+          await window.openMatchPage(data.match._id,'details');
+          return;
+        }
         setView('home');
         await loadOpen();
       }catch(error){showError(error)}
