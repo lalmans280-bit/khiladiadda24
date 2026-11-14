@@ -703,7 +703,7 @@
     profileShareButton.addEventListener('click',shareWebsiteLink);
     el('copyReferral').after(profileShareButton);
     const createChallengeButton=el('createForm').querySelector('button[type="submit"]');
-    if(createChallengeButton){createChallengeButton.hidden=false;createChallengeButton.textContent='Create paid battle'}
+    if(createChallengeButton){createChallengeButton.hidden=false;createChallengeButton.textContent='SET'}
     if(el('openMatches').previousElementSibling?.textContent.trim()==='Challenger, entry amount aur winning amount dekhein.')el('openMatches').previousElementSibling.remove();
     const freeMatchNotice=el('createForm').previousElementSibling;
     if(freeMatchNotice)freeMatchNotice.textContent='Minimum ₹50. Multiples of ₹50. Play.';
@@ -712,6 +712,7 @@
     walletDepositAmount.value='50';
     el('qrForm').closest('.panel').querySelector('.muted').textContent='Minimum ₹50. QR se payment ke baad UTR aur screenshot bhejein; admin approval par amount credit hoga.';
     const entryAmountInput=el('entryAmount');
+    if(createChallengeButton)entryAmountInput.after(createChallengeButton);
     const openBattlesHeading=document.createElement('h2');
     openBattlesHeading.className='open-battles-image-title home-open-header-title';
     openBattlesHeading.setAttribute('aria-label','My open list');
