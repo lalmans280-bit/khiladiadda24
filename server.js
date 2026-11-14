@@ -2130,7 +2130,7 @@ app.post('/api/matches/ludo-race/move', requireUser, async (req, res) => {
   }
 });
 
-const ludoScoreTurnDuration = 20 * 1000;
+const ludoScoreTurnDuration = 10 * 1000;
 
 function createLudoScoreState(creatorId, startedAt = new Date()) {
   return {
@@ -2177,7 +2177,7 @@ async function expireLudoScoreTurn(match) {
     scores: scoreAfterTimeout(state, String(state.currentTurn) === String(match.creator) ? 'creator' : 'joiner'),
     consecutiveSixes: 0,
     turnDeadlineAt: new Date(Date.now() + ludoScoreTurnDuration),
-    lastAction: '20 second timeout; 100 score minus aur turn opponent ko mili'
+    lastAction: '10 second timeout; 100 score minus aur turn opponent ko mili'
   };
   const updated = await Match.findOneAndUpdate(
     { _id: match._id, status: 'RUNNING', 'ludoScore.version': Number(state.version || 0), 'ludoScore.currentTurn': String(state.currentTurn), 'ludoScore.turnDeadlineAt': state.turnDeadlineAt, 'ludoScore.winnerId': null },
@@ -2202,7 +2202,7 @@ app.post('/api/matches/ludo-score/roll', requireUser, async (req, res) => {
     const activeMatch = await expireLudoScoreTurn(match);
     if (!activeMatch) return res.status(404).json({ error: 'Match nahi mila' });
     const state = activeMatch.ludoScore;
-    if (String(state.currentTurn) !== userId) return res.json({ message: '20 second timer khatam; 100 score minus hua aur ab opponent ki turn hai.', match: activeMatch });
+    if (String(state.currentTurn) !== userId) return res.json({ message: '10 second timer khatam; 100 score minus hua aur ab opponent ki turn hai.', match: activeMatch });
     if (state.winnerId) return res.status(400).json({ error: 'Ludo Score ka winner tay ho chuka hai' });
     if (state.diceValue !== null && state.diceValue !== undefined) return res.status(400).json({ error: 'Pehle dice ka token move karein' });
 
@@ -2270,7 +2270,7 @@ app.post('/api/matches/ludo-score/move', requireUser, async (req, res) => {
     match = await expireLudoScoreTurn(match);
     if (!match) return res.status(404).json({ error: 'Match nahi mila' });
     const state = match.ludoScore;
-    if (String(state.currentTurn) !== userId) return res.json({ message: '20 second timer khatam; 100 score minus hua aur ab opponent ki turn hai.', match });
+    if (String(state.currentTurn) !== userId) return res.json({ message: '10 second timer khatam; 100 score minus hua aur ab opponent ki turn hai.', match });
     if (state.winnerId) return res.status(400).json({ error: 'Ludo Score ka winner tay ho chuka hai' });
     if (!Array.isArray(state.legalTokenIndexes) || !state.legalTokenIndexes.includes(tokenIndex)) {
       return res.status(400).json({ error: 'Is goti ki abhi legal move nahi hai' });
