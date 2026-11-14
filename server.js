@@ -28,7 +28,6 @@ const {
   scoresAfterMove
 } = require('./lib/ludo-score-rules');
 const {
-  LUDO_RACE_COLORS,
   LUDO_RACE_TRACK,
   LUDO_RACE_COLOR_CONFIG,
   isValidLudoRaceColor,
@@ -1618,7 +1617,6 @@ app.post('/api/matches/create', requireUser, async (req, res) => {
   const { gameType } = req.body;
   const userId = req.auth.userId;
   const normalizedGameType = String(gameType || 'LUDO').toUpperCase();
-  const creatorColor = String(req.body.creatorColor || 'red').toLowerCase();
   const entryAmount = Number(req.body.entryAmount);
   if (!Number.isInteger(entryAmount) || entryAmount < MIN_BATTLE_ENTRY_AMOUNT || entryAmount > MAX_BATTLE_ENTRY_AMOUNT || entryAmount % MIN_BATTLE_ENTRY_AMOUNT !== 0) {
     return res.status(400).json({ error: 'Battle entry ₹50 se shuru hoti hai aur ₹50 ke multiples mein honi chahiye.' });
@@ -1626,10 +1624,6 @@ app.post('/api/matches/create', requireUser, async (req, res) => {
   if (!['LUDO', 'POPULAR_LUDO', 'SNAKE', 'LUDO_RACE'].includes(normalizedGameType)) {
     return res.status(400).json({ error: 'Ludo, Popular Ludo, Ludo Race ya Snake game select karein' });
   }
-  if (normalizedGameType === 'LUDO_RACE' && !isValidLudoRaceColor(creatorColor)) {
-    return res.status(400).json({ error: `Ludo Race ke liye in colors mein se chunein: ${LUDO_RACE_COLORS.join(', ')}` });
-  }
-
   let reservationHeld = false;
   try {
     const user = await User.findById(userId).select('walletBalance').lean();
@@ -1653,8 +1647,7 @@ app.post('/api/matches/create', requireUser, async (req, res) => {
         creator: userId,
         amount: entryAmount,
         creatorWinningsUsed: debit.winningsUsed,
-        gameType: normalizedGameType,
-        ...(normalizedGameType === 'LUDO_RACE' ? { creatorColor } : {})
+        gameType: normalizedGameType
       });
     } catch (err) {
       await refundWalletEntry(userId, entryAmount, debit.winningsUsed);
@@ -2498,12 +2491,6 @@ app.post('/api/matches/join', requireUser, async (req, res) => {
     }
 
     const isLudoRace = match.gameType === 'LUDO_RACE';
-    const creatorColor = isValidLudoRaceColor(match.creatorColor) ? String(match.creatorColor).toLowerCase() : 'red';
-    const requestedJoinerColor = String(req.body.joinerColor || '').toLowerCase();
-    const joinerColor = requestedJoinerColor || defaultLudoRaceJoinerColor(creatorColor);
-    if (isLudoRace && (!isValidLudoRaceColor(joinerColor) || joinerColor === creatorColor)) {
-      return res.status(400).json({ error: 'Apne opponent se alag valid color chunein.' });
-    }
 
     reservationHeld = await reserveActiveBet(userId);
     if (!reservationHeld) {
@@ -2525,8 +2512,6 @@ app.post('/api/matches/join', requireUser, async (req, res) => {
         status: 'RUNNING',
         joinedAt,
         roomCodeDeadline: new Date(Date.now() + 2 * 60 * 1000),
-        ...(isLudoRace ? { gameStartedAt: null } : {}),
-        ...(isLudoRace ? { ludoRace: createLudoRaceState(match.creator, { creator: creatorColor, joiner: joinerColor }) } : {}),
         ...(match.gameType === 'LUDO_SCORE' ? { ludoScore: createLudoScoreState(match.creator, joinedAt) } : {}),
         joinerWinningsUsed: debit.winningsUsed
       } },
@@ -2545,17 +2530,17 @@ app.post('/api/matches/join', requireUser, async (req, res) => {
       .populate('joiner', 'username phone');
     io.to(matchId).emit('match_updated', populatedMatch);
     const joinerVoiceMessage = isLudoRace
-      ? 'गेम जॉइन हो गया है। अब लूडो रेस खोलें।'
+      ? 'गेम जॉइन हो गया है। Ludo King रूम कोड का इंतज़ार करें। Ludo Race में जिसकी पहली गोटी घर पहुँचेगी, वही जीतेगा।'
       : 'गेम जॉइन हो गया है। बैटल बनाने वाला खिलाड़ी Ludo King ऐप से रूम कोड बनाकर भेजेगा। कृपया इंतज़ार करें।';
     const creatorVoiceMessage = isLudoRace
-      ? 'एक खिलाड़ी लूडो रेस में जॉइन हो गया है। अब गेम खोलें।'
+      ? 'खिलाड़ी जुड़ गया है। Ludo King ऐप में रूम बनाएं और कोड भेजें। Ludo Race में पहली गोटी घर पहुँचने वाला जीतेगा।'
       : 'गेम में खिलाड़ी जुड़ गया है। Ludo King ऐप खोलकर रूम बनाएं और उसका कोड यहाँ भेजें।';
     emitMatchActionVoice(populatedMatch, userId, joinerVoiceMessage, creatorVoiceMessage);
     res.json({
       message: match.gameType === 'LUDO_SCORE'
         ? 'Opponent join ho gaya. Website par Ludo Score game shuru karein.'
         : isLudoRace
-          ? 'Opponent join ho gaya. Ludo Race shuru karein.'
+          ? 'Opponent join ho gaya. Ludo King app ka room code setup karke share karein. Pehli goti ghar pahunchne wala winner hoga.'
           : 'Opponent join ho gaya. Ab creator Ludo King room code setup karke share karega.',
       match: populatedMatch
     });
@@ -2611,11 +2596,12 @@ app.post('/api/matches/set-room-code', requireUser, async (req, res) => {
       .populate('creator', 'username phone')
       .populate('joiner', 'username phone');
     io.to(matchId).emit('match_updated', populatedMatch);
+    const isLudoRace = populatedMatch.gameType === 'LUDO_RACE';
     emitMatchActionVoice(
       populatedMatch,
       userId,
-      'रूम कोड भेज दिया गया है।',
-      'रूम कोड मिल गया है। अब उससे गेम में जुड़ें।'
+      isLudoRace ? 'Ludo Race का रूम कोड भेज दिया गया है। पहली गोटी घर पहुँचने वाला विजेता होगा।' : 'रूम कोड भेज दिया गया है।',
+      isLudoRace ? 'Ludo Race का रूम कोड मिल गया है। Ludo King में पहली गोटी घर पहुँचने वाला विजेता होगा।' : 'रूम कोड मिल गया है। अब उससे गेम में जुड़ें।'
     );
     res.json({ message: 'Room code share hote hi lock ho gaya. Dono players code copy karke Ludo King mein kheliye.', match: populatedMatch });
   } catch (err) {
@@ -2644,7 +2630,7 @@ app.post('/api/matches/start-setup', requireUser, async (req, res) => {
     }
     io.to(String(matchId)).emit('match_updated', match);
     if (startedNow && match.joiner) {
-      const startToneEvent = { matchId: String(match._id), startedBy: String(match.creator) };
+      const startToneEvent = { matchId: String(match._id), startedBy: String(match.creator), gameType: match.gameType };
       io.to(`player:${String(match.creator)}`).emit('match_start_tone', startToneEvent);
       io.to(`player:${String(match.joiner)}`).emit('match_start_tone', startToneEvent);
     }

@@ -229,7 +229,9 @@
 						body: JSON.stringify({ matchId })
 					});
 					app.notify(result.message);
-					app.announceHindiStatus?.('Ludo King ऐप खोलकर रूम बनाएं, वहाँ से रूम कोड लेकर यहाँ भेजें।');
+					app.announceHindiStatus?.(result.match?.gameType === 'LUDO_RACE'
+						? 'Ludo King ऐप में रूम बनाकर कोड यहाँ भेजें। Ludo Race में पहली गोटी घर पहुँचने वाला जीतेगा।'
+						: 'Ludo King ऐप खोलकर रूम बनाएं, वहाँ से रूम कोड लेकर यहाँ भेजें।');
 					setupHint.remove();
 					setupButton.remove();
 					roomForm.hidden = false;
