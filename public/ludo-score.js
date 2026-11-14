@@ -53,9 +53,9 @@
     .score-cell{position:relative;display:flex;align-items:center;justify-content:center;min-width:0;min-height:0;border:1px solid #dce5de;background:#f8faf8}
     .score-cell-track{background:#fff}.score-cell-safe::after{content:'★';position:absolute;color:#b89637;font-size:clamp(6px,1.8vw,15px);pointer-events:none}
     .score-cell-yard-red{background:linear-gradient(135deg,#ffded8,#ffc6bf)}.score-cell-yard-green{background:linear-gradient(135deg,#def7e4,#c0ebce)}
-    .score-cell-yard-yellow{background:linear-gradient(135deg,#fff3c4,#f5e29b)}.score-cell-yard-blue{background:linear-gradient(135deg,#dce8ff,#bdcff4)}
-    .score-cell-start-red,.score-cell-home-red{background:#f27569}.score-cell-start-green,.score-cell-home-green{background:#58bd75}
-    .score-cell-start-yellow,.score-cell-home-yellow{background:#f0d45b}.score-cell-start-blue,.score-cell-home-blue{background:#6f96da}
+    .score-cell-yard-yellow{background:linear-gradient(135deg,#fff3c4,#f5e29b)}.score-cell-yard-blue{background:linear-gradient(135deg,#dce8ff,#bdcff4)}.score-cell-yard-red,.score-cell-yard-green,.score-cell-yard-yellow,.score-cell-yard-blue{border-color:transparent}.score-cell-filler{visibility:hidden;border-color:transparent;background:transparent}
+    .score-cell-start-red{background:#f27569}.score-cell-start-green{background:#58bd75}
+    .score-cell-start-yellow{background:#f0d45b}.score-cell-start-blue{background:#6f96da}.score-cell-home-shared{background:linear-gradient(135deg,#ffe394,#f3bd45)}
     .score-cell-base-red,.score-cell-base-green,.score-cell-base-yellow,.score-cell-base-blue{margin:3px;border:2px solid #fff;border-radius:50%;background:#fff}
     .score-cell-base-red{box-shadow:inset 0 0 0 2px #c94f46}.score-cell-base-green{box-shadow:inset 0 0 0 2px #32834e}
     .score-cell-base-yellow{box-shadow:inset 0 0 0 2px #b79412}.score-cell-base-blue{box-shadow:inset 0 0 0 2px #416ba8}
@@ -92,14 +92,14 @@
       : `<span class="ludo-score-avatar-fallback" aria-hidden="true">${app.esc(initial)}</span>`;
   }
 
-  function positionFor(color, progress, tokenIndex) {
+  function positionFor(color, progress, tokenIndex, sharedHomePath) {
     const config = colors[color] || colors.red;
     if (progress < 0) return [config.baseSlots[tokenIndex]];
     if (progress <= 51) {
       const trackIndex = (config.startIndex + progress) % 52;
       return [track[trackIndex]];
     }
-    if (progress < scorePathLength) return [config.homePath[progress - 52]];
+    if (progress < scorePathLength) return [sharedHomePath[progress - 52]];
     return [config.finish];
   }
 
@@ -149,7 +149,7 @@
 
   function makeMarkup(match, app) {
     const state = match.ludoScore?.tokens ? match.ludoScore : (['OPEN', 'CANCELLED'].includes(match.status) ? {
-      tokens: { creator: [-1, -1, -1, -1], joiner: [-1, -1, -1, -1] },
+      rulesVersion: scoreRulesVersion, tokens: { creator: [-1, -1, -1, -1], joiner: [-1, -1, -1, -1] },
       scores: { creator: 0, joiner: 0 },
       colors: match.ludoScore?.colors || {},
       currentTurn: idOf(match.creator),
@@ -167,7 +167,7 @@
       creator: colors[state.colors?.creator] ? state.colors.creator : 'red',
       joiner: colors[state.colors?.joiner] ? state.colors.joiner : 'green'
     };
-    const ownTurn = match.status === 'RUNNING' && String(state.currentTurn) === myId && !state.winnerId;
+    const sharedHomePath = colors[playerColors.creator].homePath; const ownTurn = match.status === 'RUNNING' && String(state.currentTurn) === myId && !state.winnerId;
     const legalTokens = ownTurn && Array.isArray(state.legalTokenIndexes) ? state.legalTokenIndexes : [];
     const winner = state.winnerId ? String(state.winnerId) : '';
     const winnerName = winner ? app.nameOf(winner === creatorId ? match.creator : match.joiner) : '';
@@ -181,20 +181,20 @@
         classes.push('score-cell-track');
         if (safeTrack.has(trackIndex)) classes.push('score-cell-safe');
       }
-      for (const color of Object.keys(colors)) {
+      for (const color of Object.values(playerColors)) {
         const config = colors[color];
         const [yardRowStart, yardRowEnd, yardColStart, yardColEnd] = config.yard;
         if (row >= yardRowStart && row <= yardRowEnd && col >= yardColStart && col <= yardColEnd) classes.push(`score-cell-yard-${color}`);
         if (trackIndex === config.startIndex) classes.push(`score-cell-start-${color}`);
-        if (config.homePath.some(([homeRow, homeCol]) => homeRow === row && homeCol === col)) classes.push(`score-cell-home-${color}`);
+        if (color === playerColors.creator && sharedHomePath.some(([homeRow, homeCol]) => homeRow === row && homeCol === col)) classes.push('score-cell-home-shared');
         if (config.baseSlots.some(([baseRow, baseCol]) => baseRow === row && baseCol === col)) classes.push(`score-cell-base-${color}`, 'score-cell-base-inner');
       }
-      if (row === 7 && col === 7) classes.push('score-cell-center');
+      if (finishProgress === scorePathLength && row === 7 && col === 7) classes.push('score-cell-center'); if (trackIndex < 0 && !classes.some(className => className.startsWith('score-cell-yard-') || className.startsWith('score-cell-base-') || className === 'score-cell-home-shared' || className === 'score-cell-center')) classes.push('score-cell-filler');
       const tokensHere = [];
       for (const side of ['creator', 'joiner']) {
         (state.tokens[side] || []).forEach((progress, tokenIndex) => {
           const color = playerColors[side];
-          if (!positionFor(color, progress, tokenIndex).some(([tokenRow, tokenCol]) => tokenRow === row && tokenCol === col)) return;
+          if (!positionFor(color, progress, tokenIndex, sharedHomePath).some(([tokenRow, tokenCol]) => tokenRow === row && tokenCol === col)) return;
           const canMove = side === mySide && ownTurn && legalTokens.includes(tokenIndex);
           const label = `${colors[color].name} token ${tokenIndex + 1}`;
           tokensHere.push(`<button type="button" class="score-token ${color}${canMove ? ' selectable' : ''}" data-score-token="${tokenIndex}" aria-label="${label}${canMove ? ', select to move' : ''}" ${canMove ? '' : 'disabled'}>${tokenIndex + 1}</button>`);
@@ -250,7 +250,7 @@
       <div class="stat"><small>Creator</small><strong>${app.esc(app.nameOf(match.creator))}</strong></div>
       <div class="stat"><small>Opponent</small><strong>${app.esc(joinerName)}</strong></div></div>
       <div class="panel ludo-score-panel">
-        <div class="ludo-score-head"><h3>Ludo board • 2 players • 4 gotiyan har player ke paas</h3><span class="muted">52 bahari + 5 ghar = ${scorePathLength} khane</span>${match.status === 'RUNNING' && !winner ? '<span id="ludoScoreTimer" class="ludo-score-timer" aria-live="polite">10s</span>' : ''}</div>
+        <div class="ludo-score-head"><h3>Ludo board • 2 players • 4 gotiyan har player ke paas</h3><span class="muted">52 common + 5 shared ghar = ${scorePathLength} khane</span>${match.status === 'RUNNING' && !winner ? '<span id="ludoScoreTimer" class="ludo-score-timer" aria-live="polite">10s</span>' : ''}</div>
         <div class="ludo-score-players">
           ${playerCard('creator', match.creator)}
           ${playerCard('joiner', match.joiner || { username: joinerName })}
