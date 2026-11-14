@@ -40,6 +40,13 @@
         : '';
     return message ? app.announceHindiStatus(message) : false;
   };
+  app.announceBattleEntryAmount = amount => {
+    const value = Number(amount);
+    if (!Number.isFinite(value) || value <= 0) return false;
+    return app.announceHindiStatus(
+      `आप ₹${value.toLocaleString('en-IN')} की एंट्री राशि वाला बैटल बना रहे हैं। कम से कम पचास रुपये और पचास रुपये के गुणक में राशि रखें।`
+    );
+  };
   app.announceWinScreenshotPrompt = () => {
     app.announceHindiStatus('गेम जीतने के बाद जीत का स्क्रीनशॉट अपलोड करके Result review भेजें। हारने पर I Lost चुनें।');
   };

@@ -57,6 +57,16 @@ test('announces the entered withdrawal amount and limits', () => {
   assert.match(spoken[0], /सौ रुपये/);
 });
 
+test('announces the battle entry amount and minimum increments', () => {
+  const { app, spoken } = createFeedbackHarness();
+
+  app.announceBattleEntryAmount(250);
+
+  assert.match(spoken[0], /₹250/);
+  assert.match(spoken[0], /एंट्री राशि वाला बैटल/);
+  assert.match(spoken[0], /पचास रुपये के गुणक/);
+});
+
 test('announces the win screenshot submission instructions', () => {
   const { app, spoken } = createFeedbackHarness();
 

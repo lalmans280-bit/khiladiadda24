@@ -141,6 +141,19 @@
   document.addEventListener('submit', event => {
     if (event.target.id === 'createForm') window.pendingEntryAmount = Number(el('entryAmount').value) || 50;
   }, true);
+  const entryAmountInput = el('entryAmount');
+  if (entryAmountInput) {
+    let entryAmountVoiceTimer;
+    entryAmountInput.addEventListener('input', () => {
+      window.clearTimeout(entryAmountVoiceTimer);
+      entryAmountVoiceTimer = window.setTimeout(() => {
+        const amount = Number(entryAmountInput.value);
+        if (entryAmountInput.value.trim() && Number.isFinite(amount) && amount > 0) {
+          app.announceBattleEntryAmount?.(amount);
+        }
+      }, 900);
+    });
+  }
 
   form.addEventListener('submit', async event => {
     event.preventDefault();
