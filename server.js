@@ -18,11 +18,9 @@ const {
   LUDO_SCORE_HOME_ENTRY_BONUS,
   LUDO_SCORE_LOOP_LENGTH,
   LUDO_SCORE_MAX,
-  LUDO_SCORE_RULES_VERSION,
   captureOpponentTokens,
   isLudoScoreWinner,
   legalTokenIndexesForRoll,
-  ludoScoreFinishProgress,
   ludoScoreWinnerSide,
   nextLudoTokenProgress,
   nextSixStreak,
@@ -1608,7 +1606,7 @@ app.post('/api/matches/create', requireUser, async (req, res) => {
   if (!Number.isInteger(entryAmount) || entryAmount < MIN_BATTLE_ENTRY_AMOUNT || entryAmount > MAX_BATTLE_ENTRY_AMOUNT || entryAmount % MIN_BATTLE_ENTRY_AMOUNT !== 0) {
     return res.status(400).json({ error: 'Battle entry ₹50 se shuru hoti hai aur ₹50 ke multiples mein honi chahiye.' });
   }
-  if (!['LUDO', 'POPULAR_LUDO', 'SNAKE', 'LUDO_RACE', 'LUDO_SCORE'].includes(normalizedGameType)) {
+  if (!['LUDO', 'POPULAR_LUDO', 'SNAKE', 'LUDO_RACE'].includes(normalizedGameType)) {
     return res.status(400).json({ error: 'Ludo, Popular Ludo, Ludo Race ya Snake game select karein' });
   }
   if (normalizedGameType === 'LUDO_RACE' && !isValidLudoRaceColor(creatorColor)) {
@@ -1658,7 +1656,7 @@ app.post('/api/matches/create', requireUser, async (req, res) => {
 
 app.get('/api/matches/open', async (req, res) => {
   const gameType = String(req.query.gameType || 'ALL').toUpperCase();
-  if (!['ALL', 'LUDO', 'POPULAR_LUDO', 'SNAKE', 'LUDO_RACE', 'LUDO_SCORE'].includes(gameType)) {
+  if (!['ALL', 'LUDO', 'POPULAR_LUDO', 'SNAKE', 'LUDO_RACE'].includes(gameType)) {
     return res.status(400).json({ error: 'Game type LUDO, POPULAR_LUDO, LUDO_RACE, SNAKE ya ALL hona chahiye' });
   }
   try {
@@ -1688,7 +1686,7 @@ app.get('/api/matches/mine', requireUser, async (req, res) => {
 app.get('/api/matches/running', requireUser, async (req, res) => {
   try {
     const gameType = String(req.query.gameType || 'ALL').toUpperCase();
-    if (!['ALL', 'LUDO', 'POPULAR_LUDO', 'SNAKE', 'LUDO_RACE', 'LUDO_SCORE'].includes(gameType)) {
+    if (!['ALL', 'LUDO', 'POPULAR_LUDO', 'SNAKE', 'LUDO_RACE'].includes(gameType)) {
       return res.status(400).json({ error: 'Game type LUDO, POPULAR_LUDO, LUDO_RACE, SNAKE ya ALL hona chahiye' });
     }
     const requestedLimit = Number.parseInt(req.query.limit, 10);
@@ -2130,12 +2128,11 @@ app.post('/api/matches/ludo-race/move', requireUser, async (req, res) => {
   }
 });
 
-const ludoScoreTurnDuration = 10 * 1000;
+const ludoScoreTurnDuration = 20 * 1000;
 
 function createLudoScoreState(creatorId, startedAt = new Date()) {
   return {
     version: 0,
-    rulesVersion: LUDO_SCORE_RULES_VERSION,
     tokens: { creator: [-1, -1, -1, -1], joiner: [-1, -1, -1, -1] },
     currentTurn: String(creatorId),
     diceValue: null,
@@ -2177,7 +2174,7 @@ async function expireLudoScoreTurn(match) {
     scores: scoreAfterTimeout(state, String(state.currentTurn) === String(match.creator) ? 'creator' : 'joiner'),
     consecutiveSixes: 0,
     turnDeadlineAt: new Date(Date.now() + ludoScoreTurnDuration),
-    lastAction: '10 second timeout; 100 score minus aur turn opponent ko mili'
+    lastAction: '20 second timeout; 100 score minus aur turn opponent ko mili'
   };
   const updated = await Match.findOneAndUpdate(
     { _id: match._id, status: 'RUNNING', 'ludoScore.version': Number(state.version || 0), 'ludoScore.currentTurn': String(state.currentTurn), 'ludoScore.turnDeadlineAt': state.turnDeadlineAt, 'ludoScore.winnerId': null },
@@ -2191,6 +2188,10 @@ async function expireLudoScoreTurn(match) {
 app.post('/api/matches/ludo-score/roll', requireUser, async (req, res) => {
   const { matchId } = req.body;
   try {
+    const unavailable = await Match.findById(matchId).select('gameType status');
+    if (!unavailable || unavailable.gameType === 'LUDO_SCORE' || unavailable.status !== 'RUNNING') {
+      return res.status(400).json({ error: 'Ludo Score game ab available nahi hai.' });
+    }
     let match = await Match.findById(matchId);
     if (!match || match.gameType !== 'LUDO_SCORE' || match.status !== 'RUNNING') {
       return res.status(400).json({ error: 'Ludo Score match active nahi hai' });
@@ -2202,13 +2203,13 @@ app.post('/api/matches/ludo-score/roll', requireUser, async (req, res) => {
     const activeMatch = await expireLudoScoreTurn(match);
     if (!activeMatch) return res.status(404).json({ error: 'Match nahi mila' });
     const state = activeMatch.ludoScore;
-    if (String(state.currentTurn) !== userId) return res.json({ message: '10 second timer khatam; 100 score minus hua aur ab opponent ki turn hai.', match: activeMatch });
+    if (String(state.currentTurn) !== userId) return res.json({ message: '20 second timer khatam; 100 score minus hua aur ab opponent ki turn hai.', match: activeMatch });
     if (state.winnerId) return res.status(400).json({ error: 'Ludo Score ka winner tay ho chuka hai' });
     if (state.diceValue !== null && state.diceValue !== undefined) return res.status(400).json({ error: 'Pehle dice ka token move karein' });
 
     const diceValue = crypto.randomInt(1, 7);
     const side = ludoRaceSide(match, userId);
-    const legalTokenIndexes = legalTokenIndexesForRoll(state.tokens[side], diceValue, ludoScoreFinishProgress(state));
+    const legalTokenIndexes = legalTokenIndexesForRoll(state.tokens[side], diceValue);
     const noLegalMove = legalTokenIndexes.length === 0;
     const opponentId = String(state.currentTurn) === String(match.creator) ? String(match.joiner) : String(match.creator);
     const sixStreak = nextSixStreak(state, diceValue, opponentId);
@@ -2248,6 +2249,10 @@ app.post('/api/matches/ludo-score/roll', requireUser, async (req, res) => {
 
 app.post('/api/matches/ludo-score/move', requireUser, async (req, res) => {
   const { matchId } = req.body;
+  const unavailable = await Match.findById(matchId).select('gameType status');
+  if (!unavailable || unavailable.gameType === 'LUDO_SCORE' || unavailable.status !== 'RUNNING') {
+    return res.status(400).json({ error: 'Ludo Score game ab available nahi hai.' });
+  }
   const tokenIndex = Number(req.body.tokenIndex);
   if (!Number.isInteger(tokenIndex) || tokenIndex < 0 || tokenIndex > 3) {
     return res.status(400).json({ error: 'Sahi goti select karein' });
@@ -2270,7 +2275,7 @@ app.post('/api/matches/ludo-score/move', requireUser, async (req, res) => {
     match = await expireLudoScoreTurn(match);
     if (!match) return res.status(404).json({ error: 'Match nahi mila' });
     const state = match.ludoScore;
-    if (String(state.currentTurn) !== userId) return res.json({ message: '10 second timer khatam; 100 score minus hua aur ab opponent ki turn hai.', match });
+    if (String(state.currentTurn) !== userId) return res.json({ message: '20 second timer khatam; 100 score minus hua aur ab opponent ki turn hai.', match });
     if (state.winnerId) return res.status(400).json({ error: 'Ludo Score ka winner tay ho chuka hai' });
     if (!Array.isArray(state.legalTokenIndexes) || !state.legalTokenIndexes.includes(tokenIndex)) {
       return res.status(400).json({ error: 'Is goti ki abhi legal move nahi hai' });
@@ -2299,8 +2304,7 @@ app.post('/api/matches/ludo-score/move', requireUser, async (req, res) => {
       const diceValue = Number(currentState.diceValue);
       const tokens = { creator: [...currentState.tokens.creator], joiner: [...currentState.tokens.joiner] };
       const oldProgress = tokens[side][tokenIndex];
-      const finishProgress = ludoScoreFinishProgress(currentState);
-      const newProgress = nextLudoTokenProgress(oldProgress, diceValue, finishProgress);
+      const newProgress = nextLudoTokenProgress(oldProgress, diceValue);
       if (newProgress === null) {
         const error = new Error('Game state update ho gaya. Refresh karke dobara try karein.');
         error.statusCode = 409;
@@ -2316,7 +2320,7 @@ app.post('/api/matches/ludo-score/move', requireUser, async (req, res) => {
       tokens.joiner = captureResult.tokens.joiner;
 
       const scores = scoresAfterMove(currentState, tokens, homeLaneEntry ? side : null);
-      const won = isLudoScoreWinner(tokens[side], finishProgress);
+      const won = isLudoScoreWinner(tokens[side]);
       const winnerSide = won ? ludoScoreWinnerSide(scores, side) : null;
       const winnerUserId = winnerSide
         ? String(winnerSide === 'creator' ? currentMatch.creator : currentMatch.joiner)
@@ -2411,6 +2415,7 @@ app.get('/api/matches/:matchId', requireUser, async (req, res) => {
   try {
     let match = await Match.findById(req.params.matchId);
     if (!match) return res.status(404).json({ error: 'Match nahi mila' });
+    if (match.gameType === 'LUDO_SCORE') return res.status(400).json({ error: 'Ludo Score game ab available nahi hai.' });
     if (!isMatchPlayer(match, req.auth.userId)) return res.status(403).json({ error: 'Sirf match ke players details dekh sakte hain' });
     match = await ensureLudoRaceState(match);
     match = await ensureLudoScoreState(match);
@@ -2434,6 +2439,9 @@ app.post('/api/matches/join', requireUser, async (req, res) => {
     const match = await Match.findById(matchId);
     if (!match || match.status !== 'OPEN') {
       return res.status(400).json({ error: 'Match expire ho chuka hai' });
+    }
+    if (match.gameType === 'LUDO_SCORE') {
+      return res.status(400).json({ error: 'Ludo Score game ab available nahi hai.' });
     }
     if (Number(match.amount) < MIN_BATTLE_ENTRY_AMOUNT) {
       return res.status(400).json({ error: 'Free battle join nahi ho sakti. Paid battle select karein.' });
