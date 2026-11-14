@@ -2953,6 +2953,34 @@ app.post('/api/matches/submit-result', requireUser, persistUploads(upload.single
           : 'Reports match nahi karte. Admin review ke liye bhej diye gaye hain.'
         : 'Aapka result submit ho gaya. Dusre player ke result ka wait karein.';
 
+    const actorIsCreator = String(finalMatch.creator) === String(userId);
+    const actorResult = actorIsCreator ? finalMatch.creatorResult : finalMatch.joinerResult;
+    let actorVoiceMessage;
+    let opponentVoiceMessage;
+    if (finalMatch.status === 'COMPLETED') {
+      const actorWon = String(finalMatch.winner?._id || finalMatch.winner) === String(userId);
+      actorVoiceMessage = actorWon
+        ? 'आपकी जीत की पुष्टि हो गई है। जीत की रकम आपके वॉलेट में जमा हो गई है।'
+        : 'आपकी हार की पुष्टि हो गई है। विपक्षी खिलाड़ी जीत गया है।';
+      opponentVoiceMessage = actorWon
+        ? 'आपके विपक्षी खिलाड़ी की जीत की पुष्टि हो गई है।'
+        : 'बधाई! आपकी जीत की पुष्टि हो गई है। जीत की रकम वॉलेट में जमा हो गई है।';
+    } else if (finalMatch.status === 'PENDING_RESULT') {
+      actorVoiceMessage = finalMatch.winner
+        ? 'आपकी रिपोर्ट और स्क्रीनशॉट एडमिन समीक्षा के लिए भेज दिए गए हैं। मंज़ूरी का इंतज़ार करें।'
+        : 'दोनों खिलाड़ियों की रिपोर्ट में अंतर है। एडमिन समीक्षा का इंतज़ार करें।';
+      opponentVoiceMessage = finalMatch.winner
+        ? 'विपक्षी की रिपोर्ट और स्क्रीनशॉट एडमिन समीक्षा में हैं। मंज़ूरी का इंतज़ार करें।'
+        : 'दोनों खिलाड़ियों की रिपोर्ट में अंतर है। एडमिन समीक्षा का इंतज़ार करें।';
+    } else if (actorResult === 'WIN') {
+      actorVoiceMessage = 'आपकी जीत की रिपोर्ट और स्क्रीनशॉट जमा हो गया है। दूसरे खिलाड़ी की रिपोर्ट का इंतज़ार करें।';
+      opponentVoiceMessage = 'दूसरे खिलाड़ी ने जीत की रिपोर्ट और स्क्रीनशॉट भेज दिया है। अपनी रिपोर्ट जमा करें।';
+    } else {
+      actorVoiceMessage = 'आपकी हार की रिपोर्ट जमा हो गई है। दूसरे खिलाड़ी की रिपोर्ट का इंतज़ार करें।';
+      opponentVoiceMessage = 'दूसरे खिलाड़ी ने हार की रिपोर्ट दी है। जीत की रिपोर्ट के लिए स्क्रीनशॉट भेजें।';
+    }
+    emitMatchActionVoice(finalMatch, userId, actorVoiceMessage, opponentVoiceMessage);
+
     res.json({
       message: isAdminVisibleCommission ? adminMessage : publicMessage,
       winAmount,

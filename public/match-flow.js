@@ -108,6 +108,7 @@
 		screenshot.addEventListener('change', () => {
 			const file = screenshot.files[0];
 			selectedFile.textContent = file?.name || 'Abhi koi file select nahi hai.';
+			if (file) window.matchApp?.announceHindiStatus?.('जीत का स्क्रीनशॉट चुन लिया गया है। अब Result review दबाएं।');
 			if (previewUrl) URL.revokeObjectURL(previewUrl);
 			if (!file) {
 				screenshotPreview.removeAttribute('src');
@@ -142,6 +143,7 @@
 				body.set('matchId', matchId);
 				const result = await app.api('/api/matches/submit-result', { method: 'POST', body });
 				app.notify(result.message);
+				app.announceResultReport?.(result.match);
 				const notice = document.createElement('p');
 				notice.className = result.match?.status === 'COMPLETED' ? 'notice' : 'notice warning';
 				notice.textContent = result.match?.status === 'COMPLETED'

@@ -166,6 +166,14 @@
       const signature = `${currentMatch.status}:${currentMatch.ludoRace?.version}:${currentMatch.ludoRace?.winnerId || ''}:${currentMatch.proofScreenshot || ''}:${app.nameOf(currentMatch.creator)}:${app.nameOf(currentMatch.joiner)}`;
       if (signature === activeSignature) return;
       activeSignature = signature;
+      const winnerId = String(currentMatch.ludoRace?.winnerId || '');
+      const winnerPromptKey = `${matchId}:${winnerId}`;
+      if (winnerId && window.__ludoRaceWinPrompted !== winnerPromptKey) {
+        window.__ludoRaceWinPrompted = winnerPromptKey;
+        app.announceHindiStatus?.(winnerId === idOf(app.getPlayer() || app.getUser())
+          ? 'बधाई! आप जीत गए। जीत का स्क्रीनशॉट अपलोड करके Result review भेजें।'
+          : 'विपक्षी खिलाड़ी जीत गया है। विजेता स्क्रीनशॉट अपलोड करके Result review भेजेगा।');
+      }
       if (currentMatch.ludoRace?.winnerId && window.__ludoRaceCountdownTimer) {
         clearInterval(window.__ludoRaceCountdownTimer);
         window.__ludoRaceCountdownTimer = null;
@@ -294,6 +302,7 @@
           body.set('screenshot', timestampedProofFile || await makeTimestampedScreenshot());
           const result = await app.api('/api/matches/submit-result', { method: 'POST', body });
           app.notify(result.message);
+          app.announceResultReport?.(result.match);
           renderState(result.match);
           await app.refresh();
         } catch (error) {
