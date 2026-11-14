@@ -424,14 +424,15 @@
     #view-home>.home-open-battles-panel .match-head h2,#view-home>.home-running-battles-panel>h2{display:block;margin:0;padding:0;border:0;border-radius:0;color:inherit;background:transparent;font-size:16px;line-height:1.2}
     html[data-theme="night"] .battle-prizes.open-battle-prizes .battle-player-amount{font-size:14px}
     .game-mode-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:7px}
-    .game-mode-option{display:grid;place-items:center;min-height:76px;padding:0;border:0;border-radius:0;background:transparent;transition:transform .15s}
-    .game-mode-art{position:relative;display:block;width:76px;height:76px;overflow:hidden;flex:none}
+    .game-mode-option{display:grid;width:100%;min-width:0;place-items:center;min-height:90px;padding:5px;border:1px solid var(--line);border-radius:10px;background:var(--panel);transition:transform .15s,border-color .15s,background .15s}
+    .game-mode-art{position:relative;display:block;width:min(76px,100%);height:auto;aspect-ratio:1;overflow:hidden;flex:none}
     .game-mode-art img{display:block;width:100%;height:100%;object-fit:contain}
     .game-mode-art .game-live-badge{top:2px;right:2px;bottom:auto;left:auto;gap:3px;padding:2px 4px;font-size:8px}
     .game-mode-art .game-live-dot{width:5px;height:5px}
-    #createForm .selected-game-name{display:block;margin:0 0 7px;color:var(--gold);font-size:15px;font-weight:900;line-height:1.2}
+    #createForm .selected-game-name{display:block;margin:0 0 7px;padding:7px 9px;border:1px solid var(--line);border-radius:8px;color:var(--gold);background:var(--panel);font-size:15px;font-weight:900;line-height:1.2}
     .game-mode-option:hover{transform:translateY(-1px)}
     .game-mode-option:focus-visible{outline:3px solid #f5d46b;outline-offset:3px}
+    .game-mode-option.active{border-color:var(--gold);background:linear-gradient(145deg,#293b2f,#18232b);box-shadow:0 0 0 1px #f5d46b55}
     .game-mode-option.active .game-mode-art{filter:drop-shadow(0 0 7px rgba(255,216,100,.72))}
     @media(max-width:600px){.battle-prizes.open-battle-prizes .battle-player-name{font-size:10px}html[data-theme="night"] .battle-prizes.open-battle-prizes .battle-player-amount{font-size:12px}html[data-theme="day"] .battle-prizes.open-battle-prizes .battle-player-amount{font-size:12px}}
     @media(max-width:600px){body{font-size:18px}.shell{padding-right:10px;padding-left:10px}.panel{padding:17px}.panel h2,.panel h3{font-size:23px}.panel p,.muted{font-size:15px}.field label{font-size:15px}.field input,.field select,.field textarea{font-size:17px}.btn{min-height:48px;font-size:16px}}
