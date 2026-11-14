@@ -209,6 +209,23 @@ function isMatchPlayer(match, userId) {
   });
 }
 
+function emitMatchActionVoice(match, actorId, actorMessage, opponentMessage = actorMessage) {
+  const playerIds = new Set([match.creator, match.joiner]
+    .filter(Boolean)
+    .map(player => player && typeof player === 'object' ? player._id || player.id : player)
+    .filter(Boolean)
+    .map(String));
+  const event = {
+    matchId: String(match._id),
+    actorId: actorId ? String(actorId) : '',
+    message: actorMessage,
+    opponentMessage
+  };
+  for (const playerId of playerIds) {
+    io.to(`player:${playerId}`).emit('match_action_voice', event);
+  }
+}
+
 async function reserveActiveBet(userId) {
   const activeBets = await Match.countDocuments({
     status: { $in: ACTIVE_MATCH_STATUSES },
@@ -2061,6 +2078,14 @@ app.post('/api/matches/ludo-race/roll', requireUser, async (req, res) => {
     );
     if (!updated) return res.status(409).json({ error: 'Game state update ho gaya. Refresh karke dobara try karein.' });
     io.to(String(matchId)).emit('match_updated', updated);
+    emitMatchActionVoice(
+      updated,
+      userId,
+      'आपकी चाल चल गई है।',
+      noLegalMove
+        ? (diceValue === 6 ? 'दूसरे खिलाड़ी को कोई चाल नहीं मिली, वह फिर पासा फेंकेंगे।' : 'दूसरे खिलाड़ी की चाल नहीं चली, अब आपकी बारी है।')
+        : 'दूसरे खिलाड़ी ने पासा फेंका है।'
+    );
     res.json({ message: noLegalMove ? `${diceValue} aaya; move nahi tha, ab opponent ki turn hai.` : `${diceValue} aaya. Apni goti select karein.`, match: updated });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -2133,6 +2158,12 @@ app.post('/api/matches/ludo-race/move', requireUser, async (req, res) => {
     );
     if (!updated) return res.status(409).json({ error: 'Game state update ho gaya. Refresh karke dobara try karein.' });
     io.to(String(matchId)).emit('match_updated', updated);
+    emitMatchActionVoice(
+      updated,
+      userId,
+      'आपकी चाल चल गई है।',
+      won ? 'दूसरे खिलाड़ी ने गेम जीत लिया है।' : captured ? 'दूसरे खिलाड़ी ने आपकी गोटी काटी है।' : 'दूसरे खिलाड़ी ने अपनी गोटी चली है।'
+    );
     res.json({ message: won ? 'Aapki charon gotiyan ghar pahunch gayi — aap winner hain! Screenshot upload karke result bhejein.' : captured ? 'Opponent ki goti capture hui.' : 'Goti chal di.', match: updated });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -2513,6 +2544,7 @@ app.post('/api/matches/join', requireUser, async (req, res) => {
       .populate('creator', 'username phone')
       .populate('joiner', 'username phone');
     io.to(matchId).emit('match_updated', populatedMatch);
+    emitMatchActionVoice(populatedMatch, userId, 'गेम जॉइन हो गया है।', 'आपके गेम में एक खिलाड़ी जॉइन हो गया है।');
     res.json({
       message: match.gameType === 'LUDO_SCORE'
         ? 'Opponent join ho gaya. Website par Ludo Score game shuru karein.'
@@ -2666,6 +2698,7 @@ app.post('/api/matches/start-game', requireUser, async (req, res) => {
     );
     if (!started) return res.status(409).json({ error: 'Game start nahi ho saka. Battle refresh karke dobara dekhein.' });
     io.to(String(matchId)).emit('match_updated', started);
+    emitMatchActionVoice(started, null, 'गेम शुरू हो गया है।');
     res.json({ message: 'Creator ne game start kar diya', match: started });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -2983,6 +3016,12 @@ app.post('/api/matches/cancel', requireUser, async (req, res) => {
       if (!request) return res.status(409).json({ error: 'Match update ho gaya. Refresh karke dobara dekhein.' });
 
       io.to(String(matchId)).emit('match_updated', request);
+      emitMatchActionVoice(
+        request,
+        userId,
+        'गेम कैंसल करने की रिक्वेस्ट भेज दी गई है। मंज़ूरी का इंतज़ार करें।',
+        'दूसरे खिलाड़ी ने गेम कैंसल करने की रिक्वेस्ट भेजी है। मंज़ूरी का इंतज़ार करें।'
+      );
       return res.json({ message: 'Room code share ho chuka hai. Cancel reason admin ko bhej di; approval ke baad match cancel aur dono players ko refund hoga.', match: request });
     }
 
@@ -3036,6 +3075,12 @@ app.post('/api/matches/cancel', requireUser, async (req, res) => {
       io.emit('wallet_updated', { userId: String(player._id), walletBalance: player.walletBalance, amountAdded: cancelledMatch.amount });
     }
     io.to(String(matchId)).emit('match_updated', cancelledMatch);
+    emitMatchActionVoice(
+      cancelledMatch,
+      userId,
+      'गेम कैंसल हो गया है। एंट्री का पैसा वापस कर दिया गया है।',
+      'गेम कैंसल हो गया है। एंट्री का पैसा वापस कर दिया गया है।'
+    );
     res.json({ message: 'Battle cancel ho gayi aur eligible players ki entry refund ho gayi.', match: cancelledMatch });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -3534,6 +3579,7 @@ app.post('/api/admin/cancel-match', requireAdmin, async (req, res) => {
     await releaseMatchBetSlots(currentMatch);
 
     io.to(String(currentMatch._id)).emit('match_updated', currentMatch);
+    emitMatchActionVoice(currentMatch, null, 'एडमिन ने गेम कैंसल कर दिया है। एंट्री का पैसा वापस कर दिया गया है।');
     res.json({ message: 'Game cancel ho gaya aur players ko refund kar diya gaya' });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -3601,6 +3647,13 @@ app.post('/api/admin/review-cancel-request', requireAdmin, async (req, res) => {
       reason: 'Admin approved game cancellation refund'
     }));
     io.to(String(reviewedMatch._id)).emit('match_updated', reviewedMatch);
+    emitMatchActionVoice(
+      reviewedMatch,
+      null,
+      decision === 'APPROVE'
+        ? 'कैंसल रिक्वेस्ट मंज़ूर हो गई है। गेम कैंसल और एंट्री रिफंड हो गई है।'
+        : 'एडमिन ने कैंसल रिक्वेस्ट अस्वीकार की है। गेम जारी रहेगा।'
+    );
     res.json({ message: decision === 'APPROVE' ? 'Cancel approved. Match cancel aur players ko refund kar diya.' : 'Cancel request reject kar di. Match active hai.', match: reviewedMatch });
   } catch (err) {
     res.status(err.statusCode || 500).json({ error: err.message });

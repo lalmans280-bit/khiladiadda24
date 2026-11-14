@@ -552,7 +552,7 @@
       .catch(() => {});
   </script>
   <script src="/socket.io/socket.io.js"></script>
-  <script src="/ludo-race.js?v=20260624-one-token-win"></script>
+  <script src="/ludo-race.js?v=20261114-opponent-voice"></script>
   <script>
     const token=localStorage.getItem('token');
     const storedUser=(()=>{try{return JSON.parse(localStorage.getItem('user')||'null')}catch{return null}})();
@@ -660,7 +660,23 @@
 
     const matchSocket=typeof io==='function'?io():null;
     const registerMatchSocket=()=>{if(!matchSocket||!token)return;matchSocket.emit('register_player',{token});const matchId=new URLSearchParams(location.search).get('matchId');if(matchId)matchSocket.emit('join_match_room',{matchId,token})};
-    if(matchSocket){matchSocket.on('connect',registerMatchSocket);if(matchSocket.connected)registerMatchSocket();matchSocket.on('match_start_tone',event=>{const starterId=String(event?.startedBy||''),currentUserId=String(player?._id||storedUser?.id||'');if(starterId&&starterId!==currentUserId)window.matchApp?.playAlertTone?.()})}
+    if(matchSocket){
+      matchSocket.on('connect',registerMatchSocket);
+      if(matchSocket.connected)registerMatchSocket();
+      matchSocket.on('match_start_tone',event=>{
+        const starterId=String(event?.startedBy||''),currentUserId=String(player?._id||storedUser?._id||storedUser?.id||'');
+        if(starterId&&starterId!==currentUserId){
+          window.matchApp?.playAlertTone?.();
+          window.matchApp?.announceHindiStatus?.('गेम शुरू करने की तैयारी हो गई है।');
+        }
+      });
+      matchSocket.on('match_action_voice',event=>{
+        const actorId=String(event?.actorId||''),currentUserId=String(player?._id||storedUser?._id||storedUser?.id||'');
+        if(!currentUserId||(actorId&&actorId===currentUserId))return;
+        window.matchApp?.playGameActionBeep?.();
+        window.matchApp?.announceHindiStatus?.(String(event?.opponentMessage||event?.message||''));
+      });
+    }
     if(matchSocket)matchSocket.on('match_updated',updated=>{const currentMatchId=new URLSearchParams(location.search).get('matchId');if(currentMatchId&&String(updated?._id)===currentMatchId&&window.openMatch)window.openMatch(currentMatchId).then(()=>{if(updated.status!=='COMPLETED')return;const winnerId=String(updated.winner?._id||updated.winner||''),currentUserId=String(player?._id||storedUser?.id||''),isFreeMatch=Number(updated.amount||0)===0;notify(isFreeMatch?'Battle complete. No wallet amount changed.':winnerId===currentUserId?`Admin ne result approve kar diya: Aap WIN hue. ₹${(Number(updated.amount||0)*1.8).toLocaleString('en-IN')} wallet me credit hua.`:'Admin ne result approve kar diya: Is match me aap LOSS hue.')}).catch(error=>notify(error.message,true))});
     if(matchSocket)matchSocket.on('wallet_updated',update=>{const userId=String(player?._id||storedUser?.id||'');if(!userId||String(update?.userId)!==userId||!Number.isFinite(Number(update.walletBalance)))return;if(player)player.walletBalance=Number(update.walletBalance);if(storedUser){storedUser.walletBalance=Number(update.walletBalance);localStorage.setItem('user',JSON.stringify(storedUser))}renderPlayer()});
     if(matchSocket)matchSocket.on('wallet_updated',update=>{const userId=String(player?._id||storedUser?.id||'');if(userId&&String(update?.userId)===userId)loadWalletSummary().catch(()=>{})});
@@ -1157,8 +1173,8 @@
     if(['home','games','wallet','history','profile'].includes(requestedView))setView(requestedView);
     refresh().catch(showError);battlesPollTimer=setInterval(()=>loadOpen().catch(showError),10000);setInterval(refreshSamplePlayers,10*1000);setInterval(()=>{if(el('view-profile').classList.contains('active'))loadWalletSummary().catch(showError)},10000);const initialMatchId=new URLSearchParams(location.search).get('matchId');if(initialMatchId)window.openMatch(initialMatchId).catch(showError);
   </script>
-    <script src="/match-flow.js?v=20260929-reason-required-roomcode-cancel"></script>
-    <script src="/player-game-feedback.js?v=20261118-hindi-game-feedback"></script>
+    <script src="/match-flow.js?v=20261114-opponent-voice"></script>
+    <script src="/player-game-feedback.js?v=20261114-opponent-voice"></script>
     <script src="/wallet-flow.js?v=20260929-winnings-only-withdrawal"></script>
     <script src="/game-rules.js?v=20261114-game-rules"></script>
   <script src="/player-copy.js" defer></script>
