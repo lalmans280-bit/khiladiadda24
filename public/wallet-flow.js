@@ -138,22 +138,31 @@
       window.pendingEntryAmount = Number(amountText.replace(/[^0-9]/g, '')) || 50;
     }
   }, true);
-  document.addEventListener('submit', event => {
-    if (event.target.id === 'createForm') window.pendingEntryAmount = Number(el('entryAmount').value) || 50;
-  }, true);
   const entryAmountInput = el('entryAmount');
+  let lastAnnouncedEntryAmount = '';
+  let entryAmountVoiceTimer;
+  const announceCurrentEntryAmount = () => {
+    if (!entryAmountInput?.value.trim() || !entryAmountInput.validity.valid) return;
+    const amount = Number(entryAmountInput.value);
+    if (!Number.isFinite(amount) || amount <= 0 || String(amount) === lastAnnouncedEntryAmount) return;
+    if (app.announceBattleEntryAmount?.(amount)) lastAnnouncedEntryAmount = String(amount);
+  };
   if (entryAmountInput) {
-    let entryAmountVoiceTimer;
     entryAmountInput.addEventListener('input', () => {
       window.clearTimeout(entryAmountVoiceTimer);
-      entryAmountVoiceTimer = window.setTimeout(() => {
-        const amount = Number(entryAmountInput.value);
-        if (entryAmountInput.value.trim() && Number.isFinite(amount) && amount > 0) {
-          app.announceBattleEntryAmount?.(amount);
-        }
-      }, 900);
+      entryAmountVoiceTimer = window.setTimeout(announceCurrentEntryAmount, 450);
+    });
+    entryAmountInput.addEventListener('change', () => {
+      window.clearTimeout(entryAmountVoiceTimer);
+      announceCurrentEntryAmount();
     });
   }
+  document.addEventListener('submit', event => {
+    if (event.target.id === 'createForm') {
+      window.pendingEntryAmount = Number(entryAmountInput.value) || 50;
+      announceCurrentEntryAmount();
+    }
+  }, true);
 
   form.addEventListener('submit', async event => {
     event.preventDefault();
