@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const matchSchema = new mongoose.Schema({
-  gameType: { type: String, enum: ['LUDO', 'POPULAR_LUDO', 'SNAKE', 'LUDO_RACE', 'LUDO_SCORE'], required: true },
+  gameType: { type: String, enum: ['LUDO', 'POPULAR_LUDO', 'SNAKE', 'LUDO_RACE'], required: true },
   creatorColor: { type: String, enum: ['red', 'green', 'yellow', 'blue'] },
   ludoRace: { type: mongoose.Schema.Types.Mixed, default: undefined },
   ludoScore: { type: mongoose.Schema.Types.Mixed, default: undefined },
