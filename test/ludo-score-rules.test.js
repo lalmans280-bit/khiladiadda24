@@ -3,12 +3,16 @@ const assert = require('node:assert/strict');
 const {
   LUDO_SCORE_FINISH_PROGRESS,
   LUDO_SCORE_HOME_ENTRY_BONUS,
+  LUDO_SCORE_LEGACY_FINISH_PROGRESS,
   LUDO_SCORE_LOOP_LENGTH,
   LUDO_SCORE_MAX,
+  LUDO_SCORE_PATH_LENGTH,
+  LUDO_SCORE_RULES_VERSION,
   LUDO_SAFE_TRACK_INDEXES,
   captureOpponentTokens,
   isLudoScoreWinner,
   legalTokenIndexesForRoll,
+  ludoScoreFinishProgress,
   ludoScoreWinnerSide,
   nextLudoTokenProgress,
   nextSixStreak,
@@ -30,12 +34,19 @@ test('opens a token on six and requires an exact roll to reach home', () => {
   assert.equal(nextLudoTokenProgress(56, 2), null);
 });
 
-test('uses 52 outer squares and five home-lane squares before the center finish', () => {
-  assert.equal(LUDO_SCORE_LOOP_LENGTH + (LUDO_SCORE_FINISH_PROGRESS - LUDO_SCORE_LOOP_LENGTH), 57);
-  assert.equal(nextLudoTokenProgress(51, 1), 52);
+test('new games finish on exactly 57 route spaces and retain legacy finish rules', () => {
+  assert.equal(LUDO_SCORE_PATH_LENGTH, 57);
+  assert.equal(LUDO_SCORE_FINISH_PROGRESS, 56);
+  assert.equal(LUDO_SCORE_LOOP_LENGTH + (LUDO_SCORE_FINISH_PROGRESS - LUDO_SCORE_LOOP_LENGTH + 1), LUDO_SCORE_PATH_LENGTH);
+  assert.equal(ludoScoreFinishProgress({ rulesVersion: LUDO_SCORE_RULES_VERSION }), 56);
+  assert.equal(ludoScoreFinishProgress({}), LUDO_SCORE_LEGACY_FINISH_PROGRESS);
+  assert.equal(legalTokenIndexesForRoll([55, 54, 56], 1, LUDO_SCORE_FINISH_PROGRESS).join(','), '0,1');
+  assert.equal(nextLudoTokenProgress(55, 1, LUDO_SCORE_FINISH_PROGRESS), 56);
+  assert.equal(nextLudoTokenProgress(55, 2, LUDO_SCORE_FINISH_PROGRESS), null);
+  assert.equal(isLudoScoreWinner([56, 56, 56, 56]), true);
+  assert.equal(isLudoScoreWinner([56, 56, 56, 57]), false);
   assert.equal(nextLudoTokenProgress(56, 1), 57);
-  assert.equal(isLudoScoreWinner([57, 57, 57, 57]), true);
-  assert.equal(isLudoScoreWinner([57, 57, 57, 56]), false);
+  assert.equal(isLudoScoreWinner([57, 57, 57, 57], LUDO_SCORE_LEGACY_FINISH_PROGRESS), true);
 });
 
 test('keeps opponent tokens safe on stars and captures every token on an unsafe landing', () => {
@@ -110,14 +121,15 @@ test('awards 100 points once when each token enters the home lane', () => {
   }, 'creator'), { creator: LUDO_SCORE_HOME_ENTRY_BONUS + 250, joiner: 0 });
 });
 
-test('includes all four home-entry bonuses in the maximum score', () => {
+test('includes all four home-entry bonuses in the maximum score for a 57-space game', () => {
   const state = {
-    tokens: { creator: [57, 57, 57, 56], joiner: [-1, -1, -1, -1] },
+    rulesVersion: LUDO_SCORE_RULES_VERSION,
+    tokens: { creator: [56, 56, 56, 55], joiner: [-1, -1, -1, -1] },
     scores: { creator: 1150, joiner: 0 }
   };
   assert.equal(LUDO_SCORE_MAX, 1400);
   assert.deepEqual(scoresAfterMove(state, {
-    creator: [57, 57, 57, 57],
+    creator: [56, 56, 56, 56],
     joiner: [-1, -1, -1, -1]
   }), { creator: LUDO_SCORE_MAX, joiner: 0 });
 });
