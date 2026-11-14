@@ -6,8 +6,11 @@
   <title>Support - KhiladiAdda24</title>
   <style>
     * { box-sizing: border-box; }
-    body { min-height: 100vh; min-height: 100svh; margin: 0; padding: 16px; display: grid; place-items: center; background: radial-gradient(ellipse at top, #263b2d 0%, #101713 68%); color: #f2f5ef; font-family: "Trebuchet MS", Verdana, sans-serif; }
-    .wrap { width: min(100%, 480px); margin: auto; }
+    body { min-height: 100vh; min-height: 100svh; margin: 0; padding: 72px 16px calc(88px + env(safe-area-inset-bottom)); background: radial-gradient(ellipse at top, #263b2d 0%, #101713 68%); color: #f2f5ef; font-family: "Trebuchet MS", Verdana, sans-serif; }
+    .app-topbar { position: fixed; top: 0; right: 0; left: 0; z-index: 5; display: flex; align-items: center; gap: 12px; min-height: 64px; padding: 8px 16px; border-bottom: 1px solid #33423f; color: #f2f5ef; background: #101713f5; backdrop-filter: blur(14px); }
+    .app-topbar a { display: grid; place-items: center; width: 42px; height: 42px; border: 1px solid #33423f; border-radius: 8px; color: #f4c84b; font-size: 22px; text-decoration: none; }
+    .app-topbar strong { color: #f0c85b; }
+    .wrap { display: grid; align-items: center; width: min(100%, 480px); min-height: calc(100vh - 160px); margin: 0 auto; }
     .card { width: 100%; padding: 20px; border: 1px solid #405b46; border-radius: 12px; background: linear-gradient(155deg, #1b2b20, #121a15); box-shadow: 0 16px 42px #0007; }
     .support-art { display: block; width: min(100%, 320px); aspect-ratio: 1774 / 887; margin: 0 auto 20px; overflow: hidden; border: 1px solid #49654c; border-radius: 8px; object-fit: cover; }
     h1, h2 { color: #f0c85b; }
@@ -24,10 +27,15 @@
     .support-actions .share-btn { border-color: #52685a; background: #26352b; }
     .support-actions button { font: inherit; cursor: pointer; }
     .btn:focus-visible { outline: 2px solid #f0c85b; outline-offset: 2px; }
-    @media(max-width:420px) { body { padding: 12px; } .card { padding: 16px; } h1 { font-size: 22px; } .info { font-size: 15px; } }
+    .app-bottom-nav { position: fixed; right: 0; bottom: 0; left: 0; z-index: 6; display: flex; gap: 4px; padding: 6px 6px max(6px, env(safe-area-inset-bottom)); border-top: 1px solid #33423f; background: #101713f5; backdrop-filter: blur(14px); }
+    .app-bottom-nav a { display: flex; flex: 1 1 0; min-width: 0; min-height: 56px; flex-direction: column; align-items: center; justify-content: center; gap: 3px; padding: 4px 1px; border: 1px solid #ffffff38; border-radius: 9px; color: #f5f7f4; text-decoration: none; text-align: center; font-size: clamp(8px, 2.4vw, 11px); font-weight: 800; line-height: 1.1; }
+    .app-bottom-nav a span:first-child { font-size: clamp(16px, 5vw, 21px); line-height: 1; }
+    .app-bottom-nav a.active { background: #ffffff24; box-shadow: inset 0 -3px #ffbd59; }
+    @media(max-width:420px) { body { padding: 72px 12px calc(88px + env(safe-area-inset-bottom)); } .card { padding: 16px; } h1 { font-size: 22px; } .info { font-size: 15px; } }
   </style>
 </head>
 <body>
+  <header class="app-topbar"><a href="/index.html" aria-label="Back to app">←</a><strong>KhiladiAdda24</strong><span>Support</span></header>
   <div class="wrap">
     <main class="card">
       <img class="support-art" src="/support-banner.png?v=20261028-support-update" alt="WhatsApp and Support">
@@ -43,6 +51,15 @@
       </section>
     </main>
   </div>
+  <nav class="app-bottom-nav" aria-label="Player navigation">
+    <a href="/index.html?view=home"><span aria-hidden="true">⌂</span><span>Home</span></a>
+    <a href="/index.html?view=games"><span aria-hidden="true">⚔</span><span>Games</span></a>
+    <a href="/index.html?view=wallet"><span aria-hidden="true">₹</span><span>Wallet</span></a>
+    <a href="/index.html?view=history"><span aria-hidden="true">📜</span><span>History</span></a>
+    <a href="/index.html?view=profile"><span aria-hidden="true">●</span><span>Profile</span></a>
+    <a href="/chat.html"><span aria-hidden="true">💬</span><span>Need Chat</span></a>
+    <a class="active" href="/support.html" aria-current="page"><span aria-hidden="true">🛟</span><span>Support</span></a>
+  </nav>
   <script>
     async function loadSupportContacts() {
       try {
