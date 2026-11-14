@@ -2,6 +2,7 @@
   const app = window.matchApp;
   if (!app) return;
   const { api, el, notify, refresh } = app;
+  const announce = message => app.announceHindiStatus?.(message);
   const form = el('withdrawForm');
   if (!form) return;
 
@@ -99,7 +100,16 @@
       input.disabled = !active;
     });
   };
-  payoutMethodSelect.addEventListener('change', updatePayoutFields);
+  const payoutInstructions = {
+    BANK: 'बैंक खाते में पैसे मंगाने के लिए खाताधारक का नाम, खाता नंबर और आईएफएससी कोड भरें।',
+    UPI: 'यू पी आई से पैसे मंगाने के लिए अपनी सही यू पी आई आई डी भरें।',
+    QR: 'यू पी आई क्यू आर से पैसे मंगाने के लिए अपने क्यू आर कोड की तस्वीर अपलोड करें।'
+  };
+  payoutMethodSelect.addEventListener('change', () => {
+    updatePayoutFields();
+    announce(payoutInstructions[payoutMethodSelect.value]);
+  });
+  payoutMethodSelect.addEventListener('focus', () => announce(payoutInstructions[payoutMethodSelect.value]));
   updatePayoutFields();
 
   const description = form.closest('.panel')?.querySelector('p.muted');
@@ -122,10 +132,14 @@
   form.addEventListener('submit', async event => {
     event.preventDefault();
     event.stopImmediatePropagation();
-    if (!form.reportValidity()) return;
+    if (!form.reportValidity()) {
+      announce('चुनी हुई निकासी विधि के सभी ज़रूरी विवरण सही भरें।');
+      return;
+    }
     const amount = Number(form.elements.amount.value);
     if (!Number.isInteger(amount) || amount < 500 || amount % 100 !== 0) {
       notify('Withdrawal ₹500 se shuru hoti hai aur ₹100 ke steps mein request karein.', true);
+      announce('निकासी कम से कम पाँच सौ रुपये की होनी चाहिए और सौ रुपये के चरणों में अनुरोध करें।');
       return;
     }
 
@@ -155,9 +169,27 @@
       form.reset();
       updatePayoutFields();
       notify(result.message);
+      announce('आपकी निकासी का अनुरोध समीक्षा के लिए भेज दिया गया है। इसका हाल वॉलेट हिस्ट्री में देखें।');
       await refresh();
     } catch (error) {
-      notify(error.message || 'Withdrawal request submit nahi hui.', true);
+      const message = error.message || 'Withdrawal request submit nahi hui.';
+      notify(message, true);
+      let spokenError = 'निकासी का अनुरोध भेजा नहीं जा सका। स्क्रीन पर दिख रहा कारण देखें और फिर कोशिश करें।';
+      if (/KYC|Aadhaar/i.test(message)) spokenError = 'निकासी से पहले आधार सत्यापन मंज़ूर होना ज़रूरी है।';
+      else if (/winnings|game winnings/i.test(message)) {
+        const available = message.match(/₹[\d,]+/);
+        spokenError = `केवल गेम में जीती हुई राशि निकाली जा सकती है।${available ? ` अभी उपलब्ध जीत की राशि ${available[0]} है।` : ''}`;
+      } else if (/wallet.*paise|balance|insufficient/i.test(message)) spokenError = 'वॉलेट में निकासी के लिए पर्याप्त राशि नहीं है।';
+      else if (/IFSC/i.test(message)) spokenError = 'सही ग्यारह अक्षरों का आई एफ एस सी कोड भरें।';
+      else if (/account number/i.test(message)) spokenError = 'सही बैंक खाता नंबर भरें।';
+      else if (/UPI ID/i.test(message)) spokenError = 'सही यू पी आई आई डी भरें।';
+      else if (/QR image/i.test(message)) spokenError = 'यू पी आई क्यू आर की तस्वीर अपलोड करें।';
+      announce(spokenError);
+    }
+  }, true);
+  form.addEventListener('click', event => {
+    if (event.target.closest('button[type="submit"]') && !form.checkValidity()) {
+      announce('निकासी फ़ॉर्म में चुनी हुई विधि के सभी ज़रूरी विवरण सही भरें।');
     }
   }, true);
 
@@ -166,6 +198,9 @@
   const amountInput = el('depositAmount');
   if (!qrForm || !qrArea || !amountInput) return;
 
+  amountInput.min = '50';
+  const depositDescription = qrForm.closest('.panel')?.querySelector('p.muted');
+  if (depositDescription) depositDescription.textContent = 'Minimum ₹50. QR se payment ke baad UTR aur screenshot bhejein; admin approval par amount credit hoga.';
   const qrButton = qrForm.querySelector('button[type="submit"]');
   if (qrButton) qrButton.textContent = 'Deposit · Show QR';
   const dialogStyle = document.createElement('style');
@@ -193,7 +228,10 @@
       upiButton.removeAttribute('href');
       upiButton.setAttribute('aria-disabled', 'true');
     }
-    if (!qrDialog.open) qrDialog.showModal();
+    if (!qrDialog.open) {
+      qrDialog.showModal();
+      announce(`₹${Number(amount).toLocaleString('en-IN')} का भुगतान क्यू आर तैयार है। भुगतान के बाद यू टी आर नंबर और स्क्रीनशॉट अपलोड करके जमा करने का अनुरोध भेजें।`);
+    }
   }
 
   const qrObserver = new MutationObserver(presentQr);
@@ -207,9 +245,14 @@
     document.body.append(link);
     link.click();
     link.remove();
+    announce('जमा करने का क्यू आर डाउनलोड हो गया। भुगतान के बाद ऐप में वापस आकर यू टी आर और स्क्रीनशॉट भेजें।');
   });
   el('continueDeposit').addEventListener('click', () => {
     qrDialog.close();
     el('depositForm').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    announce('भुगतान के बाद यू टी आर या रेफरेंस नंबर और भुगतान का स्क्रीनशॉट अपलोड करके जमा करने का अनुरोध भेजें।');
+  });
+  el('openDepositUpi').addEventListener('click', () => {
+    announce('यू पी आई ऐप में भुगतान करें। भुगतान के बाद यू टी आर नंबर और स्क्रीनशॉट अपलोड करके जमा करने का अनुरोध भेजें।');
   });
 })();
