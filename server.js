@@ -1660,7 +1660,11 @@ app.get('/api/matches/open', async (req, res) => {
     return res.status(400).json({ error: 'Game type LUDO, POPULAR_LUDO, LUDO_RACE, SNAKE ya ALL hona chahiye' });
   }
   try {
-    const query = { status: 'OPEN', amount: { $gte: MIN_BATTLE_ENTRY_AMOUNT } };
+    const query = {
+      status: 'OPEN',
+      amount: { $gte: MIN_BATTLE_ENTRY_AMOUNT },
+      gameType: { $in: ['LUDO', 'POPULAR_LUDO', 'SNAKE', 'LUDO_RACE'] }
+    };
     if (gameType !== 'ALL') query.gameType = gameType;
     const matches = await Match.find(query).populate('creator', 'username profileImage').sort({ updatedAt: -1 });
     res.json(matches);
@@ -1671,7 +1675,10 @@ app.get('/api/matches/open', async (req, res) => {
 
 app.get('/api/matches/mine', requireUser, async (req, res) => {
   try {
-    const matchQuery = { $or: [{ creator: req.auth.userId }, { joiner: req.auth.userId }] };
+    const matchQuery = {
+      gameType: { $in: ['LUDO', 'POPULAR_LUDO', 'SNAKE', 'LUDO_RACE'] },
+      $or: [{ creator: req.auth.userId }, { joiner: req.auth.userId }]
+    };
     if (req.query.history !== '1') matchQuery.status = { $in: ['OPEN', 'RUNNING', 'PENDING_RESULT'] };
     const matches = await Match.find(matchQuery)
       .populate('creator', 'username phone profileImage')
@@ -1691,7 +1698,11 @@ app.get('/api/matches/running', requireUser, async (req, res) => {
     }
     const requestedLimit = Number.parseInt(req.query.limit, 10);
     const limit = Number.isInteger(requestedLimit) ? Math.max(1, Math.min(requestedLimit, 20)) : 20;
-    const query = { status: 'RUNNING', joiner: { $ne: null } };
+    const query = {
+      status: 'RUNNING',
+      joiner: { $ne: null },
+      gameType: { $in: ['LUDO', 'POPULAR_LUDO', 'SNAKE', 'LUDO_RACE'] }
+    };
     if (gameType !== 'ALL') query.gameType = gameType;
     const fields = '_id gameType creator joiner amount roomCode joinedAt roomCodeDeadline roomCodeSharedAt creatorStartedAt creatorConfirmedAt joinerConfirmedAt gameStartedAt ludoRace ludoScore status updatedAt';
     const keepIds = [...new Set(String(req.query.keep || '').split(',').filter(mongoose.Types.ObjectId.isValid))]

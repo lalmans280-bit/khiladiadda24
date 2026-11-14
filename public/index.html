@@ -348,8 +348,6 @@
     #gamePicker [data-cricket-promo]{background:linear-gradient(0deg,#101713df,#1017131a 75%),url('/cricket.png') center/cover no-repeat}
     #gamePicker [data-pubg-promo]{background:linear-gradient(0deg,#101713df,#1017131a 75%),url('/pubg.png') center/cover no-repeat}
     #gamePicker .game-coming-soon-icon{display:none}
-    #gamePicker .score-game-tile{display:grid;place-items:center;justify-content:center;padding:8px}
-    #gamePicker .score-game-art{display:block;width:56px;height:56px;flex:none;object-fit:contain}
     .cricket-promo-hero{position:relative;isolation:isolate;overflow:hidden;min-height:250px;padding:clamp(22px,5vw,42px);border:1px solid #9b7138;border-radius:14px;background:linear-gradient(90deg,#101713f2 0%,#101713d9 55%,#10171366 100%),url('/cricket.png') center/cover}
     .cricket-promo-hero h1{max-width:640px;margin:12px 0;color:#ffdc7b;font-size:clamp(28px,5vw,42px);line-height:1.1}
     .cricket-promo-hero p{max-width:600px;margin:0;color:#f0eee5}
@@ -439,8 +437,6 @@
     .game-mode-option[data-game-option="LUDO"]{border-color:#86c995;color:#174b2b;background:#dcfce7}
     .game-mode-option[data-game-option="POPULAR_LUDO"]{border-color:#82aee8;color:#1e3a8a;background:#dbeafe}
     .game-mode-option[data-game-option="LUDO_RACE"]{border-color:#e4b84b;color:#78350f;background:#fef3c7}
-    .game-mode-option[data-game-option="LUDO_SCORE"]{border-color:#e27a53;color:#78351f;background:#fff0e8}
-    .game-mode-option[data-game-option="LUDO_SCORE"]{justify-content:center}
     .game-mode-option[data-game-option="SNAKE"]{border-color:#c89ae0;color:#581c87;background:#f3e8ff}
     .game-mode-option.active{box-shadow:inset 0 0 0 2px currentColor}
     @media(max-width:600px){.battle-prizes.open-battle-prizes .battle-player-name{font-size:10px}html[data-theme="night"] .battle-prizes.open-battle-prizes .battle-player-amount{font-size:12px}html[data-theme="day"] .battle-prizes.open-battle-prizes .battle-player-amount{font-size:12px}}
@@ -508,7 +504,6 @@
   <main class="shell content"><div id="notice" class="notice" role="status" hidden></div>
       <section class="view" id="view-games">
         <div class="game-launch" id="gamePicker">
-          <button class="game-tile score-game-tile" type="button" data-launch-game="LUDO_SCORE" aria-label="KhiladiAdda24 Ludo Score"><img class="score-game-art" src="/app-icon-192.png?v=20261113-ludo-score-app-icon" alt=""></button>
           <button class="game-tile game-tile-image game-coming-soon-tile" type="button" data-cricket-promo aria-label="Cricket fantasy - Coming Soon"><img class="cricket-game-logo" src="/cricket-game-logo.svg" alt=""><span class="game-coming-soon-icon" aria-hidden="true">🏏</span><strong>Cricket Fantasy</strong><span class="game-coming-soon-badge">₹1 LAKH · COMING SOON</span></button>
           <button class="game-tile game-tile-image game-coming-soon-tile" type="button" data-pubg-promo aria-label="PUBG - Coming Soon"><span class="game-coming-soon-icon" aria-hidden="true">🎯</span><strong>PUBG</strong><span class="game-coming-soon-badge">COMING SOON</span></button>
           <a class="game-support-banner" href="/support.html" aria-label="WhatsApp and support"><img src="/support-banner.png?v=20261028-support-update" alt="WhatsApp and Support"><span class="game-live-badge"><i class="game-live-dot" aria-hidden="true"></i><span class="game-live-text">LIVE</span></span></a>
@@ -578,7 +573,6 @@
   </script>
   <script src="/socket.io/socket.io.js"></script>
   <script src="/ludo-race.js?v=20260624-one-token-win"></script>
-  <script src="/ludo-score.js?v=20261114-shared-57"></script>
   <script>
     const token=localStorage.getItem('token');
     const storedUser=(()=>{try{return JSON.parse(localStorage.getItem('user')||'null')}catch{return null}})();
@@ -688,7 +682,7 @@
     const matchSocket=typeof io==='function'?io():null;
     const registerMatchSocket=()=>{if(!matchSocket||!token)return;matchSocket.emit('register_player',{token});const matchId=new URLSearchParams(location.search).get('matchId');if(matchId)matchSocket.emit('join_match_room',{matchId,token})};
     if(matchSocket){matchSocket.on('connect',registerMatchSocket);if(matchSocket.connected)registerMatchSocket();matchSocket.on('match_start_tone',event=>{const starterId=String(event?.startedBy||''),currentUserId=String(player?._id||storedUser?.id||'');if(starterId&&starterId!==currentUserId)window.matchApp?.playAlertTone?.()})}
-    if(matchSocket)matchSocket.on('match_updated',updated=>{const currentMatchId=new URLSearchParams(location.search).get('matchId');if(currentMatchId&&String(updated?._id)===currentMatchId&&window.openMatch)window.openMatch(currentMatchId).then(()=>{if(updated.status!=='COMPLETED')return;const winnerId=String(updated.winner?._id||updated.winner||''),currentUserId=String(player?._id||storedUser?.id||''),isFreeMatch=Number(updated.amount||0)===0,isScoreMatch=updated.gameType==='LUDO_SCORE',payout=Number(updated.ludoScore?.payoutAmount||Number(updated.amount||0)*1.9);notify(isFreeMatch?'Battle complete. No wallet amount changed.':isScoreMatch?(winnerId===currentUserId?`Ludo Score jeeta! ₹${payout.toLocaleString('en-IN')} wallet me automatic credit hua.`:`Ludo Score complete. Winner ko ₹${payout.toLocaleString('en-IN')} automatic credit hua.`):winnerId===currentUserId?`Admin ne result approve kar diya: Aap WIN hue. ₹${(Number(updated.amount||0)*1.8).toLocaleString('en-IN')} wallet me credit hua.`:'Admin ne result approve kar diya: Is match me aap LOSS hue.')}).catch(error=>notify(error.message,true))});
+    if(matchSocket)matchSocket.on('match_updated',updated=>{const currentMatchId=new URLSearchParams(location.search).get('matchId');if(currentMatchId&&String(updated?._id)===currentMatchId&&window.openMatch)window.openMatch(currentMatchId).then(()=>{if(updated.status!=='COMPLETED')return;const winnerId=String(updated.winner?._id||updated.winner||''),currentUserId=String(player?._id||storedUser?.id||''),isFreeMatch=Number(updated.amount||0)===0;notify(isFreeMatch?'Battle complete. No wallet amount changed.':winnerId===currentUserId?`Admin ne result approve kar diya: Aap WIN hue. ₹${(Number(updated.amount||0)*1.8).toLocaleString('en-IN')} wallet me credit hua.`:'Admin ne result approve kar diya: Is match me aap LOSS hue.')}).catch(error=>notify(error.message,true))});
     if(matchSocket)matchSocket.on('wallet_updated',update=>{const userId=String(player?._id||storedUser?.id||'');if(!userId||String(update?.userId)!==userId||!Number.isFinite(Number(update.walletBalance)))return;if(player)player.walletBalance=Number(update.walletBalance);if(storedUser){storedUser.walletBalance=Number(update.walletBalance);localStorage.setItem('user',JSON.stringify(storedUser))}renderPlayer()});
     if(matchSocket)matchSocket.on('wallet_updated',update=>{const userId=String(player?._id||storedUser?.id||'');if(userId&&String(update?.userId)===userId)loadWalletSummary().catch(()=>{})});
     window.matchSocket=matchSocket;
@@ -920,8 +914,6 @@
     if (gameTypeSelect) gameTypeSelect.remove();
     const gameModeOptions=document.createElement('div');
     const gameTypeFieldContainer = document.querySelector('#createForm .field') || document.body;
-    const ludoScoreOption=document.createElement('option');
-    const scoreAppIcon = '/app-icon-192.png?v=20261113-ludo-score-app-icon';
     const preservedSelect = document.createElement('select');
     preservedSelect.id='gameType';
     preservedSelect.hidden=true;
@@ -933,7 +925,6 @@
       {value:'LUDO',label:'Ludo Classic'},
       {value:'POPULAR_LUDO',label:'Popular Ludo'},
       {value:'LUDO_RACE',label:'Ludo Race — 1 Goti Win'},
-      {value:'LUDO_SCORE',label:'KhiladiAdda24 Ludo Score'},
       {value:'SNAKE',label:'Snake'}
     ].forEach(({value,label})=>{const option=document.createElement('option');option.value=value;option.textContent=label;preservedSelect.append(option)});
     const gameTypeFieldLabelId = 'gameTypeLabel';
@@ -948,8 +939,8 @@
     gameModeOptions.className='game-mode-options';
     gameModeOptions.setAttribute('role','group');
     gameModeOptions.setAttribute('aria-labelledby',gameTypeFieldLabelId);
-    const gameModeImages={LUDO:'/ludo_classic_256x256.png',POPULAR_LUDO:'/popular_ludo_256x256.png',LUDO_RACE:'/ludo_race_1_goti_win_256x256.png',LUDO_SCORE:scoreAppIcon,SNAKE:'/snake_ladder_256x256.png'};
-    const gameModeArtClasses={LUDO:'classic',POPULAR_LUDO:'popular',LUDO_RACE:'race',LUDO_SCORE:'score',SNAKE:'snake'};
+    const gameModeImages={LUDO:'/ludo_classic_256x256.png',POPULAR_LUDO:'/popular_ludo_256x256.png',LUDO_RACE:'/ludo_race_1_goti_win_256x256.png',SNAKE:'/snake_ladder_256x256.png'};
+    const gameModeArtClasses={LUDO:'classic',POPULAR_LUDO:'popular',LUDO_RACE:'race',SNAKE:'snake'};
     Array.from(preservedSelect.options).forEach(option=>{
       const button=document.createElement('button'),art=document.createElement('span'),image=document.createElement('img');
       button.type='button';button.className='game-mode-option';button.dataset.gameOption=option.value;button.setAttribute('aria-label',option.textContent);
@@ -961,18 +952,7 @@
     if (insertedContainer) insertedContainer.remove();
     gameTypeFieldContainer.appendChild(gameModeOptions);
     gameTypeSelect=preservedSelect;
-    const scoreColorField=document.createElement('div');
-    scoreColorField.className='field';
-    scoreColorField.hidden=true;
-    const scoreColorLabel=document.createElement('label');
-    scoreColorLabel.htmlFor='ludoScoreCreatorColor';
-    scoreColorLabel.textContent='Ludo Score mein apna color chunein';
-    const scoreColorSelect=document.createElement('select');
-    scoreColorSelect.id='ludoScoreCreatorColor';
-    [['red','🔴 Lal'],['green','🟢 Hara'],['yellow','🟡 Peela'],['blue','🔵 Neela']].forEach(([value,label])=>{const option=document.createElement('option');option.value=value;option.textContent=label;scoreColorSelect.append(option)});
-    scoreColorField.append(scoreColorLabel,scoreColorSelect);
-    document.querySelector('#createForm .two').after(scoreColorField);
-    function syncGameSelection(gameType){const selectedType=['LUDO','POPULAR_LUDO','LUDO_RACE','LUDO_SCORE','SNAKE'].includes(gameType)?gameType:'LUDO';game=selectedType==='SNAKE'?'SNAKE':'LUDO';gameTypeSelect.value=selectedType;scoreColorField.hidden=selectedType!=='LUDO_SCORE';gameModeOptions.querySelectorAll('.game-mode-option').forEach(button=>{const selected=button.dataset.gameOption===selectedType;button.classList.toggle('active',selected);button.setAttribute('aria-pressed',String(selected))});document.querySelectorAll('.game-filter').forEach(button=>button.classList.toggle('active',button.dataset.game===game));if(el('gameViewTitle'))el('gameViewTitle').textContent=selectedType==='LUDO_RACE'?'Ludo Race — 1 Goti Win':selectedType==='LUDO_SCORE'?'KhiladiAdda24 Ludo Score':''}
+    function syncGameSelection(gameType){const selectedType=['LUDO','POPULAR_LUDO','LUDO_RACE','SNAKE'].includes(gameType)?gameType:'LUDO';game=selectedType==='SNAKE'?'SNAKE':'LUDO';gameTypeSelect.value=selectedType;gameModeOptions.querySelectorAll('.game-mode-option').forEach(button=>{const selected=button.dataset.gameOption===selectedType;button.classList.toggle('active',selected);button.setAttribute('aria-pressed',String(selected))});document.querySelectorAll('.game-filter').forEach(button=>button.classList.toggle('active',button.dataset.game===game));if(el('gameViewTitle'))el('gameViewTitle').textContent=selectedType==='LUDO_RACE'?'Ludo Race — 1 Goti Win':''}
     syncGameSelection(game);
     function battlePlayerMarkup(user,role,opponent=false,amount='',gameLabel=''){
       const username=nameOf(user),profileImage=String(user?.profileImage||'').trim(),imageUrl=profileImage.startsWith('uploads/')?`/api/profile/image/${encodeURIComponent(profileImage.slice('uploads/'.length))}`:profileImage?`/${profileImage.split('/').map(encodeURIComponent).join('/')}`:'',initial=String(username).trim().charAt(0).toUpperCase()||'?';
@@ -983,24 +963,13 @@
       return `<div class="battle-player${opponent?' battle-player-opponent':''}"><div class="battle-player-main">${avatar}<span class="battle-player-info"><strong class="battle-player-name">${esc(username)}</strong><small class="battle-player-role">${esc(role)}</small>${gameTag}</span></div>${amountMarkup}</div>`;
     }
     renderDemoBattles();
-    function gameTypeLabel(gameType){return gameType==='LUDO_SCORE'?'KhiladiAdda24 Ludo Score':gameType==='LUDO_RACE'?'Ludo Race':gameType==='SNAKE'?'Snake battle':gameType==='POPULAR_LUDO'?'Popular Ludo':'Ludo Classic';}
-    function chooseLudoScoreColor(creatorColor){
-      const options=[['red','🔴 Lal'],['green','🟢 Hara'],['yellow','🟡 Peela'],['blue','🔵 Neela']].filter(([color])=>color!==creatorColor);
-      const answer=prompt(`Ludo Score color chunein:\n${options.map(([color,label],index)=>`${index+1}. ${label}`).join('\n')}`,'1');
-      if(answer===null)return null;
-      const selection=answer.trim().toLowerCase();
-      if(!selection)return '';
-      const index=Number(selection)-1;
-      return options[index]?.[0]||options.find(([color,label])=>color===selection||label.toLowerCase().includes(selection))?.[0]||'';
-    }
-    function isLudoGame(gameType){return gameType==='LUDO'||gameType==='POPULAR_LUDO'||gameType==='LUDO_RACE'||gameType==='LUDO_SCORE';}
+    function gameTypeLabel(gameType){return gameType==='LUDO_RACE'?'Ludo Race':gameType==='SNAKE'?'Snake battle':gameType==='POPULAR_LUDO'?'Popular Ludo':'Ludo Classic';}
+    function isLudoGame(gameType){return gameType==='LUDO'||gameType==='POPULAR_LUDO'||gameType==='LUDO_RACE';}
     function matchCard(m,mine=false){
       const entry=Number(m.amount),prize=entry*2*0.95,playerId=String(player?._id||storedUser?.id||''),isOwnOpen=m.status==='OPEN'&&String(m.creator?._id||m.creator)===playerId;
       const action=isOwnOpen
-        ? m.gameType==='LUDO_SCORE'
-          ? `<div class="row"><button class="btn green small" data-match="${esc(m._id)}">Open Ludo Score</button><button class="btn danger small" data-cancel-match="${esc(m._id)}">Cancel</button></div>`
-          : `<button class="btn danger small" data-cancel-match="${esc(m._id)}">Cancel</button>`
-        : `<button class="btn ${mine?'secondary':'green'} small" data-${mine?'match':'join'}="${esc(m._id)}" ${mine?'':`data-join-amount="${entry}"${m.gameType==='LUDO_SCORE'?` data-game-type="LUDO_SCORE" data-score-creator-color="${esc(m.ludoScore?.colors?.creator||'red')}"`:''}`}>${mine?'Details':'PLAY'}</button>`;
+        ? `<button class="btn danger small" data-cancel-match="${esc(m._id)}">Cancel</button>`
+        : `<button class="btn ${mine?'secondary':'green'} small" data-${mine?'match':'join'}="${esc(m._id)}" ${mine?'':`data-join-amount="${entry}"`}>${mine?'Details':'PLAY'}</button>`;
       const status=m.status==='PENDING_RESULT'?'Result review':m.status==='PENDING_CANCELLATION'?'Cancel review':m.status;
       const gameLabel=gameTypeLabel(m.gameType||game);
       const playersMarkup=m.joiner?`<div class="battle-players">${battlePlayerMarkup(m.creator,mine?'Creator':'Challenger',false,entry,gameLabel)}<img class="battle-versus battle-versus-image" src="/vs.png" alt="versus">${battlePlayerMarkup(m.joiner,'Opponent',true,entry)}</div>`:`<div class="battle-players battle-players-waiting">${battlePlayerMarkup(m.creator,mine?'Creator':'Challenger',false,entry,gameLabel)}</div>`;
@@ -1013,14 +982,13 @@
       const [openData,runningData]=await Promise.all([api('/api/matches/open?gameType=ALL'),api('/api/matches/running?gameType=ALL')]);
       const openMatches=Array.isArray(openData)?openData:openData.matches||[];
       const runningMatches=Array.isArray(runningData)?runningData:runningData.matches||[];
-      const scoreMode=gameTypeSelect.value==='LUDO_SCORE';
-      const visibleOpenMatches=scoreMode?openMatches.filter(match=>match.gameType==='LUDO_SCORE'):openMatches;
-      const visibleRunningMatches=scoreMode?runningMatches.filter(match=>match.gameType==='LUDO_SCORE'):runningMatches;
+      const visibleOpenMatches=openMatches.filter(match=>['LUDO','POPULAR_LUDO','SNAKE','LUDO_RACE'].includes(match.gameType));
+      const visibleRunningMatches=runningMatches.filter(match=>['LUDO','POPULAR_LUDO','SNAKE','LUDO_RACE'].includes(match.gameType));
       const hasRealOpenMatches = visibleOpenMatches.length > 0;
       window.__REAL_OPEN_BATTLES_AVAILABLE = hasRealOpenMatches;
       const openMarkup=visibleOpenMatches.map(m=>matchCard(m)).join('');
       renderDemoBattles();
-      const fallbackDemoMarkup=scoreMode?'':demoBattlesHeader + demoBattlesList.innerHTML;
+      const fallbackDemoMarkup=demoBattlesHeader + demoBattlesList.innerHTML;
       const allOpenBattlesMarkup = `${openMarkup ? `<div class="open-list-box">${openMarkup}</div>` : ''}<div class="demo-open-list-box demo-battles-container">${fallbackDemoMarkup}</div>`;
       el('openMatches').innerHTML = allOpenBattlesMarkup;
       if(el('gameOpenMatches'))el('gameOpenMatches').innerHTML = allOpenBattlesMarkup;
@@ -1039,10 +1007,10 @@
         const isParticipant=typeof m.viewerIsParticipant==='boolean'?m.viewerIsParticipant:[m.creator,m.joiner].some(participant=>matchPlayerId(participant)===currentPlayerId);
         const isCreator=typeof m.viewerIsCreator==='boolean'?m.viewerIsCreator:matchPlayerId(m.creator)===currentPlayerId;
         const isJoiner=isParticipant&&!isCreator;
-        const inAppRace=m.gameType==='LUDO_RACE'&&Boolean(m.ludoRace)||m.gameType==='LUDO_SCORE';
+        const inAppRace=m.gameType==='LUDO_RACE'&&Boolean(m.ludoRace);
         let actions='';
         if(inAppRace&&isParticipant){
-          actions=`<div class="row"><button class="btn green small" type="button" data-match="${esc(m._id)}">${m.gameType==='LUDO_SCORE'?'Play Ludo Score':'Open Ludo Race'}</button>${!m.gameStartedAt?`<button class="btn danger small" data-running-cancel="${esc(m._id)}" data-room-code-shared="0">Cancel before first roll</button>`:''}</div>`;
+          actions=`<div class="row"><button class="btn green small" type="button" data-match="${esc(m._id)}">Open Ludo Race</button>${!m.gameStartedAt?`<button class="btn danger small" data-running-cancel="${esc(m._id)}" data-room-code-shared="0">Cancel before first roll</button>`:''}</div>`;
         }else if(isCreator&&!m.gameStartedAt){
           actions=`<div class="row"><button class="btn danger small" data-running-cancel="${esc(m._id)}" data-room-code-shared="${m.roomCode?'1':'0'}">Cancel</button>`;
           if(!m.roomCode){
@@ -1056,7 +1024,7 @@
         }
         const secondaryAction = !inAppRace && m.roomCode && (isCreator || isJoiner) ? `<div class="battle-inline-secondary-action"><button class="btn secondary small" type="button" data-running-result="${esc(m._id)}">Result / screenshot</button>${isLudoGame(m.gameType)?`<a class="btn secondary small ludo-app-button" data-open-ludo="true" href="${ludoKingOpenUrl()}">Open Ludo King App</a>`:''}</div>` : '';
         const roomCodePanel=!inAppRace&&m.roomCode&&(isCreator||isJoiner)?`<div class="battle-room-code-panel"><div class="battle-room-code-box"><input id="runningCode-${esc(m._id)}" value="${esc(m.roomCode)}" readonly><button class="btn secondary small" type="button" data-running-copy="${esc(m._id)}" data-room-code="${esc(m.roomCode)}" data-copy-open-game="${isLudoGame(m.gameType)?'LUDO':''}">Copy</button><span class="battle-room-code-label">Locked</span></div></div>`:'';
-        const statusMarkup=isParticipant?`<div class="battle-card-top"><span class="status">${inAppRace?m.gameType==='LUDO_SCORE'?m.gameStartedAt?'Ludo Score is in progress':'Ludo Score ready • creator goes first':m.gameStartedAt?'Ludo Race is in progress':'Ludo Race ready • creator goes first':m.gameStartedAt?'Game chal raha hai':m.roomCodeSharedAt?'Room code locked • Ludo King mein kheliye':'Opponent joined • room code pending'}</span></div>`:'';
+        const statusMarkup=isParticipant?`<div class="battle-card-top"><span class="status">${inAppRace?m.gameStartedAt?'Ludo Race is in progress':'Ludo Race ready • creator goes first':m.gameStartedAt?'Game chal raha hai':m.roomCodeSharedAt?'Room code locked • Ludo King mein kheliye':'Opponent joined • room code pending'}</span></div>`:'';
         const entry=Number(m.amount),prize=entry*2*0.95;
         return `<article class="match battle-card">${statusMarkup}<div class="battle-prizes running-battle-prizes"><div class="battle-prize"><small>${entry===0?'ENTRY':'WIN'}</small><strong>${entry===0?'₹0':`₹${prize.toLocaleString('en-IN')}`}</strong></div><div class="battle-prize-players"><div class="battle-players">${battlePlayerMarkup(m.creator,'Creator',false,entry)}<img class="battle-versus battle-versus-image" src="/vs.png" alt="versus">${battlePlayerMarkup(m.joiner,'Opponent',true,entry)}</div></div>${actions?`<div class="battle-card-actions">${actions}</div>`:''}</div>${secondaryAction}<div class="battle-room-actions">${roomCodePanel}</div></article>`
       }).join(''):'';
@@ -1071,7 +1039,7 @@
         }catch(error){showError(error)}
         finally{button.disabled=false;button.textContent='Result / screenshot'}
       }));
-      const sampleMarkup=scoreMode?'':sampleRunningBattles.map(({name,avatar,opponent,opponentAvatar,amount})=>`<article class="match battle-card sample-running-battle"><div class="battle-prizes running-battle-prizes"><div class="battle-prize"><small>WIN</small><strong>₹${(amount*2*0.95).toLocaleString('en-IN')}</strong></div><div class="battle-prize-players"><div class="battle-players">${battlePlayerMarkup({username:name,profileImage:avatar.replace(/^\//,'')},'Creator',false,amount)}<img class="battle-versus battle-versus-image" src="/vs.png" alt="versus">${battlePlayerMarkup({username:opponent,profileImage:opponentAvatar.replace(/^\//,'')},'Opponent',true,amount)}</div></div></div></article>`).join('');
+      const sampleMarkup=sampleRunningBattles.map(({name,avatar,opponent,opponentAvatar,amount})=>`<article class="match battle-card sample-running-battle"><div class="battle-prizes running-battle-prizes"><div class="battle-prize"><small>WIN</small><strong>₹${(amount*2*0.95).toLocaleString('en-IN')}</strong></div><div class="battle-prize-players"><div class="battle-players">${battlePlayerMarkup({username:name,profileImage:avatar.replace(/^\//,'')},'Creator',false,amount)}<img class="battle-versus battle-versus-image" src="/vs.png" alt="versus">${battlePlayerMarkup({username:opponent,profileImage:opponentAvatar.replace(/^\//,'')},'Opponent',true,amount)}</div></div></div></article>`).join('');
       el('sampleRunningMatches').innerHTML=sampleMarkup;
       el('mySampleRunningMatches').innerHTML=sampleMarkup;
       runningList.querySelectorAll('a[href^="intent://"]').forEach(link=>{link.href=ludoKingOpenUrl()});
@@ -1088,7 +1056,6 @@
     async function loadMine(){const container=el('myMatches');if(!container)return;const data=await api('/api/matches/mine'),matches=data.matches||[];container.innerHTML=matches.length?matches.map(m=>matchCard(m,true)).join(''):'<p class="muted">Abhi koi active battle nahi hai.</p>'}
     function refreshSamplePlayers(){
       if(!el('sampleRunningMatches')||!el('mySampleRunningMatches')||window.__REAL_OPEN_BATTLES_AVAILABLE)return;
-      if(gameTypeSelect.value==='LUDO_SCORE'){el('sampleRunningMatches').replaceChildren();el('mySampleRunningMatches').replaceChildren();return}
       const sampleMarkup=sampleRunningBattles.map(({name,avatar,opponent,opponentAvatar,amount})=>`<article class="match battle-card sample-running-battle"><div class="battle-prizes running-battle-prizes"><div class="battle-prize"><small>WIN</small><strong>₹${(amount*2*0.95).toLocaleString('en-IN')}</strong></div><div class="battle-prize-players"><div class="battle-players">${battlePlayerMarkup({username:name,profileImage:avatar.replace(/^\//,'')},'Creator',false,amount)}<img class="battle-versus battle-versus-image" src="/vs.png" alt="versus">${battlePlayerMarkup({username:opponent,profileImage:opponentAvatar.replace(/^\//,'')},'Opponent',true,amount)}</div></div></div></article>`).join('');
       el('sampleRunningMatches').innerHTML=sampleMarkup;
       el('mySampleRunningMatches').innerHTML=sampleMarkup;
@@ -1152,19 +1119,12 @@
       }
       const join=event.target.closest('[data-join]');
       if(join){
-        let joinerColor='';
-        if(join.dataset.gameType==='LUDO_SCORE'){
-          joinerColor=chooseLudoScoreColor(join.dataset.scoreCreatorColor||'red');
-          if(joinerColor===null)return;
-          if(!joinerColor){notify('Ludo Score mein Lal, Hara, Peela ya Neela mein se alag color chunein.',true);return}
-        }
         join.disabled=true;
         window.pendingEntryAmount=Number(join.dataset.joinAmount)||50;
         try{
-          const data=await api('/api/matches/join',{method:'POST',body:JSON.stringify({matchId:join.dataset.join,...(joinerColor?{joinerColor}:{})})});
+          const data=await api('/api/matches/join',{method:'POST',body:JSON.stringify({matchId:join.dataset.join})});
           notify(data.message||'Battle join ho gaya.');
-          if(join.dataset.gameType==='LUDO_SCORE')await window.openMatchPage(data.match._id,'details');
-          else await Promise.all([loadOpen(),loadMine()]);
+          await Promise.all([loadOpen(),loadMine()]);
         }catch(error){showError(error);join.disabled=false}
         return;
       }
@@ -1186,12 +1146,8 @@
         const entryAmount=Number(entryAmountInput.value);
         window.pendingEntryAmount=entryAmount;
         const gameType=el('gameType').value;
-        const data=await api('/api/matches/create',{method:'POST',body:JSON.stringify({gameType,entryAmount,...(gameType==='LUDO_SCORE'?{creatorColor:el('ludoScoreCreatorColor').value}:{})})});
+        const data=await api('/api/matches/create',{method:'POST',body:JSON.stringify({gameType,entryAmount})});
         notify(data.message||'Battle create ho gaya.');
-        if(gameType==='LUDO_SCORE'){
-          await window.openMatchPage(data.match._id,'details');
-          return;
-        }
         setView('home');
         await loadOpen();
       }catch(error){showError(error)}
@@ -1213,13 +1169,11 @@
     }
     window.openMatchPage=(id,stage,showResult=false)=>{const url=new URL('/index.html',location.origin);url.searchParams.set('matchId',id);if(stage)url.searchParams.set('stage',stage);if(showResult)url.searchParams.set('showResult','1');history.pushState({matchId:id},'',url);return window.openMatch(id)};
     window.matchApp={api,el,notify,esc,nameOf,setView,refresh,getPlayer:()=>player,getUser:()=>storedUser};
-    const openMatchWithScoreMode=window.openMatch;
-    window.openMatch=async id=>{const match=await api(`/api/matches/${encodeURIComponent(id)}`);if(match.gameType==='LUDO_SCORE'&&(match.status==='OPEN'||match.ludoScore&&['RUNNING','PENDING_RESULT','COMPLETED','PENDING_CANCELLATION','CANCELLED'].includes(match.status))&&window.renderLudoScoreMatch){syncGameSelection('LUDO_SCORE');return window.renderLudoScoreMatch(match,id)}return openMatchWithScoreMode(id)};
     refresh().catch(showError);battlesPollTimer=setInterval(()=>loadOpen().catch(showError),10000);setInterval(refreshSamplePlayers,10*1000);setInterval(()=>{if(el('view-profile').classList.contains('active'))loadWalletSummary().catch(showError)},10000);const initialMatchId=new URLSearchParams(location.search).get('matchId');if(initialMatchId)window.openMatch(initialMatchId).catch(showError);
   </script>
     <script src="/match-flow.js?v=20260929-reason-required-roomcode-cancel"></script>
     <script src="/wallet-flow.js?v=20260929-winnings-only-withdrawal"></script>
-    <script src="/game-rules.js?v=20261114-ludo-score-rules"></script>
+    <script src="/game-rules.js?v=20261114-game-rules"></script>
   <script src="/player-copy.js" defer></script>
   <script>
     const setWinLabels = () => document.querySelectorAll('.battle-prize small').forEach(label => {
