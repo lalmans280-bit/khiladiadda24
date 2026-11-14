@@ -229,6 +229,7 @@
 						body: JSON.stringify({ matchId })
 					});
 					app.notify(result.message);
+					app.announceHindiStatus?.('गेम शुरू करने की तैयारी हो गई है।');
 					setupHint.remove();
 					setupButton.remove();
 					roomForm.hidden = false;
@@ -237,7 +238,6 @@
 					setupButton.disabled = false;
 				}
 			});
-			playShortAlertTone();
 			app.api(`/api/matches/${encodeURIComponent(matchId)}`).then(match => {
 				if (!roomForm.isConnected) return;
 				if (match.creatorStartedAt) {

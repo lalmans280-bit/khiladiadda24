@@ -174,11 +174,13 @@
       app.setView('match');
       const rollButton = document.getElementById('ludoRaceRoll');
       if (rollButton) rollButton.addEventListener('click', async () => {
+        app.playGameActionBeep?.();
         busy = true;
         rollButton.disabled = true;
         try {
           const result = await app.api('/api/matches/ludo-race/roll', { method: 'POST', body: JSON.stringify({ matchId }) });
           app.notify(result.message);
+          app.announceHindiStatus?.('आपकी चाल चल गई है।');
           renderState(result.match);
         } catch (error) {
           app.notify(error.message, true);
@@ -188,11 +190,13 @@
         }
       });
       document.querySelectorAll('[data-race-token]').forEach(button => button.addEventListener('click', async () => {
+        app.playGameActionBeep?.();
         busy = true;
         button.disabled = true;
         try {
           const result = await app.api('/api/matches/ludo-race/move', { method: 'POST', body: JSON.stringify({ matchId, tokenIndex: Number(button.dataset.raceToken) }) });
           app.notify(result.message);
+          app.announceHindiStatus?.('आपकी चाल चल गई है।');
           renderState(result.match);
         } catch (error) {
           app.notify(error.message, true);
@@ -300,12 +304,14 @@
       const cancelForm = document.getElementById('ludoRaceCancel');
       if (cancelForm) cancelForm.addEventListener('submit', async event => {
         event.preventDefault();
+        app.playGameActionBeep?.();
         if (!confirm('Abhi tak dice roll nahi hui. Battle cancel karke entry refund karein?')) return;
         const button = cancelForm.querySelector('button');
         button.disabled = true;
         try {
           const result = await app.api('/api/matches/cancel', { method: 'POST', body: JSON.stringify({ matchId }) });
           app.notify(result.message);
+          app.announceCancelOutcome?.(result);
           await app.refresh();
           const updated = await app.api(`/api/matches/${encodeURIComponent(matchId)}`);
           renderState(updated);
