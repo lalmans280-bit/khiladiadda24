@@ -3,6 +3,18 @@
   if (!app) return;
   const { api, el, notify, refresh } = app;
   const announce = message => app.announceHindiStatus?.(message);
+  const announceEnteredAmount = (input, type) => {
+    let timer;
+    input.addEventListener('input', () => {
+      window.clearTimeout(timer);
+      timer = window.setTimeout(() => {
+        const amount = Number(input.value);
+        if (input.value.trim() && Number.isFinite(amount) && amount > 0) {
+          app.announceWalletAmount?.(type, amount);
+        }
+      }, 900);
+    });
+  };
   const form = el('withdrawForm');
   if (!form) return;
 
@@ -43,6 +55,7 @@
   const withdrawalAmount = form.elements.amount;
   withdrawalAmount.min = '500';
   withdrawalAmount.step = '100';
+  announceEnteredAmount(withdrawalAmount, 'withdrawal');
   const payoutMethodField = document.createElement('div');
   payoutMethodField.className = 'field';
   const payoutMethodLabel = document.createElement('label');
@@ -199,6 +212,7 @@
   if (!qrForm || !qrArea || !amountInput) return;
 
   amountInput.min = '50';
+  announceEnteredAmount(amountInput, 'deposit');
   const depositDescription = qrForm.closest('.panel')?.querySelector('p.muted');
   if (depositDescription) depositDescription.textContent = 'Minimum ₹50. QR se payment ke baad UTR aur screenshot bhejein; admin approval par amount credit hoga.';
   const qrButton = qrForm.querySelector('button[type="submit"]');

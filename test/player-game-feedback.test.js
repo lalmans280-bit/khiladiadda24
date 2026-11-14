@@ -38,6 +38,25 @@ test('announces the missing wallet recharge amount', () => {
   assert.match(spoken[0], /रिचार्ज/);
 });
 
+test('announces the entered deposit amount and minimum', () => {
+  const { app, spoken } = createFeedbackHarness();
+
+  app.announceWalletAmount('deposit', 1500);
+
+  assert.match(spoken[0], /₹1,500/);
+  assert.match(spoken[0], /पचास रुपये/);
+});
+
+test('announces the entered withdrawal amount and limits', () => {
+  const { app, spoken } = createFeedbackHarness();
+
+  app.announceWalletAmount('withdrawal', 700);
+
+  assert.match(spoken[0], /₹700/);
+  assert.match(spoken[0], /पाँच सौ रुपये/);
+  assert.match(spoken[0], /सौ रुपये/);
+});
+
 test('announces the win screenshot submission instructions', () => {
   const { app, spoken } = createFeedbackHarness();
 

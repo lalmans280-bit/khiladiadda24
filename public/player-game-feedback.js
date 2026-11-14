@@ -29,6 +29,17 @@
     const rechargeAmount = Math.max(50, Math.ceil(Number(amount) || 50));
     app.announceHindiStatus(`वॉलेट में पैसे कम हैं। कृपया ₹${rechargeAmount} रिचार्ज करें, फिर गेम में शामिल हों।`);
   };
+  app.announceWalletAmount = (type, amount) => {
+    const value = Number(amount);
+    if (!Number.isFinite(value) || value <= 0) return false;
+    const formattedAmount = value.toLocaleString('en-IN');
+    const message = type === 'deposit'
+      ? `आप जमा करने के लिए ₹${formattedAmount} भर रहे हैं। न्यूनतम जमा राशि पचास रुपये है।`
+      : type === 'withdrawal'
+        ? `आप निकासी के लिए ₹${formattedAmount} भर रहे हैं। कम से कम पाँच सौ रुपये और सौ रुपये के चरणों में राशि रखें।`
+        : '';
+    return message ? app.announceHindiStatus(message) : false;
+  };
   app.announceWinScreenshotPrompt = () => {
     app.announceHindiStatus('गेम जीतने के बाद जीत का स्क्रीनशॉट अपलोड करके Result review भेजें। हारने पर I Lost चुनें।');
   };
