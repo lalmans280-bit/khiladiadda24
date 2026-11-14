@@ -338,18 +338,22 @@
     #topInstallAppButton{display:grid;place-content:center;justify-items:center;gap:0;width:34px;height:34px;min-height:34px;flex:none;padding:2px;border-color:#991b1b;color:#fff;background:#dc2626}
     #topInstallAppButton svg{display:block;width:19px;height:19px;fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round;stroke-width:2.5}
     #topInstallAppButton .install-app-label{font-size:7px;font-weight:900;line-height:1}
-    #gamePicker.game-launch{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
-    #gamePicker .game-tile-image{width:min(100%,220px)}
+    #gamePicker.game-launch{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;align-items:stretch}
+    #gamePicker .game-tile-image{display:block;position:relative;width:min(100%,260px);min-height:140px;aspect-ratio:16/11;justify-self:center;padding:0;overflow:hidden;border:1px solid rgba(255,255,255,.12);border-radius:14px;box-shadow:0 10px 28px rgba(0,0,0,.18)}
+    #gamePicker .game-tile-image::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(7,16,19,.12),rgba(7,16,19,.72));pointer-events:none}
+    #gamePicker .game-tile-image img{display:block;width:100%;height:100%;object-fit:cover;filter:saturate(1.12) contrast(1.08)}
+    #gamePicker .game-card-label{position:absolute;left:12px;right:12px;bottom:10px;z-index:2;display:flex;align-items:center;justify-content:center;min-height:30px;padding:5px 8px;border:1px solid rgba(255,255,255,.18);border-radius:999px;background:rgba(12,18,20,.72);color:#fff;font-size:11px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;line-height:1.2;text-align:center;box-shadow:0 8px 18px rgba(0,0,0,.22)}
     #gamePicker .game-coming-soon-tile{display:grid;place-content:center;justify-items:center;gap:5px;border-color:#647553;color:#fff;background:linear-gradient(140deg,#1d3929,#263b52);text-align:center}
     #gamePicker .game-coming-soon-tile strong{color:#fff;font-size:18px}
     #gamePicker .game-coming-soon-icon{font-size:34px;line-height:1.1}
     #gamePicker .cricket-game-logo{position:relative;z-index:1;width:68px;height:68px;object-fit:contain;filter:drop-shadow(0 3px 8px #000b)}
-    #gamePicker .game-coming-soon-badge{position:absolute;right:8px;bottom:8px;left:8px;padding:4px 7px;border:1px solid #f4c84b88;border-radius:999px;color:#ffe18a;background:#101713ed;font:800 10px/1 Arial,sans-serif}
+    #gamePicker .game-coming-soon-badge{position:absolute;right:8px;bottom:8px;left:8px;z-index:2;padding:4px 7px;border:1px solid #f4c84b88;border-radius:999px;color:#ffe18a;background:#101713ed;font:800 10px/1 Arial,sans-serif}
     #gamePicker [data-cricket-promo]{background:linear-gradient(0deg,#101713df,#1017131a 75%),url('/cricket.png') center/cover no-repeat}
     #gamePicker [data-pubg-promo]{background:linear-gradient(0deg,#101713df,#1017131a 75%),url('/pubg.png') center/cover no-repeat}
     #gamePicker .game-coming-soon-icon{display:none}
     #gamePicker .score-game-tile{display:grid;place-items:center;justify-content:center;padding:8px}
     #gamePicker .score-game-art{display:block;width:56px;height:56px;flex:none;object-fit:contain}
+    #gamePicker .game-live-badge{bottom:8px;left:12px;right:auto;padding:4px 7px;font-size:10px}
     .cricket-promo-hero{position:relative;isolation:isolate;overflow:hidden;min-height:250px;padding:clamp(22px,5vw,42px);border:1px solid #9b7138;border-radius:14px;background:linear-gradient(90deg,#101713f2 0%,#101713d9 55%,#10171366 100%),url('/cricket.png') center/cover}
     .cricket-promo-hero h1{max-width:640px;margin:12px 0;color:#ffdc7b;font-size:clamp(28px,5vw,42px);line-height:1.1}
     .cricket-promo-hero p{max-width:600px;margin:0;color:#f0eee5}
@@ -439,8 +443,6 @@
     .game-mode-option[data-game-option="LUDO"]{border-color:#86c995;color:#174b2b;background:#dcfce7}
     .game-mode-option[data-game-option="POPULAR_LUDO"]{border-color:#82aee8;color:#1e3a8a;background:#dbeafe}
     .game-mode-option[data-game-option="LUDO_RACE"]{border-color:#e4b84b;color:#78350f;background:#fef3c7}
-    .game-mode-option[data-game-option="LUDO_SCORE"]{border-color:#e27a53;color:#78351f;background:#fff0e8}
-    .game-mode-option[data-game-option="LUDO_SCORE"]{justify-content:center}
     .game-mode-option[data-game-option="SNAKE"]{border-color:#c89ae0;color:#581c87;background:#f3e8ff}
     .game-mode-option.active{box-shadow:inset 0 0 0 2px currentColor}
     @media(max-width:600px){.battle-prizes.open-battle-prizes .battle-player-name{font-size:10px}html[data-theme="night"] .battle-prizes.open-battle-prizes .battle-player-amount{font-size:12px}html[data-theme="day"] .battle-prizes.open-battle-prizes .battle-player-amount{font-size:12px}}
@@ -510,9 +512,11 @@
   <main class="shell content"><div id="notice" class="notice" role="status" hidden></div>
       <section class="view" id="view-games">
         <div class="game-launch" id="gamePicker">
-          <button class="game-tile score-game-tile" type="button" data-launch-game="LUDO_SCORE" aria-label="KhiladiAdda24 Ludo Score"><img class="score-game-art" src="/app-icon-192.png?v=20261113-ludo-score-app-icon" alt=""></button>
-          <button class="game-tile game-tile-image game-coming-soon-tile" type="button" data-cricket-promo aria-label="Cricket fantasy - Coming Soon"><img class="cricket-game-logo" src="/cricket-game-logo.svg" alt=""><span class="game-coming-soon-icon" aria-hidden="true">🏏</span><strong>Cricket Fantasy</strong><span class="game-coming-soon-badge">₹1 LAKH · COMING SOON</span></button>
-          <button class="game-tile game-tile-image game-coming-soon-tile" type="button" data-pubg-promo aria-label="PUBG - Coming Soon"><span class="game-coming-soon-icon" aria-hidden="true">🎯</span><strong>PUBG</strong><span class="game-coming-soon-badge">COMING SOON</span></button>
+          <button class="game-tile game-tile-image" type="button" data-launch-game="LUDO" aria-label="Ludo Classic"><img src="/ludo-classic.png" alt="Ludo Classic"><span class="game-card-label">Ludo Classic</span><span class="game-live-badge"><i class="game-live-dot" aria-hidden="true"></i><span class="game-live-text">LIVE</span></span></button>
+          <button class="game-tile game-tile-image" type="button" data-launch-game="LUDO_RACE" aria-label="Ludo Race"><img src="/ludo-classic.png" alt="Ludo Race"><span class="game-card-label">Ludo Race</span><span class="game-live-badge">NEW</span></button>
+          <button class="game-tile game-tile-image" type="button" data-rummy-promo aria-label="Rummy"><img src="/ludo-classic.png" alt="Rummy"><span class="game-card-label">Rummy</span><span class="game-live-badge">NEW</span></button>
+          <button class="game-tile game-tile-image game-coming-soon-tile" type="button" data-cricket-promo aria-label="Cricket fantasy - Coming Soon"><img class="cricket-game-logo" src="/cricket-game-logo.svg" alt=""><span class="game-card-label">Cricket Fantasy</span><span class="game-coming-soon-badge">₹1 LAKH · COMING SOON</span></button>
+          <button class="game-tile game-tile-image game-coming-soon-tile" type="button" data-pubg-promo aria-label="PUBG - Coming Soon"><span class="game-card-label">PUBG</span><span class="game-coming-soon-badge">COMING SOON</span></button>
           <a class="game-support-banner" href="/support.html" aria-label="WhatsApp and support"><img src="/support-banner.png?v=20261028-support-update" alt="WhatsApp and Support"><span class="game-live-badge"><i class="game-live-dot" aria-hidden="true"></i><span class="game-live-text">LIVE</span></span></a>
         </div>
         <div id="gameBattleView" hidden>
@@ -580,7 +584,7 @@
   </script>
   <script src="/socket.io/socket.io.js"></script>
   <script src="/ludo-race.js?v=20261113-four-colors-all-tokens"></script>
-  <script src="/ludo-score.js?v=20261114-colored-home-lanes"></script>
+  <script src="/ludo-score.js?v=20261114-four-color-score-winner"></script>
   <script>
     const token=localStorage.getItem('token');
     const storedUser=(()=>{try{return JSON.parse(localStorage.getItem('user')||'null')}catch{return null}})();
@@ -924,8 +928,6 @@
     if (gameTypeSelect) gameTypeSelect.remove();
     const gameModeOptions=document.createElement('div');
     const gameTypeFieldContainer = document.querySelector('#createForm .field') || document.body;
-    const ludoScoreOption=document.createElement('option');
-    const scoreAppIcon = '/app-icon-192.png?v=20261113-ludo-score-app-icon';
     const preservedSelect = document.createElement('select');
     preservedSelect.id='gameType';
     preservedSelect.hidden=true;
@@ -937,7 +939,6 @@
       {value:'LUDO',label:'Ludo Classic'},
       {value:'POPULAR_LUDO',label:'Popular Ludo'},
       {value:'LUDO_RACE',label:'Ludo Race — 4 Gotiyan Ghar Pahunchao'},
-      {value:'LUDO_SCORE',label:'KhiladiAdda24 Ludo Score'},
       {value:'SNAKE',label:'Snake'}
     ].forEach(({value,label})=>{const option=document.createElement('option');option.value=value;option.textContent=label;preservedSelect.append(option)});
     const gameTypeFieldLabelId = 'gameTypeLabel';
@@ -952,8 +953,8 @@
     gameModeOptions.className='game-mode-options';
     gameModeOptions.setAttribute('role','group');
     gameModeOptions.setAttribute('aria-labelledby',gameTypeFieldLabelId);
-    const gameModeImages={LUDO:'/ludo_classic_256x256.png',POPULAR_LUDO:'/popular_ludo_256x256.png',LUDO_RACE:'/ludo_race_1_goti_win_256x256.png',LUDO_SCORE:scoreAppIcon,SNAKE:'/snake_ladder_256x256.png'};
-    const gameModeArtClasses={LUDO:'classic',POPULAR_LUDO:'popular',LUDO_RACE:'race',LUDO_SCORE:'score',SNAKE:'snake'};
+    const gameModeImages={LUDO:'/ludo_classic_256x256.png',POPULAR_LUDO:'/popular_ludo_256x256.png',LUDO_RACE:'/ludo_race_1_goti_win_256x256.png',SNAKE:'/snake_ladder_256x256.png'};
+    const gameModeArtClasses={LUDO:'classic',POPULAR_LUDO:'popular',LUDO_RACE:'race',SNAKE:'snake'};
     Array.from(preservedSelect.options).forEach(option=>{
       const button=document.createElement('button'),art=document.createElement('span'),image=document.createElement('img');
       button.type='button';button.className='game-mode-option';button.dataset.gameOption=option.value;button.setAttribute('aria-label',option.textContent);
@@ -1219,7 +1220,7 @@
   </script>
     <script src="/match-flow.js?v=20260929-reason-required-roomcode-cancel"></script>
     <script src="/wallet-flow.js?v=20260929-winnings-only-withdrawal"></script>
-    <script src="/game-rules.js?v=20260929-compact-rules-button-2"></script>
+    <script src="/game-rules.js?v=20261114-ludo-score-rules"></script>
   <script src="/player-copy.js" defer></script>
   <script>
     const setWinLabels = () => document.querySelectorAll('.battle-prize small').forEach(label => {
