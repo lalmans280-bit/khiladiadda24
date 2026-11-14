@@ -2544,7 +2544,13 @@ app.post('/api/matches/join', requireUser, async (req, res) => {
       .populate('creator', 'username phone')
       .populate('joiner', 'username phone');
     io.to(matchId).emit('match_updated', populatedMatch);
-    emitMatchActionVoice(populatedMatch, userId, 'गेम जॉइन हो गया है।', 'आपके गेम में एक खिलाड़ी जॉइन हो गया है।');
+    const joinerVoiceMessage = isLudoRace
+      ? 'गेम जॉइन हो गया है। अब लूडो रेस खोलें।'
+      : 'गेम जॉइन हो गया है। अब रूम कोड का इंतज़ार करें।';
+    const creatorVoiceMessage = isLudoRace
+      ? 'एक खिलाड़ी लूडो रेस में जॉइन हो गया है। अब गेम खोलें।'
+      : 'गेम में खिलाड़ी जुड़ गया है। अब रूम कोड भेजें।';
+    emitMatchActionVoice(populatedMatch, userId, joinerVoiceMessage, creatorVoiceMessage);
     res.json({
       message: match.gameType === 'LUDO_SCORE'
         ? 'Opponent join ho gaya. Website par Ludo Score game shuru karein.'
@@ -2605,6 +2611,12 @@ app.post('/api/matches/set-room-code', requireUser, async (req, res) => {
       .populate('creator', 'username phone')
       .populate('joiner', 'username phone');
     io.to(matchId).emit('match_updated', populatedMatch);
+    emitMatchActionVoice(
+      populatedMatch,
+      userId,
+      'रूम कोड भेज दिया गया है।',
+      'रूम कोड मिल गया है। अब उससे गेम में जुड़ें।'
+    );
     res.json({ message: 'Room code share hote hi lock ho gaya. Dono players code copy karke Ludo King mein kheliye.', match: populatedMatch });
   } catch (err) {
     res.status(500).json({ error: err.message });

@@ -229,7 +229,7 @@
 						body: JSON.stringify({ matchId })
 					});
 					app.notify(result.message);
-					app.announceHindiStatus?.('गेम शुरू करने की तैयारी हो गई है।');
+					app.announceHindiStatus?.('अब गेम में रूम बनाकर उसका कोड भेजें।');
 					setupHint.remove();
 					setupButton.remove();
 					roomForm.hidden = false;
