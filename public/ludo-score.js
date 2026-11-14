@@ -46,9 +46,9 @@
     .ludo-score-die{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);place-items:center;gap:2px;width:58px;height:58px;min-width:58px;padding:8px;border:2px solid #f4c252;border-radius:15px;background:linear-gradient(145deg,#fffef5,#ffe8a5 70%,#ffd36c);box-shadow:0 5px 0 #9a661d,0 9px 18px #0006,inset 0 0 0 2px #fff9;transform:rotate(-4deg);animation:ludo-die-pop .28s ease-out}
     .ludo-score-die-pip{width:9px;height:9px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#f77668,#bd302d 72%);box-shadow:0 1px 2px #64201c}
     .ludo-score-die-empty{grid-column:1/-1;grid-row:1/-1;display:grid;place-items:center;color:#8f6722;font-size:30px;font-weight:900}
-    .ludo-score-roll{border:1px solid #ffd16a!important;background:linear-gradient(135deg,#ffd84f,#ff9838)!important;color:#38230b!important;font-weight:900!important;box-shadow:0 4px 0 #9e571d,0 8px 16px #0004}
+    .ludo-score-roll{display:grid;place-items:center;width:76px;height:76px;padding:4px;border:0!important;border-radius:14px;background:transparent!important;color:inherit!important;box-shadow:none!important;touch-action:manipulation;cursor:pointer}
     .ludo-score-roll:not(:disabled):hover{filter:brightness(1.08);transform:translateY(-1px)}
-    .ludo-score-roll:disabled{opacity:.55;box-shadow:none}
+    .ludo-score-roll:focus-visible{outline:3px solid #fff;outline-offset:3px}     .ludo-score-roll:disabled{opacity:.55;box-shadow:none;cursor:not-allowed}
     .ludo-score-board{display:grid;grid-template-columns:repeat(15,minmax(0,1fr));width:min(100%,560px);aspect-ratio:1;margin:14px auto;border:3px solid #f0c34f;border-radius:12px;overflow:hidden;background:#fff;box-shadow:0 8px 24px #0006}
     .score-cell{position:relative;display:flex;align-items:center;justify-content:center;min-width:0;min-height:0;border:1px solid #dce5de;background:#f8faf8}
     .score-cell-track{background:#fff}.score-cell-safe::after{content:'★';position:absolute;color:#b89637;font-size:clamp(6px,1.8vw,15px);pointer-events:none}
@@ -224,7 +224,7 @@
       : winner
       ? `🏆 ${app.esc(winnerName)} winner hain — highest score: ${winnerScore}/1400 points.`
       : ownTurn
-        ? state.diceValue ? `${state.diceValue} aaya — apni goti chunein.` : 'Aapki turn hai — dice roll karein.'
+        ? state.diceValue ? `${state.diceValue} aaya — apni goti chunein.` : 'Aapki turn hai — dice par tap karein.'
         : `${app.esc(ownTurnName)} ki turn hai. Board live update hota rahega.`;
     const resultMarkup = match.status === 'PENDING_RESULT'
       ? `<p class="notice warning">Screenshot admin review ke liye bhej diya gaya hai.${match.resultSubmittedAt ? `<br><small>Submitted: ${app.esc(new Date(match.resultSubmittedAt).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }))} IST</small>` : ''}</p>`
@@ -250,15 +250,15 @@
       <div class="stat"><small>Creator</small><strong>${app.esc(app.nameOf(match.creator))}</strong></div>
       <div class="stat"><small>Opponent</small><strong>${app.esc(joinerName)}</strong></div></div>
       <div class="panel ludo-score-panel">
-        <div class="ludo-score-head"><h3>Ludo board • 4 rang • 4 gotiyan = jeet</h3><span class="muted">52 bahari + 5 ghar = ${scorePathLength} khane</span>${match.status === 'RUNNING' && !winner ? '<span id="ludoScoreTimer" class="ludo-score-timer" aria-live="polite">20s</span>' : ''}</div>
+        <div class="ludo-score-head"><h3>Ludo board • 4 rang • 4 gotiyan = jeet</h3><span class="muted">52 bahari + 5 ghar = ${scorePathLength} khane</span>${match.status === 'RUNNING' && !winner ? '<span id="ludoScoreTimer" class="ludo-score-timer" aria-live="polite">10s</span>' : ''}</div>
         <div class="ludo-score-players">
           ${playerCard('creator', match.creator)}
           ${playerCard('joiner', match.joiner || { username: joinerName })}
         </div>
         <div class="ludo-score-status" aria-live="polite">${statusText}${state.lastAction ? `<br><small>${app.esc(state.lastAction)}</small>` : ''}</div>
         <div class="ludo-score-actions ludo-score-dice-row">
-          <div class="ludo-score-dice-box"><span class="ludo-score-dice-label">DICE</span>${diceMarkup(dieValue)}</div>
-          ${match.status === 'RUNNING' && !winner ? `<button type="button" class="btn ludo-score-roll" id="ludoScoreRoll" ${!ownTurn || state.diceValue || busy ? 'disabled' : ''}>Roll</button>` : ''}
+          <div class="ludo-score-dice-box"><span class="ludo-score-dice-label">DICE</span>${match.status === 'RUNNING' && !winner ? `<button type="button" class="btn ludo-score-roll" id="ludoScoreRoll" aria-label="Dice par tap karein" ${!ownTurn || state.diceValue || busy ? 'disabled' : ''}>${diceMarkup(dieValue)}</button>` : diceMarkup(dieValue)}</div>
+
           <span class="muted">${diceStatus}</span>
         </div>
         <div class="ludo-score-board" role="grid" aria-label="KhiladiAdda24 Ludo Score board">${cells}</div>
