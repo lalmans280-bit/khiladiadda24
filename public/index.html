@@ -1013,17 +1013,20 @@
       const [openData,runningData]=await Promise.all([api('/api/matches/open?gameType=ALL'),api('/api/matches/running?gameType=ALL')]);
       const openMatches=Array.isArray(openData)?openData:openData.matches||[];
       const runningMatches=Array.isArray(runningData)?runningData:runningData.matches||[];
-      const hasRealOpenMatches = openMatches.length > 0;
+      const scoreMode=gameTypeSelect.value==='LUDO_SCORE';
+      const visibleOpenMatches=scoreMode?openMatches.filter(match=>match.gameType==='LUDO_SCORE'):openMatches;
+      const visibleRunningMatches=scoreMode?runningMatches.filter(match=>match.gameType==='LUDO_SCORE'):runningMatches;
+      const hasRealOpenMatches = visibleOpenMatches.length > 0;
       window.__REAL_OPEN_BATTLES_AVAILABLE = hasRealOpenMatches;
-      const openMarkup=openMatches.map(m=>matchCard(m)).join('');
+      const openMarkup=visibleOpenMatches.map(m=>matchCard(m)).join('');
       renderDemoBattles();
-      const fallbackDemoMarkup = demoBattlesHeader + demoBattlesList.innerHTML;
+      const fallbackDemoMarkup=scoreMode?'':demoBattlesHeader + demoBattlesList.innerHTML;
       const allOpenBattlesMarkup = `${openMarkup ? `<div class="open-list-box">${openMarkup}</div>` : ''}<div class="demo-open-list-box demo-battles-container">${fallbackDemoMarkup}</div>`;
       el('openMatches').innerHTML = allOpenBattlesMarkup;
       if(el('gameOpenMatches'))el('gameOpenMatches').innerHTML = allOpenBattlesMarkup;
       const currentPlayerId=String(player?._id||storedUser?._id||storedUser?.id||'');
       const matchPlayerId=participant=>String(participant?._id||participant?.id||participant||'');
-      const myRunningMatches=runningMatches.filter(match=>typeof match.viewerIsParticipant==='boolean'
+      const myRunningMatches=visibleRunningMatches.filter(match=>typeof match.viewerIsParticipant==='boolean'
         ? match.viewerIsParticipant
         : [match.creator,match.joiner].some(participant=>matchPlayerId(participant)===currentPlayerId));
       const myRunningMatchIds=new Set(myRunningMatches.map(match=>String(match._id)));
@@ -1032,7 +1035,7 @@
       if((runningList.contains(document.activeElement)||gameRunningList.contains(document.activeElement))&&document.activeElement.matches('[data-running-room-code]'))return;
       myRunningBattlesPanel.hidden=myRunningMatches.length===0;
       gameRunningList.replaceChildren();
-      runningList.innerHTML=runningMatches.length?runningMatches.map(m=>{
+      runningList.innerHTML=visibleRunningMatches.length?visibleRunningMatches.map(m=>{
         const isParticipant=typeof m.viewerIsParticipant==='boolean'?m.viewerIsParticipant:[m.creator,m.joiner].some(participant=>matchPlayerId(participant)===currentPlayerId);
         const isCreator=typeof m.viewerIsCreator==='boolean'?m.viewerIsCreator:matchPlayerId(m.creator)===currentPlayerId;
         const isJoiner=isParticipant&&!isCreator;
@@ -1068,7 +1071,7 @@
         }catch(error){showError(error)}
         finally{button.disabled=false;button.textContent='Result / screenshot'}
       }));
-      const sampleMarkup=sampleRunningBattles.map(({name,avatar,opponent,opponentAvatar,amount})=>`<article class="match battle-card sample-running-battle"><div class="battle-prizes running-battle-prizes"><div class="battle-prize"><small>WIN</small><strong>₹${(amount*2*0.95).toLocaleString('en-IN')}</strong></div><div class="battle-prize-players"><div class="battle-players">${battlePlayerMarkup({username:name,profileImage:avatar.replace(/^\//,'')},'Creator',false,amount)}<img class="battle-versus battle-versus-image" src="/vs.png" alt="versus">${battlePlayerMarkup({username:opponent,profileImage:opponentAvatar.replace(/^\//,'')},'Opponent',true,amount)}</div></div></div></article>`).join('');
+      const sampleMarkup=scoreMode?'':sampleRunningBattles.map(({name,avatar,opponent,opponentAvatar,amount})=>`<article class="match battle-card sample-running-battle"><div class="battle-prizes running-battle-prizes"><div class="battle-prize"><small>WIN</small><strong>₹${(amount*2*0.95).toLocaleString('en-IN')}</strong></div><div class="battle-prize-players"><div class="battle-players">${battlePlayerMarkup({username:name,profileImage:avatar.replace(/^\//,'')},'Creator',false,amount)}<img class="battle-versus battle-versus-image" src="/vs.png" alt="versus">${battlePlayerMarkup({username:opponent,profileImage:opponentAvatar.replace(/^\//,'')},'Opponent',true,amount)}</div></div></div></article>`).join('');
       el('sampleRunningMatches').innerHTML=sampleMarkup;
       el('mySampleRunningMatches').innerHTML=sampleMarkup;
       runningList.querySelectorAll('a[href^="intent://"]').forEach(link=>{link.href=ludoKingOpenUrl()});
@@ -1078,13 +1081,14 @@
         if(status){status.textContent='LIVE • Game chal raha hai';status.classList.add('live-match-status')}
       });
       const runningCards=[...runningList.children];
-      runningMatches.forEach((match,index)=>{
+      visibleRunningMatches.forEach((match,index)=>{
         if(myRunningMatchIds.has(String(match._id))&&runningCards[index])gameRunningList.append(runningCards[index]);
       });
     }
     async function loadMine(){const container=el('myMatches');if(!container)return;const data=await api('/api/matches/mine'),matches=data.matches||[];container.innerHTML=matches.length?matches.map(m=>matchCard(m,true)).join(''):'<p class="muted">Abhi koi active battle nahi hai.</p>'}
     function refreshSamplePlayers(){
       if(!el('sampleRunningMatches')||!el('mySampleRunningMatches')||window.__REAL_OPEN_BATTLES_AVAILABLE)return;
+      if(gameTypeSelect.value==='LUDO_SCORE'){el('sampleRunningMatches').replaceChildren();el('mySampleRunningMatches').replaceChildren();return}
       const sampleMarkup=sampleRunningBattles.map(({name,avatar,opponent,opponentAvatar,amount})=>`<article class="match battle-card sample-running-battle"><div class="battle-prizes running-battle-prizes"><div class="battle-prize"><small>WIN</small><strong>₹${(amount*2*0.95).toLocaleString('en-IN')}</strong></div><div class="battle-prize-players"><div class="battle-players">${battlePlayerMarkup({username:name,profileImage:avatar.replace(/^\//,'')},'Creator',false,amount)}<img class="battle-versus battle-versus-image" src="/vs.png" alt="versus">${battlePlayerMarkup({username:opponent,profileImage:opponentAvatar.replace(/^\//,'')},'Opponent',true,amount)}</div></div></div></article>`).join('');
       el('sampleRunningMatches').innerHTML=sampleMarkup;
       el('mySampleRunningMatches').innerHTML=sampleMarkup;
@@ -1210,7 +1214,7 @@
     window.openMatchPage=(id,stage,showResult=false)=>{const url=new URL('/index.html',location.origin);url.searchParams.set('matchId',id);if(stage)url.searchParams.set('stage',stage);if(showResult)url.searchParams.set('showResult','1');history.pushState({matchId:id},'',url);return window.openMatch(id)};
     window.matchApp={api,el,notify,esc,nameOf,setView,refresh,getPlayer:()=>player,getUser:()=>storedUser};
     const openMatchWithScoreMode=window.openMatch;
-    window.openMatch=async id=>{const match=await api(`/api/matches/${encodeURIComponent(id)}`);if(match.gameType==='LUDO_SCORE'&&(match.status==='OPEN'||match.ludoScore&&['RUNNING','PENDING_RESULT','COMPLETED','PENDING_CANCELLATION','CANCELLED'].includes(match.status))&&window.renderLudoScoreMatch)return window.renderLudoScoreMatch(match,id);return openMatchWithScoreMode(id)};
+    window.openMatch=async id=>{const match=await api(`/api/matches/${encodeURIComponent(id)}`);if(match.gameType==='LUDO_SCORE'&&(match.status==='OPEN'||match.ludoScore&&['RUNNING','PENDING_RESULT','COMPLETED','PENDING_CANCELLATION','CANCELLED'].includes(match.status))&&window.renderLudoScoreMatch){syncGameSelection('LUDO_SCORE');return window.renderLudoScoreMatch(match,id)}return openMatchWithScoreMode(id)};
     refresh().catch(showError);battlesPollTimer=setInterval(()=>loadOpen().catch(showError),10000);setInterval(refreshSamplePlayers,10*1000);setInterval(()=>{if(el('view-profile').classList.contains('active'))loadWalletSummary().catch(showError)},10000);const initialMatchId=new URLSearchParams(location.search).get('matchId');if(initialMatchId)window.openMatch(initialMatchId).catch(showError);
   </script>
     <script src="/match-flow.js?v=20260929-reason-required-roomcode-cancel"></script>
