@@ -250,7 +250,7 @@
       <div class="stat"><small>Creator</small><strong>${app.esc(app.nameOf(match.creator))}</strong></div>
       <div class="stat"><small>Opponent</small><strong>${app.esc(joinerName)}</strong></div></div>
       <div class="panel ludo-score-panel">
-        <div class="ludo-score-head"><h3>Ludo board • 4 rang • 4 gotiyan = jeet</h3><span class="muted">52 bahari + 5 ghar = ${scorePathLength} khane</span>${match.status === 'RUNNING' && !winner ? '<span id="ludoScoreTimer" class="ludo-score-timer" aria-live="polite">10s</span>' : ''}</div>
+        <div class="ludo-score-head"><h3>Ludo board • 2 players • 4 gotiyan har player ke paas</h3><span class="muted">52 bahari + 5 ghar = ${scorePathLength} khane</span>${match.status === 'RUNNING' && !winner ? '<span id="ludoScoreTimer" class="ludo-score-timer" aria-live="polite">10s</span>' : ''}</div>
         <div class="ludo-score-players">
           ${playerCard('creator', match.creator)}
           ${playerCard('joiner', match.joiner || { username: joinerName })}
