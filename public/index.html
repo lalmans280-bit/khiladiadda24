@@ -427,6 +427,8 @@
     .game-mode-option{display:grid;place-items:center;min-height:76px;padding:0;border:0;border-radius:0;background:transparent;transition:transform .15s}
     .game-mode-art{position:relative;display:block;width:76px;height:76px;overflow:hidden;flex:none}
     .game-mode-art img{display:block;width:100%;height:100%;object-fit:contain}
+    .game-mode-art .game-live-badge{top:2px;right:2px;bottom:auto;left:auto;gap:3px;padding:2px 4px;font-size:8px}
+    .game-mode-art .game-live-dot{width:5px;height:5px}
     .game-mode-option:hover{transform:translateY(-1px)}
     .game-mode-option:focus-visible{outline:3px solid #f5d46b;outline-offset:3px}
     .game-mode-option.active .game-mode-art{filter:drop-shadow(0 0 7px rgba(255,216,100,.72))}
@@ -933,10 +935,14 @@
     const gameModeImages={LUDO:'/ludo_classic_256x256.png',POPULAR_LUDO:'/popular_ludo_256x256.png',LUDO_RACE:'/ludo_race_1_goti_win_256x256.png',SNAKE:'/snake_ladder_256x256.png'};
     const gameModeArtClasses={LUDO:'classic',POPULAR_LUDO:'popular',LUDO_RACE:'race',SNAKE:'snake'};
     Array.from(preservedSelect.options).forEach(option=>{
-      const button=document.createElement('button'),art=document.createElement('span'),image=document.createElement('img');
+      const button=document.createElement('button'),art=document.createElement('span'),image=document.createElement('img'),liveBadge=document.createElement('span'),liveDot=document.createElement('i'),liveText=document.createElement('span');
       button.type='button';button.className='game-mode-option';button.dataset.gameOption=option.value;button.setAttribute('aria-label',option.textContent);
       art.className=`game-mode-art game-mode-art--${gameModeArtClasses[option.value]}`;
-      image.src=gameModeImages[option.value];image.alt='';image.setAttribute('aria-hidden','true');art.append(image);button.append(art);
+      image.src=gameModeImages[option.value];image.alt='';image.setAttribute('aria-hidden','true');
+      liveBadge.className='game-live-badge';liveBadge.setAttribute('aria-hidden','true');
+      liveDot.className='game-live-dot';
+      liveText.className='game-live-text';liveText.textContent='LIVE';
+      liveBadge.append(liveDot,liveText);art.append(image,liveBadge);button.append(art);
       button.setAttribute('aria-pressed',String(option.selected));gameModeOptions.append(button)
     });
     const insertedContainer = gameTypeFieldContainer.querySelector('.game-mode-options');
