@@ -436,7 +436,7 @@
         const starterId=String(event?.startedBy||''),currentUserId=String(player?._id||storedUser?._id||storedUser?.id||'');
         if(starterId&&starterId!==currentUserId){
           window.matchApp?.playAlertTone?.();
-          window.matchApp?.announceHindiStatus?.('रूम कोड का इंतज़ार करें।');
+          window.matchApp?.announceHindiStatus?.('दूसरा खिलाड़ी Ludo King ऐप से रूम कोड बनाकर भेजेगा। कृपया इंतज़ार करें।');
         }
       });
       matchSocket.on('match_action_voice',event=>{
@@ -719,7 +719,7 @@
           notify(data.message||'Battle join ho gaya.');
           window.matchApp?.announceHindiStatus?.(data.match?.gameType==='LUDO_RACE'
             ? 'गेम जॉइन हो गया है। अब लूडो रेस खोलें।'
-            : 'गेम जॉइन हो गया है। अब रूम कोड का इंतज़ार करें।');
+            : 'गेम जॉइन हो गया है। बैटल बनाने वाला खिलाड़ी Ludo King ऐप से रूम कोड बनाकर भेजेगा। कृपया इंतज़ार करें।');
           await Promise.all([loadOpen(),loadMine()]);
         }catch(error){showError(error);join.disabled=false}
         return;
@@ -734,7 +734,7 @@
       }
     });
     document.addEventListener('click',async event=>{const cancel=event.target.closest('[data-cancel-match]');if(!cancel)return;window.matchApp?.playGameActionBeep?.();cancel.disabled=true;try{const matchId=cancel.dataset.cancelMatch,result=await api('/api/matches/cancel',{method:'POST',body:JSON.stringify({matchId})});notify(result.message);window.matchApp?.announceCancelOutcome?.(result);await refresh();window.openMatchPage(matchId,'details')}catch(error){showError(error);cancel.disabled=false}});
-    document.addEventListener('click',async event=>{const start=event.target.closest('[data-running-start]');if(!start)return;window.matchApp?.playGameActionBeep?.();start.disabled=true;try{await api('/api/matches/start-setup',{method:'POST',body:JSON.stringify({matchId:start.dataset.runningStart})});window.matchApp?.announceHindiStatus?.('अब गेम में रूम बनाकर उसका कोड भेजें।');await loadOpen()}catch(error){showError(error);start.disabled=false}});
+    document.addEventListener('click',async event=>{const start=event.target.closest('[data-running-start]');if(!start)return;window.matchApp?.playGameActionBeep?.();start.disabled=true;try{await api('/api/matches/start-setup',{method:'POST',body:JSON.stringify({matchId:start.dataset.runningStart})});window.matchApp?.announceHindiStatus?.('Ludo King ऐप खोलकर रूम बनाएं, वहाँ से रूम कोड लेकर यहाँ भेजें।');await loadOpen()}catch(error){showError(error);start.disabled=false}});
     document.addEventListener('click',async event=>{const copy=event.target.closest('[data-running-copy]');if(!copy)return;const code=copy.dataset.roomCode;let copied=false;try{if(navigator.clipboard?.writeText){await navigator.clipboard.writeText(code);copied=true}}catch{}if(!copied){const field=document.createElement('textarea');field.value=code;field.setAttribute('readonly','');field.style.position='fixed';field.style.opacity='0';document.body.append(field);field.select();copied=document.execCommand('copy');field.remove()}notify(copied?'Room code copy ho gaya.':`Room code: ${code}`,!copied)});
     document.addEventListener('submit',async event=>{const form=event.target.closest('[data-running-room-share]');if(!form)return;event.preventDefault();const code=form.querySelector('[data-running-room-code]').value.trim(),matchId=form.dataset.runningRoomShare;if(!/^[0-9]{4,8}$/.test(code))return notify('4-8 digit room code enter karein.',true);window.matchApp?.playGameActionBeep?.();try{await api('/api/matches/set-room-code',{method:'POST',body:JSON.stringify({matchId,roomCode:code})});notify('Room code share ho gaya.');window.matchApp?.announceHindiStatus?.('रूम कोड भेज दिया गया है।');document.activeElement.blur();await loadOpen()}catch(error){notify(error.message,true)}});
     document.addEventListener('click',async event=>{const cancel=event.target.closest('[data-running-cancel]');if(!cancel)return;window.matchApp?.playGameActionBeep?.();const roomCodeShared=cancel.dataset.roomCodeShared==='1',matchId=cancel.dataset.runningCancel,body={matchId};if(roomCodeShared){const reasons=[['1','Galat room code','WRONG_ROOM_CODE'],['2','Opponent respond nahi kar raha','OPPONENT_NOT_RESPONDING'],['3','Technical issue','TECHNICAL_ISSUE'],['4','Other','OTHER']],choice=prompt(`Cancel reason chunein:\n${reasons.map(([number,label])=>`${number}. ${label}`).join('\n')}`);if(choice===null)return;const reason=reasons.find(([number])=>number===choice.trim());if(!reason)return notify('Cancel reason list se number select karein.',true);body.reason=reason[2]}cancel.disabled=true;try{const result=await api('/api/matches/cancel',{method:'POST',body:JSON.stringify(body)});notify(result.message);window.matchApp?.announceCancelOutcome?.(result);await refresh();window.openMatchPage(matchId,'details')}catch(error){showError(error);cancel.disabled=false}});
@@ -770,7 +770,7 @@
     window.matchApp={api,el,notify,esc,nameOf,setView,refresh,getPlayer:()=>player,getUser:()=>storedUser};
     refresh().catch(showError);battlesPollTimer=setInterval(()=>loadOpen().catch(showError),10000);setInterval(refreshSamplePlayers,10*1000);setInterval(()=>{if(el('view-profile').classList.contains('active'))loadWalletSummary().catch(showError)},10000);const initialMatchId=new URLSearchParams(location.search).get('matchId');if(initialMatchId)window.openMatch(initialMatchId).catch(showError);
   </script>
-    <script src="/match-flow.js?v=20261114-room-code-voice"></script>
+    <script src="/match-flow.js?v=20261114-room-code-ludo-king-voice"></script>
     <script src="/player-game-feedback.js?v=20261114-opponent-voice"></script>
     <script src="/wallet-flow.js?v=20260929-winnings-only-withdrawal"></script>
     <script src="/game-rules.js?v=20260929-compact-rules-button-2"></script>

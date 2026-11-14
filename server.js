@@ -2546,10 +2546,10 @@ app.post('/api/matches/join', requireUser, async (req, res) => {
     io.to(matchId).emit('match_updated', populatedMatch);
     const joinerVoiceMessage = isLudoRace
       ? 'गेम जॉइन हो गया है। अब लूडो रेस खोलें।'
-      : 'गेम जॉइन हो गया है। अब रूम कोड का इंतज़ार करें।';
+      : 'गेम जॉइन हो गया है। बैटल बनाने वाला खिलाड़ी Ludo King ऐप से रूम कोड बनाकर भेजेगा। कृपया इंतज़ार करें।';
     const creatorVoiceMessage = isLudoRace
       ? 'एक खिलाड़ी लूडो रेस में जॉइन हो गया है। अब गेम खोलें।'
-      : 'गेम में खिलाड़ी जुड़ गया है। अब रूम कोड भेजें।';
+      : 'गेम में खिलाड़ी जुड़ गया है। Ludo King ऐप खोलकर रूम बनाएं और उसका कोड यहाँ भेजें।';
     emitMatchActionVoice(populatedMatch, userId, joinerVoiceMessage, creatorVoiceMessage);
     res.json({
       message: match.gameType === 'LUDO_SCORE'
@@ -2648,7 +2648,7 @@ app.post('/api/matches/start-setup', requireUser, async (req, res) => {
       io.to(`player:${String(match.creator)}`).emit('match_start_tone', startToneEvent);
       io.to(`player:${String(match.joiner)}`).emit('match_start_tone', startToneEvent);
     }
-    res.json({ message: 'Room code setup shuru ho gaya. Ludo King room banakar code share karein.', match });
+    res.json({ message: 'Room code setup shuru ho gaya. Ludo King app mein room banakar code share karein.', match });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

@@ -229,7 +229,7 @@
 						body: JSON.stringify({ matchId })
 					});
 					app.notify(result.message);
-					app.announceHindiStatus?.('अब गेम में रूम बनाकर उसका कोड भेजें।');
+					app.announceHindiStatus?.('Ludo King ऐप खोलकर रूम बनाएं, वहाँ से रूम कोड लेकर यहाँ भेजें।');
 					setupHint.remove();
 					setupButton.remove();
 					roomForm.hidden = false;
