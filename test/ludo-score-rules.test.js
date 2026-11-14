@@ -1,46 +1,20 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const {
-  LUDO_SCORE_FINISH,
-  LUDO_SCORE_TOKEN_COUNT,
-  LUDO_SCORE_COLORS,
-  LUDO_SCORE_TRACK,
-  LUDO_SCORE_COLOR_CONFIG,
-  isValidLudoScoreColor,
-  defaultLudoScoreJoinerColor,
-  ludoScoreTrackIndex,
+  LUDO_SCORE_FINISH_PROGRESS,
+  LUDO_SCORE_HOME_ENTRY_BONUS,
+  LUDO_SCORE_LOOP_LENGTH,
+  LUDO_SCORE_MAX,
+  LUDO_SAFE_TRACK_INDEXES,
+  captureOpponentTokens,
   isLudoScoreWinner,
   legalTokenIndexesForRoll,
+  ludoScoreWinnerSide,
   nextLudoTokenProgress,
   nextSixStreak,
   scoreAfterTimeout,
   scoresAfterMove
 } = require('../lib/ludo-score-rules');
-
-test('supports four Ludo Score colors with distinct player colors', () => {
-  assert.deepEqual(LUDO_SCORE_COLORS, ['red', 'green', 'yellow', 'blue']);
-  assert.equal(isValidLudoScoreColor('YELLOW'), true);
-  assert.equal(isValidLudoScoreColor('purple'), false);
-  assert.equal(defaultLudoScoreJoinerColor('red'), 'green');
-});
-
-test('each color follows a 57-square route with four yard slots', () => {
-  assert.equal(LUDO_SCORE_TRACK.length, 52);
-  for (const color of LUDO_SCORE_COLORS) {
-    assert.equal(LUDO_SCORE_COLOR_CONFIG[color].homePath.length, 5);
-    assert.equal(LUDO_SCORE_COLOR_CONFIG[color].baseSlots.length, LUDO_SCORE_TOKEN_COUNT);
-  }
-  assert.equal(LUDO_SCORE_TRACK.length + LUDO_SCORE_COLOR_CONFIG.red.homePath.length, LUDO_SCORE_FINISH);
-  assert.equal(ludoScoreTrackIndex('yellow', 0), 13);
-  assert.equal(ludoScoreTrackIndex('blue', 51), 38);
-  assert.equal(ludoScoreTrackIndex('red', 57), null);
-});
-
-test('requires all four tokens to finish before a player wins', () => {
-  assert.equal(isLudoScoreWinner([57, 57, 57, 57]), true);
-  assert.equal(isLudoScoreWinner([57, 57, 57, 56]), false);
-  assert.equal(isLudoScoreWinner([57, 57, 57]), false);
-});
 
 test('keeps tokens in the yard until a six and launches them only on six', () => {
   const tokens = [-1, -1, 0, 51, 57];
@@ -54,6 +28,31 @@ test('opens a token on six and requires an exact roll to reach home', () => {
   assert.equal(nextLudoTokenProgress(51, 6), 57);
   assert.equal(nextLudoTokenProgress(56, 1), 57);
   assert.equal(nextLudoTokenProgress(56, 2), null);
+});
+
+test('uses 52 outer squares and five home-lane squares before the center finish', () => {
+  assert.equal(LUDO_SCORE_LOOP_LENGTH + (LUDO_SCORE_FINISH_PROGRESS - LUDO_SCORE_LOOP_LENGTH), 57);
+  assert.equal(nextLudoTokenProgress(51, 1), 52);
+  assert.equal(nextLudoTokenProgress(56, 1), 57);
+  assert.equal(isLudoScoreWinner([57, 57, 57, 57]), true);
+  assert.equal(isLudoScoreWinner([57, 57, 57, 56]), false);
+});
+
+test('keeps opponent tokens safe on stars and captures every token on an unsafe landing', () => {
+  assert.deepEqual(LUDO_SAFE_TRACK_INDEXES, [0, 8, 13, 21, 26, 34, 39, 47]);
+  const safeLanding = captureOpponentTokens({
+    creator: [0, -1, -1, -1],
+    joiner: [26, 26, -1, -1]
+  }, 'creator', 0);
+  assert.equal(safeLanding.captured, false);
+  assert.deepEqual(safeLanding.tokens.joiner, [26, 26, -1, -1]);
+
+  const capture = captureOpponentTokens({
+    creator: [0, -1, -1, -1],
+    joiner: [27, 27, -1, -1]
+  }, 'creator', 1);
+  assert.equal(capture.captured, true);
+  assert.deepEqual(capture.tokens.joiner, [-1, -1, -1, -1]);
 });
 
 test('allows two consecutive sixes and forfeits the third', () => {
@@ -89,4 +88,42 @@ test('awards 250 points for each newly completed token and preserves timeout ded
     creator: [57, -1, -1, -1],
     joiner: [-1, -1, -1, -1]
   }), { creator: 400, joiner: 0 });
+});
+
+test('awards 100 points once when each token enters the home lane', () => {
+  const state = {
+    tokens: { creator: [51, -1, -1, -1], joiner: [-1, -1, -1, -1] },
+    scores: { creator: 0, joiner: 0 }
+  };
+  const enteredHome = { creator: [52, -1, -1, -1], joiner: [-1, -1, -1, -1] };
+  assert.deepEqual(scoresAfterMove(state, enteredHome, 'creator'), { creator: LUDO_SCORE_HOME_ENTRY_BONUS, joiner: 0 });
+  assert.deepEqual(scoresAfterMove({
+    tokens: enteredHome,
+    scores: { creator: LUDO_SCORE_HOME_ENTRY_BONUS, joiner: 0 }
+  }, {
+    creator: [53, -1, -1, -1],
+    joiner: [-1, -1, -1, -1]
+  }), { creator: LUDO_SCORE_HOME_ENTRY_BONUS, joiner: 0 });
+  assert.deepEqual(scoresAfterMove(state, {
+    creator: [57, -1, -1, -1],
+    joiner: [-1, -1, -1, -1]
+  }, 'creator'), { creator: LUDO_SCORE_HOME_ENTRY_BONUS + 250, joiner: 0 });
+});
+
+test('includes all four home-entry bonuses in the maximum score', () => {
+  const state = {
+    tokens: { creator: [57, 57, 57, 56], joiner: [-1, -1, -1, -1] },
+    scores: { creator: 1150, joiner: 0 }
+  };
+  assert.equal(LUDO_SCORE_MAX, 1400);
+  assert.deepEqual(scoresAfterMove(state, {
+    creator: [57, 57, 57, 57],
+    joiner: [-1, -1, -1, -1]
+  }), { creator: LUDO_SCORE_MAX, joiner: 0 });
+});
+
+test('awards the win to the higher scorer and uses the finisher as a tie-breaker', () => {
+  assert.equal(ludoScoreWinnerSide({ creator: 900, joiner: 1100 }, 'creator'), 'joiner');
+  assert.equal(ludoScoreWinnerSide({ creator: 1100, joiner: 900 }, 'creator'), 'creator');
+  assert.equal(ludoScoreWinnerSide({ creator: 1000, joiner: 1000 }, 'joiner'), 'joiner');
 });
