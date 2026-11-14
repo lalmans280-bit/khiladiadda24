@@ -18,9 +18,11 @@ const {
   LUDO_SCORE_HOME_ENTRY_BONUS,
   LUDO_SCORE_LOOP_LENGTH,
   LUDO_SCORE_MAX,
+  LUDO_SCORE_RULES_VERSION,
   captureOpponentTokens,
   isLudoScoreWinner,
   legalTokenIndexesForRoll,
+  ludoScoreFinishProgress,
   ludoScoreWinnerSide,
   nextLudoTokenProgress,
   nextSixStreak,
@@ -2133,6 +2135,7 @@ const ludoScoreTurnDuration = 20 * 1000;
 function createLudoScoreState(creatorId, startedAt = new Date()) {
   return {
     version: 0,
+    rulesVersion: LUDO_SCORE_RULES_VERSION,
     tokens: { creator: [-1, -1, -1, -1], joiner: [-1, -1, -1, -1] },
     currentTurn: String(creatorId),
     diceValue: null,
@@ -2205,7 +2208,7 @@ app.post('/api/matches/ludo-score/roll', requireUser, async (req, res) => {
 
     const diceValue = crypto.randomInt(1, 7);
     const side = ludoRaceSide(match, userId);
-    const legalTokenIndexes = legalTokenIndexesForRoll(state.tokens[side], diceValue);
+    const legalTokenIndexes = legalTokenIndexesForRoll(state.tokens[side], diceValue, ludoScoreFinishProgress(state));
     const noLegalMove = legalTokenIndexes.length === 0;
     const opponentId = String(state.currentTurn) === String(match.creator) ? String(match.joiner) : String(match.creator);
     const sixStreak = nextSixStreak(state, diceValue, opponentId);
@@ -2296,7 +2299,8 @@ app.post('/api/matches/ludo-score/move', requireUser, async (req, res) => {
       const diceValue = Number(currentState.diceValue);
       const tokens = { creator: [...currentState.tokens.creator], joiner: [...currentState.tokens.joiner] };
       const oldProgress = tokens[side][tokenIndex];
-      const newProgress = nextLudoTokenProgress(oldProgress, diceValue);
+      const finishProgress = ludoScoreFinishProgress(currentState);
+      const newProgress = nextLudoTokenProgress(oldProgress, diceValue, finishProgress);
       if (newProgress === null) {
         const error = new Error('Game state update ho gaya. Refresh karke dobara try karein.');
         error.statusCode = 409;
@@ -2312,7 +2316,7 @@ app.post('/api/matches/ludo-score/move', requireUser, async (req, res) => {
       tokens.joiner = captureResult.tokens.joiner;
 
       const scores = scoresAfterMove(currentState, tokens, homeLaneEntry ? side : null);
-      const won = isLudoScoreWinner(tokens[side]);
+      const won = isLudoScoreWinner(tokens[side], finishProgress);
       const winnerSide = won ? ludoScoreWinnerSide(scores, side) : null;
       const winnerUserId = winnerSide
         ? String(winnerSide === 'creator' ? currentMatch.creator : currentMatch.joiner)
