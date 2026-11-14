@@ -578,7 +578,7 @@
   </script>
   <script src="/socket.io/socket.io.js"></script>
   <script src="/ludo-race.js?v=20260624-one-token-win"></script>
-  <script src="/ludo-score.js?v=20261114-four-colors-profiles"></script>
+  <script src="/ludo-score.js?v=20261114-score-winner"></script>
   <script>
     const token=localStorage.getItem('token');
     const storedUser=(()=>{try{return JSON.parse(localStorage.getItem('user')||'null')}catch{return null}})();
@@ -1210,7 +1210,7 @@
   </script>
     <script src="/match-flow.js?v=20260929-reason-required-roomcode-cancel"></script>
     <script src="/wallet-flow.js?v=20260929-winnings-only-withdrawal"></script>
-    <script src="/game-rules.js?v=20260929-compact-rules-button-2"></script>
+    <script src="/game-rules.js?v=20261114-ludo-score-rules"></script>
   <script src="/player-copy.js" defer></script>
   <script>
     const setWinLabels = () => document.querySelectorAll('.battle-prize small').forEach(label => {

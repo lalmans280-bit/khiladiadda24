@@ -208,6 +208,7 @@
     }).join('');
     const creatorScore = Number(state.scores?.creator ?? state.tokens.creator.filter(value => value === 57).length * 250);
     const joinerScore = Number(state.scores?.joiner ?? state.tokens.joiner.filter(value => value === 57).length * 250);
+    const winnerScore = winner === creatorId ? creatorScore : joinerScore;
     const dieValue = state.diceValue || state.lastDice || '–';
     const playerCard = (side, user) => {
       const color = playerColors[side];
@@ -219,7 +220,7 @@
       return `<div class="ludo-score-player ${color}">
         <div class="ludo-score-player-main">${avatarMarkup(user, app)}<div class="ludo-score-player-copy">
           <strong>${app.esc(app.nameOf(user))}</strong>
-          <small>${colors[color].symbol} ${colors[color].name} · ${playerScore}/1000 points · ${homeCount}/4 ghar</small>
+          <small>${colors[color].symbol} ${colors[color].name} · ${playerScore}/1400 points · ${homeCount}/4 ghar</small>
         </div></div>${turnControl}
       </div>`;
     };
@@ -228,7 +229,7 @@
       : match.status === 'CANCELLED'
         ? 'Yeh battle cancel ho chuki hai.'
       : winner
-      ? `🏆 ${app.esc(winnerName)} winner hain — charon gotiyan ghar pahunch gayi.`
+      ? `🏆 ${app.esc(winnerName)} winner hain — highest score: ${winnerScore}/1400 points.`
       : ownTurn
         ? state.diceValue ? `${state.diceValue} aaya — apni goti chunein.` : 'Aapki turn hai — ghar ki goti 6 aane par hi khulegi.'
         : `${app.esc(ownTurnName)} ki turn hai. Board live update hota rahega.`;
