@@ -17,9 +17,11 @@ const {
   LUDO_SAFE_TRACK_INDEXES,
   LUDO_SCORE_HOME_ENTRY_BONUS,
   LUDO_SCORE_LOOP_LENGTH,
+  LUDO_SCORE_MAX,
   captureOpponentTokens,
   isLudoScoreWinner,
   legalTokenIndexesForRoll,
+  ludoScoreWinnerSide,
   nextLudoTokenProgress,
   nextSixStreak,
   scoreAfterTimeout,
@@ -2309,21 +2311,26 @@ app.post('/api/matches/ludo-score/move', requireUser, async (req, res) => {
       tokens.creator = captureResult.tokens.creator;
       tokens.joiner = captureResult.tokens.joiner;
 
+      const scores = scoresAfterMove(currentState, tokens, homeLaneEntry ? side : null);
       const won = isLudoScoreWinner(tokens[side]);
+      const winnerSide = won ? ludoScoreWinnerSide(scores, side) : null;
+      const winnerUserId = winnerSide
+        ? String(winnerSide === 'creator' ? currentMatch.creator : currentMatch.joiner)
+        : null;
       const nextTurn = won || diceValue === 6 ? userId : String(currentMatch.creator) === userId ? String(currentMatch.joiner) : String(currentMatch.creator);
       const nextState = {
         ...currentState,
         version: Number(currentState.version || 0) + 1,
         tokens,
-        scores: scoresAfterMove(currentState, tokens, homeLaneEntry ? side : null),
+        scores,
         diceValue: null,
         legalTokenIndexes: [],
-        winnerId: won ? userId : null,
+        winnerId: winnerUserId,
         currentTurn: nextTurn,
         turnDeadlineAt: new Date(Date.now() + ludoScoreTurnDuration),
         ...(won ? { winnerAt: new Date() } : {}),
         lastAction: won
-          ? `Charon gotiyan ghar pahunch gayi — winner!${homeLaneEntry ? ` +${LUDO_SCORE_HOME_ENTRY_BONUS} bonus points` : ''}`
+          ? `Match complete — ${scores[winnerSide]}/${LUDO_SCORE_MAX} points; highest score wins`
           : homeLaneEntry
             ? `Goti ${tokenIndex + 1} andar aayi — +${LUDO_SCORE_HOME_ENTRY_BONUS} bonus score!`
             : captured ? 'Opponent ki goti capture hui' : 'Goti chal di'
@@ -2338,7 +2345,7 @@ app.post('/api/matches/ludo-score/move', requireUser, async (req, res) => {
           'ludoScore.winnerId': null,
           'ludoScore.turnDeadlineAt': { $gt: new Date() }
         },
-        { $set: { ludoScore: nextState, ...(won ? { winner: userId, status: 'COMPLETED', completedAt: new Date() } : {}) } },
+        { $set: { ludoScore: nextState, ...(won ? { winner: winnerUserId, status: 'COMPLETED', completedAt: new Date() } : {}) } },
         { new: true, session }
       );
       if (!movedMatch) throw new Error('Game state update ho gaya. Refresh karke dobara try karein.');
@@ -2349,7 +2356,7 @@ app.post('/api/matches/ludo-score/move', requireUser, async (req, res) => {
         adminCommission = totalPool * 0.05;
         movedMatch.ludoScore = { ...nextState, payoutAmount: winAmount, adminCommission };
         creditedWinner = await User.findOneAndUpdate(
-          { _id: userId },
+          { _id: winnerUserId },
           { $inc: { walletBalance: winAmount, winningsBalance: winAmount } },
           { new: true, session }
         );
@@ -2384,7 +2391,9 @@ app.post('/api/matches/ludo-score/move', requireUser, async (req, res) => {
     }
     io.to(String(matchId)).emit('match_updated', updated);
     const message = creditedWinner
-      ? `Aap jeet gaye! ₹${winAmount.toLocaleString('en-IN')} wallet me automatic credit hua.`
+      ? String(creditedWinner._id) === userId
+        ? `Aap jeet gaye! ₹${winAmount.toLocaleString('en-IN')} wallet me automatic credit hua.`
+        : `Match complete; higher score wale player jeete. ₹${winAmount.toLocaleString('en-IN')} unke wallet me credit hua.`
       : updated.ludoScore.lastAction === 'Opponent ki goti capture hui' ? 'Opponent ki goti capture hui.' : 'Goti chal di.';
     res.json({ message, match: updated });
   } catch (err) {
