@@ -51,7 +51,7 @@
     .ludo-score-roll:focus-visible{outline:3px solid #fff;outline-offset:3px}     .ludo-score-roll:disabled{opacity:.55;box-shadow:none;cursor:not-allowed}
     .ludo-score-board{display:grid;grid-template-columns:repeat(15,minmax(0,1fr));width:min(100%,560px);aspect-ratio:1;margin:14px auto;border:3px solid #f0c34f;border-radius:12px;overflow:hidden;background:#fff;box-shadow:0 8px 24px #0006}
     .score-cell{position:relative;display:flex;align-items:center;justify-content:center;min-width:0;min-height:0;border:1px solid #dce5de;background:#f8faf8}
-    .score-cell-track{background:#fff}.score-cell-safe::after{content:'★';position:absolute;color:#b89637;font-size:clamp(6px,1.8vw,15px);pointer-events:none}
+    .score-cell-track{background:#fff}.score-cell-safe::after{content:'★';position:absolute;color:#b89637;font-size:clamp(8px,2.2vw,18px);pointer-events:none}
     .score-cell-yard-red{background:linear-gradient(135deg,#ffded8,#ffc6bf)}.score-cell-yard-green{background:linear-gradient(135deg,#def7e4,#c0ebce)}
     .score-cell-yard-yellow{background:linear-gradient(135deg,#fff3c4,#f5e29b)}.score-cell-yard-blue{background:linear-gradient(135deg,#dce8ff,#bdcff4)}.score-cell-yard-red,.score-cell-yard-green,.score-cell-yard-yellow,.score-cell-yard-blue{border-color:transparent}.score-cell-filler{visibility:hidden;border-color:transparent;background:transparent}
     .score-cell-start-red{background:#f27569}.score-cell-start-green{background:#58bd75}
@@ -92,14 +92,14 @@
       : `<span class="ludo-score-avatar-fallback" aria-hidden="true">${app.esc(initial)}</span>`;
   }
 
-  function positionFor(color, progress, tokenIndex, sharedHomePath) {
+  function positionFor(color, progress, tokenIndex, sharedHomePath, finishProgress) {
     const config = colors[color] || colors.red;
     if (progress < 0) return [config.baseSlots[tokenIndex]];
     if (progress <= 51) {
       const trackIndex = (config.startIndex + progress) % 52;
       return [track[trackIndex]];
     }
-    if (progress < scorePathLength) return [sharedHomePath[progress - 52]];
+    if (progress === finishProgress) return [config.finish]; if (progress < scorePathLength) return [sharedHomePath[progress - 52]];
     return [config.finish];
   }
 
@@ -167,7 +167,7 @@
       creator: colors[state.colors?.creator] ? state.colors.creator : 'red',
       joiner: colors[state.colors?.joiner] ? state.colors.joiner : 'green'
     };
-    const sharedHomePath = colors[playerColors.creator].homePath; const ownTurn = match.status === 'RUNNING' && String(state.currentTurn) === myId && !state.winnerId;
+    const sharedHomePath = colors[playerColors.creator].homePath.slice(0, finishProgress - 52); const ownTurn = match.status === 'RUNNING' && String(state.currentTurn) === myId && !state.winnerId;
     const legalTokens = ownTurn && Array.isArray(state.legalTokenIndexes) ? state.legalTokenIndexes : [];
     const winner = state.winnerId ? String(state.winnerId) : '';
     const winnerName = winner ? app.nameOf(winner === creatorId ? match.creator : match.joiner) : '';
@@ -189,12 +189,12 @@
         if (color === playerColors.creator && sharedHomePath.some(([homeRow, homeCol]) => homeRow === row && homeCol === col)) classes.push('score-cell-home-shared');
         if (config.baseSlots.some(([baseRow, baseCol]) => baseRow === row && baseCol === col)) classes.push(`score-cell-base-${color}`, 'score-cell-base-inner');
       }
-      if (finishProgress === scorePathLength && row === 7 && col === 7) classes.push('score-cell-center'); if (trackIndex < 0 && !classes.some(className => className.startsWith('score-cell-yard-') || className.startsWith('score-cell-base-') || className === 'score-cell-home-shared' || className === 'score-cell-center')) classes.push('score-cell-filler');
+      if (row === 7 && col === 7) classes.push('score-cell-center'); if (trackIndex < 0 && !classes.some(className => className.startsWith('score-cell-yard-') || className.startsWith('score-cell-base-') || className === 'score-cell-home-shared' || className === 'score-cell-center')) classes.push('score-cell-filler');
       const tokensHere = [];
       for (const side of ['creator', 'joiner']) {
         (state.tokens[side] || []).forEach((progress, tokenIndex) => {
           const color = playerColors[side];
-          if (!positionFor(color, progress, tokenIndex, sharedHomePath).some(([tokenRow, tokenCol]) => tokenRow === row && tokenCol === col)) return;
+          if (!positionFor(color, progress, tokenIndex, sharedHomePath, finishProgress).some(([tokenRow, tokenCol]) => tokenRow === row && tokenCol === col)) return;
           const canMove = side === mySide && ownTurn && legalTokens.includes(tokenIndex);
           const label = `${colors[color].name} token ${tokenIndex + 1}`;
           tokensHere.push(`<button type="button" class="score-token ${color}${canMove ? ' selectable' : ''}" data-score-token="${tokenIndex}" aria-label="${label}${canMove ? ', select to move' : ''}" ${canMove ? '' : 'disabled'}>${tokenIndex + 1}</button>`);
