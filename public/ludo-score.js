@@ -1,4 +1,7 @@
 (() => {
+  const scorePathLength = 57;
+  const scoreFinishProgress = scorePathLength - 1;
+  const scoreRulesVersion = 2;
   const track = [
     [6, 1], [6, 2], [6, 3], [6, 4], [6, 5], [5, 6], [4, 6], [3, 6], [2, 6], [1, 6], [0, 6],
     [0, 7], [0, 8], [1, 8], [2, 8], [3, 8], [4, 8], [5, 8], [6, 9], [6, 10], [6, 11], [6, 12],
@@ -102,7 +105,7 @@
       const trackIndex = (config.startIndex + progress) % 52;
       return [track[trackIndex]];
     }
-    if (progress <= 56) return [config.homePath[progress - 52]];
+    if (progress < scorePathLength) return [config.homePath[progress - 52]];
     return [config.finish];
   }
 
@@ -160,6 +163,7 @@
       diceValue: null
     } : null);
     if (!state?.tokens) return `<h2>🏆 KhiladiAdda24 Ludo Score</h2><p class="notice error">Ludo Score game state available nahi hai. Support se sampark karein.</p>`;
+    const finishProgress = Number(state.rulesVersion) >= scoreRulesVersion ? scoreFinishProgress : scorePathLength;
     const myId = idOf(app.getPlayer() || app.getUser());
     const creatorId = idOf(match.creator);
     const joinerId = idOf(match.joiner);
@@ -206,14 +210,14 @@
       }
       return `<div class="${classes.join(' ')}" style="grid-row:${row + 1};grid-column:${col + 1}">${tokensHere.length ? `<div class="score-token-stack">${tokensHere.join('')}</div>` : ''}</div>`;
     }).join('');
-    const creatorScore = Number(state.scores?.creator ?? state.tokens.creator.filter(value => value === 57).length * 250);
-    const joinerScore = Number(state.scores?.joiner ?? state.tokens.joiner.filter(value => value === 57).length * 250);
+    const creatorScore = Number(state.scores?.creator ?? state.tokens.creator.filter(value => value === finishProgress).length * 250);
+    const joinerScore = Number(state.scores?.joiner ?? state.tokens.joiner.filter(value => value === finishProgress).length * 250);
     const winnerScore = winner === creatorId ? creatorScore : joinerScore;
     const dieValue = state.diceValue || state.lastDice || '–';
     const playerCard = (side, user) => {
       const color = playerColors[side];
       const playerScore = side === 'creator' ? creatorScore : joinerScore;
-      const homeCount = (state.tokens[side] || []).filter(value => value === 57).length;
+      const homeCount = (state.tokens[side] || []).filter(value => value === finishProgress).length;
       const turnControl = match.status === 'RUNNING' && side === turnSide
         ? `<div class="ludo-score-turn-control"><div class="ludo-score-dice-box"><span class="ludo-score-dice-label">DICE</span>${diceMarkup(dieValue)}</div><button type="button" class="btn ludo-score-roll" id="ludoScoreRoll" ${!ownTurn || state.diceValue || busy ? 'disabled' : ''}>Roll</button></div>`
         : '';
@@ -250,7 +254,7 @@
       <div class="stat"><small>Creator</small><strong>${app.esc(app.nameOf(match.creator))}</strong></div>
       <div class="stat"><small>Opponent</small><strong>${app.esc(joinerName)}</strong></div></div>
       <div class="panel ludo-score-panel">
-        <div class="ludo-score-head"><h3>Ludo board • 4 rang • 4 gotiyan = jeet</h3><span class="muted">57 khane · 6 par hi goti khulegi</span>${match.status === 'RUNNING' && !winner ? '<span id="ludoScoreTimer" class="ludo-score-timer" aria-live="polite">20s</span>' : ''}</div>
+        <div class="ludo-score-head"><h3>Ludo board • 4 rang • 4 gotiyan = jeet</h3><span class="muted">52 bahari + 5 ghar = ${scorePathLength} khane · 6 par hi goti khulegi</span>${match.status === 'RUNNING' && !winner ? '<span id="ludoScoreTimer" class="ludo-score-timer" aria-live="polite">20s</span>' : ''}</div>
         <div class="ludo-score-players">
           ${playerCard('creator', match.creator)}
           ${playerCard('joiner', match.joiner || { username: joinerName })}
