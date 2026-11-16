@@ -12,7 +12,6 @@ const axios = require('axios');
 const jwt = require('jsonwebtoken');
 const { Server } = require('socket.io');
 const { pipeline } = require('stream/promises');
-const PubgPvpService = require('./pubg-pvp');
 const {
   LUDO_SAFE_TRACK_INDEXES,
   LUDO_SCORE_HOME_ENTRY_BONUS,
@@ -27,6 +26,16 @@ const {
   scoreAfterTimeout,
   scoresAfterMove
 } = require('./lib/ludo-score-rules');
+const {
+  LUDO_RACE_COLORS,
+  LUDO_RACE_TRACK,
+  LUDO_RACE_COLOR_CONFIG,
+  isValidLudoRaceColor,
+  defaultLudoRaceJoinerColor,
+  createLudoRaceState,
+  isLudoRaceWinner
+} = require('./lib/ludo-race-rules');
+
 // Models
 const User = require('./models/user');
 const Otp = require('./models/otp-model');
@@ -199,23 +208,6 @@ function isMatchPlayer(match, userId) {
   });
 }
 
-function emitMatchActionVoice(match, actorId, actorMessage, opponentMessage = actorMessage) {
-  const playerIds = new Set([match.creator, match.joiner]
-    .filter(Boolean)
-    .map(player => player && typeof player === 'object' ? player._id || player.id : player)
-    .filter(Boolean)
-    .map(String));
-  const event = {
-    matchId: String(match._id),
-    actorId: actorId ? String(actorId) : '',
-    message: actorMessage,
-    opponentMessage
-  };
-  for (const playerId of playerIds) {
-    io.to(`player:${playerId}`).emit('match_action_voice', event);
-  }
-}
-
 async function reserveActiveBet(userId) {
   const activeBets = await Match.countDocuments({
     status: { $in: ACTIVE_MATCH_STATUSES },
@@ -339,7 +331,7 @@ async function refundWalletEntry(userId, amount, winningsUsed = 0, session) {
 }
 
 function generateRandomName() {
-  const prefixes = ['Raja', 'Apex', 'Lucky', 'Quick', 'Shadow', 'Royal', 'Blaze', 'Cricket', 'Silver', 'King', 'Storm', 'Titan', 'Gold', 'Flash', 'Power'];
+  const prefixes = ['Raja', 'Apex', 'Lucky', 'Quick', 'Shadow', 'Royal', 'Blaze', 'Silver', 'King', 'Storm', 'Titan', 'Gold', 'Flash', 'Power'];
   const suffixes = ['Warrior', 'Player', 'Gamer', 'Pro', 'Ace', 'Hero', 'Lord', 'King', 'Knight', 'Blitz', 'Club', 'Rush', 'Wave'];
   const randPrefix = prefixes[Math.floor(Math.random() * prefixes.length)];
   const randSuffix = suffixes[Math.floor(Math.random() * suffixes.length)];
@@ -1608,6 +1600,7 @@ app.post('/api/matches/create', requireUser, async (req, res) => {
   const { gameType } = req.body;
   const userId = req.auth.userId;
   const normalizedGameType = String(gameType || 'LUDO').toUpperCase();
+  const creatorColor = String(req.body.creatorColor || 'red').toLowerCase();
   const entryAmount = Number(req.body.entryAmount);
   if (!Number.isInteger(entryAmount) || entryAmount < MIN_BATTLE_ENTRY_AMOUNT || entryAmount > MAX_BATTLE_ENTRY_AMOUNT || entryAmount % MIN_BATTLE_ENTRY_AMOUNT !== 0) {
     return res.status(400).json({ error: 'Battle entry ₹50 se shuru hoti hai aur ₹50 ke multiples mein honi chahiye.' });
@@ -1615,6 +1608,10 @@ app.post('/api/matches/create', requireUser, async (req, res) => {
   if (!['LUDO', 'POPULAR_LUDO', 'SNAKE', 'LUDO_RACE'].includes(normalizedGameType)) {
     return res.status(400).json({ error: 'Ludo, Popular Ludo, Ludo Race ya Snake game select karein' });
   }
+  if (normalizedGameType === 'LUDO_RACE' && !isValidLudoRaceColor(creatorColor)) {
+    return res.status(400).json({ error: `Ludo Race ke liye in colors mein se chunein: ${LUDO_RACE_COLORS.join(', ')}` });
+  }
+
   let reservationHeld = false;
   try {
     const user = await User.findById(userId).select('walletBalance').lean();
@@ -1638,7 +1635,8 @@ app.post('/api/matches/create', requireUser, async (req, res) => {
         creator: userId,
         amount: entryAmount,
         creatorWinningsUsed: debit.winningsUsed,
-        gameType: normalizedGameType
+        gameType: normalizedGameType,
+        ...(normalizedGameType === 'LUDO_RACE' ? { creatorColor } : {})
       });
     } catch (err) {
       await refundWalletEntry(userId, entryAmount, debit.winningsUsed);
@@ -1661,11 +1659,7 @@ app.get('/api/matches/open', async (req, res) => {
     return res.status(400).json({ error: 'Game type LUDO, POPULAR_LUDO, LUDO_RACE, SNAKE ya ALL hona chahiye' });
   }
   try {
-    const query = {
-      status: 'OPEN',
-      amount: { $gte: MIN_BATTLE_ENTRY_AMOUNT },
-      gameType: { $in: ['LUDO', 'POPULAR_LUDO', 'SNAKE', 'LUDO_RACE'] }
-    };
+    const query = { status: 'OPEN', amount: { $gte: MIN_BATTLE_ENTRY_AMOUNT } };
     if (gameType !== 'ALL') query.gameType = gameType;
     const matches = await Match.find(query).populate('creator', 'username profileImage').sort({ updatedAt: -1 });
     res.json(matches);
@@ -1676,10 +1670,7 @@ app.get('/api/matches/open', async (req, res) => {
 
 app.get('/api/matches/mine', requireUser, async (req, res) => {
   try {
-    const matchQuery = {
-      gameType: { $in: ['LUDO', 'POPULAR_LUDO', 'SNAKE', 'LUDO_RACE'] },
-      $or: [{ creator: req.auth.userId }, { joiner: req.auth.userId }]
-    };
+    const matchQuery = { $or: [{ creator: req.auth.userId }, { joiner: req.auth.userId }] };
     if (req.query.history !== '1') matchQuery.status = { $in: ['OPEN', 'RUNNING', 'PENDING_RESULT'] };
     const matches = await Match.find(matchQuery)
       .populate('creator', 'username phone profileImage')
@@ -1699,13 +1690,9 @@ app.get('/api/matches/running', requireUser, async (req, res) => {
     }
     const requestedLimit = Number.parseInt(req.query.limit, 10);
     const limit = Number.isInteger(requestedLimit) ? Math.max(1, Math.min(requestedLimit, 20)) : 20;
-    const query = {
-      status: 'RUNNING',
-      joiner: { $ne: null },
-      gameType: { $in: ['LUDO', 'POPULAR_LUDO', 'SNAKE', 'LUDO_RACE'] }
-    };
+    const query = { status: 'RUNNING', joiner: { $ne: null } };
     if (gameType !== 'ALL') query.gameType = gameType;
-    const fields = '_id gameType creator joiner amount roomCode joinedAt roomCodeDeadline roomCodeSharedAt creatorStartedAt creatorConfirmedAt joinerConfirmedAt gameStartedAt ludoScore status updatedAt';
+    const fields = '_id gameType creator joiner amount roomCode joinedAt roomCodeDeadline roomCodeSharedAt creatorStartedAt creatorConfirmedAt joinerConfirmedAt gameStartedAt ludoRace ludoScore status updatedAt';
     const keepIds = [...new Set(String(req.query.keep || '').split(',').filter(mongoose.Types.ObjectId.isValid))]
       .slice(0, limit)
       .map(id => new mongoose.Types.ObjectId(id));
@@ -1743,7 +1730,7 @@ app.get('/api/matches/running', requireUser, async (req, res) => {
           _id: 1, gameType: 1, creator: 1, joiner: 1, amount: 1, roomCode: 1,
           joinedAt: 1, roomCodeDeadline: 1, roomCodeSharedAt: 1,
           creatorStartedAt: 1, creatorConfirmedAt: 1, joinerConfirmedAt: 1,
-          gameStartedAt: 1, ludoScore: 1, status: 1, updatedAt: 1
+          gameStartedAt: 1, ludoRace: 1, ludoScore: 1, status: 1, updatedAt: 1
         } }
       ])
       : [];
@@ -1771,6 +1758,7 @@ app.get('/api/matches/running', requireUser, async (req, res) => {
         delete visibleMatch.creatorConfirmedAt;
         delete visibleMatch.joinerConfirmedAt;
         delete visibleMatch.gameStartedAt;
+        delete visibleMatch.ludoRace;
         delete visibleMatch.ludoScore;
       }
       return {
@@ -2272,6 +2260,7 @@ app.get('/api/matches/:matchId', requireUser, async (req, res) => {
     if (!match) return res.status(404).json({ error: 'Match nahi mila' });
     if (match.gameType === 'LUDO_SCORE') return res.status(400).json({ error: 'Ludo Score game ab available nahi hai.' });
     if (!isMatchPlayer(match, req.auth.userId)) return res.status(403).json({ error: 'Sirf match ke players details dekh sakte hain' });
+    match = await ensureLudoRaceState(match);
     match = await ensureLudoScoreState(match);
     match = await expireLudoScoreTurn(match);
     if (!match) return res.status(404).json({ error: 'Match nahi mila' });
@@ -2310,6 +2299,12 @@ app.post('/api/matches/join', requireUser, async (req, res) => {
     }
 
     const isLudoRace = match.gameType === 'LUDO_RACE';
+    const creatorColor = isValidLudoRaceColor(match.creatorColor) ? String(match.creatorColor).toLowerCase() : 'red';
+    const requestedJoinerColor = String(req.body.joinerColor || '').toLowerCase();
+    const joinerColor = requestedJoinerColor || defaultLudoRaceJoinerColor(creatorColor);
+    if (isLudoRace && (!isValidLudoRaceColor(joinerColor) || joinerColor === creatorColor)) {
+      return res.status(400).json({ error: 'Apne opponent se alag valid color chunein.' });
+    }
 
     reservationHeld = await reserveActiveBet(userId);
     if (!reservationHeld) {
@@ -2331,6 +2326,8 @@ app.post('/api/matches/join', requireUser, async (req, res) => {
         status: 'RUNNING',
         joinedAt,
         roomCodeDeadline: new Date(Date.now() + 2 * 60 * 1000),
+        ...(isLudoRace ? { gameStartedAt: null } : {}),
+        ...(isLudoRace ? { ludoRace: createLudoRaceState(match.creator, { creator: creatorColor, joiner: joinerColor }) } : {}),
         ...(match.gameType === 'LUDO_SCORE' ? { ludoScore: createLudoScoreState(match.creator, joinedAt) } : {}),
         joinerWinningsUsed: debit.winningsUsed
       } },
@@ -2348,18 +2345,11 @@ app.post('/api/matches/join', requireUser, async (req, res) => {
       .populate('creator', 'username phone')
       .populate('joiner', 'username phone');
     io.to(matchId).emit('match_updated', populatedMatch);
-    const joinerVoiceMessage = isLudoRace
-      ? 'गेम जॉइन हो गया है। Ludo King रूम कोड का इंतज़ार करें। Ludo Race में जिसकी पहली गोटी घर पहुँचेगी, वही जीतेगा।'
-      : 'गेम जॉइन हो गया है। बैटल बनाने वाला खिलाड़ी Ludo King ऐप से रूम कोड बनाकर भेजेगा। कृपया इंतज़ार करें।';
-    const creatorVoiceMessage = isLudoRace
-      ? 'खिलाड़ी जुड़ गया है। Ludo King ऐप में रूम बनाएं और कोड भेजें। Ludo Race में पहली गोटी घर पहुँचने वाला जीतेगा।'
-      : 'गेम में खिलाड़ी जुड़ गया है। Ludo King ऐप खोलकर रूम बनाएं और उसका कोड यहाँ भेजें।';
-    emitMatchActionVoice(populatedMatch, userId, joinerVoiceMessage, creatorVoiceMessage);
     res.json({
       message: match.gameType === 'LUDO_SCORE'
         ? 'Opponent join ho gaya. Website par Ludo Score game shuru karein.'
         : isLudoRace
-          ? 'Opponent join ho gaya. Ludo King app ka room code setup karke share karein. Pehli goti ghar pahunchne wala winner hoga.'
+          ? 'Opponent join ho gaya. Ludo Race shuru karein.'
           : 'Opponent join ho gaya. Ab creator Ludo King room code setup karke share karega.',
       match: populatedMatch
     });
@@ -2415,13 +2405,6 @@ app.post('/api/matches/set-room-code', requireUser, async (req, res) => {
       .populate('creator', 'username phone')
       .populate('joiner', 'username phone');
     io.to(matchId).emit('match_updated', populatedMatch);
-    const isLudoRace = populatedMatch.gameType === 'LUDO_RACE';
-    emitMatchActionVoice(
-      populatedMatch,
-      userId,
-      isLudoRace ? 'Ludo Race का रूम कोड भेज दिया गया है। पहली गोटी घर पहुँचने वाला विजेता होगा।' : 'रूम कोड भेज दिया गया है।',
-      isLudoRace ? 'Ludo Race का रूम कोड मिल गया है। Ludo King में पहली गोटी घर पहुँचने वाला विजेता होगा।' : 'रूम कोड मिल गया है। अब उससे गेम में जुड़ें।'
-    );
     res.json({ message: 'Room code share hote hi lock ho gaya. Dono players code copy karke Ludo King mein kheliye.', match: populatedMatch });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -2449,11 +2432,11 @@ app.post('/api/matches/start-setup', requireUser, async (req, res) => {
     }
     io.to(String(matchId)).emit('match_updated', match);
     if (startedNow && match.joiner) {
-      const startToneEvent = { matchId: String(match._id), startedBy: String(match.creator), gameType: match.gameType };
+      const startToneEvent = { matchId: String(match._id), startedBy: String(match.creator) };
       io.to(`player:${String(match.creator)}`).emit('match_start_tone', startToneEvent);
       io.to(`player:${String(match.joiner)}`).emit('match_start_tone', startToneEvent);
     }
-    res.json({ message: 'Room code setup shuru ho gaya. Ludo King app mein room banakar code share karein.', match });
+    res.json({ message: 'Room code setup shuru ho gaya. Ludo King room banakar code share karein.', match });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -2515,7 +2498,6 @@ app.post('/api/matches/start-game', requireUser, async (req, res) => {
     );
     if (!started) return res.status(409).json({ error: 'Game start nahi ho saka. Battle refresh karke dobara dekhein.' });
     io.to(String(matchId)).emit('match_updated', started);
-    emitMatchActionVoice(started, null, 'गेम शुरू हो गया है।');
     res.json({ message: 'Creator ne game start kar diya', match: started });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -2589,6 +2571,46 @@ app.post('/api/matches/submit-result', requireUser, persistUploads(upload.single
           throw error;
         }
         finalMatch = updatedScoreMatch;
+        return;
+      }
+
+      if (match.gameType === 'LUDO_RACE' && match.ludoRace?.winnerId) {
+        const verifiedWinnerId = String(match.ludoRace?.winnerId || '');
+        if (!verifiedWinnerId || verifiedWinnerId !== String(userId) || String(winnerId) !== verifiedWinnerId) {
+          const error = new Error('Ludo Race me sirf game se verified winner result submit kar sakta hai');
+          error.statusCode = 403;
+          throw error;
+        }
+        if (!req.file) {
+          const error = new Error('Winner ka screenshot upload karna zaroori hai');
+          error.statusCode = 400;
+          throw error;
+        }
+
+        const isCreator = String(match.creator) === String(userId);
+        const updatedRaceMatch = await Match.findOneAndUpdate(
+          { _id: matchId, status: 'RUNNING', 'ludoRace.winnerId': verifiedWinnerId, resultSubmittedBy: { $exists: false } },
+          { $set: {
+            creatorResult: isCreator ? 'WIN' : 'LOSS',
+            joinerResult: isCreator ? 'LOSS' : 'WIN',
+            creatorResultReason: '',
+            joinerResultReason: '',
+            creatorProofScreenshot: isCreator ? req.file.path : '',
+            joinerProofScreenshot: isCreator ? '' : req.file.path,
+            resultSubmittedBy: userId,
+            proofScreenshot: `uploads/${req.file.filename}`,
+            winner: verifiedWinnerId,
+            status: 'PENDING_RESULT',
+            gameStartedAt: match.gameStartedAt || new Date()
+          } },
+          { new: true, session }
+        );
+        if (!updatedRaceMatch) {
+          const error = new Error('Ludo Race result pehle submit ho chuka hai ya match update ho gaya');
+          error.statusCode = 409;
+          throw error;
+        }
+        finalMatch = updatedRaceMatch;
         return;
       }
 
@@ -2720,49 +2742,17 @@ app.post('/api/matches/submit-result', requireUser, persistUploads(upload.single
     const publicMessage = finalMatch.status === 'COMPLETED'
       ? 'LOSS confirm ho gaya. Winner ko payout credit ho gaya.'
       : finalMatch.status === 'PENDING_RESULT'
-        ? finalMatch.gameType === 'LUDO_SCORE' && finalMatch.ludoScore?.winnerId
-          ? 'KhiladiAdda24 Ludo Score result admin review ke liye bhej diya gaya.'
-          : finalMatch.winner
-            ? 'Dono players ki reports match karti hain. Result admin review ke liye bhej diya gaya.'
-            : 'Reports match nahi karte. Admin review ke liye bhej diye gaye.'
+        ? Boolean(finalMatch.gameType === 'LUDO_SCORE' ? finalMatch.ludoScore?.winnerId : finalMatch.gameType === 'LUDO_RACE' && finalMatch.ludoRace?.winnerId)
+          ? finalMatch.gameType === 'LUDO_SCORE' ? 'KhiladiAdda24 Ludo Score result admin review ke liye bhej diya gaya.' : 'Ludo Race screenshot aur verified result admin review ke liye bhej diya gaya.'
+          : 'Reports match nahi karte. Admin review ke liye bhej diye gaye.'
         : 'Aapka result submit ho gaya. Dusre player ke result ka wait karein.';
     const adminMessage = finalMatch.status === 'COMPLETED'
       ? `LOSS confirm ho gaya. Winner ko ₹${winAmount} payout aur admin ko ₹${adminCommission} commission credit ho gaya.`
       : finalMatch.status === 'PENDING_RESULT'
-        ? finalMatch.gameType === 'LUDO_SCORE' && finalMatch.ludoScore?.winnerId
-          ? 'KhiladiAdda24 Ludo Score ka result admin review ke liye bhej diya gaya.'
-          : finalMatch.winner
-            ? 'Dono players ki reports match karti hain. Result admin review ke liye bhej diya gaya.'
-            : 'Reports match nahi karte. Admin review ke liye bhej diye gaye hain.'
+        ? Boolean(finalMatch.gameType === 'LUDO_SCORE' ? finalMatch.ludoScore?.winnerId : finalMatch.gameType === 'LUDO_RACE' && finalMatch.ludoRace?.winnerId)
+          ? finalMatch.gameType === 'LUDO_SCORE' ? 'KhiladiAdda24 Ludo Score ka result admin review ke liye bhej diya gaya.' : 'Ludo Race ka verified result admin review ke liye bhej diya gaya.'
+          : 'Reports match nahi karte. Admin review ke liye bhej diye gaye hain.'
         : 'Aapka result submit ho gaya. Dusre player ke result ka wait karein.';
-
-    const actorIsCreator = String(finalMatch.creator) === String(userId);
-    const actorResult = actorIsCreator ? finalMatch.creatorResult : finalMatch.joinerResult;
-    let actorVoiceMessage;
-    let opponentVoiceMessage;
-    if (finalMatch.status === 'COMPLETED') {
-      const actorWon = String(finalMatch.winner?._id || finalMatch.winner) === String(userId);
-      actorVoiceMessage = actorWon
-        ? 'आपकी जीत की पुष्टि हो गई है। जीत की रकम आपके वॉलेट में जमा हो गई है।'
-        : 'आपकी हार की पुष्टि हो गई है। विपक्षी खिलाड़ी जीत गया है।';
-      opponentVoiceMessage = actorWon
-        ? 'आपके विपक्षी खिलाड़ी की जीत की पुष्टि हो गई है।'
-        : 'बधाई! आपकी जीत की पुष्टि हो गई है। जीत की रकम वॉलेट में जमा हो गई है।';
-    } else if (finalMatch.status === 'PENDING_RESULT') {
-      actorVoiceMessage = finalMatch.winner
-        ? 'आपकी रिपोर्ट और स्क्रीनशॉट एडमिन समीक्षा के लिए भेज दिए गए हैं। मंज़ूरी का इंतज़ार करें।'
-        : 'दोनों खिलाड़ियों की रिपोर्ट में अंतर है। एडमिन समीक्षा का इंतज़ार करें।';
-      opponentVoiceMessage = finalMatch.winner
-        ? 'विपक्षी की रिपोर्ट और स्क्रीनशॉट एडमिन समीक्षा में हैं। मंज़ूरी का इंतज़ार करें।'
-        : 'दोनों खिलाड़ियों की रिपोर्ट में अंतर है। एडमिन समीक्षा का इंतज़ार करें।';
-    } else if (actorResult === 'WIN') {
-      actorVoiceMessage = 'आपकी जीत की रिपोर्ट और स्क्रीनशॉट जमा हो गया है। दूसरे खिलाड़ी की रिपोर्ट का इंतज़ार करें।';
-      opponentVoiceMessage = 'दूसरे खिलाड़ी ने जीत की रिपोर्ट और स्क्रीनशॉट भेज दिया है। अपनी रिपोर्ट जमा करें।';
-    } else {
-      actorVoiceMessage = 'आपकी हार की रिपोर्ट जमा हो गई है। दूसरे खिलाड़ी की रिपोर्ट का इंतज़ार करें।';
-      opponentVoiceMessage = 'दूसरे खिलाड़ी ने हार की रिपोर्ट दी है। जीत की रिपोर्ट के लिए स्क्रीनशॉट भेजें।';
-    }
-    emitMatchActionVoice(finalMatch, userId, actorVoiceMessage, opponentVoiceMessage);
 
     res.json({
       message: isAdminVisibleCommission ? adminMessage : publicMessage,
@@ -2794,6 +2784,9 @@ app.post('/api/matches/cancel', requireUser, async (req, res) => {
     if (match.status === 'OPEN' && match.creator.toString() !== String(userId)) {
       return res.status(403).json({ error: 'Opponent join hone se pehle sirf A player cancel kar sakta hai' });
     }
+    if (match.status === 'RUNNING' && match.gameType === 'LUDO_RACE' && Number(match.ludoRace?.version || 0) > 0) {
+      return res.status(400).json({ error: 'Ludo Race ki pehli dice roll ke baad battle cancel nahi ki ja sakti' });
+    }
     if (match.status === 'RUNNING' && match.gameType === 'LUDO_SCORE' && Number(match.ludoScore?.rollCount || 0) > 0) {
       return res.status(400).json({ error: 'Ludo Score ki pehli dice roll ke baad battle cancel nahi ki ja sakti' });
     }
@@ -2822,12 +2815,6 @@ app.post('/api/matches/cancel', requireUser, async (req, res) => {
       if (!request) return res.status(409).json({ error: 'Match update ho gaya. Refresh karke dobara dekhein.' });
 
       io.to(String(matchId)).emit('match_updated', request);
-      emitMatchActionVoice(
-        request,
-        userId,
-        'गेम कैंसल करने की रिक्वेस्ट भेज दी गई है। मंज़ूरी का इंतज़ार करें।',
-        'दूसरे खिलाड़ी ने गेम कैंसल करने की रिक्वेस्ट भेजी है। मंज़ूरी का इंतज़ार करें।'
-      );
       return res.json({ message: 'Room code share ho chuka hai. Cancel reason admin ko bhej di; approval ke baad match cancel aur dono players ko refund hoga.', match: request });
     }
 
@@ -2841,6 +2828,11 @@ app.post('/api/matches/cancel', requireUser, async (req, res) => {
         if (!currentMatch || currentMatch.roomCode) {
           const error = new Error('Room code share ho chuka hai ya match update ho gaya. Admin review ka wait karein.');
           error.statusCode = 409;
+          throw error;
+        }
+        if (currentMatch.status === 'RUNNING' && currentMatch.gameType === 'LUDO_RACE' && Number(currentMatch.ludoRace?.version || 0) > 0) {
+          const error = new Error('Ludo Race ki pehli dice roll ke baad battle cancel nahi ki ja sakti');
+          error.statusCode = 400;
           throw error;
         }
         if (currentMatch.status === 'RUNNING' && currentMatch.gameType === 'LUDO_SCORE' && Number(currentMatch.ludoScore?.rollCount || 0) > 0) {
@@ -2876,12 +2868,6 @@ app.post('/api/matches/cancel', requireUser, async (req, res) => {
       io.emit('wallet_updated', { userId: String(player._id), walletBalance: player.walletBalance, amountAdded: cancelledMatch.amount });
     }
     io.to(String(matchId)).emit('match_updated', cancelledMatch);
-    emitMatchActionVoice(
-      cancelledMatch,
-      userId,
-      'गेम कैंसल हो गया है। एंट्री का पैसा वापस कर दिया गया है।',
-      'गेम कैंसल हो गया है। एंट्री का पैसा वापस कर दिया गया है।'
-    );
     res.json({ message: 'Battle cancel ho gayi aur eligible players ki entry refund ho gayi.', match: cancelledMatch });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -3380,7 +3366,6 @@ app.post('/api/admin/cancel-match', requireAdmin, async (req, res) => {
     await releaseMatchBetSlots(currentMatch);
 
     io.to(String(currentMatch._id)).emit('match_updated', currentMatch);
-    emitMatchActionVoice(currentMatch, null, 'एडमिन ने गेम कैंसल कर दिया है। एंट्री का पैसा वापस कर दिया गया है।');
     res.json({ message: 'Game cancel ho gaya aur players ko refund kar diya gaya' });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -3448,13 +3433,6 @@ app.post('/api/admin/review-cancel-request', requireAdmin, async (req, res) => {
       reason: 'Admin approved game cancellation refund'
     }));
     io.to(String(reviewedMatch._id)).emit('match_updated', reviewedMatch);
-    emitMatchActionVoice(
-      reviewedMatch,
-      null,
-      decision === 'APPROVE'
-        ? 'कैंसल रिक्वेस्ट मंज़ूर हो गई है। गेम कैंसल और एंट्री रिफंड हो गई है।'
-        : 'एडमिन ने कैंसल रिक्वेस्ट अस्वीकार की है। गेम जारी रहेगा।'
-    );
     res.json({ message: decision === 'APPROVE' ? 'Cancel approved. Match cancel aur players ko refund kar diya.' : 'Cancel request reject kar di. Match active hai.', match: reviewedMatch });
   } catch (err) {
     res.status(err.statusCode || 500).json({ error: err.message });
@@ -3758,24 +3736,7 @@ app.post('/api/admin/withdrawal-status', requireAdmin, async (req, res) => {
 });
 
 // Real-time Sockets
-const pubgPvpService = new PubgPvpService(io, async token => {
-  let payload;
-  try {
-    payload = jwt.verify(token, JWT_SECRET);
-  } catch {
-    return null;
-  }
-  if (payload.role !== 'user' || !payload.userId) return null;
-  const user = await findUserById(payload.userId);
-  if (!user) return null;
-  return {
-    id: String(user._id || user.id),
-    name: user.username,
-    blocked: Boolean(user.isBlocked)
-  };
-});
 io.on('connection', (socket) => {
-  pubgPvpService.attach(socket);
   socket.on('register_player', async ({ token } = {}) => {
     try {
       const payload = jwt.verify(String(token || ''), JWT_SECRET);
