@@ -578,9 +578,11 @@
 
 🔥 अभी जॉइन करो और खेलना शुरू करो!
 👉 ${referralUrl.toString()}`;
+      const shareUrl = referralUrl.toString();
+      const shareText = message.replace(shareUrl, '');
       if (navigator.share) {
         try {
-          await navigator.share({ title: 'KhiladiAdda24 Referral', text: message });
+          await navigator.share({ title: 'KhiladiAdda24 Referral', text: shareText, url: shareUrl });
           return;
         } catch (error) {
           if (error.name === 'AbortError') return;
