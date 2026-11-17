@@ -12,7 +12,7 @@
   <style>
     body { font-family: Arial, sans-serif; margin: 0; padding-bottom: 82px; background: #fff; color: #e5e7eb; }
     .wrap { max-width: 1200px; margin: 0 auto; padding: 24px; }
-    .topbar { display: flex; justify-content: space-between; align-items: center; background: rgba(15, 23, 42, 0.9); padding: 18px 20px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.08); margin-bottom: 20px; }
+    .topbar { position: sticky; top: 0; z-index: 11; display: flex; justify-content: space-between; align-items: center; background: rgba(15, 23, 42, 0.96); padding: 18px 20px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.08); margin-bottom: 20px; }
     .logo { font-size: 28px; font-weight: 700; color: #fbbf24; }
     .player-list-search { display: block; width: min(100%, 480px); height: 48px; margin: 0 auto 14px; }
     .card { background: rgba(17, 24, 39, 0.9); padding: 18px; margin-bottom: 20px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.08); }
@@ -27,6 +27,13 @@
     .toolbar button, .toolbar a { text-decoration: none; display: inline-block; }
     .topbar .toolbar > a, .topbar .toolbar > button { min-height: 40px; padding: 10px 14px; border: 1px solid rgba(255,255,255,0.3); border-radius: 8px; font-size: 12px; font-weight: 800; text-align: center; text-transform: uppercase; }
     .topbar .toolbar > a { color: #fff; background: #2563eb; }
+    .admin-menu { position: relative; }
+    .admin-menu summary { width: 44px; height: 40px; display: grid; place-items: center; border: 1px solid rgba(255,255,255,0.3); border-radius: 8px; cursor: pointer; list-style: none; }
+    .admin-menu summary::-webkit-details-marker { display: none; }
+    .menu-icon { display: grid; gap: 4px; }
+    .menu-icon span { display: block; width: 21px; height: 2px; border-radius: 2px; background: #fff; }
+    .admin-menu-items.toolbar { position: absolute; top: calc(100% + 8px); right: 0; z-index: 12; display: grid; min-width: 190px; padding: 10px; border: 1px solid rgba(255,255,255,0.16); border-radius: 10px; background: #0f172a; box-shadow: 0 8px 24px rgba(0,0,0,0.35); }
+    .admin-menu-items.toolbar > a, .admin-menu-items.toolbar > button { width: 100%; box-sizing: border-box; }
     .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
     .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; }
     .player-copy-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto; align-items: end; gap: 8px; margin: 10px 0; }
@@ -99,15 +106,17 @@
     .leaderboard-prizes { width: 100%; min-height: 90px; padding: 10px; border: 1px solid #475569; border-radius: 7px; color: #fff; background: #0f172a; font: inherit; }
     .leaderboard-player-image { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; vertical-align: middle; background: #263449; }
     .leaderboard-player-input { width: 90px; }
-    @media (max-width: 700px) { .support-admin-layout { grid-template-columns: 1fr; } .leaderboard-settings { grid-template-columns: 1fr; } .support-admin-form { grid-template-columns: 1fr; } }
-    @media (max-width: 600px) { .history-dialog { padding: 14px; } .history-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
     .admin-bottom-nav { position: fixed; z-index: 10; right: 0; bottom: 0; left: 0; display: flex; justify-content: center; gap: 12px; padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); border-top: 1px solid rgba(255,255,255,0.12); background: rgba(15,23,42,0.96); backdrop-filter: blur(12px); }
     .admin-bottom-nav button { min-width: 132px; }
+    .admin-section { scroll-margin-top: 16px; }
+    @media (max-width: 700px) { .support-admin-layout { grid-template-columns: 1fr; } .leaderboard-settings { grid-template-columns: 1fr; } .support-admin-form { grid-template-columns: 1fr; } }
+    @media (max-width: 600px) { .history-dialog { padding: 14px; } .history-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
     @media (max-width: 600px) {
       .wrap { padding: 12px; }
       body { padding-bottom: 78px; }
       .topbar { align-items: flex-start; flex-direction: column; gap: 14px; padding: 14px; }
       .logo { font-size: 23px; }
+      .admin-menu { align-self: flex-end; }
       .grid { grid-template-columns: minmax(0, 1fr); gap: 12px; }
       .finance-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
       .finance-stat { padding: 10px; }
@@ -118,7 +127,7 @@
       th, td { padding: 9px 8px; }
       button { min-height: 40px; }
       .admin-bottom-nav { gap: 8px; }
-      .admin-bottom-nav button { flex: 1; min-width: 0; }
+      .admin-bottom-nav button { flex: 1; min-width: 0; padding-right: 6px; padding-left: 6px; font-size: 12px; }
       .player-list-toolbar { align-items: flex-start; flex-direction: column; }
       .player-copy-row { grid-template-columns: minmax(0, 1fr); }
     }
@@ -128,11 +137,18 @@
   <div class="wrap">
     <div class="topbar">
       <div class="logo">KhiladiAdda24 Admin</div>
-      <div class="toolbar">
-        <a href="/index.html" onclick="openPlayerSite(event)">Player Site</a>
-        <button id="refreshAdminButton" type="button" class="secondary" onclick="refreshAdminData()">Refresh data</button>
-        <button class="danger" onclick="adminLogout()">Logout</button>
-      </div>
+      <details class="admin-menu">
+        <summary aria-label="Admin menu">
+          <span class="menu-icon" aria-hidden="true"><span></span><span></span><span></span></span>
+        </summary>
+        <div class="toolbar admin-menu-items">
+          <a href="/index.html" onclick="openPlayerSite(event)">Player Site</a>
+          <button id="refreshAdminButton" type="button" class="secondary" onclick="refreshAdminData()">Refresh data</button>
+          <a href="#depositUpiSettings" onclick="this.closest('details').open = false">Deposit UPI ID</a>
+          <a href="#completeGameHistory" onclick="this.closest('details').open = false">Complete Game History</a>
+          <button class="danger" onclick="adminLogout()">Logout</button>
+        </div>
+      </details>
     </div>
 
     <div class="card" id="runningGamesOverview" aria-live="polite">
@@ -159,7 +175,7 @@
       <p id="announcementStatus" class="muted">Loading...</p>
     </div>
 
-    <div class="card">
+    <div class="card admin-section" id="adminSupportNumbers">
       <h3>WhatsApp &amp; Support Numbers</h3>
       <p class="muted">Dono fields mein valid 10-digit Indian mobile number dalein. WhatsApp aur support ke numbers alag ho sakte hain.</p>
       <div class="form-grid">
@@ -178,7 +194,7 @@
       <p id="supportNumbersStatus" class="muted">Loading...</p>
     </div>
 
-    <div class="card">
+    <div class="card admin-section" id="adminBranding">
       <h3>Site Logo &amp; App Icons</h3>
       <p class="muted">PNG images upload karke logo, app icon, game banners aur support graphic badlein. App icons ki dimensions exact rakhein.</p>
       <div class="form-grid">
@@ -224,7 +240,7 @@
       <p id="brandingStatus" class="muted">Loading current images...</p>
     </div>
 
-    <div class="card">
+    <div class="card" id="depositUpiSettings">
       <h3>Deposit UPI ID</h3>
       <p class="muted">Player deposit QR aur UPI app payment ke liye use hone wala UPI ID.</p>
       <div class="form-grid">
@@ -239,7 +255,7 @@
       <p id="depositUpiIdStatus" class="muted">Loading...</p>
     </div>
 
-    <div class="card">
+    <div class="card admin-section" id="adminPlayerText">
       <h3>Player Text Settings</h3>
       <p class="muted">Player pages ki kisi bhi exact line ko badalne ke liye current line aur naya text bharein. Blank naya text us line ko hide karega.</p>
       <div id="playerCopyRows"></div>
@@ -295,7 +311,7 @@
       </table>
     </div>
 
-    <section class="card" aria-labelledby="adminLeaderboardTitle">
+    <section class="card admin-section" id="adminLeaderboard" aria-labelledby="adminLeaderboardTitle">
       <h3 id="adminLeaderboardTitle">Monthly Standings & Prize Controls</h3>
       <p class="muted"><span id="adminLeaderboardMonth">Loading...</span> — har completed game ke points aur rank prizes yahan configure karein. Empty player override se automatic points/prize use honge.</p>
       <div class="leaderboard-settings">
@@ -313,7 +329,7 @@
       </div>
     </section>
 
-    <section class="card" aria-labelledby="adminSupportChatTitle">
+    <section class="card admin-section" id="adminSupportChat" aria-labelledby="adminSupportChatTitle">
       <h3 id="adminSupportChatTitle">Direct Player Support Chat</h3>
       <p class="muted">Players ke support messages yahan aayenge. Reply admin account se player ke chat me directly jayega.</p>
       <div class="support-admin-layout">
@@ -396,7 +412,7 @@
       <p id="withdrawTickerSettingsStatus" class="muted" role="status"></p>
     </div>
 
-    <div class="card">
+    <div class="card" id="completeGameHistory">
       <h3>Complete Game History</h3>
       <table id="historyTable">
         <tr><th>Game</th><th>Players</th><th>Entry</th><th>Status</th><th>Winner / Cancel reason</th><th>Room code</th><th>Proof</th><th>Joined / Started</th></tr>
@@ -405,7 +421,9 @@
   </div>
   <nav class="admin-bottom-nav" aria-label="Admin navigation">
     <button id="adminHomeButton" type="button">⌂ Home</button>
+    <button id="adminAllPlayersButton" type="button" class="secondary">All players</button>
     <button id="adminNewPlayersButton" type="button" class="secondary">New players</button>
+    <button id="adminSupportChatButton" type="button" class="secondary" aria-label="Direct player support chat">Support chat</button>
   </nav>
   <dialog id="playerHistoryDialog" class="history-dialog" aria-labelledby="playerHistoryTitle">
     <div class="history-dialog-header">
@@ -1696,7 +1714,9 @@
     document.getElementById('kycEditForm').addEventListener('submit', saveKycEdit);
     document.getElementById('newPlayersFilter').addEventListener('click', () => setPlayerListMode('NEW'));
     document.getElementById('adminHomeButton').addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+    document.getElementById('adminAllPlayersButton').addEventListener('click', () => setPlayerListMode('ALL', true));
     document.getElementById('adminNewPlayersButton').addEventListener('click', () => setPlayerListMode('NEW', true));
+    document.getElementById('adminSupportChatButton').addEventListener('click', () => document.getElementById('adminSupportChat').scrollIntoView({ behavior: 'smooth', block: 'start' }));
 
     document.getElementById('saveSupportNumbersBtn').addEventListener('click', saveSupportNumbers);
     document.getElementById('saveBrandingBtn').addEventListener('click', saveBranding);
