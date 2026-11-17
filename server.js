@@ -580,8 +580,8 @@ function brandingImageUrl(settings, key, fallback) {
 function siteBrandingPayload(settings) {
   return {
     brandLogoUrl: brandingImageUrl(settings, 'brandLogoPath', '/logo.png'),
-    appIcon192Url: brandingImageUrl(settings, 'appIcon192Path', '/app-logo.png?v=20261008-2304'),
-    appIcon512Url: brandingImageUrl(settings, 'appIcon512Path', '/app-logo.png?v=20261008-2304'),
+    appIcon192Url: '/app-logo.png?v=20261008-2304',
+    appIcon512Url: '/app-logo.png?v=20261008-2304',
     homeBannerUrl: brandingImageUrl(settings, 'homeBannerPath', '/banner-ludo-snake.png'),
     ludoBannerUrl: brandingImageUrl(settings, 'ludoBannerPath', '/ludo-classic.png'),
     snakeBannerUrl: brandingImageUrl(settings, 'snakeBannerPath', '/snake-battles-banner.png'),
@@ -739,28 +739,10 @@ app.get('/api/site-branding/image/:asset', async (req, res) => {
   }
 });
 
-app.get('/api/site-manifest', async (req, res) => {
-  try {
-    const settings = await readSiteBranding();
-    const manifest = {
-      ...defaultSiteManifest(),
-      icons: [
-        {
-          src: brandingImageUrl(settings, 'appIcon512Path', '/app-logo.png?v=20261008-2304'),
-          sizes: '500x500',
-          type: 'image/png',
-          purpose: 'any'
-        }
-      ]
-    };
-    res.set('Content-Type', 'application/manifest+json');
-    res.set('Cache-Control', 'no-cache');
-    res.json(manifest);
-  } catch (err) {
-    res.set('Content-Type', 'application/manifest+json');
-    res.set('Cache-Control', 'no-cache');
-    res.json(defaultSiteManifest());
-  }
+app.get('/api/site-manifest', (req, res) => {
+  res.set('Content-Type', 'application/manifest+json');
+  res.set('Cache-Control', 'no-cache');
+  res.json(defaultSiteManifest());
 });
 
 app.post('/api/admin/branding', requireAdmin, (req, res, next) => {
