@@ -10,9 +10,9 @@
   <link rel="apple-touch-icon" href="/app-icon-192.png">
   <title>KhiladiAdda24.com Admin Panel</title>
   <style>
-    body { font-family: Arial, sans-serif; margin: 0; background: #fff; color: #e5e7eb; }
+    body { font-family: Arial, sans-serif; margin: 0; padding-bottom: 82px; background: #fff; color: #e5e7eb; }
     .wrap { max-width: 1200px; margin: 0 auto; padding: 24px; }
-    .topbar { display: flex; justify-content: space-between; align-items: center; background: rgba(15, 23, 42, 0.9); padding: 18px 20px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.08); margin-bottom: 20px; }
+    .topbar { position: sticky; top: 0; z-index: 11; display: flex; justify-content: space-between; align-items: center; background: rgba(15, 23, 42, 0.96); padding: 18px 20px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.08); margin-bottom: 20px; }
     .logo { font-size: 28px; font-weight: 700; color: #fbbf24; }
     .player-list-search { display: block; width: min(100%, 480px); height: 48px; margin: 0 auto 14px; }
     .card { background: rgba(17, 24, 39, 0.9); padding: 18px; margin-bottom: 20px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.08); }
@@ -99,18 +99,14 @@
     .leaderboard-prizes { width: 100%; min-height: 90px; padding: 10px; border: 1px solid #475569; border-radius: 7px; color: #fff; background: #0f172a; font: inherit; }
     .leaderboard-player-image { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; vertical-align: middle; background: #263449; }
     .leaderboard-player-input { width: 90px; }
-    .admin-section-nav { position: sticky; top: 8px; z-index: 20; margin-bottom: 20px; }
-    .admin-section-nav details { position: relative; }
-    .admin-section-nav summary { width: fit-content; padding: 10px 14px; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: #fff; background: #1e293b; font-weight: 800; cursor: pointer; list-style: none; }
-    .admin-section-nav summary::-webkit-details-marker { display: none; }
-    .admin-section-links { position: absolute; top: calc(100% + 6px); left: 0; display: grid; gap: 4px; width: min(320px, calc(100vw - 32px)); max-height: min(70vh, 520px); overflow: auto; padding: 8px; border: 1px solid rgba(255,255,255,0.16); border-radius: 10px; background: #0f172a; box-shadow: 0 12px 30px rgba(0,0,0,0.35); }
-    .admin-section-links a { padding: 10px; border-radius: 6px; color: #e2e8f0; text-decoration: none; }
-    .admin-section-links a:hover, .admin-section-links a:focus-visible { color: #fbbf24; background: #1e293b; }
-    #adminLeaderboard, #adminBranding, #adminPlayerText, #adminSupportChat, #adminSupportNumbers { scroll-margin-top: 80px; }
+    .admin-bottom-nav { position: fixed; z-index: 10; right: 0; bottom: 0; left: 0; display: flex; justify-content: center; gap: 12px; padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); border-top: 1px solid rgba(255,255,255,0.12); background: rgba(15,23,42,0.96); backdrop-filter: blur(12px); }
+    .admin-bottom-nav button { min-width: 132px; }
+    .admin-section { scroll-margin-top: 16px; }
     @media (max-width: 700px) { .support-admin-layout { grid-template-columns: 1fr; } .leaderboard-settings { grid-template-columns: 1fr; } .support-admin-form { grid-template-columns: 1fr; } }
     @media (max-width: 600px) { .history-dialog { padding: 14px; } .history-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
     @media (max-width: 600px) {
       .wrap { padding: 12px; }
+      body { padding-bottom: 78px; }
       .topbar { align-items: flex-start; flex-direction: column; gap: 14px; padding: 14px; }
       .logo { font-size: 23px; }
       .grid { grid-template-columns: minmax(0, 1fr); gap: 12px; }
@@ -122,6 +118,8 @@
       table { display: block; max-width: 100%; overflow-x: auto; white-space: nowrap; }
       th, td { padding: 9px 8px; }
       button { min-height: 40px; }
+      .admin-bottom-nav { gap: 8px; }
+      .admin-bottom-nav button { flex: 1; min-width: 0; padding-right: 6px; padding-left: 6px; font-size: 12px; }
       .player-list-toolbar { align-items: flex-start; flex-direction: column; }
       .player-copy-row { grid-template-columns: minmax(0, 1fr); }
     }
@@ -137,19 +135,6 @@
         <button class="danger" onclick="adminLogout()">Logout</button>
       </div>
     </div>
-
-    <nav class="admin-section-nav" aria-label="Admin settings navigation">
-      <details>
-        <summary>☰ Navigation</summary>
-        <div class="admin-section-links">
-          <a href="#adminLeaderboard">Monthly Standings &amp; Prize Controls</a>
-          <a href="#adminBranding">Site Logo &amp; App Icons</a>
-          <a href="#adminPlayerText">Player Text Settings</a>
-          <a href="#adminSupportChat">Direct Player Support Chat</a>
-          <a href="#adminSupportNumbers">WhatsApp &amp; Support Numbers</a>
-        </div>
-      </details>
-    </nav>
 
     <div class="card" id="runningGamesOverview" aria-live="polite">
       <h3>Running Games <span id="runningGamesCount" class="muted">Loading...</span></h3>
@@ -175,7 +160,7 @@
       <p id="announcementStatus" class="muted">Loading...</p>
     </div>
 
-    <div class="card" id="adminSupportNumbers">
+    <div class="card admin-section" id="adminSupportNumbers">
       <h3>WhatsApp &amp; Support Numbers</h3>
       <p class="muted">Dono fields mein valid 10-digit Indian mobile number dalein. WhatsApp aur support ke numbers alag ho sakte hain.</p>
       <div class="form-grid">
@@ -194,7 +179,7 @@
       <p id="supportNumbersStatus" class="muted">Loading...</p>
     </div>
 
-    <div class="card" id="adminBranding">
+    <div class="card admin-section" id="adminBranding">
       <h3>Site Logo &amp; App Icons</h3>
       <p class="muted">PNG images upload karke logo, app icon, game banners aur support graphic badlein. App icons ki dimensions exact rakhein.</p>
       <div class="form-grid">
@@ -255,7 +240,7 @@
       <p id="depositUpiIdStatus" class="muted">Loading...</p>
     </div>
 
-    <div class="card" id="adminPlayerText">
+    <div class="card admin-section" id="adminPlayerText">
       <h3>Player Text Settings</h3>
       <p class="muted">Player pages ki kisi bhi exact line ko badalne ke liye current line aur naya text bharein. Blank naya text us line ko hide karega.</p>
       <div id="playerCopyRows"></div>
@@ -311,7 +296,7 @@
       </table>
     </div>
 
-    <section class="card" id="adminLeaderboard" aria-labelledby="adminLeaderboardTitle">
+    <section class="card admin-section" id="adminLeaderboard" aria-labelledby="adminLeaderboardTitle">
       <h3 id="adminLeaderboardTitle">Monthly Standings & Prize Controls</h3>
       <p class="muted"><span id="adminLeaderboardMonth">Loading...</span> — har completed game ke points aur rank prizes yahan configure karein. Empty player override se automatic points/prize use honge.</p>
       <div class="leaderboard-settings">
@@ -329,7 +314,7 @@
       </div>
     </section>
 
-    <section class="card" id="adminSupportChat" aria-labelledby="adminSupportChatTitle">
+    <section class="card admin-section" id="adminSupportChat" aria-labelledby="adminSupportChatTitle">
       <h3 id="adminSupportChatTitle">Direct Player Support Chat</h3>
       <p class="muted">Players ke support messages yahan aayenge. Reply admin account se player ke chat me directly jayega.</p>
       <div class="support-admin-layout">
@@ -419,6 +404,11 @@
       </table>
     </div>
   </div>
+  <nav class="admin-bottom-nav" aria-label="Admin navigation">
+    <button id="adminHomeButton" type="button">⌂ Home</button>
+    <button id="adminNewPlayersButton" type="button" class="secondary">New players</button>
+    <button id="adminSupportChatButton" type="button" class="secondary" aria-label="Direct player support chat">Support chat</button>
+  </nav>
   <dialog id="playerHistoryDialog" class="history-dialog" aria-labelledby="playerHistoryTitle">
     <div class="history-dialog-header">
       <div><h2 id="playerHistoryTitle">Player history</h2><p id="playerHistoryAccount" class="muted"></p></div>
@@ -1707,6 +1697,10 @@
     document.getElementById('playerSearch').addEventListener('input', renderPlayerList);
     document.getElementById('kycEditForm').addEventListener('submit', saveKycEdit);
     document.getElementById('newPlayersFilter').addEventListener('click', () => setPlayerListMode('NEW'));
+    document.getElementById('adminHomeButton').addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+    document.getElementById('adminNewPlayersButton').addEventListener('click', () => setPlayerListMode('NEW', true));
+    document.getElementById('adminSupportChatButton').addEventListener('click', () => document.getElementById('adminSupportChat').scrollIntoView({ behavior: 'smooth', block: 'start' }));
+
     document.getElementById('saveSupportNumbersBtn').addEventListener('click', saveSupportNumbers);
     document.getElementById('saveBrandingBtn').addEventListener('click', saveBranding);
     document.getElementById('saveDepositUpiIdBtn').addEventListener('click', saveDepositUpiId);
