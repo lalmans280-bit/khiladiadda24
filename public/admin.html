@@ -27,6 +27,12 @@
     .toolbar button, .toolbar a { text-decoration: none; display: inline-block; }
     .topbar .toolbar > a, .topbar .toolbar > button { min-height: 40px; padding: 10px 14px; border: 1px solid rgba(255,255,255,0.3); border-radius: 8px; font-size: 12px; font-weight: 800; text-align: center; text-transform: uppercase; }
     .topbar .toolbar > a { color: #fff; background: #2563eb; }
+    .topbar-actions { display: flex; align-items: center; justify-content: flex-end; gap: 8px; }
+    .topbar .topbar-actions > .top-action { min-height: 40px; padding: 10px 14px; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: #fff; font-size: 12px; font-weight: 800; text-align: center; text-decoration: none; text-transform: uppercase; white-space: nowrap; }
+    .topbar .topbar-actions > .player-site { background: #2563eb; }
+    .topbar .topbar-actions > .refresh-data { background: #059669; }
+    .topbar .topbar-actions > .logout { background: #dc2626; }
+    .topbar .topbar-actions > .top-action:hover { filter: brightness(1.12); }
     .admin-menu { position: relative; }
     .admin-menu summary { width: 44px; height: 40px; display: grid; place-items: center; border: 1px solid rgba(255,255,255,0.3); border-radius: 8px; cursor: pointer; list-style: none; }
     .admin-menu summary::-webkit-details-marker { display: none; }
@@ -116,7 +122,9 @@
       body { padding-bottom: 78px; }
       .topbar { align-items: flex-start; flex-direction: column; gap: 14px; padding: 14px; }
       .logo { font-size: 23px; }
-      .admin-menu { align-self: flex-end; }
+      .topbar-actions { width: 100%; gap: 6px; }
+      .topbar .topbar-actions > .top-action { flex: 1; min-width: 0; padding-right: 6px; padding-left: 6px; font-size: 10px; }
+      .admin-menu summary { width: 40px; flex: 0 0 40px; }
       .grid { grid-template-columns: minmax(0, 1fr); gap: 12px; }
       .finance-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
       .finance-stat { padding: 10px; }
@@ -137,18 +145,20 @@
   <div class="wrap">
     <div class="topbar">
       <div class="logo">KhiladiAdda24 Admin</div>
-      <details class="admin-menu">
-        <summary aria-label="Admin menu">
-          <span class="menu-icon" aria-hidden="true"><span></span><span></span><span></span></span>
-        </summary>
-        <div class="toolbar admin-menu-items">
-          <a href="/index.html" onclick="openPlayerSite(event)">Player Site</a>
-          <button id="refreshAdminButton" type="button" class="secondary" onclick="refreshAdminData()">Refresh data</button>
-          <a href="#depositUpiSettings" onclick="this.closest('details').open = false">Deposit UPI ID</a>
-          <a href="#completeGameHistory" onclick="this.closest('details').open = false">Complete Game History</a>
-          <button class="danger" onclick="adminLogout()">Logout</button>
-        </div>
-      </details>
+      <div class="topbar-actions">
+        <a class="top-action player-site" href="/index.html" onclick="openPlayerSite(event)">PLAYER SITE</a>
+        <button id="refreshAdminButton" type="button" class="top-action refresh-data" onclick="refreshAdminData()">REFRESH DATA</button>
+        <button class="top-action logout" type="button" onclick="adminLogout()">LOGOUT</button>
+        <details class="admin-menu">
+          <summary aria-label="Admin menu">
+            <span class="menu-icon" aria-hidden="true"><span></span><span></span><span></span></span>
+          </summary>
+          <div class="toolbar admin-menu-items">
+            <a href="#depositUpiSettings" onclick="this.closest('details').open = false">Deposit UPI ID</a>
+            <a href="#completeGameHistory" onclick="this.closest('details').open = false">Complete Game History</a>
+          </div>
+        </details>
+      </div>
     </div>
 
     <div class="card" id="runningGamesOverview" aria-live="polite">
@@ -718,14 +728,14 @@
     async function refreshAdminData() {
       const button = document.getElementById('refreshAdminButton');
       button.disabled = true;
-      button.textContent = 'Refreshing...';
+      button.textContent = 'REFRESHING...';
       try {
         await Promise.all([loadData(), loadUsers(), loadHistory()]);
       } catch (error) {
         alert(error.message || 'Dashboard refresh nahi ho paaya.');
       } finally {
         button.disabled = false;
-        button.textContent = 'Refresh data';
+        button.textContent = 'REFRESH DATA';
       }
     }
 
