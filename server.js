@@ -579,7 +579,7 @@ function brandingImageUrl(settings, key, fallback) {
 
 function siteBrandingPayload(settings) {
   return {
-    brandLogoUrl: brandingImageUrl(settings, 'brandLogoPath', '/logo.png'),
+    brandLogoUrl: '/app-logo.png?v=20261008-2304',
     appIcon192Url: '/app-logo.png?v=20261008-2304',
     appIcon512Url: '/app-logo.png?v=20261008-2304',
     homeBannerUrl: brandingImageUrl(settings, 'homeBannerPath', '/banner-ludo-snake.png'),
@@ -717,7 +717,7 @@ app.get('/api/admin/branding', requireAdmin, async (req, res) => {
 
 app.get('/api/site-branding/image/:asset', async (req, res) => {
   const imageSettings = {
-    logo: ['brandLogoPath', '/logo.png'],
+    logo: ['brandLogoPath', '/app-logo.png?v=20261008-2304'],
     'app-icon-192': ['appIcon192Path', '/app-logo.png?v=20261008-2304'],
     'app-icon-512': ['appIcon512Path', '/app-logo.png?v=20261008-2304'],
     'home-banner': ['homeBannerPath', '/banner-ludo-snake.png'],
