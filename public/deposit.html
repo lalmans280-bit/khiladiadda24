@@ -432,28 +432,12 @@
 
 🔥 अभी जॉइन करो और खेलना शुरू करो!
 👉 ${referralUrl.toString()}`;
-      const shareUrl = referralUrl.toString();
-      const shareText = message.replace(shareUrl, '');
       if (navigator.share) {
-        let shareData = { title: 'KhiladiAdda24 Referral', text: shareText, url: shareUrl };
-        if (typeof File === 'function' && navigator.canShare) {
-          try {
-            const response = await fetch('/app-logo.png?v=20261008-2304');
-            if (!response.ok) throw new Error(`App logo request failed: ${response.status}`);
-            const logo = new File([await response.blob()], 'khiladiadda24-app-logo.png', { type: 'image/png' });
-            const shareDataWithLogo = { ...shareData, files: [logo] };
-            if (navigator.canShare(shareDataWithLogo)) shareData = shareDataWithLogo;
-          } catch (error) {
-            console.error('Could not attach the referral app logo:', error);
-            notify('App icon attach nahi ho paya; referral link share kar rahe hain.', true);
-          }
-        }
         try {
-          await navigator.share(shareData);
+          await navigator.share({ title: 'KhiladiAdda24 Referral', text: message });
           return;
         } catch (error) {
           if (error.name === 'AbortError') return;
-          console.error('Referral share failed; copying the message instead:', error);
         }
       }
       try {
