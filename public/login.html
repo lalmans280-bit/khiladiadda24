@@ -143,6 +143,10 @@
     const formHint = document.getElementById('formHint');
     const message = document.getElementById('msg');
     const loginMode = new URLSearchParams(location.search).get('admin') === '1' ? 'admin' : 'player';
+    const referralFromLink = new URLSearchParams(location.search).get('ref') || '';
+    if (loginMode === 'player' && /^[A-Za-z0-9]{8}$/.test(referralFromLink)) {
+      document.getElementById('referralCode').value = referralFromLink.toUpperCase();
+    }
     function playerDestination() {
       const next = new URLSearchParams(location.search).get('next');
       if (!next) return '/index.html';

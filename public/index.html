@@ -551,6 +551,61 @@
         if (error.name !== 'AbortError') alert(`Website link: ${appUrl}`);
       }
     }
+    async function shareReferralLink() {
+      const referralCode = String(player?.referralCode || '').trim().toUpperCase();
+      if (!/^[A-Z0-9]{8}$/.test(referralCode)) {
+        return notify('Referral ID abhi load nahi hui. Dobara try karein.', true);
+      }
+      const referralUrl = new URL('/login.html', location.origin);
+      referralUrl.searchParams.set('ref', referralCode);
+      const message = `🙏 विश्वास के साथ रहो, आपका विश्वास हमारा सपोर्ट 🙏
+
+🎯 Play Now on Khiladiadda24.com
+
+🥳 भरोसेमंद लूडो वेबसाइट
+अब खेलो और जीतों असली पैसे 💰
+
+⚡ Features:
+👉 Auto Deposit & Auto Withdrawal
+👉 किसी भी UPI पर तुरंत पैसे निकालो
+👉 ₹200 से ₹1,00,000 तक Withdrawal
+👉 हर 2 घंटे में Withdrawal Available
+
+💸 Commission सिर्फ 5%
+🎉 Referral Bonus 3%
+
+📞 24x7 Live Chat & Call Support
+
+🔥 अभी जॉइन करो और खेलना शुरू करो!
+👉 ${referralUrl.toString()}`;
+      if (navigator.share) {
+        try {
+          await navigator.share({ title: 'KhiladiAdda24 Referral', text: message });
+          return;
+        } catch (error) {
+          if (error.name === 'AbortError') return;
+        }
+      }
+      try {
+        if (navigator.clipboard?.writeText) {
+          await navigator.clipboard.writeText(message);
+        } else {
+          const field = document.createElement('textarea');
+          field.value = message;
+          field.setAttribute('readonly', '');
+          field.style.position = 'fixed';
+          field.style.opacity = '0';
+          document.body.append(field);
+          field.select();
+          const copied = document.execCommand('copy');
+          field.remove();
+          if (!copied) throw new Error('Copy unavailable');
+        }
+        notify('Referral message copy ho gaya. Ab share karein.');
+      } catch (error) {
+        alert(`Referral message copy nahi ho saka:\n\n${message}`);
+      }
+    }
     document.getElementById('installAppButton').addEventListener('click', promptAppInstall);
     document.getElementById('shareAppButton').addEventListener('click', shareWebsiteLink);
 
@@ -612,8 +667,8 @@
     const profileShareButton=document.createElement('button');
     profileShareButton.type='button';
     profileShareButton.className='btn secondary small';
-    profileShareButton.textContent='Website share karein';
-    profileShareButton.addEventListener('click',shareWebsiteLink);
+    profileShareButton.textContent='Referral link share karein';
+    profileShareButton.addEventListener('click',shareReferralLink);
     el('copyReferral').after(profileShareButton);
     const createChallengeButton=el('createForm').querySelector('button[type="submit"]');
     if(createChallengeButton){createChallengeButton.hidden=false;createChallengeButton.textContent='SET'}
@@ -980,7 +1035,7 @@
     const chatNavButton=el('chatNavButton');chatNavButton.dataset.bound='true';chatNavButton.addEventListener('click',()=>{window.location.href='/chat.html'});
     document.addEventListener('click',async event=>{
       const action=event.target.closest('[data-menu-action]');
-      if(action){el('menu').classList.remove('open');if(action.dataset.menuAction==='referral'){await shareWebsiteLink();return}notify('Abhi koi nayi notification nahi hai.');return}
+      if(action){el('menu').classList.remove('open');if(action.dataset.menuAction==='referral'){await shareReferralLink();return}notify('Abhi koi nayi notification nahi hai.');return}
       const view=event.target.closest('[data-view]');
       if(view){event.preventDefault();return setView(view.dataset.view)}
       const filter=event.target.closest('[data-game]');
