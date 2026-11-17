@@ -10,7 +10,7 @@
   <link rel="apple-touch-icon" href="/app-icon-192.png">
   <title>KhiladiAdda24.com Admin Panel</title>
   <style>
-    body { font-family: Arial, sans-serif; margin: 0; padding-bottom: 82px; background: #fff; color: #e5e7eb; }
+    body { font-family: Arial, sans-serif; margin: 0; background: #fff; color: #e5e7eb; }
     .wrap { max-width: 1200px; margin: 0 auto; padding: 24px; }
     .topbar { display: flex; justify-content: space-between; align-items: center; background: rgba(15, 23, 42, 0.9); padding: 18px 20px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.08); margin-bottom: 20px; }
     .logo { font-size: 28px; font-weight: 700; color: #fbbf24; }
@@ -102,11 +102,17 @@
     .support-admin-file-name { flex: 1; min-width: 0; overflow: hidden; color: #94a3b8; font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
     @media (max-width: 700px) { .support-admin-layout { grid-template-columns: 1fr; } .support-admin-form { grid-template-columns: 1fr; } }
     @media (max-width: 600px) { .history-dialog { padding: 14px; } .history-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-    .admin-bottom-nav { position: fixed; z-index: 10; right: 0; bottom: 0; left: 0; display: flex; justify-content: center; gap: 12px; padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); border-top: 1px solid rgba(255,255,255,0.12); background: rgba(15,23,42,0.96); backdrop-filter: blur(12px); }
-    .admin-bottom-nav button { min-width: 132px; }
+    .admin-brand { display: flex; align-items: center; gap: 12px; }
+    .admin-menu { position: relative; }
+    .admin-menu summary { display: grid; width: 42px; height: 42px; place-items: center; border: 1px solid rgba(255,255,255,0.3); border-radius: 8px; color: #fff; background: #2563eb; cursor: pointer; font-size: 23px; line-height: 1; list-style: none; }
+    .admin-menu summary::-webkit-details-marker { display: none; }
+    .admin-menu summary:hover, .admin-menu summary:focus-visible { background: #1d4ed8; }
+    .admin-section-nav { position: absolute; z-index: 20; top: calc(100% + 8px); left: 0; display: grid; width: min(320px, calc(100vw - 48px)); max-height: min(70vh, 560px); gap: 5px; overflow-y: auto; padding: 8px; border: 1px solid rgba(255,255,255,0.12); border-radius: 10px; background: rgba(15,23,42,0.98); box-shadow: 0 12px 30px rgba(0,0,0,0.4); }
+    .admin-section-nav a { padding: 10px 12px; border-radius: 7px; color: #fff; font-size: 13px; font-weight: 700; text-decoration: none; }
+    .admin-section-nav a:hover, .admin-section-nav a:focus-visible { background: #2563eb; }
+    #adminSupportNumbers, #adminBranding, #adminPlayerText, #adminSupportChat, #adminDepositUpi, #adminWalletUpdate, #adminBonusCredit, #adminPendingKyc, #adminPendingMatches, #adminRunningGames, #adminCancellationRequests, #adminPendingWithdrawals, #adminWithdrawalTicker, #adminGameHistory { scroll-margin-top: 16px; }
     @media (max-width: 600px) {
       .wrap { padding: 12px; }
-      body { padding-bottom: 78px; }
       .topbar { align-items: flex-start; flex-direction: column; gap: 14px; padding: 14px; }
       .logo { font-size: 23px; }
       .grid { grid-template-columns: minmax(0, 1fr); gap: 12px; }
@@ -118,8 +124,6 @@
       table { display: block; max-width: 100%; overflow-x: auto; white-space: nowrap; }
       th, td { padding: 9px 8px; }
       button { min-height: 40px; }
-      .admin-bottom-nav { gap: 8px; }
-      .admin-bottom-nav button { flex: 1; min-width: 0; }
       .player-list-toolbar { align-items: flex-start; flex-direction: column; }
       .player-copy-row { grid-template-columns: minmax(0, 1fr); }
     }
@@ -128,7 +132,28 @@
 <body>
   <div class="wrap">
     <div class="topbar">
-      <div class="logo">KhiladiAdda24 Admin</div>
+      <div class="admin-brand">
+        <details class="admin-menu">
+          <summary aria-label="Admin navigation"><span aria-hidden="true">☰</span></summary>
+          <nav class="admin-section-nav" aria-label="Admin sections">
+            <a href="#adminDepositUpi">Deposit UPI ID</a>
+            <a href="#adminWalletUpdate">Wallet Update</a>
+            <a href="#adminBonusCredit">Bonus Credit</a>
+            <a href="#adminPendingKyc">Pending Aadhaar KYC</a>
+            <a href="#adminPendingMatches">Pending Match Results</a>
+            <a href="#adminRunningGames">Running Games</a>
+            <a href="#adminCancellationRequests">Cancellation Requests for Review</a>
+            <a href="#adminPendingWithdrawals">Pending Withdrawals</a>
+            <a href="#adminWithdrawalTicker">Homepage LIVE Withdrawal Line</a>
+            <a href="#adminGameHistory">Complete Game History</a>
+            <a href="#adminSupportNumbers">WhatsApp &amp; Support Numbers</a>
+            <a href="#adminBranding">Site Logo &amp; App Icons</a>
+            <a href="#adminPlayerText">Player Text Settings</a>
+            <a href="#adminSupportChat">Direct Player Support Chat</a>
+          </nav>
+        </details>
+        <div class="logo">KhiladiAdda24 Admin</div>
+      </div>
       <div class="toolbar">
         <a href="/index.html" onclick="openPlayerSite(event)">Player Site</a>
         <button id="refreshAdminButton" type="button" class="secondary" onclick="refreshAdminData()">Refresh data</button>
@@ -146,21 +171,7 @@
       <ul id="notificationList" class="notice-list"><li class="muted">Pending work check ho raha hai...</li></ul>
     </div>
 
-    <div class="card">
-      <h3>Notification Line</h3>
-      <p class="muted">Top ke niche ya banner ke upar chali hui line admin se edit hogi.</p>
-      <div class="form-grid">
-        <div style="grid-column: 1 / -1;">
-          <input id="announcementTextInput" type="text" maxlength="120" placeholder="Welcome to khiladiadda24.com">
-        </div>
-      </div>
-      <div class="toolbar" style="margin-top: 12px;">
-        <button id="saveAnnouncementBtn" type="button">Save notification line</button>
-      </div>
-      <p id="announcementStatus" class="muted">Loading...</p>
-    </div>
-
-    <div class="card">
+    <div class="card" id="adminSupportNumbers">
       <h3>WhatsApp &amp; Support Numbers</h3>
       <p class="muted">Dono fields mein valid 10-digit Indian mobile number dalein. WhatsApp aur support ke numbers alag ho sakte hain.</p>
       <div class="form-grid">
@@ -179,7 +190,7 @@
       <p id="supportNumbersStatus" class="muted">Loading...</p>
     </div>
 
-    <div class="card">
+    <div class="card" id="adminBranding">
       <h3>Site Logo &amp; App Icons</h3>
       <p class="muted">PNG images upload karke logo, app icon, game banners aur support graphic badlein. App icons ki dimensions exact rakhein.</p>
       <div class="form-grid">
@@ -225,7 +236,7 @@
       <p id="brandingStatus" class="muted">Loading current images...</p>
     </div>
 
-    <div class="card">
+    <div class="card" id="adminDepositUpi">
       <h3>Deposit UPI ID</h3>
       <p class="muted">Player deposit QR aur UPI app payment ke liye use hone wala UPI ID.</p>
       <div class="form-grid">
@@ -240,7 +251,7 @@
       <p id="depositUpiIdStatus" class="muted">Loading...</p>
     </div>
 
-    <div class="card">
+    <div class="card" id="adminPlayerText">
       <h3>Player Text Settings</h3>
       <p class="muted">Player pages ki kisi bhi exact line ko badalne ke liye current line aur naya text bharein. Blank naya text us line ko hide karega.</p>
       <div id="playerCopyRows"></div>
@@ -263,7 +274,7 @@
     </div>
 
     <div class="grid">
-      <div class="card">
+      <div class="card" id="adminWalletUpdate">
         <h3>Wallet Update</h3>
         <p class="muted">Player wallet me amount add ya deduct karein.</p>
         <select id="walletUser"></select>
@@ -271,7 +282,7 @@
         <input type="text" id="walletReason" placeholder="Reason">
         <button onclick="adjustWallet()">Update Wallet</button>
       </div>
-      <div class="card">
+      <div class="card" id="adminBonusCredit">
         <h3>Bonus Credit</h3>
         <p class="muted">Bonus direct player wallet me add hoga.</p>
         <select id="bonusUser"></select>
@@ -296,7 +307,7 @@
       </table>
     </div>
 
-    <section class="card" aria-labelledby="adminSupportChatTitle">
+    <section class="card" id="adminSupportChat" aria-labelledby="adminSupportChatTitle">
       <h3 id="adminSupportChatTitle">Direct Player Support Chat</h3>
       <p class="muted">Players ke support messages yahan aayenge. Reply admin account se player ke chat me directly jayega.</p>
       <div class="support-admin-layout">
@@ -323,7 +334,7 @@
       </table>
     </div>
 
-    <div class="card">
+    <div class="card" id="adminPendingKyc">
       <h3>Pending Aadhaar KYC</h3>
       <p class="muted">Target: har KYC ko submission ke 30 minutes ke andar review karein.</p>
       <table id="kycTable">
@@ -331,35 +342,35 @@
       </table>
     </div>
 
-    <div class="card">
+    <div class="card" id="adminPendingMatches">
       <h3>Pending Match Results</h3>
       <table id="matchTable">
         <tr><th>Game / Entry</th><th>Players</th><th>Winner</th><th>Screenshot</th><th>Room / Start</th><th>Action</th></tr>
       </table>
     </div>
 
-    <div class="card">
+    <div class="card" id="adminRunningGames">
       <h3>Running Games</h3>
       <table id="runningTable">
         <tr><th>Game</th><th>Players</th><th>Entry</th><th>Room / Deadline</th><th>Confirmations</th><th>Cancel reason</th><th>Action</th></tr>
       </table>
     </div>
 
-    <div class="card">
+    <div class="card" id="adminCancellationRequests">
       <h3>Cancel Requests for Review</h3>
       <table id="cancellationTable">
         <tr><th>Game</th><th>Players</th><th>Requested by</th><th>Reason</th><th>Entry refund</th><th>Action</th></tr>
       </table>
     </div>
 
-    <div class="card">
+    <div class="card" id="adminPendingWithdrawals">
       <h3>Pending Withdrawals</h3>
       <table id="withdrawTable">
         <tr><th>Player</th><th>Amount</th><th>Method</th><th>Payout details</th><th>QR</th><th>Action</th></tr>
       </table>
     </div>
 
-    <div class="card">
+    <div class="card" id="adminWithdrawalTicker">
       <h3>Homepage LIVE Withdrawal Line</h3>
       <p class="muted">Controls which actual admin-paid withdrawals appear in the homepage ticker. Amounts cannot be manually invented or edited.</p>
       <label><input id="withdrawTickerEnabled" type="checkbox"> Show the live withdrawal line</label>
@@ -378,17 +389,13 @@
       <p id="withdrawTickerSettingsStatus" class="muted" role="status"></p>
     </div>
 
-    <div class="card">
+    <div class="card" id="adminGameHistory">
       <h3>Complete Game History</h3>
       <table id="historyTable">
         <tr><th>Game</th><th>Players</th><th>Entry</th><th>Status</th><th>Winner / Cancel reason</th><th>Room code</th><th>Proof</th><th>Joined / Started</th></tr>
       </table>
     </div>
   </div>
-  <nav class="admin-bottom-nav" aria-label="Admin navigation">
-    <button id="adminHomeButton" type="button">⌂ Home</button>
-    <button id="adminNewPlayersButton" type="button" class="secondary">New players</button>
-  </nav>
   <dialog id="playerHistoryDialog" class="history-dialog" aria-labelledby="playerHistoryTitle">
     <div class="history-dialog-header">
       <div><h2 id="playerHistoryTitle">Player history</h2><p id="playerHistoryAccount" class="muted"></p></div>
@@ -457,7 +464,7 @@
     }
 
     function adminGameTypeLabel(gameType) {
-      return gameType === 'LUDO_SCORE' ? 'KhiladiAdda24 Ludo Score' : gameType === 'LUDO_RACE' ? 'Ludo Race' : gameType === 'POPULAR_LUDO' ? 'Popular Ludo' : gameType === 'SNAKE' ? 'Snake' : 'Ludo Classic';
+      return gameType === 'LUDO_RACE' ? 'Ludo Race' : gameType === 'POPULAR_LUDO' ? 'Popular Ludo' : gameType === 'SNAKE' ? 'Snake' : 'Ludo Classic';
     }
 
     function playerWhatsAppLink(phone) {
@@ -571,7 +578,7 @@
           <div class="finance-stat">
             <small>${adminGameTypeLabel(match.gameType)} · ${escapeHtml(match.status)} · Entry ₹${Number(match.amount).toLocaleString('en-IN')} each</small>
             <strong>${escapeHtml(match.creator?.username || 'Creator')} vs ${escapeHtml(match.joiner?.username || 'Joiner')}</strong>
-            <small>${match.gameType === 'LUDO_SCORE' && match.ludoScore ? 'In-app board' : match.roomCode ? `Room: ${escapeHtml(match.roomCode)}` : 'Room code not shared'} · ${match.gameStartedAt ? 'Game started' : 'Waiting to start'}</small>
+            <small>${match.gameType === 'LUDO_RACE' && match.ludoRace || match.gameType === 'LUDO_SCORE' && match.ludoScore ? 'In-app board' : match.roomCode ? `Room: ${escapeHtml(match.roomCode)}` : 'Room code not shared'} · ${match.gameStartedAt ? 'Game started' : 'Waiting to start'}</small>
             ${match.resultSubmittedAt ? `<small>Screenshot submitted: ${escapeHtml(new Date(match.resultSubmittedAt).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }))} IST</small>` : ''}
             <small>${resultReports}</small>
             <div class="running-overview-proofs">${resultProofs}</div>
@@ -713,19 +720,6 @@
       ).join('');
     }
 
-    async function loadAnnouncementText() {
-      const input = document.getElementById('announcementTextInput');
-      const status = document.getElementById('announcementStatus');
-      try {
-        const res = await adminFetch('/api/admin/site-announcement');
-        const data = await res.json();
-        input.value = data.text || 'Welcome to khiladiadda24.com';
-        status.textContent = 'Current line: ' + (data.text || 'Welcome to khiladiadda24.com');
-      } catch (error) {
-        status.textContent = error.message || 'Announcement load nahi ho paaya.';
-      }
-    }
-
     async function loadWithdrawTickerSettings() {
       const status = document.getElementById('withdrawTickerSettingsStatus');
       try {
@@ -761,26 +755,6 @@
         status.textContent = data.message || 'Homepage live withdrawal line update ho gayi.';
       } catch (error) {
         status.textContent = error.message || 'Ticker settings save nahi hue.';
-      }
-    }
-
-    async function saveAnnouncementText() {
-      const input = document.getElementById('announcementTextInput');
-      const status = document.getElementById('announcementStatus');
-      const text = (input.value || '').trim();
-      const payload = { text: text || 'Welcome to khiladiadda24.com' };
-      try {
-        const res = await adminFetch('/api/admin/site-announcement', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Announcement save nahi ho paaya');
-        input.value = data.text || 'Welcome to khiladiadda24.com';
-        status.textContent = 'Saved: ' + (data.text || 'Welcome to khiladiadda24.com');
-      } catch (error) {
-        status.textContent = error.message || 'Announcement save nahi ho paaya';
       }
     }
 
@@ -1621,9 +1595,9 @@
     document.getElementById('playerSearch').addEventListener('input', renderPlayerList);
     document.getElementById('kycEditForm').addEventListener('submit', saveKycEdit);
     document.getElementById('newPlayersFilter').addEventListener('click', () => setPlayerListMode('NEW'));
-    document.getElementById('adminHomeButton').addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
-    document.getElementById('adminNewPlayersButton').addEventListener('click', () => setPlayerListMode('NEW', true));
-
+    document.querySelectorAll('.admin-section-nav a').forEach(link => {
+      link.addEventListener('click', () => { document.querySelector('.admin-menu').open = false; });
+    });
     document.getElementById('saveSupportNumbersBtn').addEventListener('click', saveSupportNumbers);
     document.getElementById('saveBrandingBtn').addEventListener('click', saveBranding);
     document.getElementById('saveDepositUpiIdBtn').addEventListener('click', saveDepositUpiId);
