@@ -8,6 +8,7 @@
   const speech = window.speechSynthesis;
   const SpeechUtterance = window.SpeechSynthesisUtterance;
   const getSpeechVoices = () => typeof speech?.getVoices === 'function' ? speech.getVoices() : [];
+  const femaleHindiVoicePattern = /female|woman|swara|kalpana|priya|sangeeta|lekha|heera|veena|aarti|ananya/i;
   let voices = getSpeechVoices();
   let voiceUnavailableNoticeShown = false;
 
@@ -83,13 +84,11 @@
     if (availableVoices.length) voices = availableVoices;
 
     const hindiVoices = voices.filter(voice => /^hi(?:-|_|$)/i.test(voice.lang));
-    const preferredVoice = hindiVoices.find(voice =>
-      /female|woman|swara|kalpana|priya|sangeeta|lekha|heera|veena|aarti/i.test(voice.name)
-    ) || hindiVoices[0];
+    const preferredVoice = hindiVoices.find(voice => femaleHindiVoicePattern.test(voice.name)) || hindiVoices[0];
     const utterance = new SpeechUtterance(message);
     utterance.lang = 'hi-IN';
     utterance.rate = 0.9;
-    utterance.pitch = 1.12;
+    utterance.pitch = 1.18;
     utterance.volume = 1;
     if (preferredVoice) utterance.voice = preferredVoice;
 
@@ -102,6 +101,93 @@
       return false;
     }
   };
+  const viewAnnouncements = {
+    home: 'होम स्क्रीन खुल रही है। यहाँ नया बैटल बनाएं और खुले बैटल देखें।',
+    games: 'गेम स्क्रीन खुल रही है। यहाँ उपलब्ध गेम और बैटल चुनें।',
+    wallet: 'वॉलेट खुल रहा है। यहाँ बैलेंस, जमा और निकासी की जानकारी है।',
+    profile: 'प्रोफ़ाइल खुल रही है। यहाँ खिलाड़ी और खाते की जानकारी देखें।',
+    history: 'इतिहास खुल रहा है। यहाँ गेम और वॉलेट की पिछली गतिविधियाँ देखें।',
+    match: 'बैटल की जानकारी खुल रही है। यहाँ मैच और अगला कदम देखें।',
+    battles: 'खुले बैटल की सूची खुल रही है।'
+  };
+  const gameAnnouncements = {
+    LUDO: 'लूडो क्लासिक चुना गया है।',
+    POPULAR_LUDO: 'पॉपुलर लूडो चुना गया है।',
+    LUDO_RACE: 'लूडो रेस चुना गया है। पहली गोटी घर पहुँचाने वाला खिलाड़ी जीतता है।',
+    SNAKE: 'स्नेक बैटल चुना गया है।'
+  };
+  const formAnnouncements = {
+    createForm: 'बैटल बनाने से पहले एंट्री राशि चुनें। न्यूनतम राशि पचास रुपये है।',
+    qrForm: 'वॉलेट में जमा करने के लिए राशि भरें और UPI QR बनाएं। न्यूनतम जमा पचास रुपये है।',
+    depositForm: 'जमा की पुष्टि के लिए UTR नंबर और भुगतान का स्क्रीनशॉट भेजें।',
+    withdrawForm: 'निकासी के लिए राशि और UPI ID भरें। न्यूनतम पाँच सौ रुपये हैं और KYC मंज़ूर होना ज़रूरी है।',
+    kycForm: 'आधार की जानकारी और कार्ड की तस्वीर KYC जाँच के लिए भेजें। OTP या PIN साझा न करें।',
+    profileForm: 'अपनी प्रोफ़ाइल में खिलाड़ी का नाम और तस्वीर सेव करें।',
+    roomForm: 'Ludo King में रूम बनाकर उसका कोड यहाँ साझा करें।',
+    resultForm: 'विजेता चुनें और नतीजे का स्क्रीनशॉट एडमिन समीक्षा के लिए भेजें।',
+    cancelForm: 'बैटल रद्द करने का कारण चुनें। रिफंड की मंज़ूरी एडमिन देगा।'
+  };
+  const getPlayerOptionAnnouncement = control => {
+    const data = control.dataset || {};
+    if (data.langToggle) {
+      return data.langToggle === 'en'
+        ? 'अंग्रेज़ी भाषा दिखाई जाएगी, लेकिन विकल्पों की जानकारी हिंदी आवाज़ में बताई जाएगी।'
+        : 'हिंदी भाषा चुनी गई है। विकल्पों की जानकारी हिंदी आवाज़ में बताई जाएगी।';
+    }
+    if (viewAnnouncements[data.view]) return viewAnnouncements[data.view];
+    if (gameAnnouncements[data.gameOption]) return gameAnnouncements[data.gameOption];
+    if (data.menuAction === 'referral') return 'रेफ़रल विकल्प खुल रहा है। अपना रेफ़रल आईडी साझा करके दोस्तों को आमंत्रित करें।';
+    if (data.menuAction === 'notifications') return 'सूचनाएँ खुल रही हैं। यहाँ नई जानकारी देखें।';
+    if (data.join !== undefined) return 'आप इस बैटल में शामिल होने का विकल्प चुन रहे हैं। एंट्री राशि और इनाम जाँच लें।';
+    if (data.demoPlay !== undefined) return 'यह नमूना बैटल है। इसमें शामिल नहीं हो सकते।';
+    if (data.cancelMatch !== undefined || data.demoCancel !== undefined) return 'बैटल रद्द करने का विकल्प चुना गया है। आगे बढ़ने से पहले कारण जाँच लें।';
+    if (control.classList?.contains('brand')) return viewAnnouncements.home;
+    if (control.id === 'menuToggle') return 'मेन्यू का विकल्प चुना गया है। यहाँ होम, गेम, वॉलेट, प्रोफ़ाइल और सहायता के विकल्प हैं।';
+    if (control.id === 'refreshOpen') return 'खुले बैटल की सूची ताज़ा की जा रही है।';
+    if (control.id === 'gameRefreshOpen') return 'इस गेम के खुले बैटल ताज़ा किए जा रहे हैं।';
+    if (control.id === 'refreshHistory') return 'गेम और वॉलेट का इतिहास ताज़ा किया जा रहा है।';
+    if (control.id === 'chatNavButton') return 'सहायता चैट का विकल्प चुना गया है।';
+    if (control.id === 'backToGames') return 'गेम सूची पर वापस जा रहे हैं। यहाँ उपलब्ध गेम और बैटल चुनें।';
+    if (control.id === 'copyReferral') return 'अपनी रेफ़रल ID कॉपी करके दोस्तों के साथ साझा करें।';
+    if (control.id === 'copyRoom') return 'रूम कोड कॉपी करके Ludo King में जुड़ें।';
+    if (control.id === 'logout' || control.id === 'logoutProfile') return 'लॉग आउट का विकल्प चुना गया है।';
+
+    const form = control.closest?.('form');
+    if (formAnnouncements[form?.id]) return formAnnouncements[form.id];
+
+    const selectedOption = control.selectedOptions?.[0];
+    const associatedLabel = control.labels?.[0];
+    const rawLabel = selectedOption?.textContent
+      || associatedLabel?.textContent
+      || control.getAttribute?.('aria-label')
+      || control.getAttribute?.('title')
+      || control.innerText
+      || control.textContent
+      || control.value
+      || '';
+    const label = String(rawLabel).replace(/\s+/g, ' ').trim();
+    if (!label) return 'यह विकल्प चुना गया है।';
+    const hindiLabel = window.siteI18n?.translate?.(label, 'hi') || label;
+    return /[\u0900-\u097F]/.test(hindiLabel)
+      ? `आपने ${hindiLabel} विकल्प चुना है।`
+      : 'यह विकल्प चुना गया है।';
+  };
+  app.announcePlayerOption = control => {
+    if (!control) return false;
+    return app.announceHindiStatus(getPlayerOptionAnnouncement(control));
+  };
+  if (typeof document !== 'undefined') {
+    document.addEventListener('click', event => {
+      const control = event.target?.closest?.('button,a,[role="button"],summary');
+      if (!control || control.disabled || control.getAttribute?.('aria-disabled') === 'true') return;
+      app.announcePlayerOption(control);
+    });
+    document.addEventListener('change', event => {
+      const control = event.target?.closest?.('select,input[type="checkbox"],input[type="radio"],input[type="file"]');
+      if (!control || control.disabled) return;
+      app.announcePlayerOption(control);
+    });
+  }
   app.announceCancelOutcome = result => {
     const message = result?.match?.status === 'PENDING_CANCELLATION'
       ? 'गेम कैंसल करने की रिक्वेस्ट एडमिन को भेज दी गई है। मंज़ूरी का इंतज़ार करें।'
