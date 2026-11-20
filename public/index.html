@@ -291,7 +291,6 @@
   <style id="accentPalette">
     .topbar{background:#10294d;border-bottom-color:#d9771b}
     .brand{color:#ffbd59}.brand small{color:#d7e4f2}
-    .brand .brand-main>span:first-child,.brand .brand-main>.brand-win{background:linear-gradient(180deg,#c8f7ff 0%,#42d4ff 35%,#168bff 75%,#0750c7 100%);background-clip:text;-webkit-background-clip:text;color:transparent;-webkit-text-fill-color:transparent;text-shadow:0 1px 0 #064b89,0 2px 0 #063d76,0 0 8px #00bfff,0 0 15px #008cff}
     .topbar .icon{border-color:#37577f;color:#fff;background:#18385f}
     .topbar .balance{border-color:#b96c22;color:#ffe4ad;background:#593619}
     .menu{border-color:#36557d;background:#142b4e}.menu button,.menu a{color:#eef4fa}
@@ -421,6 +420,30 @@
     #view-home>.panel:first-child{background:#dc2626}
     #view-home>.panel:first-child .challenge-info-row>.muted,#view-home>.panel:first-child #createForm label{color:#fff;font-weight:800}
     #view-home>.panel:first-child .game-rules-button{color:#000;font-weight:800;font-size:10px;line-height:14px;padding:3px 6px;min-height:26px}
+    #view-home .demo-open-list-box .demo-battle-card,#view-games .demo-open-list-box .demo-battle-card{position:relative;display:grid;grid-template-columns:52px minmax(0,1fr) 82px;align-items:center;gap:9px;margin:9px 0;padding:10px;border:1px solid #62e9ff;border-radius:12px;background:radial-gradient(ellipse at 18% 0,#174b9d 0,transparent 58%),linear-gradient(145deg,#071d55,#03153a 65%,#062c64);box-shadow:0 4px 0 #03102b,0 8px 18px #007bff55,inset 0 1px 0 #c6f7ff}
+    #view-home .demo-open-list-box .demo-battle-card::before,#view-games .demo-open-list-box .demo-battle-card::before{position:absolute;inset:4px;border:1px solid #33a9ff80;border-radius:8px;content:"";pointer-events:none}
+    .demo-battle-card>*{position:relative;z-index:1;min-width:0}
+    .demo-battle-avatar-wrap{position:relative;width:52px;height:52px;align-self:center}
+    .demo-battle-avatar{display:block;width:52px;height:52px;border:2px solid #47dfff;border-radius:50%;object-fit:cover;background:#102b68;box-shadow:0 0 0 3px #8c40ff77,0 0 13px #00bfff}
+    .demo-battle-live{position:absolute;top:-5px;left:-4px;display:inline-flex;align-items:center;gap:3px;padding:3px 5px;border:1px solid #ff8bff;border-radius:999px;color:#fff;background:linear-gradient(180deg,#c832ff,#7111c5);box-shadow:0 0 9px #d22fff99;font-size:7px;font-weight:900;line-height:1}
+    .demo-battle-live .demo-live-dot{width:5px;height:5px}
+    .demo-battle-info{display:grid;gap:6px;min-width:0}
+    .demo-battle-name-row{display:flex;align-items:center;justify-content:space-between;gap:5px;min-width:0;padding:0 1px 5px;border-bottom:1px solid #a34aff80}
+    .demo-battle-name{overflow:hidden;color:#f4f8ff;font-size:13px;font-weight:900;font-style:italic;line-height:1.1;text-overflow:ellipsis;white-space:nowrap;text-shadow:0 1px 0 #0b2f6d,0 0 8px #2faaff}
+    .demo-battle-game{flex:none;color:#a9dfff;font-size:7px;font-weight:800;letter-spacing:.03em;white-space:nowrap}
+    .demo-battle-prizes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;min-width:0}
+    .demo-battle-prize{display:grid;justify-items:center;gap:3px;min-width:0;padding:5px 4px;border:1px solid;border-radius:8px;text-align:center}
+    .demo-battle-entry{border-color:#ffd75a;background:linear-gradient(180deg,#483707,#100b02);box-shadow:0 2px 0 #785411,0 0 9px #ffcb4477,inset 0 1px 0 #fff0a655;color:#ffe98d}
+    .demo-battle-winning{border-color:#63ff8b;background:linear-gradient(180deg,#075b36,#052416);box-shadow:0 2px 0 #064123,0 0 9px #19ff7077,inset 0 1px 0 #c6ffd555;color:#b4ffca}
+    .demo-battle-prize small{font-size:7px;font-weight:800;letter-spacing:.04em;line-height:1.1;white-space:nowrap}
+    .demo-battle-prize strong{font-size:13px;font-weight:900;line-height:1.05;white-space:nowrap;text-shadow:0 1px 0 #0008}
+    .demo-battle-actions{display:grid;align-content:center;justify-items:stretch;gap:5px;min-width:0;padding:0}
+    .demo-battle-actions [data-demo-play]{width:100%;min-height:44px;padding:5px 3px;border:2px solid #d347ff;border-radius:11px;background:linear-gradient(180deg,#19c4ff 0%,#075fff 48%,#082d9b 100%);box-shadow:0 3px 0 #07115f,0 0 0 1px #74f2ff inset,0 0 12px #00aaff,0 0 10px #d21aff;color:#fff;font-size:12px;font-weight:900;letter-spacing:.06em;text-shadow:0 1px 2px #071a55;transition:transform .15s ease,box-shadow .15s ease}
+    .demo-battle-actions [data-demo-play]:hover:not(:disabled){box-shadow:0 4px 0 #07115f,0 0 0 1px #74f2ff inset,0 0 16px #00aaff,0 0 14px #d21aff;transform:translateY(-1px)}
+    .demo-battle-actions [data-demo-play]:active:not(:disabled){box-shadow:0 1px 0 #07115f,0 0 0 1px #74f2ff inset,0 0 8px #00aaff;transform:translateY(1px)}
+    .demo-battle-actions .demo-wait-status{flex-basis:auto;color:#c5eaff;font-size:7px;line-height:1.1;text-align:center}
+    .demo-battle-actions [data-demo-cancel]{width:100%;min-height:25px;padding:3px 4px;font-size:9px}
+    @media(max-width:420px){#view-home .demo-open-list-box .demo-battle-card,#view-games .demo-open-list-box .demo-battle-card{grid-template-columns:44px minmax(0,1fr) 64px;gap:6px;padding:8px}.demo-battle-avatar-wrap,.demo-battle-avatar{width:44px;height:44px}.demo-battle-avatar{width:42px;height:42px}.demo-battle-prizes{gap:4px}.demo-battle-prize{padding:4px 2px}.demo-battle-prize small{font-size:6px}.demo-battle-prize strong{font-size:11px}.demo-battle-game{font-size:6px}.demo-battle-actions [data-demo-play]{min-height:38px;font-size:10px}}
   </style>
   <script>
     try {
@@ -733,7 +756,9 @@
         const waiting=demoBattleWaitStartedAt.has(player.name);
         const remaining=waiting?Math.max(0,Math.ceil((demoBattleWaitStartedAt.get(player.name)+60000-Date.now())/1000)):60;
         const timer=`${String(Math.floor(remaining/60)).padStart(2,'0')}:${String(remaining%60).padStart(2,'0')}`;
-        return `<article class="match battle-card demo-battle-card"><div class="battle-prizes open-battle-prizes"><div class="battle-prize-players"><div class="battle-players battle-players-waiting">${battlePlayerMarkup({username:player.name,profileImage:player.avatar.replace(/^\//,'')},'Challenger',false,amount,gameType==='SNAKE'?'Snake Battle':'Ludo Classic')}</div></div><div class="battle-card-actions"><button class="btn green small" type="button" data-demo-play="${esc(player.name)}" data-demo-amount="${amount}"${waiting?' disabled aria-disabled="true"':''}>${waiting?'WAITING':'PLAY'}</button>${waiting?`<span class="demo-wait-status">Room code ka wait • <span data-demo-wait-timer="${esc(player.name)}">${timer}</span></span><button class="btn danger small" type="button" data-demo-cancel="${esc(player.name)}">CANCEL</button>`:''}</div></div></article>`;
+        const prize=Number(amount)*2*0.95;
+        const gameLabel=gameType==='SNAKE'?'SNAKE BATTLE':'LUDO CLASSIC';
+        return `<article class="match battle-card demo-battle-card"><div class="demo-battle-avatar-wrap"><img class="demo-battle-avatar" src="${esc(player.avatar)}" alt=""><span class="demo-battle-live"><i class="demo-live-dot" aria-hidden="true"></i>LIVE</span></div><div class="demo-battle-info"><div class="demo-battle-name-row"><strong class="demo-battle-name">${esc(player.name)}</strong><span class="demo-battle-game">${gameLabel}</span></div><div class="demo-battle-prizes"><div class="demo-battle-prize demo-battle-entry"><small>ENTRY FEE</small><strong>₹${Number(amount).toLocaleString('en-IN')}</strong></div><div class="demo-battle-prize demo-battle-winning"><small>WINNING PRIZE</small><strong>₹${prize.toLocaleString('en-IN')}</strong></div></div></div><div class="battle-card-actions demo-battle-actions"><button class="btn small" type="button" data-demo-play="${esc(player.name)}" data-demo-amount="${amount}"${waiting?' disabled aria-disabled="true"':''}>${waiting?'WAITING':'PLAY'}</button>${waiting?`<span class="demo-wait-status">Room code ka wait • <span data-demo-wait-timer="${esc(player.name)}">${timer}</span></span><button class="btn danger small" type="button" data-demo-cancel="${esc(player.name)}">CANCEL</button>`:''}</div></article>`;
       }).join('');
     }
     function cancelDemoWait(playerName,card){
