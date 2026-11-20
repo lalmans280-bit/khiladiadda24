@@ -42,15 +42,21 @@
     .branding-preview { display: block; width: 88px; height: 88px; margin: 8px 0; object-fit: contain; border: 1px solid rgba(255,255,255,0.16); border-radius: 8px; background: #0f172a; }
     .notifications { border-left: 4px solid #fbbf24; }
     .notifications h3 { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
-    .notice-list { display: flex; flex-wrap: wrap; gap: 10px 20px; margin: 0; padding: 0; list-style: none; }
-    .notice-list li { flex: 1 1 180px; }
-    .notice-list button { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; min-height: 42px; padding: 8px 12px; border: 1px solid rgba(251,191,36,0.35); border-radius: 8px; color: #fde68a; background: #0f172a; text-align: left; }
-    .notice-list button::after { content: "Open"; color: #93c5fd; font-size: 11px; font-weight: 800; text-transform: uppercase; }
-    .notice-list button:hover { border-color: #fbbf24; background: #1e293b; }
-    .notification-target-highlight { box-shadow: inset 0 0 0 2px #fbbf24, 0 0 18px #fbbf2466; }
-    .admin-notification-section > summary { color: #fbbf24; font-size: 18px; font-weight: 700; cursor: pointer; }
-    .admin-notification-section[open] > summary { margin-bottom: 12px; }
-    .admin-notification-section > summary:focus-visible { outline: 2px solid #fbbf24; outline-offset: 4px; }
+    .notice-list { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+    .notice-list li { min-width: 0; }
+    .notice-list a { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 42px; padding: 8px 12px; border: 1px solid rgba(251,191,36,0.35); border-radius: 8px; color: #fde68a; background: #0f172a; text-align: left; text-decoration: none; }
+    .notice-list a::after { content: "Open"; color: #93c5fd; font-size: 11px; font-weight: 800; text-transform: uppercase; }
+    .notice-list a:hover { border-color: #fbbf24; background: #1e293b; }
+    .admin-notification-section { margin: 0; padding: 0 0 10px; border: 1px solid rgba(251,191,36,0.28); border-radius: 8px; background: #0f172a; }
+    .admin-notification-section > summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 42px; padding: 8px 12px; border-radius: 8px; color: #fde68a; background: #0f172a; font-size: 14px; font-weight: 700; cursor: pointer; list-style: none; }
+    .admin-notification-section > summary::-webkit-details-marker { display: none; }
+    .admin-notification-section > summary::after { content: "Open"; color: #93c5fd; font-size: 11px; font-weight: 800; text-transform: uppercase; }
+    .admin-notification-section[open] > summary::after { content: "Close"; }
+    .admin-notification-section > summary:hover { background: #1e293b; }
+    .admin-notification-section > summary:focus-visible { outline: 2px solid #fbbf24; outline-offset: 2px; }
+    .admin-notification-section > table { width: calc(100% - 20px); margin: 10px; }
+    .admin-notification-section > .muted { margin: 10px; }
+    .admin-request-back { display: inline-block; margin: 0 0 12px; padding: 8px 12px; border-radius: 8px; color: #fff; background: #2563eb; text-decoration: none; font-weight: 700; }
     .block-button { background: #dc2626; }
     .unblock-button { background: #2563eb; }
     .player-list-toolbar { align-items: center; justify-content: space-between; margin-bottom: 10px; }
@@ -149,39 +155,14 @@
     </div>
 
     <div class="card notifications" aria-live="polite">
-      <h3>Admin Notifications <span id="notificationTotal" class="muted">Loading...</span></h3>
-      <ul id="notificationList" class="notice-list"><li class="muted">Pending work check ho raha hai...</li></ul>
-      <details class="card admin-notification-section">
-        <summary>Pending Deposits (QR Verify)</summary>
-        <table id="depTable">
-          <tr><th>User</th><th>Amount</th><th>UTR</th><th>Proof</th><th>Action</th></tr>
-        </table>
-      </details>
-      <details class="card admin-notification-section">
-        <summary>Pending Aadhaar KYC</summary>
-        <p class="muted">Target: har KYC ko submission ke 30 minutes ke andar review karein.</p>
-        <table id="kycTable">
-          <tr><th>Player</th><th>Aadhaar</th><th>Image</th><th>Submitted</th><th>Action</th></tr>
-        </table>
-      </details>
-      <details class="card admin-notification-section">
-        <summary>Pending Match Results</summary>
-        <table id="matchTable">
-          <tr><th>Game / Entry</th><th>Players</th><th>Winner</th><th>Screenshot</th><th>Room / Start</th><th>Action</th></tr>
-        </table>
-      </details>
-      <details class="card admin-notification-section">
-        <summary>Cancel Requests for Review</summary>
-        <table id="cancellationTable">
-          <tr><th>Game</th><th>Players</th><th>Requested by</th><th>Reason</th><th>Entry refund</th><th>Action</th></tr>
-        </table>
-      </details>
-      <details class="card admin-notification-section">
-        <summary>Pending Withdrawals</summary>
-        <table id="withdrawTable">
-          <tr><th>Player</th><th>Amount</th><th>Method</th><th>Payout details</th><th>QR</th><th>Action</th></tr>
-        </table>
-      </details>
+      <h3><span id="notificationHeading">Admin Notifications</span> <span id="notificationTotal" class="muted">Loading...</span></h3>
+      <ul id="notificationList" class="notice-list">
+        <li><a href="/admin.html?request=deposits">Deposits <span id="notificationDepositsCount">0</span></a></li>
+        <li><a href="/admin.html?request=kyc">KYC reviews <span id="notificationKycsCount">0</span></a></li>
+        <li><a href="/admin.html?request=matches">Match results <span id="notificationMatchesCount">0</span></a></li>
+        <li><a href="/admin.html?request=cancellations">Cancel requests <span id="notificationCancellationCount">0</span></a></li>
+        <li><a href="/admin.html?request=withdrawals">Withdrawals <span id="notificationWithdrawalsCount">0</span></a></li>
+      </ul>
     </div>
 
     <div class="card">
@@ -334,7 +315,7 @@
       </table>
     </div>
 
-    <section class="card" aria-labelledby="adminSupportChatTitle">
+    <section class="card" id="adminSupportChat" aria-labelledby="adminSupportChatTitle">
       <h3 id="adminSupportChatTitle">Direct Player Support Chat</h3>
       <p class="muted">Players ke support messages yahan aayenge. Reply admin account se player ke chat me directly jayega.</p>
       <div class="support-admin-layout">
@@ -353,6 +334,31 @@
         </div>
       </div>
     </section>
+
+    <div id="adminRequestPanels" class="card" hidden>
+      <a id="adminRequestBack" class="admin-request-back" href="/admin.html">← Back to Admin Notifications</a>
+      <details id="depositRequestPanel" class="admin-notification-section">
+        <summary>Pending Deposits (QR Verify)</summary>
+        <table id="depTable"><tr><th>User</th><th>Amount</th><th>UTR</th><th>Proof</th><th>Action</th></tr></table>
+      </details>
+      <details id="kycRequestPanel" class="admin-notification-section">
+        <summary>Pending Aadhaar KYC</summary>
+        <p class="muted">Target: har KYC ko submission ke 30 minutes ke andar review karein.</p>
+        <table id="kycTable"><tr><th>Player</th><th>Aadhaar</th><th>Image</th><th>Submitted</th><th>Action</th></tr></table>
+      </details>
+      <details id="matchRequestPanel" class="admin-notification-section">
+        <summary>Pending Match Results</summary>
+        <table id="matchTable"><tr><th>Game / Entry</th><th>Players</th><th>Winner</th><th>Screenshot</th><th>Room / Start</th><th>Action</th></tr></table>
+      </details>
+      <details id="cancellationRequestPanel" class="admin-notification-section">
+        <summary>Cancel Requests for Review</summary>
+        <table id="cancellationTable"><tr><th>Game</th><th>Players</th><th>Requested by</th><th>Reason</th><th>Entry refund</th><th>Action</th></tr></table>
+      </details>
+      <details id="withdrawalRequestPanel" class="admin-notification-section">
+        <summary>Pending Withdrawals</summary>
+        <table id="withdrawTable"><tr><th>Player</th><th>Amount</th><th>Method</th><th>Payout details</th><th>QR</th><th>Action</th></tr></table>
+      </details>
+    </div>
 
     <div class="card">
       <h3>Running Games</h3>
@@ -700,36 +706,45 @@
       }
     }
 
-    function openAdminNotification(targetId) {
-      const target = document.getElementById(targetId);
-      if (!target) {
-        console.error(`Admin notification target not found: ${targetId}`);
-        return;
-      }
-      const section = target.closest('details.admin-notification-section');
-      if (!section) {
-        console.error(`Admin notification section not found for target: ${targetId}`);
-        return true;
-      }
-      section.open = true;
-      section.classList.add('notification-target-highlight');
-      window.setTimeout(() => section.classList.remove('notification-target-highlight'), 1800);
-      return;
-    }
-
     function updateNotifications(data) {
       const tasks = [
-        { label: 'Deposits', count: data.deposits?.length || 0, target: 'depTable' },
-        { label: 'KYC reviews', count: data.kycs?.length || 0, target: 'kycTable' },
-        { label: 'Match results', count: data.matches?.length || 0, target: 'matchTable' },
-        { label: 'Cancel requests', count: data.cancellationRequests?.length || 0, target: 'cancellationTable' },
-        { label: 'Withdrawals', count: data.withdrawals?.length || 0, target: 'withdrawTable' }
+        { count: data.deposits?.length || 0, countId: 'notificationDepositsCount' },
+        { count: data.kycs?.length || 0, countId: 'notificationKycsCount' },
+        { count: data.matches?.length || 0, countId: 'notificationMatchesCount' },
+        { count: data.cancellationRequests?.length || 0, countId: 'notificationCancellationCount' },
+        { count: data.withdrawals?.length || 0, countId: 'notificationWithdrawalsCount' }
       ];
       const total = tasks.reduce((sum, task) => sum + task.count, 0);
       document.getElementById('notificationTotal').textContent = `${total} pending`;
-      document.getElementById('notificationList').innerHTML = tasks.map(task =>
-        `<li><button type="button" onclick="openAdminNotification('${task.target}')">${task.label}: ${task.count}</button></li>`
-      ).join('');
+      tasks.forEach(task => {
+        document.getElementById(task.countId).textContent = String(task.count);
+      });
+    }
+
+    function configureAdminRequestPage() {
+      const requestPages = {
+        deposits: { panel: 'depositRequestPanel', title: 'Pending Deposits' },
+        kyc: { panel: 'kycRequestPanel', title: 'Pending KYC Reviews' },
+        matches: { panel: 'matchRequestPanel', title: 'Pending Match Results' },
+        cancellations: { panel: 'cancellationRequestPanel', title: 'Cancel Requests for Review' },
+        withdrawals: { panel: 'withdrawalRequestPanel', title: 'Pending Withdrawals' }
+      };
+      const requestPage = requestPages[new URLSearchParams(window.location.search).get('request')];
+      if (!requestPage) return;
+
+      document.body.classList.add('admin-request-view');
+      const supportChat = document.getElementById('adminSupportChat');
+      const requestPanels = document.getElementById('adminRequestPanels');
+      document.querySelectorAll('.wrap > *').forEach(section => {
+        section.hidden = !section.classList.contains('topbar') && section !== supportChat && section !== requestPanels;
+      });
+      requestPanels.hidden = false;
+      document.querySelectorAll('#adminRequestPanels .admin-notification-section').forEach(section => {
+        const selected = section.id === requestPage.panel;
+        section.hidden = !selected;
+        section.open = selected;
+      });
+      document.title = `${requestPage.title} | KhiladiAdda24 Admin`;
     }
 
     async function loadAnnouncementText() {
@@ -1649,6 +1664,7 @@
     document.getElementById('saveWithdrawTickerSettings').addEventListener('click', saveWithdrawTickerSettings);
     document.getElementById('addPlayerCopyRowBtn').addEventListener('click', () => addPlayerCopyRow());
     document.getElementById('savePlayerCopyBtn').addEventListener('click', savePlayerCopy);
+    configureAdminRequestPage();
     loadSupportNumbers();
     loadBranding();
     loadDepositUpiId();
