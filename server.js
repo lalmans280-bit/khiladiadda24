@@ -3719,6 +3719,16 @@ app.post('/api/admin/withdrawal-status', requireAdmin, async (req, res) => {
 
 // Real-time Sockets
 io.on('connection', (socket) => {
+  socket.on('register_admin', async ({ token } = {}) => {
+    try {
+      const payload = jwt.verify(String(token || ''), JWT_SECRET);
+      if (payload.role !== 'admin' || !mongoose.Types.ObjectId.isValid(String(payload.userId || ''))) return;
+      const admin = await findUserById(payload.userId);
+      if (admin?.isAdmin || admin?.isPrimaryAdmin) socket.join('admin-support');
+    } catch {
+      socket.disconnect(true);
+    }
+  });
   socket.on('register_player', async ({ token } = {}) => {
     try {
       const payload = jwt.verify(String(token || ''), JWT_SECRET);

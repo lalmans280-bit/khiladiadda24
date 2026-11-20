@@ -82,6 +82,7 @@
     <a class="active" href="/chat.html" aria-current="page"><span aria-hidden="true">💬</span><span>Need Chat</span></a>
     <a href="/support.html"><span aria-hidden="true">🛟</span><span>Support</span></a>
   </nav>
+  <script src="/socket.io/socket.io.js"></script>
   <script>
     const token = localStorage.getItem('token') || '';
     const chatArea = document.getElementById('chatArea');
@@ -223,6 +224,15 @@
     if (token) {
       loadMessages();
       setInterval(loadMessages, 5000);
+    }
+    if (typeof io === 'function') {
+      const chatSocket = io();
+      const registerChatSocket = () => {
+        if (token) chatSocket.emit('register_player', { token });
+      };
+      chatSocket.on('connect', registerChatSocket);
+      if (chatSocket.connected) registerChatSocket();
+      chatSocket.on('support_message', () => loadMessages());
     }
   </script>
 </body>

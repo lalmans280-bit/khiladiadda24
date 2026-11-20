@@ -396,6 +396,7 @@
     </form>
   </dialog>
 
+  <script src="/socket.io/socket.io.js"></script>
   <script>
     const user = (() => {
       for (const key of ['adminUser', 'user']) {
@@ -1183,6 +1184,22 @@
         document.getElementById('supportAdminSend').disabled = false;
       }
     });
+
+    if (typeof io === 'function') {
+      const adminSupportSocket = io();
+      const registerAdminSupportSocket = () => {
+        if (token) adminSupportSocket.emit('register_admin', { token });
+      };
+      adminSupportSocket.on('connect', registerAdminSupportSocket);
+      if (adminSupportSocket.connected) registerAdminSupportSocket();
+      adminSupportSocket.on('support_message', message => {
+        const refreshes = [loadAdminSupportThreads()];
+        if (String(message?.userId || '') === activeSupportUserId) {
+          refreshes.push(refreshAdminSupportThread());
+        }
+        Promise.all(refreshes).catch(error => console.error(error));
+      });
+    }
 
     function formatHistoryDate(value) {
       return value ? new Date(value).toLocaleString('en-IN') : '-';
