@@ -38,9 +38,6 @@
     .menu-icon span { display: block; width: 21px; height: 2px; border-radius: 2px; background: #fff; }
     .admin-menu-items.toolbar { position: absolute; top: calc(100% + 8px); right: 0; z-index: 12; display: grid; min-width: 190px; padding: 10px; border: 1px solid rgba(255,255,255,0.16); border-radius: 10px; background: #0f172a; box-shadow: 0 8px 24px rgba(0,0,0,0.35); }
     .admin-menu-items.toolbar > a, .admin-menu-items.toolbar > button { width: 100%; box-sizing: border-box; }
-    .admin-request-back { display: inline-flex; align-items: center; margin-bottom: 16px; padding: 10px 14px; border: 1px solid rgba(251,191,36,0.5); border-radius: 8px; color: #fde68a; background: rgba(120,53,15,0.35); font-weight: 700; text-decoration: none; }
-    .admin-request-back:hover { background: rgba(120,53,15,0.6); }
-    .admin-request-back[hidden] { display: none !important; }
     #adminHomeView[hidden], #adminHomeView > [hidden], #adminToolsView[hidden], [data-admin-tool][hidden], #adminToolsView .grid[hidden] { display: none !important; }
     [data-admin-tool] { scroll-margin-top: 16px; }
     .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
@@ -196,7 +193,6 @@
     </div>
 
     <div id="adminToolsView" class="admin-tools-view" hidden>
-    <a id="adminRequestBack" class="admin-request-back" href="/admin.html" hidden>← Back to Admin Notifications</a>
     <div class="card admin-section" id="adminSupportNumbers" data-admin-tool>
       <h3>WhatsApp &amp; Support Numbers</h3>
       <p class="muted">Dono fields mein valid 10-digit Indian mobile number dalein. WhatsApp aur support ke numbers alag ho sakte hain.</p>
@@ -708,7 +704,7 @@
       const target = document.getElementById(toolId);
       if (!target || !supportChat) throw new Error(`Admin request page not found: ${request}`);
 
-      document.getElementById('adminRequestBack').hidden = false;
+      homeView.insertBefore(toolsView, supportChat);
       homeView.hidden = false;
       Array.from(homeView.children).forEach(section => {
         section.hidden = section !== supportChat;
@@ -1521,6 +1517,7 @@
 
     function showAdminTool(event, toolId) {
       if (event) event.preventDefault();
+      restoreAdminToolsViewPosition();
       const homeView = document.getElementById('adminHomeView');
       const toolsView = document.getElementById('adminToolsView');
       const target = document.getElementById(toolId);
@@ -1529,7 +1526,6 @@
       }
       homeView.hidden = true;
       toolsView.hidden = false;
-      document.getElementById('adminRequestBack').hidden = true;
       toolsView.querySelectorAll('[data-admin-tool]').forEach(tool => {
         tool.hidden = tool !== target;
       });
@@ -1540,11 +1536,11 @@
 
     function showAllAdminTools(event) {
       if (event) event.preventDefault();
+      restoreAdminToolsViewPosition();
       const homeView = document.getElementById('adminHomeView');
       const toolsView = document.getElementById('adminToolsView');
       homeView.hidden = true;
       toolsView.hidden = false;
-      document.getElementById('adminRequestBack').hidden = true;
       toolsView.querySelectorAll('[data-admin-tool]').forEach(tool => {
         tool.hidden = !tool.hasAttribute('data-admin-extra');
       });
@@ -1553,7 +1549,16 @@
       toolsView.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
+    function restoreAdminToolsViewPosition() {
+      const homeView = document.getElementById('adminHomeView');
+      const toolsView = document.getElementById('adminToolsView');
+      if (toolsView.parentElement === homeView) {
+        homeView.parentNode.insertBefore(toolsView, homeView.nextSibling);
+      }
+    }
+
     function showAdminHome() {
+      restoreAdminToolsViewPosition();
       const homeView = document.getElementById('adminHomeView');
       homeView.hidden = false;
       Array.from(homeView.children).forEach(section => {
