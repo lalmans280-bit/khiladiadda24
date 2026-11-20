@@ -48,6 +48,9 @@
     .notice-list button::after { content: "Open"; color: #93c5fd; font-size: 11px; font-weight: 800; text-transform: uppercase; }
     .notice-list button:hover { border-color: #fbbf24; background: #1e293b; }
     .notification-target-highlight { box-shadow: inset 0 0 0 2px #fbbf24, 0 0 18px #fbbf2466; }
+    .admin-notification-section > summary { color: #fbbf24; font-size: 18px; font-weight: 700; cursor: pointer; }
+    .admin-notification-section[open] > summary { margin-bottom: 12px; }
+    .admin-notification-section > summary:focus-visible { outline: 2px solid #fbbf24; outline-offset: 4px; }
     .block-button { background: #dc2626; }
     .unblock-button { background: #2563eb; }
     .player-list-toolbar { align-items: center; justify-content: space-between; margin-bottom: 10px; }
@@ -320,27 +323,27 @@
       </div>
     </section>
 
-    <div class="card">
-      <h3>Pending Deposits (QR Verify)</h3>
+    <details class="card admin-notification-section">
+      <summary>Pending Deposits (QR Verify)</summary>
       <table id="depTable">
         <tr><th>User</th><th>Amount</th><th>UTR</th><th>Proof</th><th>Action</th></tr>
       </table>
-    </div>
+    </details>
 
-    <div class="card">
-      <h3>Pending Aadhaar KYC</h3>
+    <details class="card admin-notification-section">
+      <summary>Pending Aadhaar KYC</summary>
       <p class="muted">Target: har KYC ko submission ke 30 minutes ke andar review karein.</p>
       <table id="kycTable">
         <tr><th>Player</th><th>Aadhaar</th><th>Image</th><th>Submitted</th><th>Action</th></tr>
       </table>
-    </div>
+    </details>
 
-    <div class="card">
-      <h3>Pending Match Results</h3>
+    <details class="card admin-notification-section">
+      <summary>Pending Match Results</summary>
       <table id="matchTable">
         <tr><th>Game / Entry</th><th>Players</th><th>Winner</th><th>Screenshot</th><th>Room / Start</th><th>Action</th></tr>
       </table>
-    </div>
+    </details>
 
     <div class="card">
       <h3>Running Games</h3>
@@ -349,19 +352,19 @@
       </table>
     </div>
 
-    <div class="card">
-      <h3>Cancel Requests for Review</h3>
+    <details class="card admin-notification-section">
+      <summary>Cancel Requests for Review</summary>
       <table id="cancellationTable">
         <tr><th>Game</th><th>Players</th><th>Requested by</th><th>Reason</th><th>Entry refund</th><th>Action</th></tr>
       </table>
-    </div>
+    </details>
 
-    <div class="card">
-      <h3>Pending Withdrawals</h3>
+    <details class="card admin-notification-section">
+      <summary>Pending Withdrawals</summary>
       <table id="withdrawTable">
         <tr><th>Player</th><th>Amount</th><th>Method</th><th>Payout details</th><th>QR</th><th>Action</th></tr>
       </table>
-    </div>
+    </details>
 
     <div class="card">
       <h3>Homepage LIVE Withdrawal Line</h3>
@@ -723,6 +726,7 @@
       const target = document.getElementById(button.dataset.adminNotificationTarget);
       if (!target) return;
       const section = target.closest('.card') || target;
+      if (section.tagName === 'DETAILS') section.open = true;
       section.scrollIntoView({ behavior: 'smooth', block: 'start' });
       section.classList.add('notification-target-highlight');
       window.setTimeout(() => section.classList.remove('notification-target-highlight'), 1800);
