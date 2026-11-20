@@ -705,6 +705,23 @@
       }
     }
 
+    function openAdminNotification(targetId) {
+      const target = document.getElementById(targetId);
+      if (!target) {
+        console.error(`Admin notification target not found: ${targetId}`);
+        return;
+      }
+      const section = target.closest('details.admin-notification-section');
+      if (!section) {
+        console.error(`Admin notification section not found for target: ${targetId}`);
+        return;
+      }
+      section.open = true;
+      section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      section.classList.add('notification-target-highlight');
+      window.setTimeout(() => section.classList.remove('notification-target-highlight'), 1800);
+    }
+
     function updateNotifications(data) {
       const tasks = [
         { label: 'Deposits', count: data.deposits?.length || 0, target: 'depTable' },
@@ -716,21 +733,9 @@
       const total = tasks.reduce((sum, task) => sum + task.count, 0);
       document.getElementById('notificationTotal').textContent = `${total} pending`;
       document.getElementById('notificationList').innerHTML = tasks.map(task =>
-        `<li><button type="button" data-admin-notification-target="${task.target}">${task.label}: ${task.count}</button></li>`
+        `<li><button type="button" onclick="openAdminNotification('${task.target}')">${task.label}: ${task.count}</button></li>`
       ).join('');
     }
-
-    document.getElementById('notificationList').addEventListener('click', event => {
-      const button = event.target.closest('[data-admin-notification-target]');
-      if (!button) return;
-      const target = document.getElementById(button.dataset.adminNotificationTarget);
-      if (!target) return;
-      const section = target.closest('.card') || target;
-      if (section.tagName === 'DETAILS') section.open = true;
-      section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      section.classList.add('notification-target-highlight');
-      window.setTimeout(() => section.classList.remove('notification-target-highlight'), 1800);
-    });
 
     async function loadAnnouncementText() {
       const input = document.getElementById('announcementTextInput');
