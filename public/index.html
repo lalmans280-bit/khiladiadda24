@@ -425,6 +425,7 @@
     .demo-battle-card>*{position:relative;z-index:1;min-width:0}
     .demo-battle-avatar-wrap{position:relative;width:52px;height:52px;align-self:center}
     .demo-battle-avatar{display:block;width:52px;height:52px;border:2px solid #47dfff;border-radius:50%;object-fit:cover;background:#102b68;box-shadow:0 0 0 3px #8c40ff77,0 0 13px #00bfff}
+    .demo-battle-avatar.battle-avatar-fallback{display:grid;place-items:center;color:#fff;font-size:16px;font-weight:900}
     .demo-battle-live{position:absolute;top:-5px;left:-4px;display:inline-flex;align-items:center;gap:3px;padding:3px 5px;border:1px solid #ff8bff;border-radius:999px;color:#fff;background:linear-gradient(180deg,#c832ff,#7111c5);box-shadow:0 0 9px #d22fff99;font-size:7px;font-weight:900;line-height:1}
     .demo-battle-live .demo-live-dot{width:5px;height:5px}
     .demo-battle-info{display:grid;gap:6px;min-width:0}
@@ -438,12 +439,12 @@
     .demo-battle-prize small{font-size:7px;font-weight:800;letter-spacing:.04em;line-height:1.1;white-space:nowrap}
     .demo-battle-prize strong{font-size:13px;font-weight:900;line-height:1.05;white-space:nowrap;text-shadow:0 1px 0 #0008}
     .demo-battle-actions{display:grid;align-content:center;justify-items:stretch;gap:5px;min-width:0;padding:0}
-    .demo-battle-actions [data-demo-play]{width:100%;min-height:44px;padding:5px 3px;border:2px solid #d347ff;border-radius:11px;background:linear-gradient(180deg,#19c4ff 0%,#075fff 48%,#082d9b 100%);box-shadow:0 3px 0 #07115f,0 0 0 1px #74f2ff inset,0 0 12px #00aaff,0 0 10px #d21aff;color:#fff;font-size:12px;font-weight:900;letter-spacing:.06em;text-shadow:0 1px 2px #071a55;transition:transform .15s ease,box-shadow .15s ease}
-    .demo-battle-actions [data-demo-play]:hover:not(:disabled){box-shadow:0 4px 0 #07115f,0 0 0 1px #74f2ff inset,0 0 16px #00aaff,0 0 14px #d21aff;transform:translateY(-1px)}
-    .demo-battle-actions [data-demo-play]:active:not(:disabled){box-shadow:0 1px 0 #07115f,0 0 0 1px #74f2ff inset,0 0 8px #00aaff;transform:translateY(1px)}
+    .demo-battle-actions [data-demo-play],.demo-battle-actions [data-join]{width:100%;min-height:44px;padding:5px 3px;border:2px solid #d347ff;border-radius:11px;background:linear-gradient(180deg,#19c4ff 0%,#075fff 48%,#082d9b 100%);box-shadow:0 3px 0 #07115f,0 0 0 1px #74f2ff inset,0 0 12px #00aaff,0 0 10px #d21aff;color:#fff;font-size:12px;font-weight:900;letter-spacing:.06em;text-shadow:0 1px 2px #071a55;transition:transform .15s ease,box-shadow .15s ease}
+    .demo-battle-actions [data-demo-play]:hover:not(:disabled),.demo-battle-actions [data-join]:hover:not(:disabled){box-shadow:0 4px 0 #07115f,0 0 0 1px #74f2ff inset,0 0 16px #00aaff,0 0 14px #d21aff;transform:translateY(-1px)}
+    .demo-battle-actions [data-demo-play]:active:not(:disabled),.demo-battle-actions [data-join]:active:not(:disabled){box-shadow:0 1px 0 #07115f,0 0 0 1px #74f2ff inset,0 0 8px #00aaff;transform:translateY(1px)}
     .demo-battle-actions .demo-wait-status{flex-basis:auto;color:#c5eaff;font-size:7px;line-height:1.1;text-align:center}
-    .demo-battle-actions [data-demo-cancel]{width:100%;min-height:25px;padding:3px 4px;font-size:9px}
-    @media(max-width:420px){#view-home .demo-open-list-box .demo-battle-card,#view-games .demo-open-list-box .demo-battle-card{grid-template-columns:44px minmax(0,1fr) 64px;gap:6px;padding:8px}.demo-battle-avatar-wrap,.demo-battle-avatar{width:44px;height:44px}.demo-battle-avatar{width:42px;height:42px}.demo-battle-prizes{gap:4px}.demo-battle-prize{padding:4px 2px}.demo-battle-prize small{font-size:6px}.demo-battle-prize strong{font-size:11px}.demo-battle-game{font-size:6px}.demo-battle-actions [data-demo-play]{min-height:38px;font-size:10px}}
+    .demo-battle-actions [data-demo-cancel],.demo-battle-actions [data-cancel-match]{width:100%;min-height:25px;padding:3px 4px;font-size:9px}
+    @media(max-width:420px){#view-home .demo-open-list-box .demo-battle-card,#view-games .demo-open-list-box .demo-battle-card{grid-template-columns:44px minmax(0,1fr) 64px;gap:6px;padding:8px}.demo-battle-avatar-wrap,.demo-battle-avatar{width:44px;height:44px}.demo-battle-avatar{width:42px;height:42px}.demo-battle-prizes{gap:4px}.demo-battle-prize{padding:4px 2px}.demo-battle-prize small{font-size:6px}.demo-battle-prize strong{font-size:11px}.demo-battle-game{font-size:6px}.demo-battle-actions [data-demo-play],.demo-battle-actions [data-join]{min-height:38px;font-size:10px}}
     #view-home .running-battle-card,#view-games .running-battle-card{position:relative;overflow:hidden;padding:10px;border:1px solid #62e9ff;border-radius:12px;background:radial-gradient(ellipse at 18% 0,#174b9d 0,transparent 58%),linear-gradient(145deg,#071d55,#03153a 65%,#062c64);box-shadow:0 4px 0 #03102b,0 8px 18px #007bff55,inset 0 1px 0 #c6f7ff}
     #view-home .running-battle-card::before,#view-games .running-battle-card::before{position:absolute;inset:4px;border:1px solid #33a9ff80;border-radius:8px;content:"";pointer-events:none}
     .running-battle-card>*{position:relative;z-index:1}
@@ -616,7 +617,7 @@
 👉 ₹200 से ₹1,00,000 तक Withdrawal
 👉 हर 2 घंटे में Withdrawal Available
 
-💸 Commission सिर्फ 5%
+💸 Commission सिर्फ 3%
 🎉 Referral Bonus 3%
 
 📞 24x7 Live Chat & Call Support
@@ -772,7 +773,7 @@
         const waiting=demoBattleWaitStartedAt.has(player.name);
         const remaining=waiting?Math.max(0,Math.ceil((demoBattleWaitStartedAt.get(player.name)+60000-Date.now())/1000)):60;
         const timer=`${String(Math.floor(remaining/60)).padStart(2,'0')}:${String(remaining%60).padStart(2,'0')}`;
-        const prize=Number(amount)*2*0.95;
+        const prize=Number(amount)*2*0.97;
         const gameLabel=gameType==='SNAKE'?'SNAKE BATTLE':'LUDO CLASSIC';
         return `<article class="match battle-card demo-battle-card"><div class="demo-battle-avatar-wrap"><img class="demo-battle-avatar" src="${esc(player.avatar)}" alt=""><span class="demo-battle-live"><i class="demo-live-dot" aria-hidden="true"></i>LIVE</span></div><div class="demo-battle-info"><div class="demo-battle-name-row"><strong class="demo-battle-name">${esc(player.name)}</strong><span class="demo-battle-game">${gameLabel}</span></div><div class="demo-battle-prizes"><div class="demo-battle-prize demo-battle-entry"><small>ENTRY FEE</small><strong>₹${Number(amount).toLocaleString('en-IN')}</strong></div><div class="demo-battle-prize demo-battle-winning"><small>WINNING PRIZE</small><strong>₹${prize.toLocaleString('en-IN')}</strong></div></div></div><div class="battle-card-actions demo-battle-actions"><button class="btn small" type="button" data-demo-play="${esc(player.name)}" data-demo-amount="${amount}"${waiting?' disabled aria-disabled="true"':''}>${waiting?'WAITING':'PLAY'}</button>${waiting?`<span class="demo-wait-status">Room code ka wait • <span data-demo-wait-timer="${esc(player.name)}">${timer}</span></span><button class="btn danger small" type="button" data-demo-cancel="${esc(player.name)}">CANCEL</button>`:''}</div></article>`;
       }).join('');
@@ -975,9 +976,12 @@
     gameTypeSelect=preservedSelect;
     function syncGameSelection(gameType){const selectedType=['LUDO','POPULAR_LUDO','LUDO_RACE','SNAKE'].includes(gameType)?gameType:'LUDO';game=selectedType==='SNAKE'?'SNAKE':'LUDO';gameTypeSelect.value=selectedType;el('selectedGameName').textContent=selectedGameNames[selectedType];gameModeOptions.querySelectorAll('.game-mode-option').forEach(button=>{const selected=button.dataset.gameOption===selectedType;button.classList.toggle('active',selected);button.setAttribute('aria-pressed',String(selected))});document.querySelectorAll('.game-filter').forEach(button=>button.classList.toggle('active',button.dataset.game===game));if(el('gameViewTitle'))el('gameViewTitle').textContent=selectedType==='LUDO_RACE'?'Ludo Race — 1 Goti Win':''}
     syncGameSelection(game);
+    function battleAvatarMarkup(user,className='battle-avatar'){
+      const username=nameOf(user),profileImage=String(user?.profileImage||'').trim(),imageUrl=profileImage.startsWith('uploads/')?`/api/profile/image/${encodeURIComponent(profileImage.slice('uploads/'.length))}`:profileImage?`/${profileImage.split('/').map(encodeURIComponent).join('/')}`:'',initial=String(username).trim().charAt(0).toUpperCase()||'?',avatarClass=`${className}${imageUrl?'':' battle-avatar-fallback'}`;
+      return imageUrl?`<img class="${avatarClass}" src="${esc(imageUrl)}" alt="">`:`<span class="${avatarClass}">${esc(initial)}</span>`;
+    }
     function battlePlayerMarkup(user,role,opponent=false,amount='',gameLabel=''){
-      const username=nameOf(user),profileImage=String(user?.profileImage||'').trim(),imageUrl=profileImage.startsWith('uploads/')?`/api/profile/image/${encodeURIComponent(profileImage.slice('uploads/'.length))}`:profileImage?`/${profileImage.split('/').map(encodeURIComponent).join('/')}`:'',initial=String(username).trim().charAt(0).toUpperCase()||'?';
-      const avatar=imageUrl?`<img class="battle-avatar" src="${esc(imageUrl)}" alt="">`:`<span class="battle-avatar">${esc(initial)}</span>`;
+      const username=nameOf(user),avatar=battleAvatarMarkup(user);
       const hasAmount=amount!==''&&amount!==null&&amount!==undefined;
       const amountMarkup=hasAmount?`<span class="battle-player-amount">₹${Number(amount).toLocaleString('en-IN')}</span>`:'';
       const gameTag=gameLabel?`<span class="battle-player-game-tag">${esc(gameLabel)}</span>`:'';
@@ -987,12 +991,18 @@
     function gameTypeLabel(gameType){return gameType==='LUDO_RACE'?'Ludo Race':gameType==='SNAKE'?'Snake battle':gameType==='POPULAR_LUDO'?'Popular Ludo':'Ludo Classic';}
     function isLudoGame(gameType){return gameType==='LUDO'||gameType==='POPULAR_LUDO'||gameType==='LUDO_RACE';}
     function matchCard(m,mine=false){
-      const entry=Number(m.amount),prize=entry*2*0.95,playerId=String(player?._id||storedUser?.id||''),isOwnOpen=m.status==='OPEN'&&String(m.creator?._id||m.creator)===playerId;
+      const entry=Number(m.amount),prize=entry*2*0.97,playerId=String(player?._id||storedUser?.id||''),isOwnOpen=m.status==='OPEN'&&String(m.creator?._id||m.creator)===playerId;
       const action=isOwnOpen
         ? `<button class="btn danger small" data-cancel-match="${esc(m._id)}">Cancel</button>`
         : `<button class="btn ${mine?'secondary':'green'} small" data-${mine?'match':'join'}="${esc(m._id)}" ${mine?'':`data-join-amount="${entry}"`}>${mine?'Details':'PLAY'}</button>`;
       const status=m.status==='PENDING_RESULT'?'Result review':m.status==='PENDING_CANCELLATION'?'Cancel review':m.status;
       const gameLabel=gameTypeLabel(m.gameType||game);
+      if(m.status==='OPEN'&&!mine){
+        const creatorName=nameOf(m.creator),openAction=isOwnOpen
+          ? `<button class="btn danger small" type="button" data-cancel-match="${esc(m._id)}">Cancel</button>`
+          : `<button class="btn green small" type="button" data-join="${esc(m._id)}" data-join-amount="${entry}">PLAY</button>`;
+        return `<article class="match battle-card demo-battle-card real-open-battle-card"><div class="demo-battle-avatar-wrap">${battleAvatarMarkup(m.creator,'demo-battle-avatar')}<span class="demo-battle-live"><i class="demo-live-dot" aria-hidden="true"></i>LIVE</span></div><div class="demo-battle-info"><div class="demo-battle-name-row"><strong class="demo-battle-name">${esc(creatorName)}</strong><span class="demo-battle-game">${esc(gameLabel.toUpperCase())}</span></div><div class="demo-battle-prizes"><div class="demo-battle-prize demo-battle-entry"><small>ENTRY FEE</small><strong>₹${entry.toLocaleString('en-IN')}</strong></div><div class="demo-battle-prize demo-battle-winning"><small>WINNING PRIZE</small><strong>₹${prize.toLocaleString('en-IN')}</strong></div></div></div><div class="battle-card-actions demo-battle-actions">${openAction}</div></article>`;
+      }
       const playersMarkup=m.joiner?`<div class="battle-players">${battlePlayerMarkup(m.creator,mine?'Creator':'Challenger',false,entry,gameLabel)}<img class="battle-versus battle-versus-image" src="/vs.png" alt="versus">${battlePlayerMarkup(m.joiner,'Opponent',true,entry)}</div>`:`<div class="battle-players battle-players-waiting">${battlePlayerMarkup(m.creator,mine?'Creator':'Challenger',false,entry,gameLabel)}</div>`;
       const statusMarkup=m.status==='OPEN'?'':`<div class="battle-card-top"><span class="status ${['PENDING_RESULT','PENDING_CANCELLATION'].includes(m.status)?'pending':''}">${esc(status)}</span></div>`;
       const prizeMarkup=m.status==='OPEN'?'':entry===0?'<div class="battle-prize"><small>ENTRY</small><strong>₹0</strong></div>':`<div class="battle-prize"><small>WIN</small><strong>₹${prize.toLocaleString('en-IN')}</strong></div>`;
@@ -1010,7 +1020,7 @@
       const openMarkup=visibleOpenMatches.map(m=>matchCard(m)).join('');
       renderDemoBattles();
       const fallbackDemoMarkup=demoBattlesHeader + demoBattlesList.innerHTML;
-      const allOpenBattlesMarkup = `${openMarkup ? `<div class="open-list-box">${openMarkup}</div>` : ''}<div class="demo-open-list-box demo-battles-container">${fallbackDemoMarkup}</div>`;
+      const allOpenBattlesMarkup = `${openMarkup ? `<div class="open-list-box demo-open-list-box">${demoBattlesHeader}${openMarkup}</div>` : ''}<div class="demo-open-list-box demo-battles-container">${fallbackDemoMarkup}</div>`;
       el('openMatches').innerHTML = allOpenBattlesMarkup;
       if(el('gameOpenMatches'))el('gameOpenMatches').innerHTML = allOpenBattlesMarkup;
       const currentPlayerId=String(player?._id||storedUser?._id||storedUser?.id||'');
@@ -1043,7 +1053,7 @@
         const secondaryAction = m.roomCode && (isCreator || isJoiner) ? `<div class="battle-inline-secondary-action"><button class="btn secondary small" type="button" data-running-result="${esc(m._id)}">Result / screenshot</button>${isLudoGame(m.gameType)?`<a class="btn secondary small ludo-app-button" data-open-ludo="true" href="${ludoKingOpenUrl()}">Open Ludo King App</a>`:''}</div>` : '';
         const roomCodePanel=m.roomCode&&(isCreator||isJoiner)?`<div class="battle-room-code-panel"><div class="battle-room-code-box"><input id="runningCode-${esc(m._id)}" value="${esc(m.roomCode)}" readonly><button class="btn secondary small" type="button" data-running-copy="${esc(m._id)}" data-room-code="${esc(m.roomCode)}" data-copy-open-game="${isLudoGame(m.gameType)?'LUDO':''}">Copy</button><span class="battle-room-code-label">Locked</span></div></div>`:'';
         const statusMarkup=isParticipant?`<div class="battle-card-top"><span class="status">${m.gameStartedAt?'Game chal raha hai':m.roomCodeSharedAt?'Room code locked • Ludo King mein kheliye':'Opponent joined • room code pending'}</span></div>`:'';
-        const entry=Number(m.amount),prize=entry*2*0.95;
+        const entry=Number(m.amount),prize=entry*2*0.97;
         return `<article class="match battle-card running-battle-card">${statusMarkup}<div class="battle-prizes running-battle-prizes"><div class="battle-prize-players"><div class="battle-players">${battlePlayerMarkup(m.creator,'Creator')}<img class="battle-versus battle-versus-image" src="/vs.png" alt="versus">${battlePlayerMarkup(m.joiner,'Opponent',true)}</div></div><div class="running-battle-rewards"><div class="battle-prize running-entry-prize"><small>ENTRY FEE</small><strong>₹${entry.toLocaleString('en-IN')}</strong></div>${entry===0?'':`<div class="battle-prize running-win-prize"><small>WINNING PRIZE</small><strong>₹${prize.toLocaleString('en-IN')}</strong></div>`}</div>${actions?`<div class="battle-card-actions">${actions}</div>`:''}</div>${secondaryAction}<div class="battle-room-actions">${roomCodePanel}</div></article>`
       }).join(''):'';
       runningList.querySelectorAll('[data-running-result]').forEach(button=>button.addEventListener('click',async()=>{
@@ -1057,7 +1067,7 @@
         }catch(error){showError(error)}
         finally{button.disabled=false;button.textContent='Result / screenshot'}
       }));
-      const sampleMarkup=sampleRunningBattles.map(({name,avatar,opponent,opponentAvatar,amount})=>`<article class="match battle-card running-battle-card sample-running-battle"><div class="battle-prizes running-battle-prizes"><div class="battle-prize-players"><div class="battle-players">${battlePlayerMarkup({username:name,profileImage:avatar.replace(/^\//,'')},'Creator')}<img class="battle-versus battle-versus-image" src="/vs.png" alt="versus">${battlePlayerMarkup({username:opponent,profileImage:opponentAvatar.replace(/^\//,'')},'Opponent',true)}</div></div><div class="running-battle-rewards"><div class="battle-prize running-entry-prize"><small>ENTRY FEE</small><strong>₹${Number(amount).toLocaleString('en-IN')}</strong></div><div class="battle-prize running-win-prize"><small>WINNING PRIZE</small><strong>₹${(amount*2*0.95).toLocaleString('en-IN')}</strong></div></div></div></article>`).join('');
+      const sampleMarkup=sampleRunningBattles.map(({name,avatar,opponent,opponentAvatar,amount})=>`<article class="match battle-card running-battle-card sample-running-battle"><div class="battle-prizes running-battle-prizes"><div class="battle-prize-players"><div class="battle-players">${battlePlayerMarkup({username:name,profileImage:avatar.replace(/^\//,'')},'Creator')}<img class="battle-versus battle-versus-image" src="/vs.png" alt="versus">${battlePlayerMarkup({username:opponent,profileImage:opponentAvatar.replace(/^\//,'')},'Opponent',true)}</div></div><div class="running-battle-rewards"><div class="battle-prize running-entry-prize"><small>ENTRY FEE</small><strong>₹${Number(amount).toLocaleString('en-IN')}</strong></div><div class="battle-prize running-win-prize"><small>WINNING PRIZE</small><strong>₹${(amount*2*0.97).toLocaleString('en-IN')}</strong></div></div></div></article>`).join('');
       el('sampleRunningMatches').innerHTML=sampleMarkup;
       el('mySampleRunningMatches').innerHTML=sampleMarkup;
       runningList.querySelectorAll('a[href^="intent://"]').forEach(link=>{link.href=ludoKingOpenUrl()});
@@ -1074,7 +1084,7 @@
     async function loadMine(){const container=el('myMatches');if(!container)return;const data=await api('/api/matches/mine'),matches=data.matches||[];container.innerHTML=matches.length?matches.map(m=>matchCard(m,true)).join(''):'<p class="muted">Abhi koi active battle nahi hai.</p>'}
     function refreshSamplePlayers(){
       if(!el('sampleRunningMatches')||!el('mySampleRunningMatches')||window.__REAL_OPEN_BATTLES_AVAILABLE)return;
-      const sampleMarkup=sampleRunningBattles.map(({name,avatar,opponent,opponentAvatar,amount})=>`<article class="match battle-card running-battle-card sample-running-battle"><div class="battle-prizes running-battle-prizes"><div class="battle-prize-players"><div class="battle-players">${battlePlayerMarkup({username:name,profileImage:avatar.replace(/^\//,'')},'Creator')}<img class="battle-versus battle-versus-image" src="/vs.png" alt="versus">${battlePlayerMarkup({username:opponent,profileImage:opponentAvatar.replace(/^\//,'')},'Opponent',true)}</div></div><div class="running-battle-rewards"><div class="battle-prize running-entry-prize"><small>ENTRY FEE</small><strong>₹${Number(amount).toLocaleString('en-IN')}</strong></div><div class="battle-prize running-win-prize"><small>WINNING PRIZE</small><strong>₹${(amount*2*0.95).toLocaleString('en-IN')}</strong></div></div></div></article>`).join('');
+      const sampleMarkup=sampleRunningBattles.map(({name,avatar,opponent,opponentAvatar,amount})=>`<article class="match battle-card running-battle-card sample-running-battle"><div class="battle-prizes running-battle-prizes"><div class="battle-prize-players"><div class="battle-players">${battlePlayerMarkup({username:name,profileImage:avatar.replace(/^\//,'')},'Creator')}<img class="battle-versus battle-versus-image" src="/vs.png" alt="versus">${battlePlayerMarkup({username:opponent,profileImage:opponentAvatar.replace(/^\//,'')},'Opponent',true)}</div></div><div class="running-battle-rewards"><div class="battle-prize running-entry-prize"><small>ENTRY FEE</small><strong>₹${Number(amount).toLocaleString('en-IN')}</strong></div><div class="battle-prize running-win-prize"><small>WINNING PRIZE</small><strong>₹${(amount*2*0.97).toLocaleString('en-IN')}</strong></div></div></div></article>`).join('');
       el('sampleRunningMatches').innerHTML=sampleMarkup;
       el('mySampleRunningMatches').innerHTML=sampleMarkup;
     }
