@@ -38,7 +38,7 @@
     .menu-icon span { display: block; width: 21px; height: 2px; border-radius: 2px; background: #fff; }
     .admin-menu-items.toolbar { position: absolute; top: calc(100% + 8px); right: 0; z-index: 12; display: grid; min-width: 190px; padding: 10px; border: 1px solid rgba(255,255,255,0.16); border-radius: 10px; background: #0f172a; box-shadow: 0 8px 24px rgba(0,0,0,0.35); }
     .admin-menu-items.toolbar > a, .admin-menu-items.toolbar > button { width: 100%; box-sizing: border-box; }
-    #adminHomeView[hidden], #adminToolsView[hidden], [data-admin-tool][hidden], #adminToolsView .grid[hidden] { display: none !important; }
+    #adminHomeView[hidden], #adminHomeView > [hidden], #adminToolsView[hidden], [data-admin-tool][hidden], #adminToolsView .grid[hidden] { display: none !important; }
     [data-admin-tool] { scroll-margin-top: 16px; }
     .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
     .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; }
@@ -673,17 +673,46 @@
 
     function updateNotifications(data) {
       const tasks = [
-        { label: 'Deposits', count: data.deposits?.length || 0, target: 'depTable' },
-        { label: 'KYC reviews', count: data.kycs?.length || 0, target: 'kycTable' },
-        { label: 'Match results', count: data.matches?.length || 0, target: 'matchTable' },
-        { label: 'Cancel requests', count: data.cancellationRequests?.length || 0, target: 'cancellationTable' },
-        { label: 'Withdrawals', count: data.withdrawals?.length || 0, target: 'withdrawTable' }
+        { label: 'Deposits', count: data.deposits?.length || 0, request: 'deposits' },
+        { label: 'KYC reviews', count: data.kycs?.length || 0, request: 'kyc' },
+        { label: 'Match results', count: data.matches?.length || 0, request: 'matches' },
+        { label: 'Cancel requests', count: data.cancellationRequests?.length || 0, request: 'cancellations' },
+        { label: 'Withdrawals', count: data.withdrawals?.length || 0, request: 'withdrawals' }
       ];
       const total = tasks.reduce((sum, task) => sum + task.count, 0);
       document.getElementById('notificationTotal').textContent = `${total} pending`;
       document.getElementById('notificationList').innerHTML = tasks.map(task =>
-        `<li><a href="#${task.target}">${task.label}: ${task.count}</a></li>`
+        `<li><a href="/admin.html?request=${task.request}">${task.label}: ${task.count}</a></li>`
       ).join('');
+    }
+
+    function configureAdminRequestPage() {
+      const requestTools = {
+        deposits: 'pendingDeposits',
+        kyc: 'pendingKyc',
+        matches: 'pendingMatchResults',
+        cancellations: 'cancellationRequests',
+        withdrawals: 'pendingWithdrawalRequests'
+      };
+      const request = new URLSearchParams(location.search).get('request');
+      const toolId = Object.prototype.hasOwnProperty.call(requestTools, request) ? requestTools[request] : null;
+      if (!toolId) return;
+
+      const homeView = document.getElementById('adminHomeView');
+      const supportChat = document.getElementById('adminSupportChat');
+      const toolsView = document.getElementById('adminToolsView');
+      const target = document.getElementById(toolId);
+      if (!target || !supportChat) throw new Error(`Admin request page not found: ${request}`);
+
+      homeView.hidden = false;
+      Array.from(homeView.children).forEach(section => {
+        section.hidden = section !== supportChat;
+      });
+      toolsView.hidden = false;
+      toolsView.querySelectorAll('[data-admin-tool]').forEach(tool => {
+        tool.hidden = tool !== target;
+      });
+      updateAdminToolGroups();
     }
 
     async function loadWithdrawTickerSettings() {
@@ -1518,7 +1547,11 @@
     }
 
     function showAdminHome() {
-      document.getElementById('adminHomeView').hidden = false;
+      const homeView = document.getElementById('adminHomeView');
+      homeView.hidden = false;
+      Array.from(homeView.children).forEach(section => {
+        section.hidden = false;
+      });
       document.getElementById('adminToolsView').hidden = true;
       closeAdminMenu();
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1546,6 +1579,7 @@
     document.getElementById('saveDepositUpiIdBtn').addEventListener('click', saveDepositUpiId);
     document.getElementById('saveLeaderboardSettings').addEventListener('click', saveAdminLeaderboardSettings);
     document.getElementById('saveWithdrawTickerSettings').addEventListener('click', saveWithdrawTickerSettings);
+    configureAdminRequestPage();
     loadSupportNumbers();
     loadDepositUpiId();
     loadWithdrawTickerSettings();
