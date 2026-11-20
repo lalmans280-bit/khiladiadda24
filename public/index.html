@@ -471,6 +471,28 @@
       document.getElementById('accentPalette').disabled = savedTheme !== 'night';
     } catch {}
   </script>
+  <style id="player3DTextStyle">
+    .brand-main,.brand .brand-tagline{ text-shadow:0 1px 0 #694b0c,0 2px 0 #3f2a05,0 4px 5px #000b,0 0 10px #ffd34a55 }
+    .brand-main .brand-win{ text-shadow:0 1px 0 #805500,0 2px 0 #543900,0 0 10px #ffda6877 }
+    .app-brand-logo{ filter:drop-shadow(0 3px 0 #08101b) drop-shadow(0 6px 5px #0009) drop-shadow(0 0 7px #f4c84b66) }
+    .lang-toggle{ border-color:#48d9ff; box-shadow:0 3px 0 #071326,0 5px 12px #00aaff33,inset 0 1px 0 #b6f5ff55 }
+    .lang-btn{ color:#e9faff; font-weight:900; text-shadow:0 1px 0 #071326,0 2px 0 #030913,0 0 6px #56eaff66 }
+    .lang-btn.active{ color:#172018; background:linear-gradient(180deg,#fff2a6,#e8b52e); box-shadow:0 2px 0 #80580a,inset 0 1px 0 #fff8cc; text-shadow:0 1px 0 #fff5c7 }
+    #view-home #createForm label[for="entryAmount"]{ color:#fff1c2; font-weight:900; letter-spacing:.08em; text-transform:uppercase; text-shadow:0 1px 0 #792a18,0 2px 0 #541b13,0 3px 4px #0008,0 0 8px #ffd75a66 }
+    #view-home #entryAmount{ font-weight:900; text-shadow:0 1px 0 #0b2f6d,0 2px 0 #04162b }
+    #view-home .match-head.home-open-header>#refreshOpen,#gameBattleView #gameRefreshOpen{ border-color:#53dfff; color:#fff; background:linear-gradient(180deg,#19c4ff 0%,#075fff 52%,#082d9b 100%); box-shadow:0 3px 0 #07115f,0 0 0 1px #74f2ff inset,0 0 11px #00aaff66; font-weight:900; text-shadow:0 1px 0 #071a55,0 2px 0 #061148 }
+    #view-home .match-head.home-open-header>#refreshOpen:hover:not(:disabled),#gameBattleView #gameRefreshOpen:hover:not(:disabled){ box-shadow:0 4px 0 #07115f,0 0 0 1px #74f2ff inset,0 0 15px #00aaff88; transform:translateY(-1px) }
+    #view-home .match-head.home-open-header>#refreshOpen:active:not(:disabled),#gameBattleView #gameRefreshOpen:active:not(:disabled){ box-shadow:0 1px 0 #07115f,0 0 0 1px #74f2ff inset,0 0 7px #00aaff66; transform:translateY(1px) }
+    #view-home .battle-card .battle-player-name,#view-games .battle-card .battle-player-name{ text-shadow:0 1px 0 #0b2f6d,0 2px 0 #04162b,0 0 8px #2faaff88 }
+    #view-home .battle-card .battle-player-role,#view-games .battle-card .battle-player-role{ text-shadow:0 1px 0 #071326,0 2px 0 #030913 }
+    #view-home .battle-card .battle-player-amount,#view-games .battle-card .battle-player-amount{ text-shadow:0 1px 0 #573805,0 2px 0 #2c1d04,0 0 6px #ffc53d88 }
+    #view-home .battle-card .battle-prize small,#view-games .battle-card .battle-prize small{ font-weight:900; text-shadow:0 1px 0 #30200b,0 2px 0 #171006 }
+    #view-home .battle-card .battle-prize strong,#view-games .battle-card .battle-prize strong{ text-shadow:0 1px 0 #503300,0 2px 0 #271a00,0 0 8px #ffbb3388 }
+    #view-home .battle-card .battle-card-game,#view-games .battle-card .battle-card-game{ filter:drop-shadow(0 1px 0 #042034) drop-shadow(0 2px 2px #00101a) }
+    #view-home .battle-card .battle-card-actions .btn,#view-games .battle-card .battle-card-actions .btn{ box-shadow:0 3px 0 #071326,0 5px 9px #0007; text-shadow:0 1px 0 #15202a,0 2px 0 #060b10 }
+    #view-home .demo-battle-game,#view-games .demo-battle-game,#view-home .demo-battle-prize small,#view-games .demo-battle-prize small{ text-shadow:0 1px 0 #071a4b,0 2px 0 #04102a,0 0 6px #2faaff66 }
+    #view-home .demo-battle-prize small,#view-games .demo-battle-prize small{ font-weight:900; letter-spacing:.05em; text-transform:uppercase }
+  </style>
 </head>
 <body>
   <header class="topbar"><div class="top-inner"><button class="icon" id="menuToggle" aria-label="Menu" aria-expanded="false">☰</button><a class="brand" href="#home" aria-label="Home"><img class="app-brand-logo" src="/app-logo.png" alt="" aria-hidden="true"><span class="brand-copy"><span class="brand-main"><span>PLAY</span><span>•</span><span>BATTLE</span><span class="brand-win">WIN</span></span><small class="brand-tagline">OPEN 24/7 WITHDRAW</small></span></a><div class="top-actions"><div class="lang-toggle" aria-label="Language selector"><button class="lang-btn active" type="button" data-lang-toggle="hi">HI</button><button class="lang-btn" type="button" data-lang-toggle="en">EN</button></div><span class="balance" id="headerBalance">₹ --</span></div></div><div class="menu" id="menu"><button data-view="profile" data-i18n-key="menuProfile">👤 My profile</button><button data-view="home" data-i18n-key="menuHome">🏆 Win cash</button><button data-view="wallet" data-i18n-key="menuWallet">👛 My wallet</button><button data-view="history" data-i18n-key="menuHistory">📜 History</button><button data-menu-action="referral" data-i18n-key="menuReferral">🎁 Refer and earn</button><button data-menu-action="notifications" data-i18n-key="menuNotifications">🔔 Notification</button><a href="/support.html" data-i18n-key="supportLink">🛟 Support</a><a href="/policy.html" data-i18n-key="policyLink">📄 All policies</a><button class="menu-logout" id="logout" data-i18n-key="logout">🚪 Logout</button></div><nav class="nav"><button class="active" data-view="home" data-i18n-key="navHome">Home</button><button data-view="games" data-i18n-key="navGames">Games</button><button data-view="wallet" data-i18n-key="navWallet">Wallet</button><button data-view="profile" data-i18n-key="navProfile">Profile</button></nav></header>
