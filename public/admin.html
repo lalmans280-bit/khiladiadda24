@@ -102,6 +102,9 @@
     .support-admin-form { display: grid; grid-template-columns: 1fr; gap: 8px; }
     .support-admin-form textarea { width: 100%; padding: 10px; border: 1px solid #475569; border-radius: 7px; color: #fff; background: #0f172a; font: inherit; }
     .support-admin-form-actions { display: flex; align-items: center; justify-content: flex-end; gap: 8px; }
+    .support-admin-status { min-height: 20px; color: #94a3b8; font-size: 13px; }
+    .support-admin-status.success { color: #86efac; font-weight: 700; }
+    .support-admin-status.error { color: #fca5a5; }
     .support-admin-attach { min-height: 40px; padding: 8px 10px; border: 1px solid #475569; border-radius: 8px; color: #e2e8f0; background: #334155; font-size: 13px; }
     .support-admin-file { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
     .support-admin-file-name { flex: 1; min-width: 0; overflow: hidden; color: #94a3b8; font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
@@ -189,6 +192,7 @@
                 <input id="supportAdminAttachment" class="support-admin-file" type="file" accept="image/jpeg,image/png,image/webp" aria-label="Reply screenshot attach karein" disabled>
                 <button id="supportAdminSend" type="submit" disabled>Send reply</button>
               </div>
+              <div id="supportAdminStatus" class="support-admin-status" role="status" aria-live="polite"></div>
             </form>
           </div>
         </div>
@@ -969,6 +973,12 @@
 
     let activeSupportUserId = '';
 
+    function setSupportAdminStatus(message, type = '') {
+      const status = document.getElementById('supportAdminStatus');
+      status.textContent = message;
+      status.className = `support-admin-status${type ? ` ${type}` : ''}`;
+    }
+
     const adminSupportAttachmentUrls = new Map();
     const supportAdminAttachment = document.getElementById('supportAdminAttachment');
     const supportAdminAttachmentName = document.getElementById('supportAdminAttachmentName');
@@ -1161,8 +1171,11 @@
       const input = document.getElementById('supportAdminInput');
       const text = input.value.trim();
       const attachment = document.getElementById('supportAdminAttachment').files[0];
-      if (!activeSupportUserId || (!text && !attachment)) return;
-      document.getElementById('supportAdminSend').disabled = true;
+      if (!activeSupportUserId) return setSupportAdminStatus('Reply bhejne ke liye player conversation select karein.', 'error');
+      if (!text && !attachment) return setSupportAdminStatus('Reply message likhein ya screenshot attach karein.', 'error');
+      const sendButton = document.getElementById('supportAdminSend');
+      sendButton.disabled = true;
+      setSupportAdminStatus('Reply bheji ja rahi hai...');
       try {
         const body = new FormData();
         body.set('text', text);
@@ -1177,11 +1190,16 @@
         document.getElementById('supportAdminAttachment').value = '';
         supportAdminAttachmentName.textContent = 'No screenshot selected';
         supportAdminAttachmentName.title = '';
-        await Promise.all([refreshAdminSupportThread(), loadAdminSupportThreads()]);
+        setSupportAdminStatus('✓ Sent — Player ko reply bhej diya gaya.', 'success');
+        try {
+          await Promise.all([refreshAdminSupportThread(), loadAdminSupportThreads()]);
+        } catch (error) {
+          setSupportAdminStatus(`Reply sent, but chat refresh nahi hui: ${error.message}`, 'error');
+        }
       } catch (error) {
-        alert(error.message || 'Reply send nahi hui.');
+        setSupportAdminStatus(error.message || 'Reply send nahi hui.', 'error');
       } finally {
-        document.getElementById('supportAdminSend').disabled = false;
+        sendButton.disabled = false;
       }
     });
 
