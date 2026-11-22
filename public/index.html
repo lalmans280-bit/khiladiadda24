@@ -1229,7 +1229,18 @@
       const room=el('roomForm');if(room)room.addEventListener('submit',async event=>{event.preventDefault();window.matchApp?.playGameActionBeep?.();try{const data=await api('/api/matches/set-room-code',{method:'POST',body:JSON.stringify({matchId:id,roomCode:el('roomCode').value})});notify(data.message);window.matchApp?.announceHindiStatus?.(m.gameType==='LUDO_RACE'?'Ludo Race का रूम कोड भेज दिया गया है। पहली गोटी घर पहुँचने वाला विजेता होगा।':'रूम कोड भेज दिया गया है।');await openMatch(id)}catch(error){showError(error)}});
       if(roomCopy)roomCopy.addEventListener('click',async()=>{if(isLudoGame(m.gameType)){window.matchApp?.playGameActionBeep?.();window.matchApp?.announceHindiStatus?.('लूडो किंग गेम खुल रहा है।');navigator.clipboard.writeText(m.roomCode).then(()=>notify('Room code copy ho gaya.')).catch(()=>notify(`Room code: ${m.roomCode}`));window.openLudoKingApp();return}try{await navigator.clipboard.writeText(m.roomCode);notify('Room code copy ho gaya.')}catch{notify(`Room code: ${m.roomCode}`)}});
       if(isLudoGame(m.gameType)&&m.roomCode){const roomPanel=el('roomCodeText')?.closest('.panel');if(roomPanel){const openLudo=document.createElement('a');openLudo.className='btn green';openLudo.href=ludoKingOpenUrl();openLudo.textContent='Open Ludo King';openLudo.dataset.openLudo='true';roomPanel.append(openLudo)}}
-      const result=el('resultForm');if(result)result.addEventListener('submit',async event=>{event.preventDefault();const body=new FormData(result);body.set('matchId',id);try{const data=await api('/api/matches/submit-result',{method:'POST',body});notify(data.message);window.matchApp?.announceResultReport?.(data.match);await refresh();await openMatch(id)}catch(error){showError(error)}});
+      const result=el('resultForm');
+      const resultShot=el('resultShot');
+      if(resultShot&&!el('openResultShot')){
+        const openShot=document.createElement('button');
+        openShot.id='openResultShot';
+        openShot.type='button';
+        openShot.className='btn secondary small';
+        openShot.textContent='Open screenshot picker';
+        openShot.addEventListener('click',()=>resultShot.click());
+        resultShot.before(openShot);
+      }
+      if(result)result.addEventListener('submit',async event=>{event.preventDefault();const body=new FormData(result);body.set('matchId',id);try{const data=await api('/api/matches/submit-result',{method:'POST',body});notify(data.message);window.matchApp?.announceResultReport?.(data.match);await refresh();await openMatch(id)}catch(error){showError(error)}});
       const cancel=el('cancelForm');if(cancel){const reasonSelect=cancel.querySelector('#reason'),requiresAdmin=m.status==='RUNNING'&&Boolean(m.roomCode);cancel.addEventListener('submit',async event=>{event.preventDefault();window.matchApp?.playGameActionBeep?.();const prompt=requiresAdmin?'Room code share ho chuka hai. Cancel reason admin ko bhejein? Approval ke baad hi cancel aur refund hoga.':'Room code share hone se pehle game cancel karke entry refund karein?';if(!confirm(prompt))return;const body={matchId:id};if(requiresAdmin){const reason=reasonSelect?.value;if(!reason)return notify('Cancel reason select karein.',true);body.reason=reason}try{const data=await api('/api/matches/cancel',{method:'POST',body:JSON.stringify(body)});notify(data.message);window.matchApp?.announceCancelOutcome?.(data);await refresh();await openMatch(id)}catch(error){showError(error)}})}
     }
     window.openMatchPage=(id,stage,showResult=false)=>{const url=new URL('/index.html',location.origin);url.searchParams.set('matchId',id);if(stage)url.searchParams.set('stage',stage);if(showResult)url.searchParams.set('showResult','1');history.pushState({matchId:id},'',url);return window.openMatch(id)};
