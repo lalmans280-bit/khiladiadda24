@@ -4,15 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#101713">
-  <link rel="icon" href="/app-icon.svg" type="image/svg+xml">
-  <link rel="shortcut icon" href="/app-icon.svg" type="image/svg+xml">
-  <link rel="icon" href="/app-icon-192.png" type="image/png" sizes="192x192">
-  <link rel="apple-touch-icon" href="/app-icon-192.png">
+  <link rel="icon" href="/app-logo.png?v=20261008-2304" type="image/png" sizes="500x500">
+  <link rel="apple-touch-icon" href="/app-logo.png?v=20261008-2304">
   <title>KhiladiAdda24.com Admin Panel</title>
   <style>
     body { font-family: Arial, sans-serif; margin: 0; padding-bottom: 82px; background: #fff; color: #e5e7eb; }
     .wrap { max-width: 1200px; margin: 0 auto; padding: 24px; }
-    .topbar { display: flex; justify-content: space-between; align-items: center; background: rgba(15, 23, 42, 0.9); padding: 18px 20px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.08); margin-bottom: 20px; }
+    .topbar { position: sticky; top: 0; z-index: 11; display: flex; justify-content: space-between; align-items: center; background: rgba(15, 23, 42, 0.96); padding: 18px 20px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.08); margin-bottom: 20px; }
     .logo { font-size: 28px; font-weight: 700; color: #fbbf24; }
     .player-list-search { display: block; width: min(100%, 480px); height: 48px; margin: 0 auto 14px; }
     .card { background: rgba(17, 24, 39, 0.9); padding: 18px; margin-bottom: 20px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.08); }
@@ -27,37 +25,36 @@
     .toolbar button, .toolbar a { text-decoration: none; display: inline-block; }
     .topbar .toolbar > a, .topbar .toolbar > button { min-height: 40px; padding: 10px 14px; border: 1px solid rgba(255,255,255,0.3); border-radius: 8px; font-size: 12px; font-weight: 800; text-align: center; text-transform: uppercase; }
     .topbar .toolbar > a { color: #fff; background: #2563eb; }
+    .topbar-actions { display: flex; align-items: center; justify-content: flex-end; gap: 8px; }
+    .topbar .topbar-actions > .top-action { min-height: 40px; padding: 10px 14px; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: #fff; font-size: 12px; font-weight: 800; text-align: center; text-decoration: none; text-transform: uppercase; white-space: nowrap; }
+    .topbar .topbar-actions > .player-site { background: #2563eb; }
+    .topbar .topbar-actions > .refresh-data { background: #059669; }
+    .topbar .topbar-actions > .logout { background: #dc2626; }
+    .topbar .topbar-actions > .top-action:hover { filter: brightness(1.12); }
+    .admin-menu { position: relative; }
+    .admin-menu summary { width: 44px; height: 40px; display: grid; place-items: center; border: 1px solid rgba(255,255,255,0.3); border-radius: 8px; cursor: pointer; list-style: none; }
+    .admin-menu summary::-webkit-details-marker { display: none; }
+    .menu-icon { display: grid; gap: 4px; }
+    .menu-icon span { display: block; width: 21px; height: 2px; border-radius: 2px; background: #fff; }
+    .admin-menu-items.toolbar { position: absolute; top: calc(100% + 8px); right: 0; z-index: 12; display: grid; min-width: 190px; padding: 10px; border: 1px solid rgba(255,255,255,0.16); border-radius: 10px; background: #0f172a; box-shadow: 0 8px 24px rgba(0,0,0,0.35); }
+    .admin-menu-items.toolbar > a, .admin-menu-items.toolbar > button { width: 100%; box-sizing: border-box; }
+    .admin-request-back { display: inline-flex; align-items: center; margin-bottom: 16px; padding: 10px 14px; border: 1px solid rgba(251,191,36,0.5); border-radius: 8px; color: #fde68a; background: rgba(120,53,15,0.35); font-weight: 700; text-decoration: none; }
+    .admin-request-back:hover { background: rgba(120,53,15,0.6); }
+    .admin-request-back[hidden] { display: none !important; }
+    #adminHomeView[hidden], #adminHomeView > [hidden], #adminToolsView[hidden], [data-admin-tool][hidden], #adminToolsView .grid[hidden] { display: none !important; }
+    [data-admin-tool] { scroll-margin-top: 16px; }
     .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
     .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; }
-    .player-copy-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto; align-items: end; gap: 8px; margin: 10px 0; }
-    .player-copy-row label { display: block; color: #cbd5e1; font-size: 12px; }
-    .player-copy-row textarea { width: 100%; min-height: 64px; box-sizing: border-box; padding: 9px; border: 1px solid #475569; border-radius: 7px; color: #fff; background: #0f172a; font: inherit; resize: vertical; }
-    .player-copy-row button { background: #dc2626; }
     input, select { width: 100%; box-sizing: border-box; padding: 9px; border-radius: 7px; border: 1px solid #475569; background: #0f172a; color: #fff; margin: 4px 0; }
     .secondary { background: #2563eb; }
     .danger { background: #dc2626; }
     .muted { color: #94a3b8; font-size: 13px; }
     .match-proof-preview { display: block; width: 140px; max-height: 100px; object-fit: contain; border: 1px solid rgba(255,255,255,0.16); border-radius: 6px; background: #0f172a; }
     .payout-qr-preview { display: block; width: 110px; max-height: 110px; object-fit: contain; border: 1px solid rgba(255,255,255,0.16); border-radius: 6px; background: white; }
-    .branding-preview { display: block; width: 88px; height: 88px; margin: 8px 0; object-fit: contain; border: 1px solid rgba(255,255,255,0.16); border-radius: 8px; background: #0f172a; }
     .notifications { border-left: 4px solid #fbbf24; }
     .notifications h3 { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
-    .notice-list { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
-    .notice-list li { min-width: 0; }
-    .notice-list a { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 42px; padding: 8px 12px; border: 1px solid rgba(251,191,36,0.35); border-radius: 8px; color: #fde68a; background: #0f172a; text-align: left; text-decoration: none; }
-    .notice-list a::after { content: "Open"; color: #93c5fd; font-size: 11px; font-weight: 800; text-transform: uppercase; }
-    .notice-list a:hover { border-color: #fbbf24; background: #1e293b; }
-    .admin-notification-section { margin: 0; padding: 0 0 10px; border: 1px solid rgba(251,191,36,0.28); border-radius: 8px; background: #0f172a; }
-    .admin-notification-section > summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 42px; padding: 8px 12px; border-radius: 8px; color: #fde68a; background: #0f172a; font-size: 14px; font-weight: 700; cursor: pointer; list-style: none; }
-    .admin-notification-section > summary::-webkit-details-marker { display: none; }
-    .admin-notification-section > summary::after { content: "Open"; color: #93c5fd; font-size: 11px; font-weight: 800; text-transform: uppercase; }
-    .admin-notification-section[open] > summary::after { content: "Close"; }
-    .admin-notification-section > summary:hover { background: #1e293b; }
-    .admin-notification-section > summary:focus-visible { outline: 2px solid #fbbf24; outline-offset: 2px; }
-    .admin-notification-section > table { width: calc(100% - 20px); margin: 10px; }
-    .admin-notification-section > .muted { margin: 10px; }
-    .admin-request-back { display: inline-block; margin: 0 0 12px; padding: 8px 12px; border-radius: 8px; color: #fff; background: #2563eb; text-decoration: none; font-weight: 700; }
-    .admin-request-view .wrap > .grid[hidden] { display: none !important; }
+    .notice-list { display: flex; flex-wrap: wrap; gap: 10px 20px; margin: 0; padding: 0; list-style: none; }
+    .notice-list a { text-decoration: none; }
     .block-button { background: #dc2626; }
     .unblock-button { background: #2563eb; }
     .player-list-toolbar { align-items: center; justify-content: space-between; margin-bottom: 10px; }
@@ -69,6 +66,10 @@
     .finance-stat small { display: block; color: #94a3b8; }
     .finance-stat strong { display: block; margin-top: 6px; color: #f8fafc; font-size: 22px; overflow-wrap: anywhere; }
     .player-name-link { padding: 0; border: 0; color: #60a5fa; background: transparent; font: inherit; text-align: left; text-decoration: underline; }
+    .player-kyc-status { display: inline-block; padding: 4px 8px; border-radius: 999px; font-size: 12px; font-weight: 700; white-space: nowrap; }
+    .player-kyc-status.not-submitted, .player-kyc-status.rejected { color: #fecaca; background: #7f1d1d; }
+    .player-kyc-status.pending { color: #fde68a; background: #78350f; }
+    .player-kyc-status.approved { color: #bbf7d0; background: #14532d; }
     .player-whatsapp-link { color: #22c55e; text-decoration: underline; cursor: pointer; }
     .history-dialog { width: min(900px, calc(100vw - 28px)); max-height: min(86vh, 900px); overflow: auto; padding: 20px; border: 1px solid rgba(255,255,255,0.16); border-radius: 10px; color: #e5e7eb; background: #111827; }
     .history-dialog::backdrop { background: rgba(0,0,0,0.75); }
@@ -78,16 +79,6 @@
     .history-summary small, .history-summary strong { display: block; }
     .history-summary small { color: #94a3b8; }
     .history-summary strong { margin-top: 5px; overflow-wrap: anywhere; }
-    .kyc-history-card { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin: 0 0 22px; padding: 14px; border: 1px solid rgba(251,191,36,0.35); border-radius: 10px; background: rgba(15,23,42,0.7); }
-    .kyc-history-card > div { min-width: 0; }
-    .kyc-history-card small, .kyc-history-card strong { display: block; }
-    .kyc-history-card small { color: #94a3b8; }
-    .kyc-history-card strong { margin-top: 5px; overflow-wrap: anywhere; }
-    .kyc-status-badge { width: fit-content; padding: 5px 9px; border-radius: 999px; }
-    .kyc-status-badge.not-submitted, .kyc-status-badge.rejected { color: #fecaca; background: #7f1d1d; }
-    .kyc-status-badge.pending { color: #fde68a; background: #78350f; }
-    .kyc-status-badge.approved { color: #bbf7d0; background: #14532d; }
-    .kyc-status-badge.unknown { color: #e2e8f0; background: #334155; }
     .history-dialog h4 { margin: 20px 0 8px; color: #fbbf24; }
     .history-dialog table { margin-top: 0; }
     .kyc-edit-dialog { width: min(480px, calc(100vw - 28px)); }
@@ -111,18 +102,30 @@
     .support-admin-form { display: grid; grid-template-columns: 1fr; gap: 8px; }
     .support-admin-form textarea { width: 100%; padding: 10px; border: 1px solid #475569; border-radius: 7px; color: #fff; background: #0f172a; font: inherit; }
     .support-admin-form-actions { display: flex; align-items: center; justify-content: flex-end; gap: 8px; }
+    .support-admin-status { min-height: 20px; color: #94a3b8; font-size: 13px; }
+    .support-admin-status.success { color: #86efac; font-weight: 700; }
+    .support-admin-status.error { color: #fca5a5; }
     .support-admin-attach { min-height: 40px; padding: 8px 10px; border: 1px solid #475569; border-radius: 8px; color: #e2e8f0; background: #334155; font-size: 13px; }
     .support-admin-file { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
     .support-admin-file-name { flex: 1; min-width: 0; overflow: hidden; color: #94a3b8; font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
-    @media (max-width: 700px) { .support-admin-layout { grid-template-columns: 1fr; } .support-admin-form { grid-template-columns: 1fr; } }
-    @media (max-width: 600px) { .history-dialog { padding: 14px; } .history-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    .leaderboard-settings { display: grid; grid-template-columns: repeat(3, minmax(120px, 1fr)); gap: 10px; }
+    .leaderboard-settings label { color: #cbd5e1; font-size: 12px; }
+    .leaderboard-prizes { width: 100%; min-height: 90px; padding: 10px; border: 1px solid #475569; border-radius: 7px; color: #fff; background: #0f172a; font: inherit; }
+    .leaderboard-player-image { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; vertical-align: middle; background: #263449; }
+    .leaderboard-player-input { width: 90px; }
     .admin-bottom-nav { position: fixed; z-index: 10; right: 0; bottom: 0; left: 0; display: flex; justify-content: center; gap: 12px; padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); border-top: 1px solid rgba(255,255,255,0.12); background: rgba(15,23,42,0.96); backdrop-filter: blur(12px); }
     .admin-bottom-nav button { min-width: 132px; }
+    .admin-section { scroll-margin-top: 16px; }
+    @media (max-width: 700px) { .support-admin-layout { grid-template-columns: 1fr; } .leaderboard-settings { grid-template-columns: 1fr; } .support-admin-form { grid-template-columns: 1fr; } }
+    @media (max-width: 600px) { .history-dialog { padding: 14px; } .history-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
     @media (max-width: 600px) {
       .wrap { padding: 12px; }
       body { padding-bottom: 78px; }
       .topbar { align-items: flex-start; flex-direction: column; gap: 14px; padding: 14px; }
       .logo { font-size: 23px; }
+      .topbar-actions { width: 100%; gap: 6px; }
+      .topbar .topbar-actions > .top-action { flex: 1; min-width: 0; padding-right: 6px; padding-left: 6px; font-size: 10px; }
+      .admin-menu summary { width: 40px; flex: 0 0 40px; }
       .grid { grid-template-columns: minmax(0, 1fr); gap: 12px; }
       .finance-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
       .finance-stat { padding: 10px; }
@@ -133,9 +136,8 @@
       th, td { padding: 9px 8px; }
       button { min-height: 40px; }
       .admin-bottom-nav { gap: 8px; }
-      .admin-bottom-nav button { flex: 1; min-width: 0; }
+      .admin-bottom-nav button { flex: 1; min-width: 0; padding-right: 6px; padding-left: 6px; font-size: 12px; }
       .player-list-toolbar { align-items: flex-start; flex-direction: column; }
-      .player-copy-row { grid-template-columns: minmax(0, 1fr); }
     }
   </style>
 </head>
@@ -143,44 +145,63 @@
   <div class="wrap">
     <div class="topbar">
       <div class="logo">KhiladiAdda24 Admin</div>
-      <div class="toolbar">
-        <a href="/index.html" onclick="openPlayerSite(event)">Player Site</a>
-        <button id="refreshAdminButton" type="button" class="secondary" onclick="refreshAdminData()">Refresh data</button>
-        <button class="danger" onclick="adminLogout()">Logout</button>
+      <div class="topbar-actions">
+        <a class="top-action player-site" href="/index.html" onclick="openPlayerSite(event)">PLAYER SITE</a>
+        <button id="refreshAdminButton" type="button" class="top-action refresh-data" onclick="refreshAdminData()">REFRESH DATA</button>
+        <button class="top-action logout" type="button" onclick="adminLogout()">LOGOUT</button>
+        <details class="admin-menu">
+          <summary aria-label="Admin menu">
+            <span class="menu-icon" aria-hidden="true"><span></span><span></span><span></span></span>
+          </summary>
+          <div class="toolbar admin-menu-items">
+            <a href="#walletUpdate" onclick="showAdminTool(event, 'walletUpdate')">Wallet Update</a>
+            <a href="#bonusCredit" onclick="showAdminTool(event, 'bonusCredit')">Bonus Credit</a>
+            <a href="#adminSupportNumbers" onclick="showAdminTool(event, 'adminSupportNumbers')">WhatsApp &amp; Support Numbers</a>
+            <a href="#depositWithdrawalSummary" onclick="showAdminTool(event, 'depositWithdrawalSummary')">Deposit &amp; Withdrawal Summary</a>
+            <a href="#depositUpiSettings" onclick="showAdminTool(event, 'depositUpiSettings')">Deposit UPI ID</a>
+            <a href="#completeGameHistory" onclick="showAdminTool(event, 'completeGameHistory')">Complete Game History</a>
+            <a href="#adminToolsView" onclick="showAllAdminTools(event)">Other Admin Tools</a>
+          </div>
+        </details>
       </div>
     </div>
 
-    <div class="card" id="runningGamesOverview" aria-live="polite">
-      <h3>Running Games <span id="runningGamesCount" class="muted">Loading...</span></h3>
-      <div id="runningGamesOverviewList" class="empty">Running games load ho rahe hain...</div>
-    </div>
+    <div id="adminHomeView">
+      <div class="card" id="runningGamesOverview" aria-live="polite">
+        <h3>Running Games <span id="runningGamesCount" class="muted">Loading...</span></h3>
+        <div id="runningGamesOverviewList" class="empty">Running games load ho rahe hain...</div>
+      </div>
 
-    <div class="card notifications" aria-live="polite">
-      <h3><span id="notificationHeading">Admin Notifications</span> <span id="notificationTotal" class="muted">Loading...</span></h3>
-      <ul id="notificationList" class="notice-list">
-        <li><a href="/admin.html?request=deposits">Deposits <span id="notificationDepositsCount">0</span></a></li>
-        <li><a href="/admin.html?request=kyc">KYC reviews <span id="notificationKycsCount">0</span></a></li>
-        <li><a href="/admin.html?request=matches">Match results <span id="notificationMatchesCount">0</span></a></li>
-        <li><a href="/admin.html?request=cancellations">Cancel requests <span id="notificationCancellationCount">0</span></a></li>
-        <li><a href="/admin.html?request=withdrawals">Withdrawals <span id="notificationWithdrawalsCount">0</span></a></li>
-      </ul>
-    </div>
+      <div class="card notifications" aria-live="polite">
+        <h3>Admin Notifications <span id="notificationTotal" class="muted">Loading...</span></h3>
+        <ul id="notificationList" class="notice-list"><li class="muted">Pending work check ho raha hai...</li></ul>
+      </div>
 
-    <div class="card">
-      <h3>Notification Line</h3>
-      <p class="muted">Top ke niche ya banner ke upar chali hui line admin se edit hogi.</p>
-      <div class="form-grid">
-        <div style="grid-column: 1 / -1;">
-          <input id="announcementTextInput" type="text" maxlength="120" placeholder="Welcome to khiladiadda24.com">
+      <section class="card admin-section" id="adminSupportChat" aria-labelledby="adminSupportChatTitle">
+        <h3 id="adminSupportChatTitle">Direct Player Support Chat</h3>
+        <p class="muted">Players ke support messages yahan aayenge. Reply admin account se player ke chat me directly jayega.</p>
+        <div class="support-admin-layout">
+          <div id="supportThreadList" class="support-thread-list"><p class="muted">Conversations load ho rahi hain...</p></div>
+          <div class="support-admin-chat">
+            <div id="supportAdminMessages" class="support-admin-messages"><p class="muted">Conversation kholne ke liye player select karein.</p></div>
+            <form id="supportAdminForm" class="support-admin-form">
+              <textarea id="supportAdminInput" rows="2" maxlength="1000" placeholder="Player ko reply likhein..." disabled></textarea>
+              <div class="support-admin-form-actions">
+                <span id="supportAdminAttachmentName" class="support-admin-file-name">No screenshot selected</span>
+                <button id="supportAdminAttachButton" class="support-admin-attach" type="button" disabled>📎 Attach screenshot</button>
+                <input id="supportAdminAttachment" class="support-admin-file" type="file" accept="image/jpeg,image/png,image/webp" aria-label="Reply screenshot attach karein" disabled>
+                <button id="supportAdminSend" type="submit" disabled>Send reply</button>
+              </div>
+              <div id="supportAdminStatus" class="support-admin-status" role="status" aria-live="polite"></div>
+            </form>
+          </div>
         </div>
-      </div>
-      <div class="toolbar" style="margin-top: 12px;">
-        <button id="saveAnnouncementBtn" type="button">Save notification line</button>
-      </div>
-      <p id="announcementStatus" class="muted">Loading...</p>
+      </section>
     </div>
 
-    <div class="card">
+    <div id="adminToolsView" class="admin-tools-view" hidden>
+    <a id="adminRequestBack" class="admin-request-back" href="/admin.html" hidden>← Back to Admin Notifications</a>
+    <div class="card admin-section" id="adminSupportNumbers" data-admin-tool>
       <h3>WhatsApp &amp; Support Numbers</h3>
       <p class="muted">Dono fields mein valid 10-digit Indian mobile number dalein. WhatsApp aur support ke numbers alag ho sakte hain.</p>
       <div class="form-grid">
@@ -199,53 +220,7 @@
       <p id="supportNumbersStatus" class="muted">Loading...</p>
     </div>
 
-    <div class="card">
-      <h3>Site Logo &amp; App Icons</h3>
-      <p class="muted">PNG images upload karke logo, app icon, game banners aur support graphic badlein. App icons ki dimensions exact rakhein.</p>
-      <div class="form-grid">
-        <div>
-          <label for="brandLogoFile">Login logo PNG</label>
-          <img id="brandLogoPreview" class="branding-preview" alt="Current top logo preview" hidden>
-          <input id="brandLogoFile" type="file" accept="image/png,.png">
-        </div>
-        <div>
-          <label for="appIcon192File">App icon PNG (192 x 192)</label>
-          <img id="appIcon192Preview" class="branding-preview" alt="Current 192 pixel app icon preview" hidden>
-          <input id="appIcon192File" type="file" accept="image/png,.png">
-        </div>
-        <div>
-          <label for="appIcon512File">App icon PNG (512 x 512)</label>
-          <img id="appIcon512Preview" class="branding-preview" alt="Current 512 pixel app icon preview" hidden>
-          <input id="appIcon512File" type="file" accept="image/png,.png">
-        </div>
-        <div>
-          <label for="homeBannerFile">Home battle banner PNG</label>
-          <img id="homeBannerPreview" class="branding-preview" alt="Current home banner preview" hidden>
-          <input id="homeBannerFile" type="file" accept="image/png,.png">
-        </div>
-        <div>
-          <label for="ludoBannerFile">Ludo card PNG</label>
-          <img id="ludoBannerPreview" class="branding-preview" alt="Current Ludo card preview" hidden>
-          <input id="ludoBannerFile" type="file" accept="image/png,.png">
-        </div>
-        <div>
-          <label for="snakeBannerFile">Snake card PNG</label>
-          <img id="snakeBannerPreview" class="branding-preview" alt="Current Snake card preview" hidden>
-          <input id="snakeBannerFile" type="file" accept="image/png,.png">
-        </div>
-        <div>
-          <label for="supportBannerFile">Support banner PNG</label>
-          <img id="supportBannerPreview" class="branding-preview" alt="Current support banner preview" hidden>
-          <input id="supportBannerFile" type="file" accept="image/png,.png">
-        </div>
-      </div>
-      <div class="toolbar" style="margin-top: 12px;">
-        <button id="saveBrandingBtn" type="button">Save selected images</button>
-      </div>
-      <p id="brandingStatus" class="muted">Loading current images...</p>
-    </div>
-
-    <div class="card">
+    <div class="card" id="depositUpiSettings" data-admin-tool>
       <h3>Deposit UPI ID</h3>
       <p class="muted">Player deposit QR aur UPI app payment ke liye use hone wala UPI ID.</p>
       <div class="form-grid">
@@ -260,18 +235,7 @@
       <p id="depositUpiIdStatus" class="muted">Loading...</p>
     </div>
 
-    <div class="card">
-      <h3>Player Text Settings</h3>
-      <p class="muted">Player pages ki kisi bhi exact line ko badalne ke liye current line aur naya text bharein. Blank naya text us line ko hide karega.</p>
-      <div id="playerCopyRows"></div>
-      <div class="toolbar" style="margin-top: 12px;">
-        <button id="addPlayerCopyRowBtn" type="button" class="secondary">Add text line</button>
-        <button id="savePlayerCopyBtn" type="button">Save player text</button>
-      </div>
-      <p id="playerCopyStatus" class="muted">Loading...</p>
-    </div>
-
-    <div class="card" aria-live="polite">
+    <div class="card" id="depositWithdrawalSummary" data-admin-tool aria-live="polite">
       <h3>Deposit & Withdrawal Summary</h3>
       <div class="finance-grid">
         <div class="finance-stat"><small>Total deposits approved</small><strong id="totalDeposits">₹ --</strong></div>
@@ -283,7 +247,7 @@
     </div>
 
     <div class="grid">
-      <div class="card">
+      <div class="card" id="walletUpdate" data-admin-tool>
         <h3>Wallet Update</h3>
         <p class="muted">Player wallet me amount add ya deduct karein.</p>
         <select id="walletUser"></select>
@@ -291,7 +255,7 @@
         <input type="text" id="walletReason" placeholder="Reason">
         <button onclick="adjustWallet()">Update Wallet</button>
       </div>
-      <div class="card">
+      <div class="card" id="bonusCredit" data-admin-tool>
         <h3>Bonus Credit</h3>
         <p class="muted">Bonus direct player wallet me add hoga.</p>
         <select id="bonusUser"></select>
@@ -301,7 +265,7 @@
       </div>
     </div>
 
-    <div class="card">
+    <div class="card" id="allPlayersList" data-admin-tool data-admin-extra>
       <h3 id="userListTitle">All Players & Wallets</h3>
       <input class="player-list-search" id="playerSearch" type="search" aria-label="Search player by name, phone, or ID" placeholder="Search name, mobile, or player ID">
       <div class="toolbar player-list-toolbar">
@@ -312,63 +276,73 @@
         <span id="playerListSummary" class="muted" aria-live="polite"></span>
       </div>
       <table id="userTable">
-        <tr><th>S.N.</th><th>Player</th><th>Phone</th><th>Wallet</th><th>Joined</th><th>KYC</th><th>Status</th><th>Admin</th><th>Action</th></tr>
+        <tr><th>S.N.</th><th>Player / ID</th><th>Phone</th><th>Wallet</th><th>Monthly rank</th><th>Monthly points</th><th>Joined</th><th>KYC</th><th>Status</th><th>Admin</th><th>Action</th></tr>
       </table>
     </div>
 
-    <section class="card" id="adminSupportChat" aria-labelledby="adminSupportChatTitle">
-      <h3 id="adminSupportChatTitle">Direct Player Support Chat</h3>
-      <p class="muted">Players ke support messages yahan aayenge. Reply admin account se player ke chat me directly jayega.</p>
-      <div class="support-admin-layout">
-        <div id="supportThreadList" class="support-thread-list"><p class="muted">Conversations load ho rahi hain...</p></div>
-        <div class="support-admin-chat">
-          <div id="supportAdminMessages" class="support-admin-messages"><p class="muted">Conversation kholne ke liye player select karein.</p></div>
-          <form id="supportAdminForm" class="support-admin-form">
-            <textarea id="supportAdminInput" rows="2" maxlength="1000" placeholder="Player ko reply likhein..." disabled></textarea>
-            <div class="support-admin-form-actions">
-              <span id="supportAdminAttachmentName" class="support-admin-file-name">No screenshot selected</span>
-              <button id="supportAdminAttachButton" class="support-admin-attach" type="button" disabled>📎 Attach screenshot</button>
-              <input id="supportAdminAttachment" class="support-admin-file" type="file" accept="image/jpeg,image/png,image/webp" aria-label="Reply screenshot attach karein" disabled>
-              <button id="supportAdminSend" type="submit" disabled>Send reply</button>
-            </div>
-          </form>
-        </div>
+    <section class="card admin-section" id="adminLeaderboard" data-admin-tool data-admin-extra aria-labelledby="adminLeaderboardTitle">
+      <h3 id="adminLeaderboardTitle">Monthly Standings & Prize Controls</h3>
+      <p class="muted"><span id="adminLeaderboardMonth">Loading...</span> — har completed game ke points aur rank prizes yahan configure karein. Empty player override se automatic points/prize use honge.</p>
+      <div class="leaderboard-settings">
+        <label>Points per completed game<input id="pointsPerGameInput" type="number" min="0" step="1"></label>
+        <label>Winner bonus points<input id="winBonusInput" type="number" min="0" step="1"></label>
+        <label>Total prize pool (₹)<input id="prizePoolInput" type="number" min="0" step="1"></label>
+      </div>
+      <label for="rankPrizesInput">Rank 1–100 prize amounts (₹), comma/newline separated; use 0 for no prize</label>
+      <textarea id="rankPrizesInput" class="leaderboard-prizes"></textarea>
+      <div class="toolbar" style="margin-top: 10px;"><button id="saveLeaderboardSettings" type="button">Save points & rank prizes</button><span id="leaderboardSettingsStatus" class="muted" aria-live="polite"></span></div>
+      <div style="overflow-x:auto">
+        <table id="adminLeaderboardTable">
+          <tr><th>Rank</th><th>Player</th><th>Points override</th><th>Prize override (₹)</th><th>Games</th><th>Wins</th><th>Action</th></tr>
+        </table>
       </div>
     </section>
 
-    <div id="adminRequestPanels" class="card" hidden>
-      <a id="adminRequestBack" class="admin-request-back" href="/admin.html">← Back to Admin Notifications</a>
-      <details id="depositRequestPanel" class="admin-notification-section">
-        <summary>Pending Deposits (QR Verify)</summary>
-        <table id="depTable"><tr><th>User</th><th>Amount</th><th>UTR</th><th>Proof</th><th>Action</th></tr></table>
-      </details>
-      <details id="kycRequestPanel" class="admin-notification-section">
-        <summary>Pending Aadhaar KYC</summary>
-        <p class="muted">Target: har KYC ko submission ke 30 minutes ke andar review karein.</p>
-        <table id="kycTable"><tr><th>Player</th><th>Aadhaar</th><th>Image</th><th>Submitted</th><th>Action</th></tr></table>
-      </details>
-      <details id="matchRequestPanel" class="admin-notification-section">
-        <summary>Pending Match Results</summary>
-        <table id="matchTable"><tr><th>Game / Entry</th><th>Players</th><th>Winner</th><th>Screenshot</th><th>Room / Start</th><th>Action</th></tr></table>
-      </details>
-      <details id="cancellationRequestPanel" class="admin-notification-section">
-        <summary>Cancel Requests for Review</summary>
-        <table id="cancellationTable"><tr><th>Game</th><th>Players</th><th>Requested by</th><th>Reason</th><th>Entry refund</th><th>Action</th></tr></table>
-      </details>
-      <details id="withdrawalRequestPanel" class="admin-notification-section">
-        <summary>Pending Withdrawals</summary>
-        <table id="withdrawTable"><tr><th>Player</th><th>Amount</th><th>Method</th><th>Payout details</th><th>QR</th><th>Action</th></tr></table>
-      </details>
+    <div class="card" id="pendingDeposits" data-admin-tool data-admin-extra>
+      <h3>Pending Deposits (QR Verify)</h3>
+      <table id="depTable">
+        <tr><th>User</th><th>Amount</th><th>UTR</th><th>Proof</th><th>Action</th></tr>
+      </table>
     </div>
 
-    <div class="card">
+    <div class="card" id="pendingKyc" data-admin-tool data-admin-extra>
+      <h3>Pending Aadhaar KYC</h3>
+      <p class="muted">Target: har KYC ko submission ke 30 minutes ke andar review karein.</p>
+      <table id="kycTable">
+        <tr><th>Player</th><th>Aadhaar</th><th>Image</th><th>Submitted</th><th>Action</th></tr>
+      </table>
+    </div>
+
+    <div class="card" id="pendingMatchResults" data-admin-tool data-admin-extra>
+      <h3>Pending Match Results</h3>
+      <table id="matchTable">
+        <tr><th>Game / Entry</th><th>Players</th><th>Winner</th><th>Screenshot</th><th>Room / Start</th><th>Action</th></tr>
+      </table>
+    </div>
+
+    <div class="card" id="runningGamesTable" data-admin-tool data-admin-extra>
       <h3>Running Games</h3>
       <table id="runningTable">
         <tr><th>Game</th><th>Players</th><th>Entry</th><th>Room / Deadline</th><th>Confirmations</th><th>Cancel reason</th><th>Action</th></tr>
       </table>
     </div>
 
-    <div class="card">
+    <div class="card" id="cancellationRequests" data-admin-tool data-admin-extra>
+      <h3>Cancel Requests for Review</h3>
+      <table id="cancellationTable">
+        <tr><th>Game</th><th>Players</th><th>Requested by</th><th>Reason</th><th>Entry refund</th><th>Action</th></tr>
+      </table>
+    </div>
+
+    <div class="card" id="pendingWithdrawalRequests" data-admin-tool data-admin-extra>
+      <h3>Pending Withdrawals</h3>
+      <p class="muted">The homepage LIVE ticker shows only successful withdrawals from the last 30 days. Mark an actual payout as Paid below to add it; rejected or pending requests are not shown.</p>
+      <table id="withdrawTable">
+        <tr><th>Player</th><th>Amount</th><th>Method</th><th>Payout details</th><th>QR</th><th>Action</th></tr>
+      </table>
+    </div>
+
+    <div class="card" id="homepageWithdrawalLine" data-admin-tool data-admin-extra>
       <h3>Homepage LIVE Withdrawal Line</h3>
       <p class="muted">Controls which actual admin-paid withdrawals appear in the homepage ticker. Amounts cannot be manually invented or edited.</p>
       <label><input id="withdrawTickerEnabled" type="checkbox"> Show the live withdrawal line</label>
@@ -387,16 +361,19 @@
       <p id="withdrawTickerSettingsStatus" class="muted" role="status"></p>
     </div>
 
-    <div class="card">
+    <div class="card" id="completeGameHistory" data-admin-tool>
       <h3>Complete Game History</h3>
       <table id="historyTable">
         <tr><th>Game</th><th>Players</th><th>Entry</th><th>Status</th><th>Winner / Cancel reason</th><th>Room code</th><th>Proof</th><th>Joined / Started</th></tr>
       </table>
     </div>
+    </div>
   </div>
   <nav class="admin-bottom-nav" aria-label="Admin navigation">
     <button id="adminHomeButton" type="button">⌂ Home</button>
+    <button id="adminAllPlayersButton" type="button" class="secondary">All players</button>
     <button id="adminNewPlayersButton" type="button" class="secondary">New players</button>
+    <button id="adminSupportChatButton" type="button" class="secondary" aria-label="Direct player support chat">Support chat</button>
   </nav>
   <dialog id="playerHistoryDialog" class="history-dialog" aria-labelledby="playerHistoryTitle">
     <div class="history-dialog-header">
@@ -460,10 +437,6 @@
 
     function escapeHtml(value) {
       return String(value ?? '').replace(/[&<>"']/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[character]));
-    }
-
-    function escapeAttribute(value) {
-      return escapeHtml(value).replace(/`/g, '&#96;');
     }
 
     function adminGameTypeLabel(gameType) {
@@ -581,8 +554,7 @@
           <div class="finance-stat">
             <small>${adminGameTypeLabel(match.gameType)} · ${escapeHtml(match.status)} · Entry ₹${Number(match.amount).toLocaleString('en-IN')} each</small>
             <strong>${escapeHtml(match.creator?.username || 'Creator')} vs ${escapeHtml(match.joiner?.username || 'Joiner')}</strong>
-            <small>${match.gameType === 'LUDO_RACE' && match.ludoRace || match.gameType === 'LUDO_SCORE' && match.ludoScore ? 'In-app board' : match.roomCode ? `Room: ${escapeHtml(match.roomCode)}` : 'Room code not shared'} · ${match.gameStartedAt ? 'Game started' : 'Waiting to start'}</small>
-            ${match.resultSubmittedAt ? `<small>Screenshot submitted: ${escapeHtml(new Date(match.resultSubmittedAt).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }))} IST</small>` : ''}
+            <small>${match.roomCode ? `Room: ${escapeHtml(match.roomCode)}` : 'Room code not shared'} · ${match.gameStartedAt ? 'Game started' : 'Waiting to start'}</small>
             <small>${resultReports}</small>
             <div class="running-overview-proofs">${resultProofs}</div>
             ${adminMatchDecisionControls(match, 'overview-')}
@@ -697,69 +669,61 @@
     async function refreshAdminData() {
       const button = document.getElementById('refreshAdminButton');
       button.disabled = true;
-      button.textContent = 'Refreshing...';
+      button.textContent = 'REFRESHING...';
       try {
         await Promise.all([loadData(), loadUsers(), loadHistory()]);
       } catch (error) {
         alert(error.message || 'Dashboard refresh nahi ho paaya.');
       } finally {
         button.disabled = false;
-        button.textContent = 'Refresh data';
+        button.textContent = 'REFRESH DATA';
       }
     }
 
     function updateNotifications(data) {
       const tasks = [
-        { count: data.deposits?.length || 0, countId: 'notificationDepositsCount' },
-        { count: data.kycs?.length || 0, countId: 'notificationKycsCount' },
-        { count: data.matches?.length || 0, countId: 'notificationMatchesCount' },
-        { count: data.cancellationRequests?.length || 0, countId: 'notificationCancellationCount' },
-        { count: data.withdrawals?.length || 0, countId: 'notificationWithdrawalsCount' }
+        { label: 'Deposits', count: data.deposits?.length || 0, request: 'deposits' },
+        { label: 'KYC reviews', count: data.kycs?.length || 0, request: 'kyc' },
+        { label: 'Match results', count: data.matches?.length || 0, request: 'matches' },
+        { label: 'Cancel requests', count: data.cancellationRequests?.length || 0, request: 'cancellations' },
+        { label: 'Withdrawals', count: data.withdrawals?.length || 0, request: 'withdrawals' }
       ];
       const total = tasks.reduce((sum, task) => sum + task.count, 0);
       document.getElementById('notificationTotal').textContent = `${total} pending`;
-      tasks.forEach(task => {
-        document.getElementById(task.countId).textContent = String(task.count);
-      });
+      document.getElementById('notificationList').innerHTML = tasks.map(task =>
+        `<li><a href="/admin.html?request=${task.request}">${task.label}: ${task.count}</a></li>`
+      ).join('');
     }
 
     function configureAdminRequestPage() {
-      const requestPages = {
-        deposits: { panel: 'depositRequestPanel', title: 'Pending Deposits' },
-        kyc: { panel: 'kycRequestPanel', title: 'Pending KYC Reviews' },
-        matches: { panel: 'matchRequestPanel', title: 'Pending Match Results' },
-        cancellations: { panel: 'cancellationRequestPanel', title: 'Cancel Requests for Review' },
-        withdrawals: { panel: 'withdrawalRequestPanel', title: 'Pending Withdrawals' }
+      const requestTools = {
+        deposits: 'pendingDeposits',
+        kyc: 'pendingKyc',
+        matches: 'pendingMatchResults',
+        cancellations: 'cancellationRequests',
+        withdrawals: 'pendingWithdrawalRequests'
       };
-      const requestPage = requestPages[new URLSearchParams(window.location.search).get('request')];
-      if (!requestPage) return;
+      const request = new URLSearchParams(location.search).get('request');
+      const toolId = Object.prototype.hasOwnProperty.call(requestTools, request) ? requestTools[request] : null;
+      if (!toolId) return;
 
-      document.body.classList.add('admin-request-view');
+      const homeView = document.getElementById('adminHomeView');
       const supportChat = document.getElementById('adminSupportChat');
-      const requestPanels = document.getElementById('adminRequestPanels');
-      document.querySelectorAll('.wrap > *').forEach(section => {
-        section.hidden = !section.classList.contains('topbar') && section !== supportChat && section !== requestPanels;
-      });
-      requestPanels.hidden = false;
-      document.querySelectorAll('#adminRequestPanels .admin-notification-section').forEach(section => {
-        const selected = section.id === requestPage.panel;
-        section.hidden = !selected;
-        section.open = selected;
-      });
-      document.title = `${requestPage.title} | KhiladiAdda24 Admin`;
-    }
+      const toolsView = document.getElementById('adminToolsView');
+      const target = document.getElementById(toolId);
+      if (!target || !supportChat) throw new Error(`Admin request page not found: ${request}`);
 
-    async function loadAnnouncementText() {
-      const input = document.getElementById('announcementTextInput');
-      const status = document.getElementById('announcementStatus');
-      try {
-        const res = await adminFetch('/api/admin/site-announcement');
-        const data = await res.json();
-        input.value = data.text || 'Welcome to khiladiadda24.com';
-        status.textContent = 'Current line: ' + (data.text || 'Welcome to khiladiadda24.com');
-      } catch (error) {
-        status.textContent = error.message || 'Announcement load nahi ho paaya.';
-      }
+      document.getElementById('adminRequestBack').hidden = false;
+      homeView.insertBefore(toolsView, supportChat);
+      homeView.hidden = false;
+      Array.from(homeView.children).forEach(section => {
+        section.hidden = section !== supportChat;
+      });
+      toolsView.hidden = false;
+      toolsView.querySelectorAll('[data-admin-tool]').forEach(tool => {
+        tool.hidden = tool !== target;
+      });
+      updateAdminToolGroups();
     }
 
     async function loadWithdrawTickerSettings() {
@@ -800,26 +764,6 @@
       }
     }
 
-    async function saveAnnouncementText() {
-      const input = document.getElementById('announcementTextInput');
-      const status = document.getElementById('announcementStatus');
-      const text = (input.value || '').trim();
-      const payload = { text: text || 'Welcome to khiladiadda24.com' };
-      try {
-        const res = await adminFetch('/api/admin/site-announcement', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Announcement save nahi ho paaya');
-        input.value = data.text || 'Welcome to khiladiadda24.com';
-        status.textContent = 'Saved: ' + (data.text || 'Welcome to khiladiadda24.com');
-      } catch (error) {
-        status.textContent = error.message || 'Announcement save nahi ho paaya';
-      }
-    }
-
     async function loadSupportNumbers() {
       const status = document.getElementById('supportNumbersStatus');
       try {
@@ -853,81 +797,6 @@
         status.textContent = data.message || 'Support and WhatsApp numbers saved.';
       } catch (error) {
         status.textContent = error.message || 'Contact numbers save nahi ho sake.';
-      }
-    }
-
-    async function loadBranding() {
-      const status = document.getElementById('brandingStatus');
-      try {
-        const res = await adminFetch('/api/admin/branding');
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Logo aur app icons load nahi hue.');
-        [['brandLogoPreview', data.brandLogoUrl], ['appIcon192Preview', data.appIcon192Url], ['appIcon512Preview', data.appIcon512Url], ['homeBannerPreview', data.homeBannerUrl], ['ludoBannerPreview', data.ludoBannerUrl], ['snakeBannerPreview', data.snakeBannerUrl], ['supportBannerPreview', data.supportBannerUrl]].forEach(([id, url]) => {
-          const preview = document.getElementById(id);
-          preview.src = url;
-          preview.hidden = false;
-        });
-        status.textContent = 'Current logo and app icons loaded.';
-      } catch (error) {
-        status.textContent = error.message || 'Logo aur app icons load nahi hue.';
-      }
-    }
-
-    async function saveBranding() {
-      const fields = [
-        ['brandLogoFile', 'brandLogo', null],
-        ['appIcon192File', 'appIcon192', 192],
-        ['appIcon512File', 'appIcon512', 512],
-        ['homeBannerFile', 'homeBanner', null],
-        ['ludoBannerFile', 'ludoBanner', null],
-        ['snakeBannerFile', 'snakeBanner', null],
-        ['supportBannerFile', 'supportBanner', null]
-      ];
-      const formData = new FormData();
-      let selectedCount = 0;
-      const status = document.getElementById('brandingStatus');
-      for (const [inputId, fieldName, expectedSize] of fields) {
-        const file = document.getElementById(inputId).files[0];
-        if (!file) continue;
-        if (file.type !== 'image/png' || !file.name.toLowerCase().endsWith('.png')) {
-          status.textContent = 'Sirf PNG image select karein.';
-          return;
-        }
-        if (expectedSize) {
-          try {
-            const image = await createImageBitmap(file);
-            const validSize = image.width === expectedSize && image.height === expectedSize;
-            image.close();
-            if (!validSize) {
-              status.textContent = `${inputId.includes('192') ? '192' : '512'} x ${expectedSize}px PNG select karein.`;
-              return;
-            }
-          } catch {
-            status.textContent = 'PNG image read nahi ho paayi.';
-            return;
-          }
-        }
-        formData.append(fieldName, file);
-        selectedCount += 1;
-      }
-      if (!selectedCount) {
-        status.textContent = 'Kam se kam ek PNG image select karein.';
-        return;
-      }
-      status.textContent = 'Images upload ho rahi hain...';
-      try {
-        const res = await adminFetch('/api/admin/branding', { method: 'POST', body: formData });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Images save nahi hui.');
-        fields.forEach(([inputId]) => { document.getElementById(inputId).value = ''; });
-        [['brandLogoPreview', data.brandLogoUrl], ['appIcon192Preview', data.appIcon192Url], ['appIcon512Preview', data.appIcon512Url], ['homeBannerPreview', data.homeBannerUrl], ['ludoBannerPreview', data.ludoBannerUrl], ['snakeBannerPreview', data.snakeBannerUrl], ['supportBannerPreview', data.supportBannerUrl]].forEach(([id, url]) => {
-          const preview = document.getElementById(id);
-          preview.src = url;
-          preview.hidden = false;
-        });
-        status.textContent = data.message || 'Logo aur app icons save ho gaye.';
-      } catch (error) {
-        status.textContent = error.message || 'Images save nahi hui.';
       }
     }
 
@@ -968,75 +837,6 @@
       }
     }
 
-    function addPlayerCopyRow(entry = {}) {
-      const row = document.createElement('div');
-      row.className = 'player-copy-row';
-      const fromLabel = document.createElement('label');
-      fromLabel.textContent = 'Current player line';
-      const fromInput = document.createElement('textarea');
-      fromInput.dataset.playerCopyFrom = '';
-      fromInput.placeholder = 'Exact existing line from player page';
-      fromInput.value = entry.from || '';
-      fromLabel.append(fromInput);
-      const toLabel = document.createElement('label');
-      toLabel.textContent = 'New text';
-      const toInput = document.createElement('textarea');
-      toInput.dataset.playerCopyTo = '';
-      toInput.placeholder = 'Replacement text';
-      toInput.value = entry.to ?? '';
-      toLabel.append(toInput);
-      const removeButton = document.createElement('button');
-      removeButton.type = 'button';
-      removeButton.textContent = 'Remove';
-      removeButton.addEventListener('click', () => row.remove());
-      row.append(fromLabel, toLabel, removeButton);
-      document.getElementById('playerCopyRows').append(row);
-    }
-
-    async function loadPlayerCopy() {
-      const status = document.getElementById('playerCopyStatus');
-      try {
-        const res = await adminFetch('/api/admin/player-copy');
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Player text load nahi hua.');
-        const entries = data.entries?.length ? data.entries : [
-          { from: 'Challenger, entry amount aur winning amount dekhein.', to: 'Challenger, entry amount aur winning amount dekhein.' },
-          { from: 'Is game ke liye abhi open challenge nahi hai.', to: 'Is game ke liye abhi open challenge nahi hai.' }
-        ];
-        document.getElementById('playerCopyRows').replaceChildren();
-        entries.forEach(addPlayerCopyRow);
-        status.textContent = 'Player text lines loaded.';
-      } catch (error) {
-        status.textContent = error.message || 'Player text load nahi hua.';
-      }
-    }
-
-    async function savePlayerCopy() {
-      const status = document.getElementById('playerCopyStatus');
-      const rows = [...document.querySelectorAll('#playerCopyRows .player-copy-row')];
-      const entries = rows.map(row => ({
-        from: row.querySelector('[data-player-copy-from]').value.trim(),
-        to: row.querySelector('[data-player-copy-to]').value
-      })).filter(entry => entry.from);
-      const uniqueLines = new Set(entries.map(entry => entry.from));
-      if (uniqueLines.size !== entries.length) {
-        status.textContent = 'Current player line duplicate nahi ho sakti.';
-        return;
-      }
-      try {
-        const res = await adminFetch('/api/admin/player-copy', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ entries })
-        });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Player text save nahi hua.');
-        status.textContent = data.message || 'Player text settings save ho gayi.';
-      } catch (error) {
-        status.textContent = error.message || 'Player text save nahi hua.';
-      }
-    }
-
     function renderFinanceSummary(summary = {}) {
       const formatAmount = amount => `₹ ${Number(amount || 0).toLocaleString('en-IN')}`;
       document.getElementById('totalDeposits').textContent = formatAmount(summary.totalDeposits);
@@ -1052,7 +852,9 @@
       const modePlayers = playerListMode === 'NEW'
         ? allPlayers.filter(player => new Date(player.createdAt).getTime() >= newPlayerSince)
         : allPlayers;
-      modePlayers.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      modePlayers.sort((a, b) => Number(b.monthlyPoints || 0) - Number(a.monthlyPoints || 0)
+        || Number(b.monthlyGamesPlayed || 0) - Number(a.monthlyGamesPlayed || 0)
+        || new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
       const searchInput = document.getElementById('playerSearch').value.trim();
       const searchTerm = searchInput.toLocaleLowerCase();
       const searchDigits = searchInput.replace(/\D/g, '');
@@ -1063,15 +865,15 @@
           || (searchDigits && String(player.phone || '').replace(/\D/g, '').includes(searchDigits)))
         : modePlayers;
       document.getElementById('userListTitle').textContent = playerListMode === 'NEW' ? 'New Players · Last 7 Days' : 'All Players & Wallets';
-      document.getElementById('playerListSummary').textContent = `${players.length} player${players.length === 1 ? '' : 's'}`;
-      table.innerHTML = '<tr><th>S.N.</th><th>Player</th><th>Phone</th><th>Wallet</th><th>Joined</th><th>KYC</th><th>Status</th><th>Admin</th><th>Action</th></tr>';
+      document.getElementById('playerListSummary').textContent = `${players.length} player${players.length === 1 ? '' : 's'} · Monthly points: 20 per win, 5 per completed game`;
+      table.innerHTML = '<tr><th>S.N.</th><th>Player / ID</th><th>Phone</th><th>Wallet</th><th>Monthly rank</th><th>Monthly points</th><th>Joined</th><th>KYC</th><th>Status</th><th>Admin</th><th>Action</th></tr>';
       if (!players.length) {
         const emptyMessage = searchTerm
           ? 'Is search se koi player nahi mila.'
           : playerListMode === 'NEW'
             ? 'Last 7 days mein koi naya player nahi.'
             : 'Player list khali hai.';
-        table.innerHTML += `<tr><td colspan="9" class="empty">${emptyMessage}</td></tr>`;
+        table.innerHTML += `<tr><td colspan="11" class="empty">${emptyMessage}</td></tr>`;
         return;
       }
       players.forEach((u, index) => {
@@ -1080,11 +882,102 @@
         const isAdminUser = Boolean(u.isAdmin) || isPrimary;
         const adminLabel = isPrimary ? 'Primary' : isAdminUser ? 'Admin' : 'User';
         const adminAction = isPrimary ? '<button disabled>Primary admin</button>' : isAdminUser ? `<button class="danger" onclick="toggleAdminStatus('${u._id}', false)">Remove admin</button>` : `<button class="secondary" onclick="toggleAdminStatus('${u._id}', true)">Make admin</button>`;
-        table.innerHTML += `<tr><td>${index + 1}</td><td><button type="button" class="player-name-link" onclick="openPlayerHistory('${u._id}')">${escapeHtml(u.username)}</button></td><td>${playerWhatsAppLink(u.phone)}</td><td>₹${Number(u.walletBalance || 0).toLocaleString('en-IN')}</td><td>${new Date(u.createdAt).toLocaleString()}</td><td>${adminKycStatusLabel(u.kycStatus)}</td><td>${blocked ? 'Blocked' : 'Active'}</td><td>${adminLabel}</td><td><button class="secondary" onclick="openPlayerEditor('${u._id}')">Edit profile</button> <button class="${blocked ? 'unblock-button' : 'block-button'}" onclick="setPlayerBlocked('${u._id}', ${!blocked})">${blocked ? 'Unblock' : 'Block'}</button> ${adminAction}</td></tr>`;
+        table.innerHTML += `<tr><td>${index + 1}</td><td><button type="button" class="player-name-link" onclick="openPlayerHistory('${u._id}')">${escapeHtml(u.username)}</button></td><td>${playerWhatsAppLink(u.phone)}</td><td>₹${Number(u.walletBalance || 0).toLocaleString('en-IN')}</td><td>${u.monthlyRank || '-'}</td><td><strong>${Number(u.monthlyPoints || 0).toLocaleString('en-IN')}</strong><br><small>${Number(u.monthlyGamesPlayed || 0)} completed games</small></td><td>${new Date(u.createdAt).toLocaleString()}</td><td><span class="player-kyc-status ${u.kycStatus === 'APPROVED' ? 'approved' : u.kycStatus === 'PENDING' ? 'pending' : u.kycStatus === 'REJECTED' ? 'rejected' : 'not-submitted'}">${u.kycStatus === 'APPROVED' ? 'Approved' : u.kycStatus === 'PENDING' ? 'Pending review' : u.kycStatus === 'REJECTED' ? 'Rejected' : 'Not submitted'}</span></td><td>${blocked ? 'Blocked' : 'Active'}</td><td>${adminLabel}</td><td><button class="secondary" onclick="openPlayerEditor('${u._id}')">Edit profile</button> <button class="${blocked ? 'unblock-button' : 'block-button'}" onclick="setPlayerBlocked('${u._id}', ${!blocked})">${blocked ? 'Unblock' : 'Block'}</button> ${adminAction}</td></tr>`;
       });
     }
 
+    function adminProfileImageUrl(profileImage) {
+      const image = String(profileImage || '');
+      if (!image) return '/app-logo.png?v=20261008-2304';
+      if (image.startsWith('uploads/')) return `/api/profile/image/${encodeURIComponent(image.split('/').pop())}`;
+      return image.startsWith('/') ? image : `/${image}`;
+    }
+
+    function escapeAttribute(value) {
+      return escapeHtml(value).replace(/`/g, '&#96;');
+    }
+
+    async function loadAdminLeaderboard() {
+      const status = document.getElementById('leaderboardSettingsStatus');
+      try {
+        const response = await adminFetch('/api/admin/leaderboard/monthly', { cache: 'no-store' });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Monthly standings load nahi hui.');
+        document.getElementById('adminLeaderboardMonth').textContent = data.month;
+        document.getElementById('pointsPerGameInput').value = data.pointsPerGame;
+        document.getElementById('winBonusInput').value = data.winBonus;
+        document.getElementById('prizePoolInput').value = data.prizePool;
+        document.getElementById('rankPrizesInput').value = data.prizes.join(', ');
+        const table = document.getElementById('adminLeaderboardTable');
+        table.innerHTML = '<tr><th>Rank</th><th>Player</th><th>Points override</th><th>Prize override (₹)</th><th>Games</th><th>Wins</th><th>Action</th></tr>';
+        data.rankings.forEach(player => {
+          const image = adminProfileImageUrl(player.profileImage);
+          table.insertAdjacentHTML('beforeend', `<tr><td>${player.rank || '-'}</td><td><img class="leaderboard-player-image" src="${escapeAttribute(image)}" alt="" loading="lazy"> ${escapeHtml(player.username)}<br><small>${escapeHtml(player.userId)}</small></td><td><strong>${Number(player.points).toLocaleString('en-IN')} pts</strong><br><input class="leaderboard-player-input" type="number" min="0" step="1" aria-label="Points override for ${escapeAttribute(player.username)}" data-points-for="${escapeAttribute(player.userId)}" value="${player.pointsOverride ?? ''}" placeholder="Automatic"></td><td><strong>₹${Number(player.prize || 0).toLocaleString('en-IN')}</strong><br><input class="leaderboard-player-input" type="number" min="0" step="1" aria-label="Prize override for ${escapeAttribute(player.username)}" data-prize-for="${escapeAttribute(player.userId)}" value="${player.prizeOverride ?? ''}" placeholder="Rank prize"></td><td>${Number(player.gamesPlayed)}</td><td>${Number(player.wins)}</td><td><button type="button" onclick="saveMonthlyPlayer('${escapeAttribute(player.userId)}')">Save player</button></td></tr>`);
+        });
+        status.textContent = `${data.rankings.length} players loaded. Blank override uses automatic game points and rank prize.`;
+      } catch (error) {
+        status.textContent = error.message || 'Monthly standings load nahi hui.';
+      }
+    }
+
+    async function saveAdminLeaderboardSettings() {
+      const status = document.getElementById('leaderboardSettingsStatus');
+      const prizes = document.getElementById('rankPrizesInput').value
+        .split(/[,\n]+/)
+        .map(value => value.trim())
+        .filter(Boolean)
+        .map(Number);
+      const body = {
+        pointsPerGame: Number(document.getElementById('pointsPerGameInput').value),
+        winBonus: Number(document.getElementById('winBonusInput').value),
+        prizePool: Number(document.getElementById('prizePoolInput').value),
+        prizes
+      };
+      if (prizes.length !== 100) {
+        status.textContent = `Rank 1–100 ke liye exactly 100 prize amounts chahiye; abhi ${prizes.length} hain.`;
+        return;
+      }
+      try {
+        const response = await adminFetch('/api/admin/leaderboard/monthly/settings', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Leaderboard settings save nahi hui.');
+        status.textContent = data.message || 'Leaderboard settings save ho gayi.';
+        await Promise.all([loadAdminLeaderboard(), loadUsers()]);
+      } catch (error) {
+        status.textContent = error.message || 'Leaderboard settings save nahi hui.';
+      }
+    }
+
+    async function saveMonthlyPlayer(userId) {
+      const status = document.getElementById('leaderboardSettingsStatus');
+      const points = document.querySelector(`[data-points-for="${CSS.escape(userId)}"]`).value;
+      const prize = document.querySelector(`[data-prize-for="${CSS.escape(userId)}"]`).value;
+      try {
+        const response = await adminFetch(`/api/admin/leaderboard/monthly/player/${encodeURIComponent(userId)}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ points, prize })
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Player ke points/prize save nahi hue.');
+        status.textContent = data.message || 'Player points/prize saved.';
+        await Promise.all([loadAdminLeaderboard(), loadUsers()]);
+      } catch (error) {
+        status.textContent = error.message || 'Player ke points/prize save nahi hue.';
+      }
+    }
+
     let activeSupportUserId = '';
+
+    function setSupportAdminStatus(message, type = '') {
+      const status = document.getElementById('supportAdminStatus');
+      status.textContent = message;
+      status.className = `support-admin-status${type ? ` ${type}` : ''}`;
+    }
 
     const adminSupportAttachmentUrls = new Map();
     const supportAdminAttachment = document.getElementById('supportAdminAttachment');
@@ -1278,8 +1171,11 @@
       const input = document.getElementById('supportAdminInput');
       const text = input.value.trim();
       const attachment = document.getElementById('supportAdminAttachment').files[0];
-      if (!activeSupportUserId || (!text && !attachment)) return;
-      document.getElementById('supportAdminSend').disabled = true;
+      if (!activeSupportUserId) return setSupportAdminStatus('Reply bhejne ke liye player conversation select karein.', 'error');
+      if (!text && !attachment) return setSupportAdminStatus('Reply message likhein ya screenshot attach karein.', 'error');
+      const sendButton = document.getElementById('supportAdminSend');
+      sendButton.disabled = true;
+      setSupportAdminStatus('Reply bheji ja rahi hai...');
       try {
         const body = new FormData();
         body.set('text', text);
@@ -1294,11 +1190,16 @@
         document.getElementById('supportAdminAttachment').value = '';
         supportAdminAttachmentName.textContent = 'No screenshot selected';
         supportAdminAttachmentName.title = '';
-        await Promise.all([refreshAdminSupportThread(), loadAdminSupportThreads()]);
+        setSupportAdminStatus('✓ Sent — Player ko reply bhej diya gaya.', 'success');
+        try {
+          await Promise.all([refreshAdminSupportThread(), loadAdminSupportThreads()]);
+        } catch (error) {
+          setSupportAdminStatus(`Reply sent, but chat refresh nahi hui: ${error.message}`, 'error');
+        }
       } catch (error) {
-        alert(error.message || 'Reply send nahi hui.');
+        setSupportAdminStatus(error.message || 'Reply send nahi hui.', 'error');
       } finally {
-        document.getElementById('supportAdminSend').disabled = false;
+        sendButton.disabled = false;
       }
     });
 
@@ -1309,31 +1210,17 @@
       };
       adminSupportSocket.on('connect', registerAdminSupportSocket);
       if (adminSupportSocket.connected) registerAdminSupportSocket();
-      adminSupportSocket.on('support_message', () => {
-        loadAdminSupportThreads().catch(error => console.error(error));
+      adminSupportSocket.on('support_message', message => {
+        const refreshes = [loadAdminSupportThreads()];
+        if (String(message?.userId || '') === activeSupportUserId) {
+          refreshes.push(refreshAdminSupportThread());
+        }
+        Promise.all(refreshes).catch(error => console.error(error));
       });
     }
 
     function formatHistoryDate(value) {
       return value ? new Date(value).toLocaleString('en-IN') : '-';
-    }
-
-    function adminKycStatusLabel(status) {
-      return ({
-        NOT_SUBMITTED: 'Not submitted',
-        PENDING: 'Pending review',
-        APPROVED: 'Approved',
-        REJECTED: 'Rejected'
-      })[status] || 'Unknown';
-    }
-
-    function adminKycStatusClass(status) {
-      return ({
-        NOT_SUBMITTED: 'not-submitted',
-        PENDING: 'pending',
-        APPROVED: 'approved',
-        REJECTED: 'rejected'
-      })[status] || 'unknown';
     }
 
     function openPlayerEditor(userId) {
@@ -1346,14 +1233,12 @@
           const data = await res.json();
           if (!res.ok) throw new Error(data.error || 'Player profile nahi mili');
           const user = data.user;
-          const kyc = data.kyc || {};
           content.innerHTML = `
             <div class="history-summary">
               <div><small>Selected player</small><strong>${escapeHtml(user.username)}</strong></div>
               <div><small>Phone</small><strong>${escapeHtml(user.phone)}</strong></div>
               <div><small>Wallet</small><strong>₹${Number(user.walletBalance || 0).toLocaleString('en-IN')}</strong></div>
               <div><small>Status</small><strong>${user.isBlocked ? 'Blocked' : 'Active'}</strong></div>
-              <div><small>KYC</small><strong>${adminKycStatusLabel(kyc.status || 'NOT_SUBMITTED')}</strong>${kyc.submittedAt ? `<small>Submitted ${formatHistoryDate(kyc.submittedAt)}</small>` : ''}</div>
             </div>
             <form id="adminPlayerEditForm" class="admin-player-form">
               <div class="field"><label>Username<input name="username" value="${escapeHtml(user.username)}" required></label></div>
@@ -1408,8 +1293,7 @@
             : `Server ne JSON ke badle webpage bheja (HTTP ${res.status}). Backend restart ya redeploy karke dobara try karein.`);
         }
         if (!res.ok) throw new Error(data.error || 'Player history nahi mili');
-        const { user, kyc, deposits, withdrawals, matches } = data;
-        const kycStatus = kyc?.status || 'NOT_SUBMITTED';
+        const { user, kyc, deposits, withdrawals, matches } = data;         const kycStatus = kyc?.status || 'NOT_SUBMITTED';
         const approvedDeposits = deposits.filter(item => item.status === 'APPROVED');
         const paidWithdrawals = withdrawals.filter(item => item.status === 'PAID');
         const totalDeposits = approvedDeposits.reduce((total, item) => total + Number(item.amount || 0), 0);
@@ -1431,20 +1315,15 @@
         }).join('') || '<tr><td colspan="6">No game history</td></tr>';
         content.innerHTML = `
           <div class="history-summary">
-            <div><small>Player ID</small><strong>${escapeHtml(user._id)}</strong></div>
             <div><small>Current wallet</small><strong>₹${Number(user.walletBalance).toLocaleString('en-IN')}</strong></div>
             <div><small>Deposited · approved</small><strong>₹${totalDeposits.toLocaleString('en-IN')}</strong></div>
             <div><small>Withdrawn · paid</small><strong>₹${totalWithdrawals.toLocaleString('en-IN')}</strong></div>
-            <div><small>Games played</small><strong>${playedMatches.length} / ${matches.length} total</strong></div>
+            <div><small>Games played</small><strong>${playedMatches.length} / ${matches.length} total</strong></div>             <div><small>KYC</small><strong>${kyc?.status === 'APPROVED' ? 'Approved' : kyc?.status === 'PENDING' ? 'Pending review' : kyc?.status === 'REJECTED' ? 'Rejected' : 'Not submitted'}</strong></div>
           </div>
-          <h4>KYC Verification</h4>
-          <div class="kyc-history-card" aria-label="Player KYC verification details">
-            <div><small>Status</small><strong class="kyc-status-badge ${adminKycStatusClass(kycStatus)}">${adminKycStatusLabel(kycStatus)}</strong></div>
-            <div><small>Submitted</small><strong>${kyc?.submittedAt ? formatHistoryDate(kyc.submittedAt) : 'Not submitted'}</strong></div>
-            <div><small>Reviewed</small><strong>${kyc?.reviewedAt ? formatHistoryDate(kyc.reviewedAt) : 'Not reviewed'}</strong></div>
-            ${kyc?.aadhaarNumber ? `<div><small>Aadhaar</small><strong>XXXX XXXX ${escapeHtml(String(kyc.aadhaarNumber).slice(-4))}</strong></div>` : ''}
-            ${kyc?.aadhaarImage ? `<div><small>Document</small><strong><a href="/api/admin/uploads/${encodeURIComponent(String(kyc.aadhaarImage).split('/').pop())}" target="_blank" rel="noopener noreferrer">View Aadhaar image</a></strong></div>` : ''}
-            ${kycStatus === 'REJECTED' && kyc?.rejectionReason ? `<div><small>Rejection reason</small><strong>${escapeHtml(kyc.rejectionReason)}</strong></div>` : ''}
+          <h4>KYC Document</h4>
+          <div class="kyc-history-card">
+            ${kyc?.aadhaarNumber ? `<div><small>Aadhaar</small><strong>XXXX XXXX ${escapeHtml(String(kyc.aadhaarNumber).slice(-4))}</strong></div>` : '<div><small>Aadhaar</small><strong>Not submitted</strong></div>'}
+            ${kyc?.aadhaarImage ? `<div><small>Document</small><strong><a href="/api/admin/uploads/${encodeURIComponent(String(kyc.aadhaarImage).split('/').pop())}" target="_blank" rel="noopener noreferrer">View Aadhaar image</a></strong></div>` : '<div><small>Document</small><strong>Not uploaded</strong></div>'}
           </div>
           <h4>Deposits</h4><table><tr><th>Date</th><th>Amount</th><th>Status</th></tr>${depositRows}</table>
           <h4>Withdrawals</h4><table><tr><th>Date</th><th>Amount</th><th>Method</th><th>Status</th></tr>${withdrawalRows}</table>
@@ -1510,7 +1389,6 @@
         table.innerHTML += `<tr><td>${adminGameTypeLabel(m.gameType)}</td><td>${players}<br>${m.creator?.phone || '-'} vs ${m.joiner?.phone || '-'}</td><td>₹${m.amount} each</td><td>${m.status}</td><td>${m.winner?.username || '-'}<br>${m.cancelReason || '-'}${m.cancelledBy?.username ? `<br>By ${m.cancelledBy.username}` : ''}${m.cancelledAt ? `<br>${new Date(m.cancelledAt).toLocaleString()}` : ''}</td><td>${m.roomCode || '-'}<br>By: ${m.roomCodeSharedBy?.username || '-'}</td><td>${proof}</td><td>Joined: ${m.joinedAt ? new Date(m.joinedAt).toLocaleString() : '-'}<br>Started: ${m.gameStartedAt ? new Date(m.gameStartedAt).toLocaleString() : '-'}</td></tr>`;
       });
       if (!data.matches.length) table.innerHTML += '<tr><td colspan="8" class="empty">No game history</td></tr>';
-      await loadAdminImagePreviews();
     }
 
     async function approveDep(id) {
@@ -1666,27 +1544,103 @@
       if (res.ok) loadData();
     }
 
+    function closeAdminMenu() {
+      const menu = document.querySelector('.admin-menu');
+      if (menu) menu.open = false;
+    }
+
+    function updateAdminToolGroups() {
+      document.querySelectorAll('#adminToolsView .grid').forEach(group => {
+        group.hidden = !Array.from(group.children).some(child => !child.hidden);
+      });
+    }
+
+    function showAdminTool(event, toolId) {
+      if (event) event.preventDefault();
+      restoreAdminToolsViewPosition();
+      const homeView = document.getElementById('adminHomeView');
+      const toolsView = document.getElementById('adminToolsView');
+      const target = document.getElementById(toolId);
+      if (!target || !target.hasAttribute('data-admin-tool')) {
+        throw new Error(`Admin tool not found: ${toolId}`);
+      }
+      document.getElementById('adminRequestBack').hidden = true;
+      homeView.hidden = true;
+      toolsView.hidden = false;
+      toolsView.querySelectorAll('[data-admin-tool]').forEach(tool => {
+        tool.hidden = tool !== target;
+      });
+      updateAdminToolGroups();
+      closeAdminMenu();
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function showAllAdminTools(event) {
+      if (event) event.preventDefault();
+      restoreAdminToolsViewPosition();
+      const homeView = document.getElementById('adminHomeView');
+      const toolsView = document.getElementById('adminToolsView');
+      homeView.hidden = true;
+      toolsView.hidden = false;
+      document.getElementById('adminRequestBack').hidden = true;
+      toolsView.querySelectorAll('[data-admin-tool]').forEach(tool => {
+        tool.hidden = !tool.hasAttribute('data-admin-extra');
+      });
+      updateAdminToolGroups();
+      closeAdminMenu();
+      toolsView.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function restoreAdminToolsViewPosition() {
+      const homeView = document.getElementById('adminHomeView');
+      const toolsView = document.getElementById('adminToolsView');
+      if (toolsView.parentElement === homeView) {
+        homeView.parentNode.insertBefore(toolsView, homeView.nextSibling);
+      }
+    }
+
+    function showAdminHome() {
+      restoreAdminToolsViewPosition();
+      const homeView = document.getElementById('adminHomeView');
+      homeView.hidden = false;
+      Array.from(homeView.children).forEach(section => {
+        section.hidden = false;
+      });
+      document.getElementById('adminRequestBack').hidden = true;
+      document.getElementById('adminToolsView').hidden = true;
+      closeAdminMenu();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
     document.getElementById('allPlayersFilter').addEventListener('click', () => setPlayerListMode('ALL'));
     document.getElementById('playerSearch').addEventListener('input', renderPlayerList);
     document.getElementById('kycEditForm').addEventListener('submit', saveKycEdit);
     document.getElementById('newPlayersFilter').addEventListener('click', () => setPlayerListMode('NEW'));
-    document.getElementById('adminHomeButton').addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
-    document.getElementById('adminNewPlayersButton').addEventListener('click', () => setPlayerListMode('NEW', true));
+    document.getElementById('adminHomeButton').addEventListener('click', showAdminHome);
+    document.getElementById('adminAllPlayersButton').addEventListener('click', () => {
+      showAdminTool(null, 'allPlayersList');
+      setPlayerListMode('ALL', true);
+    });
+    document.getElementById('adminNewPlayersButton').addEventListener('click', () => {
+      showAdminTool(null, 'allPlayersList');
+      setPlayerListMode('NEW', true);
+    });
+    document.getElementById('adminSupportChatButton').addEventListener('click', () => {
+      showAdminHome();
+      document.getElementById('adminSupportChat').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
 
     document.getElementById('saveSupportNumbersBtn').addEventListener('click', saveSupportNumbers);
-    document.getElementById('saveBrandingBtn').addEventListener('click', saveBranding);
     document.getElementById('saveDepositUpiIdBtn').addEventListener('click', saveDepositUpiId);
+    document.getElementById('saveLeaderboardSettings').addEventListener('click', saveAdminLeaderboardSettings);
     document.getElementById('saveWithdrawTickerSettings').addEventListener('click', saveWithdrawTickerSettings);
-    document.getElementById('addPlayerCopyRowBtn').addEventListener('click', () => addPlayerCopyRow());
-    document.getElementById('savePlayerCopyBtn').addEventListener('click', savePlayerCopy);
     configureAdminRequestPage();
     loadSupportNumbers();
-    loadBranding();
     loadDepositUpiId();
-    loadPlayerCopy();
-    loadData();
     loadWithdrawTickerSettings();
+    loadData();
     loadUsers();
+    loadAdminLeaderboard();
     loadAdminSupportThreads();
     loadHistory();
     setInterval(loadData, 30000);
