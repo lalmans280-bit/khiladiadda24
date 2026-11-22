@@ -2668,44 +2668,20 @@ app.post('/api/matches/submit-result', requireUser, persistUploads(upload.single
       }
 
       finalMatch = updated;
-      const creatorReportedLoss = updated.creatorResult === 'LOSS';
-      const joinerReportedLoss = updated.joinerResult === 'LOSS';
-      if (creatorReportedLoss !== joinerReportedLoss) {
-        const winnerId = creatorReportedLoss ? updated.joiner : updated.creator;
-        const totalPool = updated.amount * 2;
-        const payout = calculateMatchPayout(totalPool);
-        winAmount = payout.winAmount;
-        adminCommission = payout.adminCommission;
-        creditedWinner = await User.findOneAndUpdate(
-          { _id: winnerId },
-          { $inc: { walletBalance: winAmount, winningsBalance: winAmount } },
+      if (!updated.creatorResult || !updated.joinerResult) {
+        const pendingSingleReport = await Match.findOneAndUpdate(
+          { _id: matchId, status: 'RUNNING' },
+          { $set: { status: 'PENDING_RESULT', winner: null } },
           { new: true, session }
         );
-        if (!creditedWinner) {
-          const error = new Error('Winner user nahi mila');
-          error.statusCode = 400;
+        if (!pendingSingleReport) {
+          const error = new Error('Match result update nahi ho saka');
+          error.statusCode = 409;
           throw error;
         }
-
-        const primaryAdmin = await ensurePrimaryAdminUser();
-        if (primaryAdmin) {
-          creditedAdmin = await User.findOneAndUpdate(
-            { _id: primaryAdmin._id },
-            { $inc: { walletBalance: adminCommission } },
-            { new: true, session }
-          );
-        }
-
-        updated.winner = winnerId;
-        updated.status = 'COMPLETED';
-        updated.completedAt = new Date();
-        await updated.save({ session });
-        await releaseMatchBetSlots(updated, session);
-        finalMatch = updated;
+        finalMatch = pendingSingleReport;
         return;
       }
-
-      if (!updated.creatorResult || !updated.joinerResult) return;
 
       const creatorWinner = updated.creatorResult === 'WIN' ? updated.creator : updated.joiner;
       const joinerWinner = updated.joinerResult === 'WIN' ? updated.joiner : updated.creator;
