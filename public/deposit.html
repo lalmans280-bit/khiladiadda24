@@ -743,7 +743,7 @@
     window.matchApp={api,el,notify,esc,nameOf,setView,refresh,getPlayer:()=>player,getUser:()=>storedUser};
     refresh().catch(showError);battlesPollTimer=setInterval(()=>loadOpen().catch(showError),10000);setInterval(refreshSamplePlayers,10*1000);setInterval(()=>{if(el('view-profile').classList.contains('active'))loadWalletSummary().catch(showError)},10000);const initialMatchId=new URLSearchParams(location.search).get('matchId');if(initialMatchId)window.openMatch(initialMatchId).catch(showError);
   </script>
-    <script src="/match-flow.js?v=20260929-reason-required-roomcode-cancel"></script>
+    <script src="/match-flow.js?v=20261122-winning-screenshot-picker"></script>
     <script src="/wallet-flow.js?v=20260929-winnings-only-withdrawal"></script>
     <script src="/game-rules.js?v=20260929-compact-rules-button-2"></script>
   <script src="/player-copy.js" defer></script>

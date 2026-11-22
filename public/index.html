@@ -1238,7 +1238,7 @@
     if(['home','games','wallet','history','profile'].includes(requestedView))setView(requestedView);
     refresh().catch(showError);battlesPollTimer=setInterval(()=>loadOpen().catch(showError),10000);setInterval(refreshSamplePlayers,10*1000);setInterval(()=>{if(el('view-profile').classList.contains('active'))loadWalletSummary().catch(showError)},10000);const initialMatchId=new URLSearchParams(location.search).get('matchId');if(initialMatchId)window.openMatch(initialMatchId).catch(showError);
   </script>
-    <script src="/match-flow.js?v=20261114-wallet-win-result-voice"></script>
+    <script src="/match-flow.js?v=20261122-winning-screenshot-picker"></script>
     <script src="/player-game-feedback.js?v=20261114-battle-entry-amount-voice"></script>
     <script src="/wallet-flow.js?v=20261114-battle-entry-amount-voice-v2"></script>
     <script src="/game-rules.js?v=20261114-game-rules"></script>
