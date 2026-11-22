@@ -601,7 +601,7 @@
               <td>${d.userId ? d.userId.phone : 'N/A'}</td>
               <td>₹${d.amount}</td>
               <td><b>${d.utrNumber}</b></td>
-              <td>${d.screenshot ? adminImagePreview(d.screenshot, 'Payment screenshot', 'match-proof-preview') : '-'}</td>
+              <td><a href="/api/admin/uploads/${encodeURIComponent((d.screenshot || '').split('/').pop())}" target="_blank">Screenshot</a></td>
               <td><button onclick="approveDep('${d._id}')">Approve Balance</button></td>
             </tr>
           `;
@@ -639,7 +639,7 @@
       } else {
         data.kycs.forEach(k => {
           const maskedAadhaar = `XXXX XXXX ${String(k.aadhaarNumber).slice(-4)}`;
-          kTable.innerHTML += `<tr><td>${k.userId ? `${k.userId.username} (${k.userId.phone})` : 'N/A'}</td><td>${maskedAadhaar}</td><td>${k.aadhaarImage ? adminImagePreview(k.aadhaarImage, 'Aadhaar document', 'match-proof-preview') : '-'}</td><td>${new Date(k.submittedAt).toLocaleString()}</td><td><button class="secondary" onclick="openKycEditor('${k._id}', '${String(k.aadhaarNumber).replace(/\D/g, '')}')">Edit</button> <button onclick="setKycStatus('${k._id}', 'APPROVED')">Approve</button> <button class="danger" onclick="setKycStatus('${k._id}', 'REJECTED')">Reject</button></td></tr>`;
+          kTable.innerHTML += `<tr><td>${k.userId ? `${k.userId.username} (${k.userId.phone})` : 'N/A'}</td><td>${maskedAadhaar}</td><td><a href="/api/admin/uploads/${encodeURIComponent((k.aadhaarImage || '').split('/').pop())}" target="_blank">View Aadhaar</a></td><td>${new Date(k.submittedAt).toLocaleString()}</td><td><button class="secondary" onclick="openKycEditor('${k._id}', '${String(k.aadhaarNumber).replace(/\D/g, '')}')">Edit</button> <button onclick="setKycStatus('${k._id}', 'APPROVED')">Approve</button> <button class="danger" onclick="setKycStatus('${k._id}', 'REJECTED')">Reject</button></td></tr>`;
         });
       }
 
@@ -1443,7 +1443,7 @@
             <div><small>Submitted</small><strong>${kyc?.submittedAt ? formatHistoryDate(kyc.submittedAt) : 'Not submitted'}</strong></div>
             <div><small>Reviewed</small><strong>${kyc?.reviewedAt ? formatHistoryDate(kyc.reviewedAt) : 'Not reviewed'}</strong></div>
             ${kyc?.aadhaarNumber ? `<div><small>Aadhaar</small><strong>XXXX XXXX ${escapeHtml(String(kyc.aadhaarNumber).slice(-4))}</strong></div>` : ''}
-            ${kyc?.aadhaarImage ? `<div><small>Document</small><strong>${adminImagePreview(kyc.aadhaarImage, 'Aadhaar document', 'match-proof-preview')}</strong></div>` : ''}
+            ${kyc?.aadhaarImage ? `<div><small>Document</small><strong><a href="/api/admin/uploads/${encodeURIComponent(String(kyc.aadhaarImage).split('/').pop())}" target="_blank" rel="noopener noreferrer">View Aadhaar image</a></strong></div>` : ''}
             ${kycStatus === 'REJECTED' && kyc?.rejectionReason ? `<div><small>Rejection reason</small><strong>${escapeHtml(kyc.rejectionReason)}</strong></div>` : ''}
           </div>
           <h4>Deposits</h4><table><tr><th>Date</th><th>Amount</th><th>Status</th></tr>${depositRows}</table>
@@ -1506,7 +1506,7 @@
       table.innerHTML = '<tr><th>Game</th><th>Players</th><th>Entry</th><th>Status</th><th>Winner / Cancel reason</th><th>Room code</th><th>Proof</th><th>Joined / Started</th></tr>';
       data.matches.forEach(m => {
         const players = `${m.creator?.username || 'N/A'} vs ${m.joiner?.username || 'Waiting'}`;
-        const proof = m.proofScreenshot ? adminImagePreview(m.proofScreenshot, 'Winning screenshot', 'match-proof-preview') : '-';
+        const proof = m.proofScreenshot ? `<a href="/api/admin/uploads/${encodeURIComponent(m.proofScreenshot.split('/').pop())}" target="_blank">View screenshot</a>` : '-';
         table.innerHTML += `<tr><td>${adminGameTypeLabel(m.gameType)}</td><td>${players}<br>${m.creator?.phone || '-'} vs ${m.joiner?.phone || '-'}</td><td>₹${m.amount} each</td><td>${m.status}</td><td>${m.winner?.username || '-'}<br>${m.cancelReason || '-'}${m.cancelledBy?.username ? `<br>By ${m.cancelledBy.username}` : ''}${m.cancelledAt ? `<br>${new Date(m.cancelledAt).toLocaleString()}` : ''}</td><td>${m.roomCode || '-'}<br>By: ${m.roomCodeSharedBy?.username || '-'}</td><td>${proof}</td><td>Joined: ${m.joinedAt ? new Date(m.joinedAt).toLocaleString() : '-'}<br>Started: ${m.gameStartedAt ? new Date(m.gameStartedAt).toLocaleString() : '-'}</td></tr>`;
       });
       if (!data.matches.length) table.innerHTML += '<tr><td colspan="8" class="empty">No game history</td></tr>';
