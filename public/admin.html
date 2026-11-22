@@ -647,7 +647,7 @@
           ].filter(Boolean).join('<br>') || 'No screenshot';
           const runningDecision = m.status === 'OPEN'
             ? `<button class="danger" onclick="cancelAdminMatch('${escapeHtml(m._id)}')">Cancel &amp; refund</button>`
-            : '<a href="#runningGamesOverview">Decision in Running Games above</a>';
+            : adminMatchDecisionControls(m, 'running-');
           rTable.innerHTML += `<tr><td>${adminGameTypeLabel(m.gameType)} (${m.status})</td><td>${players}<br>${playerContacts}</td><td>₹${m.amount} each</td><td>${m.roomCode || 'Not shared'}<br>Due: ${deadline}</td><td>${confirmations}<br>${m.gameStartedAt ? `Started: ${new Date(m.gameStartedAt).toLocaleString()}` : 'Not started'}</td><td>${resultProofs}</td><td>${m.cancelReason || '-'}</td><td>${runningDecision}</td></tr>`;
         });
       }
