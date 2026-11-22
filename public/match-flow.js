@@ -143,7 +143,6 @@
 				body.set('matchId', matchId);
 				const result = await app.api('/api/matches/submit-result', { method: 'POST', body });
 				app.notify(result.message);
-				app.announceResultReport?.(result.match);
 				const notice = document.createElement('p');
 				notice.className = result.match?.status === 'COMPLETED' ? 'notice' : 'notice warning';
 				notice.textContent = result.match?.status === 'COMPLETED'
@@ -242,6 +241,7 @@
 					setupButton.disabled = false;
 				}
 			});
+			playShortAlertTone();
 			app.api(`/api/matches/${encodeURIComponent(matchId)}`).then(match => {
 				if (!roomForm.isConnected) return;
 				if (match.creatorStartedAt) {

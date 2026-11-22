@@ -35,6 +35,11 @@ const {
   createLudoRaceState,
   isLudoRaceWinner
 } = require('./lib/ludo-race-rules');
+const {
+  ADMIN_COMMISSION_PERCENT,
+  WINNER_PAYOUT_PERCENT,
+  calculateMatchPayout
+} = require('./lib/match-payout');
 
 // Models
 const User = require('./models/user');
@@ -579,9 +584,9 @@ function brandingImageUrl(settings, key, fallback) {
 
 function siteBrandingPayload(settings) {
   return {
-    brandLogoUrl: '/app-logo.png?v=20261008-2304',
-    appIcon192Url: '/app-logo.png?v=20261008-2304',
-    appIcon512Url: '/app-logo.png?v=20261008-2304',
+    brandLogoUrl: brandingImageUrl(settings, 'brandLogoPath', '/logo.png'),
+    appIcon192Url: brandingImageUrl(settings, 'appIcon192Path', '/app-logo.png?v=20261008-2304'),
+    appIcon512Url: brandingImageUrl(settings, 'appIcon512Path', '/app-logo.png?v=20261008-2304'),
     homeBannerUrl: brandingImageUrl(settings, 'homeBannerPath', '/banner-ludo-snake.png'),
     ludoBannerUrl: brandingImageUrl(settings, 'ludoBannerPath', '/ludo-classic.png'),
     snakeBannerUrl: brandingImageUrl(settings, 'snakeBannerPath', '/snake-battles-banner.png'),
@@ -717,7 +722,7 @@ app.get('/api/admin/branding', requireAdmin, async (req, res) => {
 
 app.get('/api/site-branding/image/:asset', async (req, res) => {
   const imageSettings = {
-    logo: ['brandLogoPath', '/app-logo.png?v=20261008-2304'],
+    logo: ['brandLogoPath', '/logo.png'],
     'app-icon-192': ['appIcon192Path', '/app-logo.png?v=20261008-2304'],
     'app-icon-512': ['appIcon512Path', '/app-logo.png?v=20261008-2304'],
     'home-banner': ['homeBannerPath', '/banner-ludo-snake.png'],
@@ -739,10 +744,28 @@ app.get('/api/site-branding/image/:asset', async (req, res) => {
   }
 });
 
-app.get('/api/site-manifest', (req, res) => {
-  res.set('Content-Type', 'application/manifest+json');
-  res.set('Cache-Control', 'no-cache');
-  res.json(defaultSiteManifest());
+app.get('/api/site-manifest', async (req, res) => {
+  try {
+    const settings = await readSiteBranding();
+    const manifest = {
+      ...defaultSiteManifest(),
+      icons: [
+        {
+          src: brandingImageUrl(settings, 'appIcon512Path', '/app-logo.png?v=20261008-2304'),
+          sizes: '500x500',
+          type: 'image/png',
+          purpose: 'any'
+        }
+      ]
+    };
+    res.set('Content-Type', 'application/manifest+json');
+    res.set('Cache-Control', 'no-cache');
+    res.json(manifest);
+  } catch (err) {
+    res.set('Content-Type', 'application/manifest+json');
+    res.set('Cache-Control', 'no-cache');
+    res.json(defaultSiteManifest());
+  }
 });
 
 app.post('/api/admin/branding', requireAdmin, (req, res, next) => {
@@ -2185,8 +2208,9 @@ app.post('/api/matches/ludo-score/move', requireUser, async (req, res) => {
 
       if (won) {
         const totalPool = Number(movedMatch.amount) * 2;
-        winAmount = totalPool * 0.95;
-        adminCommission = totalPool * 0.05;
+        const payout = calculateMatchPayout(totalPool);
+        winAmount = payout.winAmount;
+        adminCommission = payout.adminCommission;
         movedMatch.ludoScore = { ...nextState, payoutAmount: winAmount, adminCommission };
         creditedWinner = await User.findOneAndUpdate(
           { _id: winnerUserId },
@@ -2649,8 +2673,9 @@ app.post('/api/matches/submit-result', requireUser, persistUploads(upload.single
       if (creatorReportedLoss !== joinerReportedLoss) {
         const winnerId = creatorReportedLoss ? updated.joiner : updated.creator;
         const totalPool = updated.amount * 2;
-        winAmount = totalPool * 0.95;
-        adminCommission = totalPool * 0.05;
+        const payout = calculateMatchPayout(totalPool);
+        winAmount = payout.winAmount;
+        adminCommission = payout.adminCommission;
         creditedWinner = await User.findOneAndUpdate(
           { _id: winnerId },
           { $inc: { walletBalance: winAmount, winningsBalance: winAmount } },
@@ -3265,8 +3290,7 @@ app.post('/api/admin/approve-match', requireAdmin, async (req, res) => {
     await ensureWinningsBalance(match.winner);
 
     const totalPool = match.amount * 2;
-    const adminCommission = totalPool * 0.05;
-    const winAmount = totalPool * 0.95;
+    const { adminCommission, winAmount } = calculateMatchPayout(totalPool);
 
     const [winner, adminUser] = await Promise.all([
       User.findById(match.winner),
@@ -3310,7 +3334,7 @@ app.post('/api/admin/approve-match', requireAdmin, async (req, res) => {
       .populate('winner', 'username phone');
     io.to(String(match._id)).emit('match_updated', completedMatch);
 
-    res.json({ message: 'Winner ko 95% payout aur admin ko 5% commission credit ho chuka hai!', winAmount, commission: adminCommission, match: completedMatch });
+    res.json({ message: `Winner ko ${WINNER_PAYOUT_PERCENT}% payout aur admin ko ${ADMIN_COMMISSION_PERCENT}% commission credit ho chuka hai!`, winAmount, commission: adminCommission, match: completedMatch });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
