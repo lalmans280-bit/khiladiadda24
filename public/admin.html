@@ -598,7 +598,7 @@
               <td>${m.creator?.username || 'Creator'}: ${m.creatorResult || 'Not submitted'}${m.creatorResultReason ? ` · Reason: ${m.creatorResultReason}` : ''} · ${creatorProof}<br>${m.joiner?.username || 'Joiner'}: ${m.joinerResult || 'Not submitted'}${m.joinerResultReason ? ` · Reason: ${m.joinerResultReason}` : ''} · ${joinerProof}</td>
               <td>${reportsConflict ? `Reports differ.<br>Manual admin decision required.` : m.winner ? `${m.winner.username} (${m.winner.phone || '-'})` : 'N/A'}</td>
               <td>${m.roomCode || 'N/A'}<br>Shared by: ${m.roomCodeSharedBy?.username || '-'}<br>${m.gameStartedAt ? new Date(m.gameStartedAt).toLocaleString() : 'Not started'}</td>
-              <td><a href="#runningGamesOverview">Decision in Running Games above</a></td>
+              <td>${adminMatchDecisionControls(m, 'pending-')}</td>
             </tr>
           `;
         });
