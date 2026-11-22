@@ -1993,6 +1993,26 @@ function createLudoScoreState(creatorId, startedAt = new Date()) {
   };
 }
 
+async function ensureLudoRaceState(match) {
+  if (!match || match.gameType !== 'LUDO_RACE' || match.status !== 'RUNNING' || match.ludoRace) return match;
+  const creatorColor = isValidLudoRaceColor(match.creatorColor) ? String(match.creatorColor).toLowerCase() : 'red';
+  const state = createLudoRaceState(match.creator, {
+    creator: creatorColor,
+    joiner: defaultLudoRaceJoinerColor(creatorColor)
+  });
+  const updated = await Match.findOneAndUpdate(
+    {
+      _id: match._id,
+      gameType: 'LUDO_RACE',
+      status: 'RUNNING',
+      $or: [{ ludoRace: { $exists: false } }, { ludoRace: null }]
+    },
+    { $set: { ludoRace: state } },
+    { new: true }
+  );
+  return updated || Match.findById(match._id);
+}
+
 async function ensureLudoScoreState(match) {
   if (!match || match.gameType !== 'LUDO_SCORE' || match.status !== 'RUNNING' || match.ludoScore) return match;
   const updated = await Match.findOneAndUpdate(
