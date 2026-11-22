@@ -73,11 +73,10 @@
 		screenshotField.classList.add('win-proof-column');
 		const screenshotLabel = screenshotField.querySelector('label');
 		screenshotLabel.textContent = 'Win screenshot file (both players)';
-		const openScreenshotButton = document.createElement('button');
-		openScreenshotButton.type = 'button';
+		const openScreenshotButton = document.createElement('label');
 		openScreenshotButton.className = 'btn secondary small open-result-screenshot';
+		openScreenshotButton.htmlFor = 'resultShot';
 		openScreenshotButton.textContent = 'Open screenshot picker';
-		openScreenshotButton.addEventListener('click', () => screenshot.click());
 		screenshotField.insertBefore(openScreenshotButton, screenshot);
 		const lossButton = document.createElement('button');
 		lossButton.type = 'button';

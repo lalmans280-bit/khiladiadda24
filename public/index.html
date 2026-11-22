@@ -1232,12 +1232,11 @@
       const result=el('resultForm');
       const resultShot=el('resultShot');
       if(resultShot&&!el('openResultShot')){
-        const openShot=document.createElement('button');
+        const openShot=document.createElement('label');
         openShot.id='openResultShot';
-        openShot.type='button';
         openShot.className='btn secondary small';
+        openShot.htmlFor='resultShot';
         openShot.textContent='Open screenshot picker';
-        openShot.addEventListener('click',()=>resultShot.click());
         resultShot.before(openShot);
       }
       if(result)result.addEventListener('submit',async event=>{event.preventDefault();const body=new FormData(result);body.set('matchId',id);try{const data=await api('/api/matches/submit-result',{method:'POST',body});notify(data.message);window.matchApp?.announceResultReport?.(data.match);await refresh();await openMatch(id)}catch(error){showError(error)}});
@@ -1249,7 +1248,9 @@
     if(['home','games','wallet','history','profile'].includes(requestedView))setView(requestedView);
     refresh().catch(showError);battlesPollTimer=setInterval(()=>loadOpen().catch(showError),10000);setInterval(refreshSamplePlayers,10*1000);setInterval(()=>{if(el('view-profile').classList.contains('active'))loadWalletSummary().catch(showError)},10000);const initialMatchId=new URLSearchParams(location.search).get('matchId');if(initialMatchId)window.openMatch(initialMatchId).catch(showError);
   </script>
-    <script src="/match-flow.js?v=20261122-winning-screenshot-picker"></script>
+    <script src="/ludo-race.js?v=20261122-all-games-screenshot"></script>
+    <script src="/ludo-score.js?v=20261122-all-games-screenshot"></script>
+    <script src="/match-flow.js?v=20261122-native-screenshot-picker"></script>
     <script src="/player-game-feedback.js?v=20261114-battle-entry-amount-voice"></script>
     <script src="/wallet-flow.js?v=20261114-battle-entry-amount-voice-v2"></script>
     <script src="/game-rules.js?v=20261114-game-rules"></script>
