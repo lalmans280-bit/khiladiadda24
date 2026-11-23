@@ -96,6 +96,7 @@ test('support page provides voice typing and legacy chat redirects to it', () =>
   assert.match(supportHtml, /id="dictationButton"[^>]*type="button"/);
   assert.match(supportHtml, /id="dictationStatus"[^>]*aria-live="polite"/);
   assert.match(supportHtml, /message-dictation\.js/);
+  assert.match(supportHtml, /href="https:\/\/wa\.me\/919179557295" target="_blank" rel="noopener noreferrer">\+91 9179557295<\/a>/);
 
   const indexHtml = fs.readFileSync(require.resolve('../public/index.html'), 'utf8');
   assert.doesNotMatch(indexHtml, /Need Chat|chatNavButton/);
