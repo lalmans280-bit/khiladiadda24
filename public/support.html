@@ -32,6 +32,11 @@
     textarea{min-height:90px;padding:10px;border:1px solid #52685a;border-radius:8px;color:inherit;background:#101920;resize:vertical}
     input[type=file]{padding:8px;border:1px solid #52685a;border-radius:8px;background:#101920}
     button{min-height:42px;margin-top:12px;padding:9px 15px;border:0;border-radius:8px;background:#f4c84b;color:#172018;font:inherit;font-weight:700;cursor:pointer}
+    .dictation-controls{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+    .dictation-button{background:#1d4f3a;color:#e7f9ef;border:1px solid rgba(255,255,255,.15)}
+    .dictation-button[aria-pressed="true"]{background:#7f1d1d;color:#fff}
+    .dictation-status{min-height:24px;color:#c4cfca}
+    .dictation-status.error{color:#ffaaa2}
     button:disabled{opacity:.6;cursor:wait}
     #status{min-height:24px;color:#c4cfca}
     #status.error{color:#ffaaa2}
@@ -55,6 +60,10 @@
         <form id="chatForm">
           <label for="message">Aapka message</label>
           <textarea id="message" maxlength="1000" placeholder="Apni problem detail mein likhein..."></textarea>
+          <div class="dictation-controls">
+            <button id="dictationButton" class="dictation-button" type="button" aria-pressed="false">🎙️ बोलकर लिखें</button>
+            <span id="dictationStatus" class="dictation-status" role="status" aria-live="polite">बोली गई बात message में लिखेगी, भेजेगी नहीं।</span>
+          </div>
           <label for="attachment">Screenshot (JPEG, PNG ya WebP; max 5 MB)</label>
           <input id="attachment" type="file" accept="image/jpeg,image/png,image/webp">
           <img id="preview" alt="Screenshot preview" hidden>
@@ -211,5 +220,6 @@
       supportSocket.on('support_message', () => loadMessages());
     }
   </script>
+  <script src="/message-dictation.js?v=20261123-voice-message"></script>
 </body>
 </html>
