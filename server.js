@@ -79,8 +79,14 @@ const defaultSupportContacts = { supportNumber: '79557295', whatsappNumber: '795
 const ADMIN_PHONES = new Set(['7828189494', '917828189494', '07828189494']);
 const PRIMARY_ADMIN_PHONE = '7828189494';
 const RANDOM_PROFILE_IMAGES = ['1.png', '2.png', '3.png', '4.png', '5.png'];
-const DEFAULT_VOICE_CONTROL_HINT = 'वेबसाइट को अपनी आवाज़ से भी चलाएँ • प्रोफ़ाइल में वॉइस कंट्रोल शुरू करें';
+const DEFAULT_VOICE_CONTROL_HINT = 'वेबसाइट को AI से भी चला सकते हैं • नीचे AI Assistant दबाएँ';
+const LEGACY_VOICE_CONTROL_HINT = 'वेबसाइट को अपनी आवाज़ से भी चलाएँ • प्रोफ़ाइल में वॉइस कंट्रोल शुरू करें';
 const LEGACY_DEFAULT_PROFILE_IMAGES = new Set(['avatar-1.jpeg', 'avatar-2.jpeg', 'avatar-3.jpeg']);
+
+function getVoiceControlHint(settings) {
+  const text = String(settings?.voiceControlHint || '').trim();
+  return !text || text === LEGACY_VOICE_CONTROL_HINT ? DEFAULT_VOICE_CONTROL_HINT : text;
+}
 
 function isTestLoginEnabled() {
   return process.env.NODE_ENV !== 'production'
@@ -950,7 +956,7 @@ app.get('/api/site-voice-hint', async (req, res) => {
     const settings = mongoose.connection.readyState === 1
       ? await SiteSettings.findById('support-contact').select('voiceControlHint').lean()
       : null;
-    res.json({ text: settings?.voiceControlHint || DEFAULT_VOICE_CONTROL_HINT });
+    res.json({ text: getVoiceControlHint(settings) });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -962,7 +968,7 @@ app.get('/api/admin/site-voice-hint', requireAdmin, async (req, res) => {
   }
   try {
     const settings = await SiteSettings.findById('support-contact').select('voiceControlHint').lean();
-    res.json({ text: settings?.voiceControlHint || DEFAULT_VOICE_CONTROL_HINT });
+    res.json({ text: getVoiceControlHint(settings) });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -982,7 +988,7 @@ app.post('/api/admin/site-voice-hint', requireAdmin, async (req, res) => {
       { $set: { voiceControlHint: text } },
       { new: true, upsert: true, runValidators: true, setDefaultsOnInsert: true }
     );
-    res.json({ message: 'Player voice line update ho gayi.', text });
+    res.json({ message: 'Player AI Assistant line update ho gayi.', text });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

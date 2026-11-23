@@ -11,45 +11,40 @@
   controlPanel.addEventListener('click', event => event.stopPropagation());
   const commandHelp = controlPanel.querySelector('p.muted');
   if (commandHelp) {
-    commandHelp.textContent = 'होम पर 🎤 Voice दबाकर बोलें: पेज/गेम का नाम खोलो, “500 रुपये की बैटल लगाओ”, या किसी दिख रहे बटन का नाम लेकर “दबाओ” कहें। हर submit से पहले पुष्टि होगी।';
+    commandHelp.textContent = 'Header ke neeche 🎤 AI Assistant दबाकर बोलें: पेज/गेम खोलें, “500 रुपये की बैटल लगाओ”, या किसी दिख रहे विकल्प का नाम बोलें। जरूरी काम से पहले पुष्टि होगी।';
   }
-  const homeRefreshButton = document.getElementById('refreshOpen');
-  const homeRow = homeRefreshButton?.parentElement;
+  const homeAssistantSlot = document.getElementById('aiAssistantHomeSlot');
   let homeStartButton = null;
   let homeConfirmButton = null;
   let homeCancelButton = null;
   let homeStatus = null;
-  if (homeRow && !document.getElementById('voiceHomeToggle')) {
+  if (homeAssistantSlot && !document.getElementById('voiceHomeToggle')) {
     homeStartButton = document.createElement('button');
     homeStartButton.id = 'voiceHomeToggle';
     homeStartButton.type = 'button';
     homeStartButton.className = 'btn secondary small';
-    homeStartButton.textContent = '🎤 Voice';
-    homeRefreshButton.after(homeStartButton);
+    homeStartButton.textContent = '🎤 AI Assistant';
+    homeAssistantSlot.append(homeStartButton);
     homeConfirmButton = document.createElement('button');
     homeConfirmButton.id = 'voiceHomeConfirm';
     homeConfirmButton.type = 'button';
     homeConfirmButton.className = 'btn green small';
     homeConfirmButton.textContent = 'हाँ, पुष्टि';
     homeConfirmButton.hidden = true;
-    homeStartButton.after(homeConfirmButton);
+    homeAssistantSlot.append(homeConfirmButton);
     homeCancelButton = document.createElement('button');
     homeCancelButton.id = 'voiceHomeCancel';
     homeCancelButton.type = 'button';
     homeCancelButton.className = 'btn danger small';
     homeCancelButton.textContent = 'नहीं';
     homeCancelButton.hidden = true;
-    homeConfirmButton.after(homeCancelButton);
-    homeRow.style.flexDirection = 'row';
-    homeRow.style.alignItems = 'center';
-    homeRow.style.justifyContent = 'flex-end';
-    homeRow.style.flexWrap = 'wrap';
+    homeAssistantSlot.append(homeCancelButton);
     homeStatus = document.createElement('p');
     homeStatus.className = 'notice';
     homeStatus.setAttribute('role', 'status');
     homeStatus.setAttribute('aria-live', 'polite');
     homeStatus.hidden = true;
-    homeRow.parentElement.insertBefore(homeStatus, homeRow.nextSibling);
+    homeAssistantSlot.append(homeStatus);
   }
 
   const hindiNumbers = new Map([
@@ -682,12 +677,14 @@
   function updateVoiceButtons() {
     startButton.disabled = !Recognition || listening;
     stopButton.disabled = !listening;
-    startButton.textContent = aiAssistantEnabled ? '🎤 AI Assistant शुरू करें' : '🎤 आवाज़ शुरू करें';
+    startButton.textContent = '🎤 AI Assistant शुरू करें';
     if (homeStartButton) {
       homeStartButton.disabled = !Recognition;
-      homeStartButton.textContent = listening ? '⏹ रोकें' : aiAssistantEnabled ? '🎤 AI Assistant' : '🎤 Voice';
+      homeStartButton.textContent = listening ? '⏹ रोकें' : '🎤 AI Assistant';
       homeStartButton.setAttribute('aria-pressed', String(listening));
-      homeStartButton.title = listening ? 'आवाज़ बंद करें' : 'Hindi voice assistant शुरू करें';
+      homeStartButton.title = listening
+        ? 'आवाज़ बंद करें'
+        : aiAssistantEnabled ? 'Hindi AI Assistant शुरू करें' : 'Voice controls; AI service अभी उपलब्ध नहीं है';
     }
   }
 

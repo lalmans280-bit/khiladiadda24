@@ -159,6 +159,7 @@
             <a href="#adminSupportNumbers" onclick="showAdminTool(event, 'adminSupportNumbers')">WhatsApp &amp; Support Numbers</a>
             <a href="#depositWithdrawalSummary" onclick="showAdminTool(event, 'depositWithdrawalSummary')">Deposit &amp; Withdrawal Summary</a>
             <a href="#depositUpiSettings" onclick="showAdminTool(event, 'depositUpiSettings')">Deposit UPI ID</a>
+            <a href="#playerVoiceHintSettings" onclick="showAdminTool(event, 'playerVoiceHintSettings')">AI Assistant Help Line</a>
             <a href="#completeGameHistory" onclick="showAdminTool(event, 'completeGameHistory')">Complete Game History</a>
             <a href="#adminToolsView" onclick="showAllAdminTools(event)">Other Admin Tools</a>
           </div>
@@ -221,12 +222,12 @@
     </div>
 
     <div class="card admin-section" id="playerVoiceHintSettings" data-admin-tool>
-      <h3>Player Voice Help Line</h3>
-      <p class="muted">Player page ke top par dikhne wali chhoti Hindi line. Maximum 160 characters.</p>
-      <label for="playerVoiceHintInput">Player help line</label>
-      <input id="playerVoiceHintInput" type="text" maxlength="160" placeholder="वेबसाइट को अपनी आवाज़ से भी चलाएँ">
+      <h3>Player AI Assistant Help Line</h3>
+      <p class="muted">Player page par header ke neeche dikhne wali line. Maximum 160 characters.</p>
+      <label for="playerVoiceHintInput">Player AI Assistant line</label>
+      <input id="playerVoiceHintInput" type="text" maxlength="160" placeholder="वेबसाइट को AI से भी चला सकते हैं • नीचे AI Assistant दबाएँ">
       <div class="toolbar" style="margin-top: 12px;">
-        <button id="savePlayerVoiceHintBtn" type="button">Save voice help line</button>
+        <button id="savePlayerVoiceHintBtn" type="button">Save AI Assistant line</button>
       </div>
       <p id="playerVoiceHintStatus" class="muted" role="status" aria-live="polite">Loading...</p>
     </div>
@@ -817,11 +818,11 @@
       try {
         const res = await adminFetch('/api/admin/site-voice-hint');
         const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Player voice line load nahi hui.');
+        if (!res.ok) throw new Error(data.error || 'Player AI Assistant line load nahi hui.');
         input.value = data.text || '';
-        status.textContent = 'Current player voice line loaded.';
+        status.textContent = 'Current player AI Assistant line loaded.';
       } catch (error) {
-        status.textContent = error.message || 'Player voice line load nahi hui.';
+        status.textContent = error.message || 'Player AI Assistant line load nahi hui.';
       }
     }
 
@@ -840,11 +841,11 @@
           body: JSON.stringify({ text })
         });
         const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Player voice line save nahi hui.');
+        if (!res.ok) throw new Error(data.error || 'Player AI Assistant line save nahi hui.');
         input.value = data.text || '';
-        status.textContent = data.message || 'Player voice line save ho gayi.';
+        status.textContent = data.message || 'Player AI Assistant line save ho gayi.';
       } catch (error) {
-        status.textContent = error.message || 'Player voice line save nahi hui.';
+        status.textContent = error.message || 'Player AI Assistant line save nahi hui.';
       }
     }
 

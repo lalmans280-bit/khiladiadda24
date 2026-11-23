@@ -19,7 +19,7 @@ const siteSettingsSchema = new mongoose.Schema({
   supportBannerPath: { type: String, default: '' },
   voiceControlHint: {
     type: String,
-    default: 'वेबसाइट को अपनी आवाज़ से भी चलाएँ • प्रोफ़ाइल में वॉइस कंट्रोल शुरू करें',
+    default: 'वेबसाइट को AI से भी चला सकते हैं • नीचे AI Assistant दबाएँ',
     maxlength: 160
   },
   withdrawalTickerEnabled: { type: Boolean, default: true },
