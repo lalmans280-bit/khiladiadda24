@@ -493,9 +493,14 @@
     #view-home .demo-battle-game,#view-games .demo-battle-game,#view-home .demo-battle-prize small,#view-games .demo-battle-prize small{ text-shadow:0 1px 0 #071a4b,0 2px 0 #04102a,0 0 6px #2faaff66 }
     #view-home .demo-battle-prize small,#view-games .demo-battle-prize small{ font-weight:900; letter-spacing:.05em; text-transform:uppercase }
   </style>
+  <style id="voiceHelpLineStyles">
+    .voice-help-line{max-width:1120px;margin:0 auto 6px;padding:4px 10px;border:1px solid #62522a;border-radius:7px;color:#ffe9a8;background:#2c281d;font-size:12px;font-weight:800;line-height:1.35;text-align:center}
+    @media(max-width:600px){.voice-help-line{margin-right:8px;margin-left:8px;padding:4px 7px;font-size:11px}}
+  </style>
 </head>
 <body>
   <header class="topbar"><div class="top-inner"><button class="icon" id="menuToggle" aria-label="Menu" aria-expanded="false">☰</button><a class="brand" href="#home" aria-label="Home"><img class="app-brand-logo" src="/app-logo.png" alt="" aria-hidden="true"><span class="brand-copy"><span class="brand-main"><span>PLAY</span><span>•</span><span>BATTLE</span><span class="brand-win">WIN</span></span><small class="brand-tagline">OPEN 24/7 WITHDRAW</small></span></a><div class="top-actions"><div class="lang-toggle" aria-label="Language selector"><button class="lang-btn active" type="button" data-lang-toggle="hi">HI</button><button class="lang-btn" type="button" data-lang-toggle="en">EN</button></div><span class="balance" id="headerBalance">₹ --</span></div></div><div class="menu" id="menu"><button data-view="profile" data-i18n-key="menuProfile">👤 My profile</button><button data-view="home" data-i18n-key="menuHome">🏆 Win cash</button><button data-view="wallet" data-i18n-key="menuWallet">👛 My wallet</button><button data-view="history" data-i18n-key="menuHistory">📜 History</button><button data-menu-action="referral" data-i18n-key="menuReferral">🎁 Refer and earn</button><button data-menu-action="notifications" data-i18n-key="menuNotifications">🔔 Notification</button><a href="/support.html" data-i18n-key="supportLink">🛟 Support</a><a href="/policy.html" data-i18n-key="policyLink">📄 All policies</a><button class="menu-logout" id="logout" data-i18n-key="logout">🚪 Logout</button></div><nav class="nav"><button class="active" data-view="home" data-i18n-key="navHome">Home</button><button data-view="games" data-i18n-key="navGames">Games</button><button data-view="wallet" data-i18n-key="navWallet">Wallet</button><button data-view="profile" data-i18n-key="navProfile">Profile</button></nav></header>
+  <p class="voice-help-line" id="voiceHelpLine" role="note">वेबसाइट को अपनी आवाज़ से भी चलाएँ • प्रोफ़ाइल में वॉइस कंट्रोल शुरू करें</p>
   <div class="app-promo" id="appPromo" hidden role="region" aria-label="Mobile app options">
     <span class="app-promo-copy">KhiladiAdda24 mobile app</span>
     <button type="button" id="installAppButton">Install App</button>
@@ -693,6 +698,12 @@
         if(element&&url)element[attribute]=url;
       });
     }).catch(()=>{});
+    fetch('/api/site-voice-hint', { cache: 'no-store' }).then(response => {
+      if (!response.ok) throw new Error('Voice help line load nahi hui.');
+      return response.json();
+    }).then(data => {
+      if (typeof data.text === 'string' && data.text.trim()) el('voiceHelpLine').textContent = data.text.trim();
+    }).catch(error => console.error('Voice help line could not be loaded.', error));
 
     const matchSocket=typeof io==='function'?io():null;
     const registerMatchSocket=()=>{if(!matchSocket||!token)return;matchSocket.emit('register_player',{token});const matchId=new URLSearchParams(location.search).get('matchId');if(matchId)matchSocket.emit('join_match_room',{matchId,token})};
