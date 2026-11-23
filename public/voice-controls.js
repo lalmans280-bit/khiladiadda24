@@ -1,6 +1,8 @@
 (() => {
   const app = window.matchApp;
   const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const speechSynthesis = window.speechSynthesis;
+  const SpeechSynthesisUtterance = window.SpeechSynthesisUtterance;
   const controlPanel = document.getElementById('voiceControls');
   const startButton = document.getElementById('voiceStart');
   const stopButton = document.getElementById('voiceStop');
@@ -12,6 +14,9 @@
   const commandHelp = controlPanel.querySelector('p.muted');
   if (commandHelp) {
     commandHelp.textContent = 'Header ke neeche 🎤 AI Assistant दबाकर बोलें: पेज/गेम खोलें, “500 रुपये की बैटल लगाओ”, या किसी दिख रहे विकल्प का नाम बोलें। जरूरी काम से पहले पुष्टि होगी।';
+    commandHelp.textContent += speechSynthesis && SpeechSynthesisUtterance
+      ? ' जवाब हिंदी आवाज़ में सुनाई देंगे; उपलब्ध होने पर महिला voice चुनी जाएगी।'
+      : ' इस browser में बोलकर जवाब उपलब्ध नहीं हैं।';
   }
   const homeAssistantSlot = document.getElementById('aiAssistantHomeSlot');
   let homeStartButton = null;
@@ -60,14 +65,73 @@
     ['ten', 10], ['hundred', 100], ['thousand', 1000], ['lakh', 100000]
   ]);
   let recognition = null;
+  let recognitionActive = false;
   let listening = false;
+  let voiceRepliesEnabled = false;
+  let replySpeaking = false;
+  let activeUtterance = null;
   let aiAssistantEnabled = false;
   let aiThinking = false;
   let restartTimer = 0;
   let pendingAction = null;
   let pendingTimer = 0;
 
-  function setStatus(message, error = false) {
+  function chooseHindiReplyVoice() {
+    if (!speechSynthesis) return null;
+    const voices = speechSynthesis.getVoices();
+    const hindiVoices = voices.filter(voice => /^hi(?:$|-|_)/i.test(voice.lang));
+    const feminineName = /female|woman|kalpana|aditi|heera|priya|swara|kajal|neerja|sangeeta|raveena|meera|isha/i;
+    return hindiVoices.find(voice => feminineName.test(voice.name)) || hindiVoices[0] || null;
+  }
+
+  function finishSpokenReply(utterance) {
+    if (activeUtterance !== utterance) return;
+    activeUtterance = null;
+    replySpeaking = false;
+    if (!listening || !recognition) return;
+    try {
+      recognition.start();
+      recognitionActive = true;
+    } catch (error) {
+      listening = false;
+      updateVoiceButtons();
+      setStatus(`माइक फिर से शुरू नहीं हो पाया: ${error.message}`, true);
+    }
+  }
+
+  function speakStatus(message) {
+    const text = String(message || '').trim();
+    if (!voiceRepliesEnabled || !speechSynthesis || !SpeechSynthesisUtterance
+        || !text || /^सुना:/u.test(text) || /command समझ रहा है/u.test(text)) return;
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'hi-IN';
+    utterance.rate = 0.96;
+    utterance.pitch = 1.12;
+    const voice = chooseHindiReplyVoice();
+    if (voice) utterance.voice = voice;
+    utterance.onend = () => finishSpokenReply(utterance);
+    utterance.onerror = () => finishSpokenReply(utterance);
+
+    activeUtterance = utterance;
+    replySpeaking = true;
+    window.clearTimeout(restartTimer);
+    restartTimer = 0;
+    speechSynthesis.cancel();
+    if (listening && recognition && recognitionActive) {
+      try {
+        recognition.stop();
+        recognitionActive = false;
+      } catch (error) {
+        console.error('Hindi voice recognition could not pause for a spoken reply.', error);
+        listening = false;
+        voiceRepliesEnabled = false;
+        updateVoiceButtons();
+      }
+    }
+    speechSynthesis.speak(utterance);
+  }
+
+  function setStatus(message, error = false, speak = true) {
     status.textContent = message;
     status.classList.toggle('error', error);
     if (homeStatus) {
@@ -75,6 +139,7 @@
       homeStatus.classList.toggle('error', error);
       homeStatus.hidden = false;
     }
+    if (speak) speakStatus(message);
   }
 
   function normalize(text) {
@@ -457,7 +522,7 @@
       return;
     }
     aiThinking = true;
-    setStatus('AI assistant command समझ रहा है। अपरिचित आवाज़ का text Google Gemini को भेजा जाएगा।');
+    setStatus('AI assistant command समझ रहा है। अपरिचित आवाज़ का text Google Gemini को भेजा जाएगा।', false, false);
     try {
       const result = await app.api('/api/assistant/interpret', {
         method: 'POST',
@@ -691,10 +756,17 @@
   function stopListening() {
     const wasListening = listening;
     listening = false;
+    voiceRepliesEnabled = false;
     window.clearTimeout(restartTimer);
-    if (recognition && wasListening) {
+    if (activeUtterance && speechSynthesis) {
+      activeUtterance = null;
+      replySpeaking = false;
+      speechSynthesis.cancel();
+    }
+    if (recognition && wasListening && recognitionActive) {
       try {
         recognition.stop();
+        recognitionActive = false;
       } catch (error) {
         setStatus(`माइक बंद नहीं हो पाया: ${error.message}`, true);
       }
@@ -714,11 +786,13 @@
     }
     try {
       recognition.start();
+      recognitionActive = true;
       listening = true;
+      voiceRepliesEnabled = true;
       updateVoiceButtons();
       setStatus(aiAssistantEnabled
         ? 'AI assistant सुन रहा है। अनजान command समझने के लिए transcript Google Gemini को भेजा जाएगा।'
-        : 'माइक चालू है। हिंदी में वेबसाइट के विकल्प बोलें।');
+        : 'माइक चालू है। हिंदी में वेबसाइट के विकल्प बोलें।', false, false);
     } catch (error) {
       setStatus(`माइक शुरू नहीं हो पाया: ${error.message}`, true);
     }
@@ -736,24 +810,27 @@
       const result = event.results[event.results.length - 1];
       if (!result?.isFinal) return;
       const transcript = result[0]?.transcript || '';
-      setStatus(`सुना: “${transcript}”`);
+      setStatus(`सुना: “${transcript}”`, false, false);
       handleCommand(transcript).catch(error => setStatus(error?.message || 'कमांड पूरा नहीं हो पाया।', true));
     };
     recognition.onerror = event => {
       if (event.error === 'no-speech' || event.error === 'aborted') return;
       listening = false;
+      recognitionActive = false;
       updateVoiceButtons();
       setStatus(event.error === 'not-allowed' || event.error === 'service-not-allowed'
         ? 'माइक की अनुमति नहीं मिली। Browser settings में microphone अनुमति दें।'
         : `आवाज़ पहचान में समस्या हुई: ${event.error}`, true);
     };
     recognition.onend = () => {
-      if (!listening) return;
+      recognitionActive = false;
+      if (!listening || replySpeaking) return;
       window.clearTimeout(restartTimer);
       restartTimer = window.setTimeout(() => {
         if (!listening) return;
         try {
           recognition.start();
+          recognitionActive = true;
         } catch (error) {
           listening = false;
           updateVoiceButtons();
