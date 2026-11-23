@@ -104,3 +104,16 @@ test('support page provides voice typing and legacy chat redirects to it', () =>
   const legacyChatHtml = fs.readFileSync(require.resolve('../public/chat.html'), 'utf8');
   assert.match(legacyChatHtml, /location\.replace\('\/support\.html'\)/);
 });
+
+test('AI Assistant controls are removed while Support voice typing remains available', () => {
+  const indexHtml = fs.readFileSync(require.resolve('../public/index.html'), 'utf8');
+  assert.doesNotMatch(indexHtml, /voiceControls|voiceStart|voiceStop|voice-controls\.js|site-voice-hint|AI Assistant/);
+
+  const adminHtml = fs.readFileSync(require.resolve('../public/admin.html'), 'utf8');
+  assert.doesNotMatch(adminHtml, /AI Assistant|site-voice-hint|playerVoiceHint/);
+  assert.match(adminHtml, /Direct Player Support Chat/);
+
+  const supportHtml = fs.readFileSync(require.resolve('../public/support.html'), 'utf8');
+  assert.match(supportHtml, /id="dictationButton"/);
+  assert.match(supportHtml, /message-dictation\.js/);
+});

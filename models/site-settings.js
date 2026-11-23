@@ -17,11 +17,6 @@ const siteSettingsSchema = new mongoose.Schema({
   ludoBannerPath: { type: String, default: '' },
   snakeBannerPath: { type: String, default: '' },
   supportBannerPath: { type: String, default: '' },
-  voiceControlHint: {
-    type: String,
-    default: 'वेबसाइट को AI से भी चला सकते हैं • नीचे AI Assistant दबाएँ',
-    maxlength: 160
-  },
   withdrawalTickerEnabled: { type: Boolean, default: true },
   withdrawalTickerDays: { type: Number, enum: [7, 14, 30], default: 30 },
   withdrawalTickerMinimumAmount: { type: Number, min: 0, max: 10000000, default: 0 },

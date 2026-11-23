@@ -78,14 +78,7 @@ const defaultSupportContacts = { supportNumber: '79557295', whatsappNumber: '795
 const ADMIN_PHONES = new Set(['7828189494', '917828189494', '07828189494']);
 const PRIMARY_ADMIN_PHONE = '7828189494';
 const RANDOM_PROFILE_IMAGES = ['1.png', '2.png', '3.png', '4.png', '5.png'];
-const DEFAULT_VOICE_CONTROL_HINT = 'वेबसाइट को AI से भी चला सकते हैं • नीचे AI Assistant दबाएँ';
-const LEGACY_VOICE_CONTROL_HINT = 'वेबसाइट को अपनी आवाज़ से भी चलाएँ • प्रोफ़ाइल में वॉइस कंट्रोल शुरू करें';
 const LEGACY_DEFAULT_PROFILE_IMAGES = new Set(['avatar-1.jpeg', 'avatar-2.jpeg', 'avatar-3.jpeg']);
-
-function getVoiceControlHint(settings) {
-  const text = String(settings?.voiceControlHint || '').trim();
-  return !text || text === LEGACY_VOICE_CONTROL_HINT ? DEFAULT_VOICE_CONTROL_HINT : text;
-}
 
 function isTestLoginEnabled() {
   return process.env.NODE_ENV !== 'production'
@@ -969,49 +962,6 @@ app.post('/api/admin/site-announcement', requireAdmin, async (req, res) => {
   const normalizedText = safeText.length > 120 ? safeText.slice(0, 120).trim() : safeText;
   siteAnnouncementText = normalizedText;
   res.json({ message: 'Notification line update ho gaya.', text: siteAnnouncementText });
-});
-
-app.get('/api/site-voice-hint', async (req, res) => {
-  try {
-    const settings = mongoose.connection.readyState === 1
-      ? await SiteSettings.findById('support-contact').select('voiceControlHint').lean()
-      : null;
-    res.json({ text: getVoiceControlHint(settings) });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-app.get('/api/admin/site-voice-hint', requireAdmin, async (req, res) => {
-  if (mongoose.connection.readyState !== 1) {
-    return res.status(503).json({ error: mongoUnavailableMessage() });
-  }
-  try {
-    const settings = await SiteSettings.findById('support-contact').select('voiceControlHint').lean();
-    res.json({ text: getVoiceControlHint(settings) });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-app.post('/api/admin/site-voice-hint', requireAdmin, async (req, res) => {
-  if (mongoose.connection.readyState !== 1) {
-    return res.status(503).json({ error: mongoUnavailableMessage() });
-  }
-  if (typeof req.body?.text !== 'string' || req.body.text.trim().length > 160) {
-    return res.status(400).json({ error: 'Line 160 characters se chhoti honi chahiye.' });
-  }
-  const text = req.body.text.trim() || DEFAULT_VOICE_CONTROL_HINT;
-  try {
-    await SiteSettings.findByIdAndUpdate(
-      'support-contact',
-      { $set: { voiceControlHint: text } },
-      { new: true, upsert: true, runValidators: true, setDefaultsOnInsert: true }
-    );
-    res.json({ message: 'Player AI Assistant line update ho gayi.', text });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
 });
 
 function normalizeIndianMobileNumber(value) {
