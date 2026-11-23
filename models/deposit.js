@@ -5,6 +5,7 @@ const depositSchema = new mongoose.Schema({
   amount: { type: Number, required: true },
   utrNumber: { type: String, required: true, unique: true },
   screenshot: { type: String },
+  screenshotDeleteAt: { type: Date },
   status: { type: String, enum: ['PENDING', 'APPROVED', 'REJECTED'], default: 'PENDING' },
   rejectionReason: { type: String, default: '' }
 }, { timestamps: true });

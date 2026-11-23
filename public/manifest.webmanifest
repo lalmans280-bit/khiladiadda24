@@ -1,11 +1,15 @@
 {
   "name": "KhiladiAdda24",
   "short_name": "KhiladiAdda24",
+  "description": "Ludo & Snake real-money battle platform",
+  "id": "/index.html",
   "start_url": "/index.html",
   "scope": "/",
   "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone"],
   "background_color": "#101713",
   "theme_color": "#101713",
+  "orientation": "portrait",
   "icons": [
     {
       "src": "/app-logo.png?v=20261008-2304",

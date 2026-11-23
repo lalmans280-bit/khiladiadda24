@@ -1,0 +1,9 @@
+node_modules/
+.env
+.env.*
+!.env.example
+uploads/
+server-*.log
+npm-debug.log*
+/_deploy-worktree/
+/_score-*/

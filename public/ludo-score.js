@@ -1,7 +1,8 @@
 (() => {
-  const scorePathLength = 57;
-  const scoreFinishProgress = scorePathLength - 1;
-  const scoreRulesVersion = 2;
+  if (typeof window === 'undefined' || typeof document === 'undefined') {
+    return;
+  }
+
   const track = [
     [6, 1], [6, 2], [6, 3], [6, 4], [6, 5], [5, 6], [4, 6], [3, 6], [2, 6], [1, 6], [0, 6],
     [0, 7], [0, 8], [1, 8], [2, 8], [3, 8], [4, 8], [5, 8], [6, 9], [6, 10], [6, 11], [6, 12],
@@ -9,13 +10,45 @@
     [10, 8], [11, 8], [12, 8], [13, 8], [14, 8], [14, 7], [14, 6], [13, 6], [12, 6], [11, 6],
     [10, 6], [9, 6], [8, 5], [8, 4], [8, 3], [8, 2], [8, 1], [8, 0], [7, 0], [6, 0]
   ];
-  const colors = {
-    red: { startIndex: 0, homePath: [[7, 1], [7, 2], [7, 3], [7, 4], [7, 5]], finish: [7, 7], baseSlots: [[1, 1], [1, 4], [4, 1], [4, 4]], yard: [0, 5, 0, 5], name: 'Lal', symbol: '🔴' },
-    green: { startIndex: 26, homePath: [[8, 13], [8, 12], [8, 11], [8, 10], [8, 9]], finish: [7, 7], baseSlots: [[10, 10], [10, 13], [13, 10], [13, 13]], yard: [9, 14, 9, 14], name: 'Hara', symbol: '🟢' },
-    yellow: { startIndex: 13, homePath: [[1, 7], [2, 7], [3, 7], [4, 7], [5, 7]], finish: [7, 7], baseSlots: [[1, 10], [1, 13], [4, 10], [4, 13]], yard: [0, 5, 9, 14], name: 'Peela', symbol: '🟡' },
-    blue: { startIndex: 39, homePath: [[13, 7], [12, 7], [11, 7], [10, 7], [9, 7]], finish: [7, 7], baseSlots: [[10, 1], [10, 4], [13, 1], [13, 4]], yard: [9, 14, 0, 5], name: 'Neela', symbol: '🔵' }
+  const directionArrows = {
+    '0,1': '→', '0,-1': '←', '-1,0': '↑', '1,0': '↓',
+    '-1,1': '↗', '1,1': '↘', '1,-1': '↙', '-1,-1': '↖'
+  };
+  const turnDirections = new Map();
+  track.forEach((point, index) => {
+    const previous = track[(index + track.length - 1) % track.length];
+    const next = track[(index + 1) % track.length];
+    const incoming = `${Math.sign(point[0] - previous[0])},${Math.sign(point[1] - previous[1])}`;
+    const outgoing = `${Math.sign(next[0] - point[0])},${Math.sign(next[1] - point[1])}`;
+    if (incoming !== outgoing || index === 0 || index === 26) turnDirections.set(index, directionArrows[outgoing]);
+  });
+  const homeEntryMarkers = new Map([
+    [51, { side: 'creator', arrow: directionArrows['1,1'], label: 'Red home lane entry' }],
+    [25, { side: 'joiner', arrow: directionArrows['0,-1'], label: 'Green home lane entry' }]
+  ]);
+  const homePaths = {
+    creator: [[7, 1], [7, 2], [7, 3], [7, 4], [7, 5]],
+    joiner: [[8, 13], [8, 12], [8, 11], [8, 10], [8, 9]]
+  };
+  const finishPosition = [7, 7];
+  const centerConnectors = {
+    creator: { position: [7, 6], arrow: '→', label: 'Red lane to shared center' },
+    joiner: { position: [8, 8], arrow: '↖', label: 'Green lane to shared center' }
+  };
+  const baseSlots = {
+    creator: [[1, 1], [1, 4], [4, 1], [4, 4]],
+    joiner: [[10, 10], [10, 13], [13, 10], [13, 13]]
+  };
+  const decorativeBaseSlots = {
+    yellow: [[1, 10], [1, 13], [4, 10], [4, 13]],
+    blue: [[10, 1], [10, 4], [13, 1], [13, 4]]
   };
   const safeTrack = new Set([0, 8, 13, 21, 26, 34, 39, 47]);
+  const scoreMaximum = 1400;
+  const scoreForTokens = tokens => tokens.reduce(
+    (score, progress) => score + (progress >= 52 ? 100 : 0) + (progress === 57 ? 250 : 0),
+    0
+  );
   let activeMatchId = '';
   let activeSignature = '';
   let latestMatch;
@@ -23,54 +56,87 @@
 
   const style = document.createElement('style');
   style.textContent = `
-    .ludo-score-panel{margin-top:14px;border:1px solid #3d6046;background:linear-gradient(145deg,#203126,#17231b)}
-    .ludo-score-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
-    .ludo-score-head h3{margin:0}
-    .ludo-score-players{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}
-    .ludo-score-player{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:8px;min-width:0;padding:9px 11px;border:1px solid #405247;border-radius:10px;background:linear-gradient(135deg,#24382a,#1b2a20)}
-    .ludo-score-player-main{display:flex;align-items:center;gap:8px;min-width:0}
-    .ludo-score-avatar,.ludo-score-avatar-fallback{display:grid;place-items:center;width:40px;height:40px;flex:none;border:2px solid #d5c16b;border-radius:50%;object-fit:cover;color:#fff;background:#304336;font-size:16px;font-weight:900}
-    .ludo-score-player-copy{min-width:0}
-    .ludo-score-player-copy strong{display:block;overflow-wrap:anywhere}
-    .ludo-score-player-copy small{color:var(--muted)}
-    .ludo-score-player small{color:var(--muted)}
-    .ludo-score-player.creator{border-color:#e16a5d}.ludo-score-player.joiner{border-color:#4bc174}
-    .ludo-score-player.red{border-color:#e16a5d}.ludo-score-player.green{border-color:#4bc174}
-    .ludo-score-player.yellow{border-color:#d4b333}.ludo-score-player.blue{border-color:#5a82c7}
-    .ludo-score-status{margin:8px 0;padding:10px 12px;border:1px solid #405b46;border-radius:10px;background:#1d2d21}
-    .ludo-score-timer{display:inline-grid;place-items:center;min-width:52px;padding:5px 8px;border:1px solid #d7b14e;border-radius:7px;color:#f4d36c;font-weight:800;font-variant-numeric:tabular-nums}
-    .ludo-score-timer.urgent{color:#ff8c78;border-color:#ff8c78}
-    .ludo-score-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:10px 0}
-    .ludo-score-dice-box{display:grid;justify-items:center;gap:7px;padding:9px 12px;border:1px solid #7d6130;border-radius:14px;background:linear-gradient(145deg,#3b3020,#29271e)}
-    .ludo-score-dice-label{color:#f4d36c;font-size:10px;font-weight:900;letter-spacing:1.2px}
-    .ludo-score-die{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);place-items:center;gap:2px;width:58px;height:58px;min-width:58px;padding:8px;border:2px solid #f4c252;border-radius:15px;background:linear-gradient(145deg,#fffef5,#ffe8a5 70%,#ffd36c);box-shadow:0 5px 0 #9a661d,0 9px 18px #0006,inset 0 0 0 2px #fff9;transform:rotate(-4deg);animation:ludo-die-pop .28s ease-out}
+    body.ludo-score-page{min-height:100dvh;background:#092d65}
+    body.ludo-score-page .topbar,body.ludo-score-page .bottom{display:none!important}
+    body.ludo-score-page .shell.content{width:100%;max-width:none;margin:0;padding:0}
+    body.ludo-score-page #view-match{margin:0;padding:0}
+    body.ludo-score-page #view-match>.panel{margin:0;padding:0;border:0;border-radius:0;background:transparent}
+    body.ludo-score-page #view-match .panel>[data-view="battles"]{display:none}
+    body.ludo-score-page #matchDetails{min-height:100dvh}
+    body.ludo-score-page .ludo-score-screen{display:flex;min-height:100dvh;flex-direction:column;align-items:center;justify-content:space-between;overflow:hidden;padding:0 0 env(safe-area-inset-bottom);background:repeating-linear-gradient(135deg,#0d3975 0 18px,#10427f 18px 36px)}
+    body.ludo-score-page .ludo-score-board{width:min(100vw,68vh,680px);margin:0;border:4px solid #f8fafc;border-radius:0;background:#fff;box-shadow:0 8px 24px #001c4d99}
+    .ludo-score-board{display:grid;grid-template-columns:repeat(15,minmax(0,1fr));aspect-ratio:1;overflow:hidden}
+    .ludo-score-status{width:100%;min-height:34px;padding:7px 10px;color:#fff;background:#082855b8;font-size:12px;font-weight:700;text-align:center}
+    .ludo-score-status small{color:#e4edff}
+    .ludo-score-timer{display:inline-grid;place-items:center;min-width:36px;margin-bottom:3px;padding:2px 6px;border:1px solid #fff8;border-radius:999px;color:#fff;font-size:12px;font-weight:900;font-variant-numeric:tabular-nums}
+    .ludo-score-timer.urgent{color:#ffe27b;border-color:#ffe27b}
+    .ludo-score-players{display:grid;width:min(100%,520px);grid-template-columns:minmax(0,1fr) 76px minmax(0,1fr);align-items:end;gap:6px;margin:0;padding:4px 10px 12px}
+    .ludo-score-player{display:grid;min-width:0;justify-items:center;gap:5px}
+    .ludo-score-avatar{display:grid;width:48px;height:48px;place-items:center;overflow:hidden;border:3px solid #fff;border-radius:50%;color:#fff;font-size:19px;font-weight:900;box-shadow:0 2px 8px #001a45a6}
+    .ludo-score-avatar img{width:100%;height:100%;object-fit:cover}
+    .ludo-score-player-info{width:100%;min-height:44px;padding:5px 4px;border:1px solid #ffffff8a;border-radius:8px;color:#fff;text-align:center;box-shadow:0 3px 8px #001a4566}
+    .ludo-score-player.creator .ludo-score-avatar{background:#db3543}
+    .ludo-score-player.creator .ludo-score-player-info{background:linear-gradient(135deg,#0d4c91,#082e68)}
+    .ludo-score-player.joiner .ludo-score-avatar{background:#168d56}
+    .ludo-score-player.joiner .ludo-score-player-info{background:linear-gradient(135deg,#16834f,#075f45)}
+    .ludo-score-player strong{display:block;overflow:hidden;font-size:12px;text-overflow:ellipsis;white-space:nowrap}
+    .ludo-score-player small{display:block;color:#dbeafe;font-size:10px;line-height:1.25}
+    .ludo-score-player small.ludo-score-wallet{color:#fff;font-weight:800}
+    .ludo-score-controls{display:grid;min-width:0;justify-items:center;align-content:end;gap:4px;padding-bottom:19px}
+    .ludo-score-roll{display:grid;width:70px;height:70px;min-width:0;place-items:center;padding:0;border:0!important;border-radius:50%;background:transparent!important;box-shadow:none!important}
+    .ludo-score-roll:disabled{opacity:1}
+    .ludo-score-ready-die{display:grid;width:64px;height:64px;place-items:center;border:2px solid #fff;border-radius:16px;background:linear-gradient(145deg,#fff1a7,#ffbe37);box-shadow:0 5px 0 #9a661d,0 9px 18px #0006;font-size:48px;line-height:1;transform:rotate(-8deg);animation:ludo-die-pop .28s ease-out}
+    .ludo-score-cancel{position:fixed;top:8px;right:8px;z-index:3;margin:0}
+    .ludo-score-cancel button{width:28px;min-height:28px;padding:0;border:1px solid #ffffff99;border-radius:50%;color:#fff;background:#082855cc;font-size:18px;line-height:1}
+    .ludo-score-die{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);place-items:center;gap:2px;width:62px;height:62px;min-width:62px;padding:8px;border:2px solid #fff;border-radius:15px;background:linear-gradient(145deg,#fffef5,#ffe8a5 70%,#ffd36c);box-shadow:0 5px 0 #9a661d,0 9px 18px #0006,inset 0 0 0 2px #fff9;transform:rotate(-8deg);animation:ludo-die-pop .28s ease-out}
     .ludo-score-die-pip{width:9px;height:9px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#f77668,#bd302d 72%);box-shadow:0 1px 2px #64201c}
     .ludo-score-die-empty{grid-column:1/-1;grid-row:1/-1;display:grid;place-items:center;color:#8f6722;font-size:30px;font-weight:900}
-    .ludo-score-roll{display:grid;place-items:center;width:76px;height:76px;padding:4px;border:0!important;border-radius:14px;background:transparent!important;color:inherit!important;box-shadow:none!important;touch-action:manipulation;cursor:pointer}
-    .ludo-score-roll:not(:disabled):hover{filter:brightness(1.08);transform:translateY(-1px)}
-    .ludo-score-roll:focus-visible{outline:3px solid #fff;outline-offset:3px}     .ludo-score-roll:disabled{opacity:.55;box-shadow:none;cursor:not-allowed}
-    .ludo-score-board{display:grid;grid-template-columns:repeat(15,minmax(0,1fr));width:min(100%,560px);aspect-ratio:1;margin:14px auto;border:3px solid #f0c34f;border-radius:12px;overflow:hidden;background:#fff;box-shadow:0 8px 24px #0006}
-    .score-cell{position:relative;display:flex;align-items:center;justify-content:center;min-width:0;min-height:0;border:1px solid #dce5de;background:#f8faf8}
-    .score-cell-track{background:#fff}.score-cell-safe::after{content:'★';position:absolute;color:#b89637;font-size:clamp(6px,1.8vw,15px);pointer-events:none}
-    .score-cell-yard-red{background:linear-gradient(135deg,#ffded8,#ffc6bf)}.score-cell-yard-green{background:linear-gradient(135deg,#def7e4,#c0ebce)}
-    .score-cell-yard-yellow{background:linear-gradient(135deg,#fff3c4,#f5e29b)}.score-cell-yard-blue{background:linear-gradient(135deg,#dce8ff,#bdcff4)}.score-cell-yard-red,.score-cell-yard-green,.score-cell-yard-yellow,.score-cell-yard-blue{border-color:transparent}.score-cell-filler{visibility:hidden;border-color:transparent;background:transparent}
-    .score-cell-start-red{background:#f27569}.score-cell-start-green{background:#58bd75}
-    .score-cell-start-yellow{background:#f0d45b}.score-cell-start-blue{background:#6f96da}.score-cell-home-shared{background:linear-gradient(135deg,#ffe394,#f3bd45)}
-    .score-cell-base-red,.score-cell-base-green,.score-cell-base-yellow,.score-cell-base-blue{margin:3px;border:2px solid #fff;border-radius:50%;background:#fff}
+    .score-cell{position:relative;display:flex;align-items:center;justify-content:center;min-width:0;min-height:0;background:transparent}
+    .score-cell-track{border:1px solid #dce5de;background:#fff}        .score-cell-safe::after{content:'★';position:absolute;color:#b89637;font-size:clamp(12px,2.8vw,20px);font-weight:900;pointer-events:none}    .score-cell-yard-red{background:#e93b45}.score-cell-yard-green{background:#139653}
+    .score-cell-yard-yellow{background:#f3c53e}.score-cell-yard-blue{background:#3478d4}
+    .score-cell-yard-inner-red,.score-cell-yard-inner-green,.score-cell-yard-inner-yellow,.score-cell-yard-inner-blue{border-color:transparent;background:#fff}
+    .score-cell-start-creator,.score-cell-home-creator{background:#f27569}
+    .score-cell-start-joiner,.score-cell-home-joiner{background:#58bd75}
+    .score-cell-base{margin:3px;border:2px solid #fff;border-radius:50%;background:#fff}
     .score-cell-base-red{box-shadow:inset 0 0 0 2px #c94f46}.score-cell-base-green{box-shadow:inset 0 0 0 2px #32834e}
-    .score-cell-base-yellow{box-shadow:inset 0 0 0 2px #b79412}.score-cell-base-blue{box-shadow:inset 0 0 0 2px #416ba8}
-    .score-cell-center{background:conic-gradient(#c95950 0deg 90deg,#e3c24b 90deg 180deg,#499565 180deg 270deg,#4d76b2 270deg)}
+    .score-cell-base-yellow{box-shadow:inset 0 0 0 2px #b78b12}.score-cell-base-blue{box-shadow:inset 0 0 0 2px #2b65b8}
+    .score-cell-center{background:conic-gradient(#f3c53e 0deg 90deg,#168d56 90deg 180deg,#3478d4 180deg 270deg,#d94a43 270deg 360deg)}
+    .score-cell-center.score-cell-token-position{background:conic-gradient(#f3c53e 0deg 90deg,#168d56 90deg 180deg,#3478d4 180deg 270deg,#d94a43 270deg 360deg)}
+    .score-cell-center-home{position:absolute;top:0;left:0;z-index:2;font-size:clamp(10px,2.8vw,18px);line-height:1;pointer-events:none}
+    .score-cell-home{border:1px solid #fff}
+    .score-cell-home-creator,.score-cell-home-creator.score-cell-token-position{background:#e9574f}
+    .score-cell-home-joiner,.score-cell-home-joiner.score-cell-token-position{background:#16a765}
+    .score-cell-finish-creator,.score-cell-finish-creator.score-cell-token-position{background:#f27569}
+    .score-cell-finish-joiner,.score-cell-finish-joiner.score-cell-token-position{background:#58bd75}
+    .score-cell-token-position{border-color:transparent;background:transparent}
+    .score-cell-token-position::after{display:none}
+    .score-cell-direction{position:absolute;top:0;right:0;z-index:2;display:grid;width:clamp(9px,2.4vw,16px);height:clamp(9px,2.4vw,16px);place-items:center;border-radius:50%;color:#67420c;background:#fff;font-size:clamp(7px,1.8vw,11px);font-weight:900;line-height:1;pointer-events:none}
+    .score-cell-home-entry.creator{border:1px solid #c94f46;color:#c94f46}
+    .score-cell-home-entry.joiner{border:1px solid #32834e;color:#32834e}
+    .score-cell-center-connector.creator{border:1px solid #fff;color:#fff;background:#e9574f}
+    .score-cell-center-connector.joiner{border:1px solid #fff;color:#fff;background:#16a765}
+    .score-cell-center-connector-creator{background:#e9574f}
+    .score-cell-center-connector-joiner{background:#16a765}
+    .score-cell-home-direction.creator{top:50%;right:0;left:auto;width:clamp(9px,2.4vw,16px);height:clamp(9px,2.4vw,16px);color:#c94f46;background:#fff;transform:translateY(-50%)}
+    .score-cell-home-direction.joiner{top:50%;right:auto;left:0;width:clamp(9px,2.4vw,16px);height:clamp(9px,2.4vw,16px);color:#32834e;background:#fff;transform:translateY(-50%)}
+    .score-cell-home-step{position:absolute;bottom:0;z-index:2;display:grid;min-width:9px;height:9px;place-items:center;border-radius:4px;color:#233247;background:#fff;font-size:7px;font-weight:900;line-height:1;pointer-events:none}
+    .score-cell-home-step.creator{left:0}
+    .score-cell-home-step.joiner{right:0}
+    .score-cell-finish-marker{position:absolute;top:0;z-index:2;font-size:clamp(8px,2vw,13px);line-height:1;pointer-events:none}
+    .score-cell-finish-marker.creator{left:0}
+    .score-cell-finish-marker.joiner{right:0}
     .score-token-stack{position:relative;z-index:1;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:1px;max-width:100%}
     .score-token{display:grid;place-items:center;width:clamp(11px,3.3vw,24px);height:clamp(11px,3.3vw,24px);padding:0;border:2px solid #fff;border-radius:50%;box-shadow:0 1px 3px #0007;color:#fff;font-size:clamp(7px,1.5vw,11px);font-weight:800}
-    .score-token.creator,.score-token.red{background:#c94f46}.score-token.joiner,.score-token.green{background:#32834e}
-    .score-token.yellow{background:#b79412}.score-token.blue{background:#416ba8}
+    .score-cell-center .score-token{width:clamp(14px,4vw,28px);height:clamp(14px,4vw,28px);font-size:clamp(8px,2vw,13px)}
+    .score-token.creator{background:#c94f46}.score-token.joiner{background:#32834e}
     .score-token.selectable{outline:2px solid #f0c85b;cursor:pointer;animation:score-pulse 1.1s infinite alternate}
     .score-token:disabled{cursor:default;opacity:1}
     .ludo-score-proof{max-width:560px;margin:12px auto 0}
     .ludo-score-proof input{width:100%}
-    @keyframes ludo-die-pop{from{transform:rotate(-12deg) scale(.8)}to{transform:rotate(-4deg) scale(1)}}
+    @keyframes ludo-die-pop{from{transform:rotate(-12deg) scale(.8)}to{transform:rotate(-8deg) scale(1)}}
     @keyframes score-pulse{to{transform:scale(1.13)}}
-    @media(max-width:520px){.ludo-score-board{border-width:2px}.ludo-score-players{grid-template-columns:1fr}.ludo-score-player{padding:7px;font-size:13px}.ludo-score-die{width:52px;height:52px;min-width:52px}}
+    @media(max-width:520px){body.ludo-score-page .ludo-score-board{width:min(100vw,64vh);border-width:3px}.ludo-score-players{grid-template-columns:minmax(0,1fr) 64px minmax(0,1fr);gap:3px;padding-right:6px;padding-left:6px}.ludo-score-avatar{width:42px;height:42px}.ludo-score-player-info{min-height:40px}.ludo-score-controls{padding-bottom:17px}.ludo-score-roll{width:62px;height:62px}.ludo-score-die{width:54px;height:54px;min-width:54px}.ludo-score-status{font-size:11px}}
+    @media(max-height:520px){.ludo-score-players{padding-bottom:4px}.ludo-score-avatar{width:36px;height:36px}.ludo-score-controls{padding-bottom:4px}}
   `;
   document.head.append(style);
 
@@ -78,30 +144,21 @@
     return String(user?._id || user?.id || user || '');
   }
 
-  function avatarMarkup(user, app) {
-    const username = String(app.nameOf(user) || 'Player');
-    const initial = username.trim().charAt(0).toUpperCase() || '?';
-    const profileImage = String(user?.profileImage || '').trim();
-    const imageUrl = profileImage.startsWith('uploads/')
-      ? `/api/profile/image/${encodeURIComponent(profileImage.slice('uploads/'.length))}`
-      : profileImage
-        ? `/${profileImage.split('/').map(encodeURIComponent).join('/')}`
-        : '';
-    return imageUrl
-      ? `<img class="ludo-score-avatar" src="${app.esc(imageUrl)}" alt="${app.esc(username)} profile picture" data-score-avatar data-initial="${app.esc(initial)}">`
-      : `<span class="ludo-score-avatar-fallback" aria-hidden="true">${app.esc(initial)}</span>`;
-  }
-
-  function positionFor(color, progress, tokenIndex, sharedHomePath) {
-    const config = colors[color] || colors.red;
-    if (progress < 0) return [config.baseSlots[tokenIndex]];
+  function positionFor(side, progress, tokenIndex) {
+    if (progress < 0) return [baseSlots[side][tokenIndex]];
     if (progress <= 51) {
-      const trackIndex = (config.startIndex + progress) % 52;
+      const trackIndex = side === 'creator' ? progress : (progress + 26) % 52;
       return [track[trackIndex]];
     }
-    if (progress < scorePathLength) return [sharedHomePath[progress - 52]];
-    return [config.finish];
+    if (progress === 57) return [finishPosition];
+    return [homePaths[side][progress - 52]];
   }
+
+  window.updateLudoScoreWalletBalance = balance => {
+    const amount = Number(balance);
+    const wallet = document.getElementById('ludoScoreWalletBalance');
+    if (wallet && Number.isFinite(amount)) wallet.textContent = `Wallet ₹${amount.toLocaleString('en-IN')}`;
+  };
 
   function diceMarkup(value) {
     const face = Number(value);
@@ -114,6 +171,7 @@
       6: [0, 2, 3, 5, 6, 8]
     };
     const pips = pipsByFace[face];
+    if (!pips) return '<span class="ludo-score-ready-die" role="img" aria-label="Dice ready to roll">🎲</span>';
     const faceContents = pips
       ? Array.from({ length: 9 }, (_, index) => pips.includes(index) ? '<span class="ludo-score-die-pip"></span>' : '<span></span>').join('')
       : '<span class="ludo-score-die-empty">?</span>';
@@ -148,26 +206,20 @@
   }
 
   function makeMarkup(match, app) {
-    const state = match.ludoScore?.tokens ? match.ludoScore : (['OPEN', 'CANCELLED'].includes(match.status) ? {
-      rulesVersion: scoreRulesVersion, tokens: { creator: [-1, -1, -1, -1], joiner: [-1, -1, -1, -1] },
+    const state = match.ludoScore || (['OPEN', 'CANCELLED'].includes(match.status) ? {
+      tokens: { creator: [-1, -1, -1, -1], joiner: [-1, -1, -1, -1] },
       scores: { creator: 0, joiner: 0 },
-      colors: match.ludoScore?.colors || {},
       currentTurn: idOf(match.creator),
       legalTokenIndexes: [],
       diceValue: null
     } : null);
     if (!state?.tokens) return `<h2>🏆 KhiladiAdda24 Ludo Score</h2><p class="notice error">Ludo Score game state available nahi hai. Support se sampark karein.</p>`;
-    const finishProgress = Number(state.rulesVersion) >= scoreRulesVersion ? scoreFinishProgress : scorePathLength;
     const myId = idOf(app.getPlayer() || app.getUser());
     const creatorId = idOf(match.creator);
     const joinerId = idOf(match.joiner);
     const joinerName = match.joiner ? app.nameOf(match.joiner) : 'Pratidvandvi';
     const mySide = creatorId === myId ? 'creator' : 'joiner';
-    const playerColors = {
-      creator: colors[state.colors?.creator] ? state.colors.creator : 'red',
-      joiner: colors[state.colors?.joiner] ? state.colors.joiner : 'green'
-    };
-    const sharedHomePath = colors[playerColors.creator].homePath; const ownTurn = match.status === 'RUNNING' && String(state.currentTurn) === myId && !state.winnerId;
+    const ownTurn = match.status === 'RUNNING' && String(state.currentTurn) === myId && !state.winnerId;
     const legalTokens = ownTurn && Array.isArray(state.legalTokenIndexes) ? state.legalTokenIndexes : [];
     const winner = state.winnerId ? String(state.winnerId) : '';
     const winnerName = winner ? app.nameOf(winner === creatorId ? match.creator : match.joiner) : '';
@@ -181,51 +233,103 @@
         classes.push('score-cell-track');
         if (safeTrack.has(trackIndex)) classes.push('score-cell-safe');
       }
-      for (const color of Object.values(playerColors)) {
-        const config = colors[color];
-        const [yardRowStart, yardRowEnd, yardColStart, yardColEnd] = config.yard;
-        if (row >= yardRowStart && row <= yardRowEnd && col >= yardColStart && col <= yardColEnd) classes.push(`score-cell-yard-${color}`);
-        if (trackIndex === config.startIndex) classes.push(`score-cell-start-${color}`);
-        if (color === playerColors.creator && sharedHomePath.some(([homeRow, homeCol]) => homeRow === row && homeCol === col)) classes.push('score-cell-home-shared');
-        if (config.baseSlots.some(([baseRow, baseCol]) => baseRow === row && baseCol === col)) classes.push(`score-cell-base-${color}`, 'score-cell-base-inner');
+      if (row < 6 && col < 6) {
+        classes.push('score-cell-yard-red');
+        if (row > 0 && row < 5 && col > 0 && col < 5) classes.push('score-cell-yard-inner-red');
       }
-      if (finishProgress === scorePathLength && row === 7 && col === 7) classes.push('score-cell-center'); if (trackIndex < 0 && !classes.some(className => className.startsWith('score-cell-yard-') || className.startsWith('score-cell-base-') || className === 'score-cell-home-shared' || className === 'score-cell-center')) classes.push('score-cell-filler');
+      if (row < 6 && col > 8) {
+        classes.push('score-cell-yard-yellow');
+        if (row > 0 && row < 5 && col > 9 && col < 14) classes.push('score-cell-yard-inner-yellow');
+      }
+      if (row > 8 && col < 6) {
+        classes.push('score-cell-yard-blue');
+        if (row > 9 && row < 14 && col > 0 && col < 5) classes.push('score-cell-yard-inner-blue');
+      }
+      if (row > 8 && col > 8) {
+        classes.push('score-cell-yard-green');
+        if (row > 9 && row < 14 && col > 9 && col < 14) classes.push('score-cell-yard-inner-green');
+      }
+      for (const side of ['creator', 'joiner']) {
+        if (trackIndex === (side === 'creator' ? 0 : 26)) classes.push(`score-cell-start-${side}`);
+        const color = side === 'creator' ? 'red' : 'green';
+        if (baseSlots[side].some(([baseRow, baseCol]) => baseRow === row && baseCol === col)) classes.push('score-cell-base', `score-cell-base-${color}`);
+      }
+      for (const color of ['yellow', 'blue']) {
+        if (decorativeBaseSlots[color].some(([baseRow, baseCol]) => baseRow === row && baseCol === col)) {
+          classes.push('score-cell-base', `score-cell-base-${color}`);
+        }
+      }
+      const onCreatorHomePath = homePaths.creator.some(([homeRow, homeCol]) => homeRow === row && homeCol === col);
+      const onJoinerHomePath = homePaths.joiner.some(([homeRow, homeCol]) => homeRow === row && homeCol === col);
+      if (onCreatorHomePath) classes.push('score-cell-home', 'score-cell-home-creator');
+      if (onJoinerHomePath) classes.push('score-cell-home', 'score-cell-home-joiner');
+      const onCenter = row === finishPosition[0] && col === finishPosition[1];
+      if (onCenter) classes.push('score-cell-center');
+      const centerConnectorSide = ['creator', 'joiner'].find(side => {
+        const [connectorRow, connectorCol] = centerConnectors[side].position;
+        return row === connectorRow && col === connectorCol;
+      });
+      if (centerConnectorSide) classes.push(`score-cell-center-connector`, `score-cell-center-connector-${centerConnectorSide}`);
+      const direction = turnDirections.get(trackIndex);
+      const directionMarkup = onCreatorHomePath
+        ? '<span class="score-cell-direction score-cell-home-direction creator" aria-hidden="true">→</span>'
+        : onJoinerHomePath
+          ? '<span class="score-cell-direction score-cell-home-direction joiner" aria-hidden="true">←</span>'
+          : centerConnectorSide
+            ? `<span class="score-cell-direction score-cell-center-connector ${centerConnectorSide}" aria-label="${centerConnectors[centerConnectorSide].label}" title="${centerConnectors[centerConnectorSide].label}">${centerConnectors[centerConnectorSide].arrow}</span>`
+          : homeEntryMarkers.has(trackIndex)
+            ? `<span class="score-cell-direction score-cell-home-entry ${homeEntryMarkers.get(trackIndex).side}" aria-label="${homeEntryMarkers.get(trackIndex).label}" title="${homeEntryMarkers.get(trackIndex).label}">${homeEntryMarkers.get(trackIndex).arrow}</span>`
+            : direction ? `<span class="score-cell-direction" aria-hidden="true">${direction}</span>` : '';
+      const creatorHomeStep = homePaths.creator.findIndex(([homeRow, homeCol]) => homeRow === row && homeCol === col);
+      const joinerHomeStep = homePaths.joiner.findIndex(([homeRow, homeCol]) => homeRow === row && homeCol === col);
+      const homeStepMarkup = creatorHomeStep >= 0
+        ? `<span class="score-cell-home-step creator" aria-label="Red home step ${creatorHomeStep + 1}">${creatorHomeStep + 1}</span>`
+        : joinerHomeStep >= 0
+          ? `<span class="score-cell-home-step joiner" aria-label="Green home step ${joinerHomeStep + 1}">${joinerHomeStep + 1}</span>`
+          : '';
+      const finishMarkup = onCenter ? '<span class="score-cell-center-home" aria-label="Shared center home">🏠</span>' : '';
       const tokensHere = [];
       for (const side of ['creator', 'joiner']) {
         (state.tokens[side] || []).forEach((progress, tokenIndex) => {
-          const color = playerColors[side];
-          if (!positionFor(color, progress, tokenIndex, sharedHomePath).some(([tokenRow, tokenCol]) => tokenRow === row && tokenCol === col)) return;
+          if (!positionFor(side, progress, tokenIndex).some(([tokenRow, tokenCol]) => tokenRow === row && tokenCol === col)) return;
           const canMove = side === mySide && ownTurn && legalTokens.includes(tokenIndex);
-          const label = `${colors[color].name} token ${tokenIndex + 1}`;
-          tokensHere.push(`<button type="button" class="score-token ${color}${canMove ? ' selectable' : ''}" data-score-token="${tokenIndex}" aria-label="${label}${canMove ? ', select to move' : ''}" ${canMove ? '' : 'disabled'}>${tokenIndex + 1}</button>`);
+          const label = `${side === 'creator' ? 'Red' : 'Green'} token ${tokenIndex + 1}`;
+          const locked = progress === -1 && !canMove;
+          tokensHere.push(`<button type="button" class="score-token ${side}${canMove ? ' selectable' : ''}" data-score-token="${tokenIndex}" aria-label="${label}${canMove ? ', select to move' : locked ? ', ghar mein band; 6 chahiye' : ''}"${locked ? ' title="Ghar se kholne ke liye 6 chahiye"' : ''} ${canMove ? '' : 'disabled'}>${tokenIndex + 1}</button>`);
         });
       }
-      return `<div class="${classes.join(' ')}" style="grid-row:${row + 1};grid-column:${col + 1}">${tokensHere.length ? `<div class="score-token-stack">${tokensHere.join('')}</div>` : ''}</div>`;
+      if (tokensHere.length) classes.push('score-cell-token-position');
+      return `<div class="${classes.join(' ')}" style="grid-row:${row + 1};grid-column:${col + 1}">${directionMarkup}${homeStepMarkup}${finishMarkup}${tokensHere.length ? `<div class="score-token-stack">${tokensHere.join('')}</div>` : ''}</div>`;
     }).join('');
-    const creatorScore = Number(state.scores?.creator ?? state.tokens.creator.filter(value => value === finishProgress).length * 250);
-    const joinerScore = Number(state.scores?.joiner ?? state.tokens.joiner.filter(value => value === finishProgress).length * 250);
-    const winnerScore = winner === creatorId ? creatorScore : joinerScore;
+    const creatorScore = Number(state.scores?.creator ?? scoreForTokens(state.tokens.creator));
+    const joinerScore = Number(state.scores?.joiner ?? scoreForTokens(state.tokens.joiner));
     const dieValue = state.diceValue || state.lastDice || '–';
-    const playerCard = (side, user) => {
-      const color = playerColors[side];
-      const playerScore = side === 'creator' ? creatorScore : joinerScore;
-      const homeCount = (state.tokens[side] || []).filter(value => value === finishProgress).length;
-      return `<div class="ludo-score-player ${color}">
-        <div class="ludo-score-player-main">${avatarMarkup(user, app)}<div class="ludo-score-player-copy">
-          <strong>${app.esc(app.nameOf(user))}</strong>
-          <small>${colors[color].symbol} ${colors[color].name} · ${playerScore}/1400 points · ${homeCount}/4 ghar</small>
-        </div></div>
-      </div>`;
-    };
     const statusText = match.status === 'OPEN'
       ? 'Pratidvandvi ka intezar hai — join karte hi yahin game shuru hoga.'
       : match.status === 'CANCELLED'
         ? 'Yeh battle cancel ho chuki hai.'
       : winner
-      ? `🏆 ${app.esc(winnerName)} winner hain — highest score: ${winnerScore}/1400 points.`
+      ? `🏆 ${app.esc(winnerName)} winner hain — score ${Number(state.scores?.[winner === creatorId ? 'creator' : 'joiner'] || 0)} points.`
       : ownTurn
-        ? state.diceValue ? `${state.diceValue} aaya — apni goti chunein.` : 'Aapki turn hai — dice par tap karein.'
+        ? state.diceValue ? `${state.diceValue} aaya — apni goti chunein.` : 'Aapki baari.'
         : `${app.esc(ownTurnName)} ki turn hai. Board live update hota rahega.`;
+    const playerCard = (user, side, score, homeCount, isCurrentUser) => {
+      const name = String(app.nameOf(user) || 'Player');
+      const profileImage = String(user?.profileImage || '').trim();
+      const imageUrl = profileImage.startsWith('uploads/')
+        ? `/api/profile/image/${encodeURIComponent(profileImage.slice('uploads/'.length))}`
+        : profileImage ? `/${profileImage.split('/').map(encodeURIComponent).join('/')}` : '';
+      const avatar = imageUrl
+        ? `<img src="${app.esc(imageUrl)}" alt="${app.esc(name)}">`
+        : app.esc(name.trim().charAt(0).toUpperCase() || '?');
+      const currentPlayer = app.getPlayer() || app.getUser();
+      const rawBalance = isCurrentUser ? currentPlayer?.walletBalance ?? user?.walletBalance : undefined;
+      const balance = Number(rawBalance);
+      const walletMarkup = isCurrentUser
+        ? `<small id="ludoScoreWalletBalance" class="ludo-score-wallet">Wallet ${Number.isFinite(balance) ? `₹${balance.toLocaleString('en-IN')}` : '₹--'}</small>`
+        : '';
+      return `<div class="ludo-score-player ${side}"><span class="ludo-score-avatar">${avatar}</span><div class="ludo-score-player-info"><strong>${app.esc(name)}</strong><small>${score}/${scoreMaximum} · ${homeCount}/4 ghar</small>${walletMarkup}</div></div>`;
+    };
     const resultMarkup = match.status === 'PENDING_RESULT'
       ? `<p class="notice warning">Screenshot admin review ke liye bhej diya gaya hai.${match.resultSubmittedAt ? `<br><small>Submitted: ${app.esc(new Date(match.resultSubmittedAt).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }))} IST</small>` : ''}</p>`
       : match.status === 'COMPLETED'
@@ -236,34 +340,18 @@
             ? '<p class="notice warning">Winner screenshot bhejkar result admin review mein dalega.</p>'
             : '';
     const cancelMarkup = match.status === 'RUNNING' && Number(state.rollCount || 0) === 0
-      ? '<form id="ludoScoreCancel" class="ludo-score-actions"><button class="btn danger small" type="submit">Pehli dice roll se pehle cancel/refund</button></form>'
+      ? '<form id="ludoScoreCancel" class="ludo-score-cancel"><button type="submit" aria-label="Battle cancel karein" title="Battle cancel karein">×</button></form>'
       : '';
-    const diceStatus = match.status === 'OPEN'
-      ? 'Match shuru hone par dice yahin hoga'
-      : match.status === 'CANCELLED'
-        ? 'Match cancel'
-        : winner || match.status === 'COMPLETED'
-          ? 'Game complete'
-          : ownTurn ? 'Apni turn' : 'Opponent ki turn';
-    return `<h2>🏆 KhiladiAdda24 Ludo Score • ${app.esc(match.status)}</h2>
-      <div class="grid"><div class="stat"><small>Entry</small><strong>₹${Number(match.amount).toLocaleString('en-IN')}</strong></div>
-      <div class="stat"><small>Creator</small><strong>${app.esc(app.nameOf(match.creator))}</strong></div>
-      <div class="stat"><small>Opponent</small><strong>${app.esc(joinerName)}</strong></div></div>
-      <div class="panel ludo-score-panel">
-        <div class="ludo-score-head"><h3>Ludo board • 2 players • 4 gotiyan har player ke paas</h3><span class="muted">52 common + 5 shared ghar = ${scorePathLength} khane</span>${match.status === 'RUNNING' && !winner ? '<span id="ludoScoreTimer" class="ludo-score-timer" aria-live="polite">10s</span>' : ''}</div>
-        <div class="ludo-score-players">
-          ${playerCard('creator', match.creator)}
-          ${playerCard('joiner', match.joiner || { username: joinerName })}
-        </div>
-        <div class="ludo-score-status" aria-live="polite">${statusText}${state.lastAction ? `<br><small>${app.esc(state.lastAction)}</small>` : ''}</div>
-        <div class="ludo-score-actions ludo-score-dice-row">
-          <div class="ludo-score-dice-box"><span class="ludo-score-dice-label">DICE</span>${match.status === 'RUNNING' && !winner ? `<button type="button" class="btn ludo-score-roll" id="ludoScoreRoll" aria-label="Dice par tap karein" ${!ownTurn || state.diceValue || busy ? 'disabled' : ''}>${diceMarkup(dieValue)}</button>` : diceMarkup(dieValue)}</div>
-
-          <span class="muted">${diceStatus}</span>
-        </div>
-        <div class="ludo-score-board" role="grid" aria-label="KhiladiAdda24 Ludo Score board">${cells}</div>
-        ${resultMarkup}${cancelMarkup}
-      </div>`;
+    return `<div class="ludo-score-screen">
+      <div class="ludo-score-board" role="grid" aria-label="KhiladiAdda24 Ludo Score board">${cells}</div>
+      <div class="ludo-score-status" aria-live="polite">${statusText}${state.lastAction ? `<br><small>${app.esc(state.lastAction)}</small>` : ''}</div>
+      <div class="ludo-score-players">
+        ${playerCard(match.creator, 'creator', creatorScore, state.tokens.creator.filter(value => value === 57).length, mySide === 'creator')}
+        <div class="ludo-score-controls">${match.status === 'RUNNING' && !winner ? '<span id="ludoScoreTimer" class="ludo-score-timer" aria-live="polite">20s</span>' : ''}<button type="button" class="btn ludo-score-roll" id="ludoScoreRoll" aria-label="Dice roll karein" ${!ownTurn || state.diceValue || busy ? 'disabled' : ''}>${diceMarkup(dieValue)}</button></div>
+        ${playerCard(match.joiner || { username: joinerName }, 'joiner', joinerScore, state.tokens.joiner.filter(value => value === 57).length, mySide === 'joiner')}
+      </div>
+      ${resultMarkup}${cancelMarkup}
+    </div>`;
   }
 
   async function render(match, matchId) {
@@ -278,18 +366,11 @@
     const renderState = currentMatch => {
       if (activeMatchId !== String(matchId)) return;
       latestMatch = currentMatch;
-      const signature = `${currentMatch.status}:${currentMatch.ludoScore?.version}:${currentMatch.ludoScore?.winnerId || ''}:${currentMatch.proofScreenshot || ''}:${currentMatch.resultSubmittedAt || ''}:${currentMatch.ludoScore?.colors?.creator || ''}:${currentMatch.ludoScore?.colors?.joiner || ''}:${currentMatch.creator?.profileImage || ''}:${currentMatch.joiner?.profileImage || ''}`;
+      const signature = `${currentMatch.status}:${currentMatch.ludoScore?.version}:${currentMatch.ludoScore?.winnerId || ''}:${currentMatch.proofScreenshot || ''}:${currentMatch.resultSubmittedAt || ''}`;
       if (signature === activeSignature) return;
       activeSignature = signature;
       app.el('matchDetails').innerHTML = makeMarkup(currentMatch, app);
       app.setView('match');
-      document.querySelectorAll('[data-score-avatar]').forEach(image => image.addEventListener('error', () => {
-        const fallback = document.createElement('span');
-        fallback.className = 'ludo-score-avatar-fallback';
-        fallback.setAttribute('aria-hidden', 'true');
-        fallback.textContent = image.dataset.initial || '?';
-        image.replaceWith(fallback);
-      }, { once: true }));
       const rollButton = document.getElementById('ludoScoreRoll');
       if (rollButton) rollButton.addEventListener('click', async () => {
         busy = true;
@@ -312,6 +393,7 @@
           const result = await app.api('/api/matches/ludo-score/move', { method: 'POST', body: JSON.stringify({ matchId, tokenIndex: Number(button.dataset.scoreToken) }) });
           app.notify(result.message);
           renderState(result.match);
+          if (result.match.status === 'COMPLETED') await app.refresh();
         } catch (error) {
           app.notify(error.message, true);
           button.disabled = false;
@@ -344,7 +426,7 @@
         shareButton.addEventListener('click', async () => {
           if (!proofFile) return app.notify('Screenshot taiyaar hone ka wait karein.', true);
           const timestamp = new Intl.DateTimeFormat('en-IN', { dateStyle: 'medium', timeStyle: 'medium', timeZone: 'Asia/Kolkata' }).format(new Date());
-          const text = `KhiladiAdda24 Ludo Score · Winner ${app.nameOf(app.getPlayer() || app.getUser())} · 1000/1000 · ${timestamp} IST${adminNumber ? ` · Admin WhatsApp +${adminNumber}` : ''}`;
+          const text = `KhiladiAdda24 Ludo Score · Winner ${app.nameOf(app.getPlayer() || app.getUser())} · ${scoreMaximum}/${scoreMaximum} · ${timestamp} IST${adminNumber ? ` · Admin WhatsApp +${adminNumber}` : ''}`;
           try {
             if (navigator.share && navigator.canShare?.({ files: [proofFile] })) {
               await navigator.share({ title: 'KhiladiAdda24 Ludo Score', text, files: [proofFile] });

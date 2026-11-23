@@ -2,125 +2,214 @@
 <html lang="hi">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101713">
+  <meta name="robots" content="noindex,follow">
   <title>Support - KhiladiAdda24</title>
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    if (!localStorage.getItem('token')) {
+      window.location.replace('/login.html?next=%2Fsupport.html');
+    }
+  </script>
   <style>
-    * { box-sizing: border-box; }
-    body { min-height: 100vh; min-height: 100svh; margin: 0; padding: 72px 16px calc(88px + env(safe-area-inset-bottom)); background: radial-gradient(ellipse at top, #263b2d 0%, #101713 68%); color: #f2f5ef; font-family: "Trebuchet MS", Verdana, sans-serif; }
-    .app-topbar { position: fixed; top: 0; right: 0; left: 0; z-index: 5; display: flex; align-items: center; gap: 12px; min-height: 64px; padding: 8px 16px; border-bottom: 1px solid #33423f; color: #f2f5ef; background: #101713f5; backdrop-filter: blur(14px); }
-    .app-topbar a { display: grid; place-items: center; width: 42px; height: 42px; border: 1px solid #33423f; border-radius: 8px; color: #f4c84b; font-size: 22px; text-decoration: none; }
-    .app-topbar strong { color: #f0c85b; }
-    .wrap { display: grid; align-items: center; width: min(100%, 480px); min-height: calc(100vh - 160px); margin: 0 auto; }
-    .card { width: 100%; padding: 20px; border: 1px solid #405b46; border-radius: 12px; background: linear-gradient(155deg, #1b2b20, #121a15); box-shadow: 0 16px 42px #0007; }
-    .support-art { display: block; width: min(100%, 320px); aspect-ratio: 1774 / 887; margin: 0 auto 20px; overflow: hidden; border: 1px solid #49654c; border-radius: 8px; object-fit: cover; }
-    h1, h2 { color: #f0c85b; }
-    h1 { margin: 0 0 16px; font-size: 24px; }
-    h2 { margin: 18px 0 8px; font-size: 18px; }
-    .info { margin: 12px 0; font-size: 16px; line-height: 1.5; overflow-wrap: anywhere; }
-    .contact-link { color: #e7f4e9; text-decoration: underline; text-underline-offset: 3px; }
-    .whatsapp-link { color: #7fe0a0; }
-    .help-copy { margin-top: 18px; padding-top: 4px; border-top: 1px solid #35483a; color: #bdcabe; font-size: 14px; line-height: 1.6; }
-    .help-copy p { margin: 8px 0; }
-    .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; margin-top: 14px; padding: 10px 18px; border: 1px solid #438954; border-radius: 7px; color: #fff; background: #287442; font-weight: 800; text-decoration: none; }
-    .support-actions { display: flex; flex-wrap: wrap; gap: 10px; }
-    .support-actions .btn { margin-top: 14px; }
-    .support-actions .share-btn { border-color: #52685a; background: #26352b; }
-    .support-actions button { font: inherit; cursor: pointer; }
-    .btn:focus-visible { outline: 2px solid #f0c85b; outline-offset: 2px; }
-    .app-bottom-nav { position: fixed; right: 0; bottom: 0; left: 0; z-index: 6; display: flex; gap: 4px; padding: 6px 6px max(6px, env(safe-area-inset-bottom)); border-top: 1px solid #33423f; background: #101713f5; backdrop-filter: blur(14px); }
-    .app-bottom-nav a { display: flex; flex: 1 1 0; min-width: 0; min-height: 56px; flex-direction: column; align-items: center; justify-content: center; gap: 3px; padding: 4px 1px; border: 1px solid #ffffff38; border-radius: 9px; color: #f5f7f4; text-decoration: none; text-align: center; font-size: clamp(8px, 2.4vw, 11px); font-weight: 800; line-height: 1.1; }
-    .app-bottom-nav a span:first-child { font-size: clamp(16px, 5vw, 21px); line-height: 1; }
-    .app-bottom-nav a.active { background: #ffffff24; box-shadow: inset 0 -3px #ffbd59; }
-    @media(max-width:420px) { body { padding: 72px 12px calc(88px + env(safe-area-inset-bottom)); } .card { padding: 16px; } h1 { font-size: 22px; } .info { font-size: 15px; } }
+    :root{color-scheme:dark;font:16px/1.5 Arial,sans-serif;background:#101713;color:#f2f5ef}
+    *{box-sizing:border-box}
+    body{margin:0;padding:20px 12px 40px}
+    main{width:min(100%,720px);margin:0 auto}
+    .card{margin:12px 0;padding:18px;border:1px solid #33423f;border-radius:12px;background:#18232b}
+    h1,h2{margin:0 0 10px;color:#f4c84b}
+    p{color:#c4cfca}
+    a{color:#f4c84b}
+    .chat-messages{display:grid;gap:10px;max-height:55vh;min-height:120px;overflow:auto;margin:14px 0;padding:10px;border:1px solid #33423f;border-radius:8px;background:#101920}
+    .chat-bubble{max-width:90%;padding:10px;border-radius:9px;background:#263832;overflow-wrap:anywhere}
+    .chat-bubble.player{justify-self:end;background:#244e36}
+    .chat-bubble strong,.chat-bubble small{display:block}
+    .chat-bubble small{margin-top:5px;color:#b8c4bc;font-size:12px}
+    .chat-attachment{display:block;width:min(100%,360px);max-height:300px;margin-top:8px;border-radius:8px;object-fit:contain}
+    label{display:block;margin:12px 0 5px}
+    textarea,input[type=file]{width:100%;font:inherit}
+    textarea{min-height:90px;padding:10px;border:1px solid #52685a;border-radius:8px;color:inherit;background:#101920;resize:vertical}
+    input[type=file]{padding:8px;border:1px solid #52685a;border-radius:8px;background:#101920}
+    button{min-height:42px;margin-top:12px;padding:9px 15px;border:0;border-radius:8px;background:#f4c84b;color:#172018;font:inherit;font-weight:700;cursor:pointer}
+    button:disabled{opacity:.6;cursor:wait}
+    #status{min-height:24px;color:#c4cfca}
+    #status.error{color:#ffaaa2}
+    #preview{display:block;max-width:min(100%,220px);max-height:160px;margin-top:8px;border-radius:8px}
+    [hidden]{display:none!important}
   </style>
 </head>
 <body>
-  <header class="app-topbar"><a href="/index.html" aria-label="Back to app">←</a><strong>KhiladiAdda24</strong><span>Support</span></header>
-  <div class="wrap">
-    <main class="card">
-      <img class="support-art" src="/support-banner.png?v=20261028-support-update" alt="WhatsApp and Support">
+  <main>
+    <section class="card">
       <h1>KhiladiAdda24 Support</h1>
-      <div class="info">📞 Support Number: <a class="contact-link" id="supportPhoneLink">+91 79557295</a></div>
-      <div class="info">💬 WhatsApp: <a class="contact-link whatsapp-link" id="whatsappPhoneLink">+91 79557295</a></div>
-      <div class="info">⏰ Support: 24/7 Available</div>
-      <div class="support-actions"><a class="btn" href="/index.html">Back to App</a><button class="btn share-btn" id="shareWebsite" type="button">Website share karein</button></div>
-      <section class="help-copy">
-        <h2>Need Help?</h2>
-        <p>For login issues, deposit queries, withdrawal help, game disputes, and wallet support, contact us anytime.</p>
-        <p>We resolve urgent matters within working time and update users through wallet notifications and support messages.</p>
-      </section>
-    </main>
-  </div>
-  <nav class="app-bottom-nav" aria-label="Player navigation">
-    <a href="/index.html?view=home"><span aria-hidden="true">⌂</span><span>Home</span></a>
-    <a href="/index.html?view=games"><span aria-hidden="true">⚔</span><span>Games</span></a>
-    <a href="/index.html?view=wallet"><span aria-hidden="true">₹</span><span>Wallet</span></a>
-    <a href="/index.html?view=history"><span aria-hidden="true">📜</span><span>History</span></a>
-    <a href="/index.html?view=profile"><span aria-hidden="true">●</span><span>Profile</span></a>
-    <a href="/chat.html"><span aria-hidden="true">💬</span><span>Need Chat</span></a>
-    <a class="active" href="/support.html" aria-current="page"><span aria-hidden="true">🛟</span><span>Support</span></a>
-  </nav>
+      <p>Login, deposit, withdrawal ya game ki problem ho to message bhejein. Zarurat ho to screenshot attach karein.</p>
+      <p>Support number: <a href="tel:+919179557295">+91 9179557295</a></p>
+      <p><a href="/index.html">App par wapas jaayein</a></p>
+    </section>
+    <section class="card" aria-labelledby="chatTitle">
+      <h2 id="chatTitle">Player Support Chat</h2>
+      <p id="loginPrompt" hidden>Chat ke liye <a href="/login.html?next=%2Fsupport.html">player login karein</a>.</p>
+      <div id="chatArea" hidden>
+        <div id="messages" class="chat-messages" aria-live="polite"></div>
+        <form id="chatForm">
+          <label for="message">Aapka message</label>
+          <textarea id="message" maxlength="1000" placeholder="Apni problem detail mein likhein..."></textarea>
+          <label for="attachment">Screenshot (JPEG, PNG ya WebP; max 5 MB)</label>
+          <input id="attachment" type="file" accept="image/jpeg,image/png,image/webp">
+          <img id="preview" alt="Screenshot preview" hidden>
+          <button id="sendButton" type="submit">Message bhejein</button>
+          <div id="status" role="status" aria-live="polite"></div>
+        </form>
+      </div>
+    </section>
+  </main>
   <script>
-    async function loadSupportContacts() {
+    const token = localStorage.getItem('token') || '';
+    const chatArea = document.getElementById('chatArea');
+    const loginPrompt = document.getElementById('loginPrompt');
+    const messageList = document.getElementById('messages');
+    const messageInput = document.getElementById('message');
+    const attachmentInput = document.getElementById('attachment');
+    const preview = document.getElementById('preview');
+    const status = document.getElementById('status');
+    const attachmentUrls = new Map();
+    let refreshInFlight = false;
+
+    chatArea.hidden = !token;
+    loginPrompt.hidden = Boolean(token);
+
+    function showStatus(text, isError = false) {
+      status.textContent = text;
+      status.classList.toggle('error', isError);
+    }
+
+    async function loadMessages() {
+      if (!token || refreshInFlight) return;
+      refreshInFlight = true;
       try {
-        const response = await fetch('/api/site-support', { cache: 'no-store' });
-        if (!response.ok) return;
+        const response = await fetch('/api/support/messages', {
+          cache: 'no-store',
+          headers: { Authorization: `Bearer ${token}` }
+        });
         const data = await response.json();
-        const supportNumber = String(data.supportNumber || '').replace(/\D/g, '');
-        const whatsappNumber = String(data.whatsappNumber || '').replace(/\D/g, '');
-        const supportLink = document.getElementById('supportPhoneLink');
-        const whatsappLink = document.getElementById('whatsappPhoneLink');
-        supportLink.textContent = supportNumber ? `+91 ${supportNumber}` : 'Not configured';
-        whatsappLink.textContent = whatsappNumber ? `+91 ${whatsappNumber}` : 'Not configured';
-        if (/^[6-9]\d{9}$/.test(supportNumber)) supportLink.href = `tel:+91${supportNumber}`;
-        if (/^[6-9]\d{9}$/.test(whatsappNumber)) {
-          whatsappLink.href = `https://wa.me/91${whatsappNumber}`;
-          whatsappLink.target = '_blank';
-          whatsappLink.rel = 'noopener noreferrer';
-        }
-      } catch {}
-    }
-
-    async function loadSupportBranding() {
-      try {
-        const response = await fetch('/api/site-branding', { cache: 'no-store' });
-        if (!response.ok) return;
-        const branding = await response.json();
-        if (branding.supportBannerUrl) document.querySelector('.support-art').src = branding.supportBannerUrl;
-      } catch {}
-    }
-
-    document.getElementById('shareWebsite').addEventListener('click', async () => {
-      const appUrl = `${location.origin}/index.html`;
-      try {
-        if (navigator.share) {
-          await navigator.share({ title: 'KhiladiAdda24', text: 'KhiladiAdda24 website dekhein', url: appUrl });
+        if (response.status === 401 || response.status === 403) {
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+          window.location.replace('/login.html?next=%2Fsupport.html');
           return;
         }
-        if (navigator.clipboard?.writeText) {
-          await navigator.clipboard.writeText(appUrl);
-        } else {
-          const field = document.createElement('textarea');
-          field.value = appUrl;
-          field.setAttribute('readonly', '');
-          field.style.position = 'fixed';
-          field.style.opacity = '0';
-          document.body.append(field);
-          field.select();
-          const copied = document.execCommand('copy');
-          field.remove();
-          if (!copied) throw new Error('Copy unavailable');
+        if (!response.ok) throw new Error(data.error || 'Chat load nahi ho saki.');
+        messageList.replaceChildren();
+        if (!data.messages?.length) {
+          const empty = document.createElement('p');
+          empty.textContent = 'Namaste! Apna message ya screenshot bhejein.';
+          messageList.appendChild(empty);
         }
-        alert('Website link copy ho gaya. Ab share karein.');
+        for (const item of data.messages || []) {
+          const bubble = document.createElement('div');
+          bubble.className = `chat-bubble${item.senderRole === 'player' ? ' player' : ''}`;
+          const sender = document.createElement('strong');
+          sender.textContent = item.senderName || (item.senderRole === 'player' ? 'You' : 'Support');
+          bubble.appendChild(sender);
+          if (item.text) {
+            const text = document.createElement('div');
+            text.textContent = item.text;
+            bubble.appendChild(text);
+          }
+          if (item.attachment) {
+            try {
+              let imageUrl = attachmentUrls.get(item.id);
+              if (!imageUrl) {
+                const imageResponse = await fetch(item.attachment, {
+                  headers: { Authorization: `Bearer ${token}` }
+                });
+                if (!imageResponse.ok) throw new Error('Screenshot load nahi ho saka.');
+                imageUrl = URL.createObjectURL(await imageResponse.blob());
+                attachmentUrls.set(item.id, imageUrl);
+              }
+              const image = document.createElement('img');
+              image.className = 'chat-attachment';
+              image.src = imageUrl;
+              image.alt = 'Chat screenshot';
+              bubble.appendChild(image);
+            } catch (error) {
+              const errorText = document.createElement('small');
+              errorText.textContent = error.message;
+              bubble.appendChild(errorText);
+            }
+          }
+          const time = document.createElement('small');
+          time.textContent = new Date(item.createdAt).toLocaleString('en-IN');
+          bubble.appendChild(time);
+          messageList.appendChild(bubble);
+        }
+        messageList.scrollTop = messageList.scrollHeight;
       } catch (error) {
-        if (error.name !== 'AbortError') alert(`Website link: ${appUrl}`);
+        showStatus(error.message || 'Chat load nahi ho saki.', true);
+      } finally {
+        refreshInFlight = false;
+      }
+    }
+
+    attachmentInput.addEventListener('change', () => {
+      const file = attachmentInput.files[0];
+      preview.hidden = true;
+      preview.removeAttribute('src');
+      if (!file) return;
+      if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type) || file.size > 5 * 1024 * 1024) {
+        attachmentInput.value = '';
+        showStatus('JPEG, PNG ya WebP screenshot 5 MB ke andar select karein.', true);
+        return;
+      }
+      preview.src = URL.createObjectURL(file);
+      preview.hidden = false;
+      showStatus('');
+    });
+
+    document.getElementById('chatForm').addEventListener('submit', async event => {
+      event.preventDefault();
+      const text = messageInput.value.trim();
+      const file = attachmentInput.files[0];
+      if (!text && !file) return showStatus('Message likhein ya screenshot attach karein.', true);
+      const body = new FormData();
+      body.set('text', text);
+      if (file) body.set('attachment', file);
+      const sendButton = document.getElementById('sendButton');
+      sendButton.disabled = true;
+      showStatus('Message bheja ja raha hai...');
+      try {
+        const response = await fetch('/api/support/messages', {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token}` },
+          body
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Message send nahi ho saka.');
+        messageInput.value = '';
+        attachmentInput.value = '';
+        preview.hidden = true;
+        preview.removeAttribute('src');
+        showStatus('Message support team ko bhej diya gaya.');
+        await loadMessages();
+      } catch (error) {
+        showStatus(error.message || 'Message send nahi ho saka.', true);
+      } finally {
+        sendButton.disabled = false;
       }
     });
 
-    loadSupportContacts();
-    loadSupportBranding();
+    loadMessages();
+    if (token) setInterval(loadMessages, 5000);
+    if (typeof io === 'function') {
+      const supportSocket = io();
+      const registerSupportSocket = () => {
+        if (token) supportSocket.emit('register_player', { token });
+      };
+      supportSocket.on('connect', registerSupportSocket);
+      if (supportSocket.connected) registerSupportSocket();
+      supportSocket.on('support_message', () => loadMessages());
+    }
   </script>
-  <script src="/i18n.js"></script>
-  <script src="/player-copy.js" defer></script>
 </body>
 </html>

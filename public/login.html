@@ -4,25 +4,47 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#101713">
-  <meta name="robots" content="index,follow">   <meta name="description" content="KhiladiAdda24 player login. Sign in or create your account securely with mobile number verification.">   <link rel="canonical" href="https://khiladiadda24.com/login.html">
+  <meta name="robots" content="index,follow">
+  <meta name="description" content="KhiladiAdda24 player login. Sign in or create your account securely with mobile number verification.">
+  <link rel="canonical" href="https://khiladiadda24.com/login.html">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link rel="manifest" href="/api/site-manifest">
   <link rel="icon" href="/favicon.ico" sizes="any">
-  <link rel="icon" href="/app-logo.png?v=20261008-2304" type="image/png" sizes="500x500">
-  <link rel="apple-touch-icon" href="/app-logo.png?v=20261008-2304">
-  <title>KhiladiAdda24 Login | Player Sign In</title> <meta property="og:type" content="website"> <meta property="og:site_name" content="KhiladiAdda24"> <meta property="og:title" content="KhiladiAdda24 Login | Player Sign In"> <meta property="og:description" content="Sign in to KhiladiAdda24 or create your player account with mobile number verification."> <meta property="og:url" content="https://khiladiadda24.com/login.html?preview=logo-v1"> <meta property="og:image" content="https://khiladiadda24.com/app-logo.png?v=20261117-referral-preview"> <meta property="og:image:width" content="500"> <meta property="og:image:height" content="500"> <meta property="og:image:alt" content="KhiladiAdda24 app logo"> <meta name="twitter:card" content="summary_large_image"> <meta name="twitter:image" content="https://khiladiadda24.com/app-logo.png?v=20261117-referral-preview">
+  <link rel="icon" href="/app-icon.svg" type="image/svg+xml">
+  <link rel="shortcut icon" href="/app-icon.svg" type="image/svg+xml">
+  <link rel="icon" href="/app-icon-192.png" type="image/png" sizes="192x192">
+  <link rel="apple-touch-icon" href="/app-icon-192.png">
+  <link rel="mask-icon" href="/app-icon.svg" color="#f4c84b">
+  <title>KhiladiAdda24 Login | Player Sign In</title>
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="KhiladiAdda24">
+  <meta property="og:title" content="KhiladiAdda24 Login | Player Sign In">
+  <meta property="og:description" content="Sign in to KhiladiAdda24 or create your player account with mobile number verification.">
+  <meta property="og:url" content="https://khiladiadda24.com/login.html">
   <style>
     :root { color-scheme: light; --ink: #201918; --muted: #6f6a66; --red: #b20e16; --gold: #ffdc65; --green: #078b37; --line: #e6e2df; --error: #b42318; }
     * { box-sizing: border-box; }
     body { min-height: 100vh; min-height: 100dvh; margin: 0; padding: 28px; display: grid; place-items: center; background: radial-gradient(ellipse at 10% 5%, #7c0c13, transparent 40%), linear-gradient(140deg, #21090b, #520b0d 52%, #21090b); color: var(--ink); font-family: Arial, sans-serif; }
     .login-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(360px, 450px); width: min(1040px, 100%); min-height: min(680px, calc(100dvh - 56px)); overflow: hidden; border: 1px solid #ffd66d78; border-radius: 22px; background: #fff; box-shadow: 0 28px 90px #0008; }
     .promo-panel { position: relative; display: flex; flex-direction: column; justify-content: space-between; min-height: 620px; overflow: hidden; padding: 0; color: #fff; background: radial-gradient(ellipse at 50% 30%, #fff08a80 0, #ffb00060 20%, transparent 48%), radial-gradient(ellipse at 50% 80%, #ffb000 0, transparent 38%), linear-gradient(155deg, #ff1744 0%, #f0003a 48%, #ad0039 100%); }
-    .promo-panel::before, .promo-panel::after { position: absolute; width: 320px; height: 320px; border: 1px solid #ffdc6540; border-radius: 50%; content: ""; pointer-events: none; }
-    .promo-panel::before { top: 28%; left: -175px; box-shadow: 0 0 0 24px #ffdc6512, 0 0 0 56px #ffdc650a; }
-    .promo-panel::after { right: -210px; bottom: -90px; box-shadow: 0 0 0 24px #ffdc6512, 0 0 0 56px #ffdc650a; }
-    .promo-panel::before { position: absolute; z-index: 0; right: 0; bottom: 0; left: 0; width: auto; height: 48px; border: 0; border-radius: 0; background-image: radial-gradient(circle, #fffbd0 0 2px, #ffdc65 3px 4px, transparent 8px), linear-gradient(176deg, transparent 0 44%, #ffdc6580 47%, transparent 51%); background-repeat: repeat-x, no-repeat; background-position: 0 11px, 0 0; background-size: 58px 28px, 100% 36px; content: ""; filter: drop-shadow(0 0 7px #ffe875); pointer-events: none; }     .promo-panel::after { position: absolute; z-index: 0; top: 22%; left: 50%; width: min(80%, 420px); height: 240px; border: 0; border-radius: 50%; background: #ffe15a30; content: ""; filter: blur(38px); pointer-events: none; transform: translateX(-50%); }     .fireflies { position: absolute; z-index: 2; inset: 0; overflow: hidden; pointer-events: none; }     .firefly { position: absolute; width: 5px; height: 5px; border-radius: 50%; background: #fff8ac; box-shadow: 0 0 7px 2px #fff080, 0 0 16px 5px #ffcf38a0; opacity: .3; }     .firefly:nth-child(1) { top: 15%; left: 12%; --drift: 24px -34px; }     .firefly:nth-child(2) { top: 23%; left: 81%; --drift: -29px -21px; animation-delay: -1.7s; }     .firefly:nth-child(3) { top: 38%; left: 24%; --drift: 32px 18px; animation-delay: -3.2s; }     .firefly:nth-child(4) { top: 46%; left: 72%; --drift: -18px 31px; animation-delay: -.8s; }     .firefly:nth-child(5) { top: 59%; left: 13%; --drift: 38px -25px; animation-delay: -2.6s; }     .firefly:nth-child(6) { top: 67%; left: 86%; --drift: -35px 20px; animation-delay: -4s; }     .firefly:nth-child(7) { top: 79%; left: 37%; --drift: 22px -29px; animation-delay: -1.1s; }     .firefly:nth-child(8) { top: 31%; left: 51%; --drift: -24px 34px; animation-delay: -3.7s; }     @keyframes garland-twinkle { 0%, 100% { opacity: .58; filter: drop-shadow(0 0 3px #ffe875); } 50% { opacity: 1; filter: drop-shadow(0 0 11px #fff3a1); } }     @keyframes firefly-drift { 0%, 100% { opacity: .18; transform: translate(0, 0) scale(.7); } 45% { opacity: 1; transform: translate(var(--drift)) scale(1.35); } }     @media (prefers-reduced-motion: no-preference) { .promo-panel::before { animation: garland-twinkle 1.4s ease-in-out infinite; } .firefly { animation: firefly-drift 5.2s ease-in-out infinite; } }
+    .promo-panel::before { position: absolute; z-index: 0; right: 0; bottom: 0; left: 0; height: 48px; background-image: radial-gradient(circle, #fffbd0 0 2px, #ffdc65 3px 4px, transparent 8px), linear-gradient(176deg, transparent 0 44%, #ffdc6580 47%, transparent 51%); background-repeat: repeat-x, no-repeat; background-position: 0 11px, 0 0; background-size: 58px 28px, 100% 36px; content: ""; filter: drop-shadow(0 0 7px #ffe875); pointer-events: none; }
+    .promo-panel::after { position: absolute; z-index: 0; top: 22%; left: 50%; width: min(80%, 420px); height: 240px; border-radius: 50%; background: #ffe15a30; content: ""; filter: blur(38px); pointer-events: none; transform: translateX(-50%); }
+    @keyframes garland-twinkle { 0%, 100% { opacity: .58; filter: drop-shadow(0 0 3px #ffe875); } 50% { opacity: 1; filter: drop-shadow(0 0 11px #fff3a1); } }
+    .fireflies { position: absolute; z-index: 2; inset: 0; overflow: hidden; pointer-events: none; }
+    .firefly { position: absolute; width: 5px; height: 5px; border-radius: 50%; background: #fff8ac; box-shadow: 0 0 7px 2px #fff080, 0 0 16px 5px #ffcf38a0; opacity: .3; }
+    .firefly:nth-child(1) { top: 15%; left: 12%; --drift: 24px -34px; }
+    .firefly:nth-child(2) { top: 23%; left: 81%; --drift: -29px -21px; animation-delay: -1.7s; }
+    .firefly:nth-child(3) { top: 38%; left: 24%; --drift: 32px 18px; animation-delay: -3.2s; }
+    .firefly:nth-child(4) { top: 46%; left: 72%; --drift: -18px 31px; animation-delay: -.8s; }
+    .firefly:nth-child(5) { top: 59%; left: 13%; --drift: 38px -25px; animation-delay: -2.6s; }
+    .firefly:nth-child(6) { top: 67%; left: 86%; --drift: -35px 20px; animation-delay: -4s; }
+    .firefly:nth-child(7) { top: 79%; left: 37%; --drift: 22px -29px; animation-delay: -1.1s; }
+    .firefly:nth-child(8) { top: 31%; left: 51%; --drift: -24px 34px; animation-delay: -3.7s; }
+    @keyframes firefly-drift { 0%, 100% { opacity: .18; transform: translate(0, 0) scale(.7); } 45% { opacity: 1; transform: translate(var(--drift)) scale(1.35); } }
+    @media (prefers-reduced-motion: no-preference) { .promo-panel::before { animation: garland-twinkle 1.4s ease-in-out infinite; } }
+    @media (prefers-reduced-motion: no-preference) { .firefly { animation: firefly-drift 5.2s ease-in-out infinite; } }
     .promo-art { position: relative; z-index: 1; display: block; width: 100%; height: auto; margin: 0; object-fit: contain; filter: drop-shadow(0 0 12px #fff080) drop-shadow(0 0 26px #ffb000a0); }
     .flying-note { position: absolute; z-index: 5; top: 72%; left: 50%; width: min(18%, 118px); aspect-ratio: 707 / 282; opacity: 0; background-position: center; background-size: 100% 100%; background-repeat: no-repeat; filter: drop-shadow(0 3px 5px #0008); mix-blend-mode: multiply; pointer-events: none; transform: translate(-50%, 8px) scale(.5); }
     @keyframes note-rise { 0%, 8% { opacity: 0; transform: translate(-50%, 8px) scale(.5) rotate(0); } 16% { opacity: 1; transform: translate(-50%, 0) scale(.8) rotate(var(--note-tilt)); } 68% { opacity: 1; transform: translate(calc(-50% + var(--note-drift)), -125px) scale(1) rotate(calc(var(--note-tilt) * -1)); } 100% { opacity: 0; transform: translate(calc(-50% + var(--note-drift)), -225px) scale(.75) rotate(var(--note-tilt)); } }
@@ -38,7 +60,7 @@
     @media (prefers-reduced-motion: reduce) { .flying-note { display: none; } }
     .box { position: relative; align-self: stretch; width: 100%; overflow-y: auto; padding: clamp(25px, 4vw, 44px); background: #fff; font-weight: 700; }
     #adminModeLink { position: absolute; top: 17px; right: 19px; display: grid; width: 38px; min-height: 38px; padding: 0; place-items: center; border: 1px solid var(--line); border-radius: 50%; background: #fff; color: #694d13; font-size: 16px; line-height: 1; text-decoration: none; }
-    .login-heading { margin: 0 0 28px; text-align: center; }
+    .login-heading { position: relative; margin: 0 0 28px; text-align: center; }
     .login-logo { display: block; width: 88px; height: 88px; margin: 0 auto 12px; object-fit: contain; }
     .brand-tagline { margin: 0 0 6px; color: var(--red); font-size: 11px; font-weight: 900; letter-spacing: 1.6px; }
     .welcome-back { margin: 0 0 7px; color: var(--ink); font-size: 25px; }
@@ -64,8 +86,6 @@
     #timerText { min-height: 20px; margin: 7px 0; color: var(--muted); font-size: 13px; text-align: center; }
     #msg { min-height: 22px; margin: 12px 0 0; color: #27623a; font-size: 13px; line-height: 1.5; text-align: center; overflow-wrap: anywhere; }
     #msg.error { color: var(--error); }
-    .login-footnote { margin: 18px 0 0; color: var(--muted); font-size: 12px; font-weight: 400; line-height: 1.6; text-align: center; }
-    .login-footnote a { color: #9c1720; font-weight: 700; }
     .hidden { display: none; }
     @media (max-width: 760px) {
       body { display: block; padding: 0; background: #fff; }
@@ -95,7 +115,11 @@
       <div class="flying-note" aria-hidden="true"></div>
       <div class="flying-note" aria-hidden="true"></div>
       <div class="flying-note" aria-hidden="true"></div>
-      <div class="flying-note" aria-hidden="true"></div>       <div class="fireflies" aria-hidden="true">         <span class="firefly"></span><span class="firefly"></span><span class="firefly"></span><span class="firefly"></span>         <span class="firefly"></span><span class="firefly"></span><span class="firefly"></span><span class="firefly"></span>       </div>
+      <div class="flying-note" aria-hidden="true"></div>
+      <div class="fireflies" aria-hidden="true">
+        <span class="firefly"></span><span class="firefly"></span><span class="firefly"></span><span class="firefly"></span>
+        <span class="firefly"></span><span class="firefly"></span><span class="firefly"></span><span class="firefly"></span>
+      </div>
     </section>
     <section class="box" aria-label="Player sign in">
       <a id="adminModeLink" href="/login.html?admin=1" aria-label="Admin login" title="Admin login"><span aria-hidden="true">&#128081;</span></a>
@@ -126,10 +150,11 @@
         <button id="changePhoneBtn" class="secondary" type="button">Mobile number badlein</button>
       </form>
       <p id="msg" role="status" aria-live="polite" aria-atomic="true"></p>
-      
     </section>
   </main>
 
+  <script>
+  </script>
   <script>
     let otpTimer = null;
     let otpCooldown = 0;
@@ -140,10 +165,6 @@
     const formHint = document.getElementById('formHint');
     const message = document.getElementById('msg');
     const loginMode = new URLSearchParams(location.search).get('admin') === '1' ? 'admin' : 'player';
-    const referralFromLink = new URLSearchParams(location.search).get('ref') || '';
-    if (loginMode === 'player' && /^[A-Za-z0-9]{8}$/.test(referralFromLink)) {
-      document.getElementById('referralCode').value = referralFromLink.toUpperCase();
-    }
     function playerDestination() {
       const next = new URLSearchParams(location.search).get('next');
       if (!next) return '/index.html';
@@ -164,6 +185,12 @@
     function setMessage(text, isError = false) {
       message.textContent = text;
       message.classList.toggle('error', isError);
+    }
+
+    const openedAsFile = location.protocol === 'file:';
+    if (openedAsFile) {
+      document.getElementById('otpSendBtn').disabled = true;
+      setMessage('Yeh login page file se khula hai. OTP ke liye app ko website ya local server URL se kholein.', true);
     }
 
     function updateOtpButtons() {
@@ -204,6 +231,7 @@
 
     async function sendOtp(event) {
       event.preventDefault();
+      if (openedAsFile) return;
       const phone = document.getElementById('phone').value.trim();
       const referralCode = document.getElementById('referralCode').value.trim().toUpperCase();
 
@@ -246,6 +274,7 @@
 
     async function verifyOtp(event) {
       event.preventDefault();
+      if (openedAsFile) return;
       const phone = document.getElementById('phone').value.trim();
       const otp = document.getElementById('otp').value.trim();
       if (!/^\d{4,6}$/.test(otp)) {
