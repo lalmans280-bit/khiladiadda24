@@ -13,7 +13,7 @@
   controlPanel.addEventListener('click', event => event.stopPropagation());
   const commandHelp = controlPanel.querySelector('p.muted');
   if (commandHelp) {
-    commandHelp.textContent = 'Header ke neeche 🎤 AI Assistant दबाकर बोलें: पेज/गेम खोलें, “500 रुपये की बैटल लगाओ”, या किसी दिख रहे विकल्प का नाम बोलें। जरूरी काम से पहले पुष्टि होगी।';
+    commandHelp.textContent = 'Header ke neeche 🎤 AI Assistant दबाकर Hindi, Hinglish ya English mein bolen: “500 रुपये की बैटल लगाओ”, “wallet kholo”, “paise jama karo” या किसी दिख रहे विकल्प का नाम बोलें। जरूरी काम से पहले पुष्टि होगी।';
     commandHelp.textContent += speechSynthesis && SpeechSynthesisUtterance
       ? ' जवाब हिंदी आवाज़ में सुनाई देंगे; उपलब्ध होने पर महिला voice चुनी जाएगी।'
       : ' इस browser में बोलकर जवाब उपलब्ध नहीं हैं।';
@@ -420,7 +420,7 @@
 
   async function executeAIIntent(intent) {
     if (!intent || intent.action === 'unknown') {
-      setStatus('AI assistant कमांड नहीं समझ पाया। थोड़ा अलग बोलकर कोशिश करें।', true);
+      setStatus('AI assistant कमांड नहीं समझ पाया। Hindi या Hinglish में कोशिश करें, जैसे “500 की battle लगाओ” या “wallet kholo”।', true);
       return;
     }
 
