@@ -66,6 +66,8 @@
   ]);
   let recognition = null;
   let listening = false;
+  let aiAssistantEnabled = false;
+  let aiThinking = false;
   let restartTimer = 0;
   let pendingAction = null;
   let pendingTimer = 0;
@@ -298,18 +300,22 @@
     return true;
   }
 
+  function getVisibleControls() {
+    return [...document.querySelectorAll('button,a,[role="button"]')]
+      .filter(control => !control.disabled
+        && control.getAttribute('aria-disabled') !== 'true'
+        && !control.closest('[hidden],.view:not(.active),#voiceControls')
+        && (!control.getClientRects || control.getClientRects().length > 0)
+        && !['voiceHomeToggle', 'voiceHomeConfirm', 'voiceHomeCancel'].includes(control.id));
+  }
+
   function clickNamedControl(text) {
     const actionWords = /(?:dabao|click|press|karo|karein|bhejo|bhejein|submit|save|share|copy|kholo|open|select|chuno|start|refresh|banao|banayein|logout|log out|sign out|दबाओ|दबाएं|करो|करें|भेजो|भेजें|सेव|खोलो|खोलें|चुनो|शुरू|बनाओ|बनाएं|बनाइए)/;
     if (!actionWords.test(text)) return false;
     const ignoredWords = new Set(['ke', 'liye', 'ka', 'ki', 'ko', 'and', 'the', 'a', 'an', 'please', 'button', 'option', 'बटन']);
     const getControlWords = value => normalize(value).split(/\s+/).filter(word => word && !ignoredWords.has(word));
     const commandWords = new Set(getControlWords(text));
-    const controls = [...document.querySelectorAll('button,a,[role="button"]')]
-      .filter(control => !control.disabled
-        && control.getAttribute('aria-disabled') !== 'true'
-        && !control.closest('[hidden],.view:not(.active),#voiceControls')
-        && (!control.getClientRects || control.getClientRects().length > 0)
-        && !['voiceHomeToggle', 'voiceHomeConfirm', 'voiceHomeCancel'].includes(control.id));
+    const controls = getVisibleControls();
     const matches = controls.filter(control => {
       const label = normalize(control.getAttribute('aria-label') || control.innerText || control.textContent);
       if (label.length <= 2) return false;
@@ -332,8 +338,151 @@
     return true;
   }
 
+  function cancellationReasonPhrase(reason) {
+    return {
+      OPPONENT_NOT_JOINED: 'opponent not joined',
+      OPPONENT_NOT_RESPONDING: 'opponent not responding',
+      WRONG_ROOM_CODE: 'wrong room code',
+      TECHNICAL_ISSUE: 'technical issue',
+      OTHER: 'other'
+    }[reason] || '';
+  }
+
+  function selectGameType(gameType) {
+    const names = {
+      LUDO: 'ludo classic',
+      POPULAR_LUDO: 'popular ludo',
+      LUDO_RACE: 'ludo race',
+      SNAKE: 'snake'
+    };
+    return names[gameType] ? chooseGame(names[gameType]) : false;
+  }
+
+  async function executeAIIntent(intent) {
+    if (!intent || intent.action === 'unknown') {
+      setStatus('AI assistant कमांड नहीं समझ पाया। थोड़ा अलग बोलकर कोशिश करें।', true);
+      return;
+    }
+
+    if (intent.action === 'navigate') {
+      if (intent.view === 'support') window.location.href = '/support.html';
+      else if (intent.view === 'chat') window.location.href = '/chat.html';
+      else if (['home', 'wallet', 'profile', 'history'].includes(intent.view)) {
+        app.setView(intent.view);
+        setStatus(`${intent.view} पेज खुल गया।`);
+      } else {
+        setStatus('AI assistant ने पेज नहीं पहचाना।', true);
+      }
+      return;
+    }
+    if (intent.action === 'select_game') {
+      if (!selectGameType(intent.gameType)) setStatus('AI assistant ने game नहीं पहचाना।', true);
+      return;
+    }
+    if (intent.action === 'create_battle') {
+      if (intent.gameType) selectGameType(intent.gameType);
+      if (!Number.isFinite(intent.amount) || intent.amount <= 0) {
+        app.setView('home');
+        setStatus('बैटल की राशि बताइए, जैसे “500 रुपये की बैटल लगाओ”।', true);
+        return;
+      }
+      makeBattle(intent.amount);
+      return;
+    }
+    if (intent.action === 'join_battle') {
+      if (!Number.isFinite(intent.amount) || intent.amount <= 0) {
+        setStatus('Join करने वाली बैटल की राशि बताइए।', true);
+        return;
+      }
+      await prepareJoin(intent.amount);
+      return;
+    }
+    if (intent.action === 'cancel_battle') {
+      await prepareCancellation(`cancel battle ${cancellationReasonPhrase(intent.reason)}`);
+      return;
+    }
+    if (intent.action === 'deposit' || intent.action === 'withdraw') {
+      if (!Number.isFinite(intent.amount) || intent.amount <= 0) {
+        app.setView('wallet');
+        setStatus('Request की राशि बोलें। UPI ID और payment details हाथ से भरें।', true);
+        return;
+      }
+      if (intent.action === 'deposit') prepareDeposit(intent.amount);
+      else prepareWithdrawal(intent.amount);
+      return;
+    }
+    if (intent.action === 'click_control') {
+      if (!clickNamedControl(`${intent.controlLabel} click`)) {
+        setStatus('यह विकल्प अभी दिखाई नहीं दे रहा। पहले उसका पेज खोलें।', true);
+      }
+      return;
+    }
+    if (intent.action === 'select_option') {
+      if (!intent.optionLabel || !chooseVisibleOption(`${intent.optionLabel} select`)) {
+        setStatus('AI assistant को यह visible option नहीं मिला। स्क्रीन से चुनें।', true);
+      }
+      return;
+    }
+    if (intent.action === 'profile_name') {
+      const input = app.el('username');
+      const form = app.el('profileForm');
+      const name = String(intent.name || '').trim();
+      if (!input || !form || name.length < 2 || name.length > 40) {
+        setStatus('Player name उपलब्ध नहीं है या उसकी लंबाई गलत है।', true);
+        return;
+      }
+      app.setView('profile');
+      input.value = name;
+      askConfirmation(`Player name “${name}” सेव करना`, () => form.requestSubmit());
+      return;
+    }
+    if (intent.action === 'room_code') {
+      if (!fillRoomCode(`room code ${intent.roomCode}`)) {
+        setStatus('पहले running battle का room code field खोलें।', true);
+      }
+      return;
+    }
+    if (intent.action === 'stop_listening') {
+      stopListening();
+      return;
+    }
+    setStatus('AI assistant ने यह विकल्प नहीं समझा।', true);
+  }
+
+  async function interpretWithAI(transcript) {
+    if (/\b(?:aadhaar|aadhar|otp|pin|password|passcode|cvv|upi\s*id|bank account|account number)\b/i.test(transcript)
+        || /\b\d{10,12}\b/.test(transcript)
+        || /\b[\w.+-]+@[\w.-]+\b/.test(transcript)
+        || /आधार|ओटीपी|यूपीआई/.test(transcript)) {
+      setStatus('संवेदनशील जानकारी AI को नहीं भेजी जाएगी। Aadhaar, OTP, UPI ID या password न बोलें।', true);
+      return;
+    }
+    if (aiThinking) {
+      setStatus('AI assistant अभी पिछला command समझ रहा है। कृपया रुकें।');
+      return;
+    }
+    aiThinking = true;
+    setStatus('AI assistant command समझ रहा है। अपरिचित आवाज़ का text Google Gemini को भेजा जाएगा।');
+    try {
+      const result = await app.api('/api/assistant/interpret', {
+        method: 'POST',
+        body: JSON.stringify({
+          text: transcript,
+          visibleControls: getVisibleControls()
+            .map(control => normalize(control.getAttribute('aria-label') || control.innerText || control.textContent))
+            .filter(label => label.length > 2)
+            .slice(0, 40)
+        })
+      });
+      await executeAIIntent(result.intent);
+    } finally {
+      aiThinking = false;
+    }
+  }
+
   function cancellationReason(text) {
     if (matchesAny(text, [/wrong room code/, /galat room code/, /गलत.*रूम कोड/, /गलत कोड/])) return 'WRONG_ROOM_CODE';
+    if (matchesAny(text, [/opponent.*not joined/, /opponent.*did not join/, /सामने वाला.*नहीं जुड़ा/])) return 'OPPONENT_NOT_JOINED';
     if (matchesAny(text, [/opponent.*(?:respond|reply|response)/, /opponent.*जवाब/, /जवाब नहीं/, /विरोधी.*जवाब/])) return 'OPPONENT_NOT_RESPONDING';
     if (matchesAny(text, [/technical issue/, /technical problem/, /तकनीकी समस्या/])) return 'TECHNICAL_ISSUE';
     if (matchesAny(text, [/\bother\b/, /अन्य/, /दूसरा कारण/])) return 'OTHER';
@@ -527,17 +676,18 @@
       return;
     }
     if (clickNamedControl(text)) return;
-    setStatus('यह कमांड समझ नहीं आया। विकल्प का नाम बोलकर “दबाओ” कहें, जैसे “KYC review दबाओ”।', true);
+    await interpretWithAI(transcript);
   }
 
   function updateVoiceButtons() {
     startButton.disabled = !Recognition || listening;
     stopButton.disabled = !listening;
+    startButton.textContent = aiAssistantEnabled ? '🎤 AI Assistant शुरू करें' : '🎤 आवाज़ शुरू करें';
     if (homeStartButton) {
       homeStartButton.disabled = !Recognition;
-      homeStartButton.textContent = listening ? '⏹ रोकें' : '🎤 Voice';
+      homeStartButton.textContent = listening ? '⏹ रोकें' : aiAssistantEnabled ? '🎤 AI Assistant' : '🎤 Voice';
       homeStartButton.setAttribute('aria-pressed', String(listening));
-      homeStartButton.title = listening ? 'आवाज़ बंद करें' : 'Hindi voice control शुरू करें';
+      homeStartButton.title = listening ? 'आवाज़ बंद करें' : 'Hindi voice assistant शुरू करें';
     }
   }
 
@@ -569,7 +719,9 @@
       recognition.start();
       listening = true;
       updateVoiceButtons();
-      setStatus('माइक चालू है। हिंदी में वेबसाइट के विकल्प बोलें।');
+      setStatus(aiAssistantEnabled
+        ? 'AI assistant सुन रहा है। अनजान command समझने के लिए transcript Google Gemini को भेजा जाएगा।'
+        : 'माइक चालू है। हिंदी में वेबसाइट के विकल्प बोलें।');
     } catch (error) {
       setStatus(`माइक शुरू नहीं हो पाया: ${error.message}`, true);
     }
@@ -630,5 +782,17 @@
   homeCancelButton?.addEventListener('click', event => {
     event.stopPropagation();
     cancelPending();
+  });
+  app.api('/api/assistant/status').then(({ enabled }) => {
+    if (!enabled) return;
+    aiAssistantEnabled = true;
+    const heading = controlPanel.querySelector('h2');
+    if (heading) heading.textContent = '🎙️ Hindi AI voice assistant';
+    if (commandHelp) {
+      commandHelp.textContent += ' अनजान command समझने के लिए transcript Google Gemini को भेजा जाएगा; sensitive जानकारी न बोलें।';
+    }
+    updateVoiceButtons();
+  }).catch(error => {
+    setStatus(error?.message || 'AI assistant status नहीं मिल पाया।', true);
   });
 })();
