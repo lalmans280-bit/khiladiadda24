@@ -629,7 +629,7 @@ app.post('/api/assistant/interpret', requireUser, async (req, res) => {
     'Convert explicitly spoken Hindi or English number words to an integer rupee amount. Examples: “paanch sau ki battle lagao” means create_battle with amount 500; “पैसे जमा करो” means deposit; “paise nikaalo” means withdraw; “battle radd kar do” means cancel_battle; “wallet kholo” means navigate to wallet; “ludo race chalao” means select_game with LUDO_RACE.',
     'For click_control, match the spoken meaning to a visibleControls entry and return that exact label; never invent a label. If no visible label matches, return unknown.',
     'Do not request or process credentials, payment details, Aadhaar, OTP, passwords, or account numbers.',
-    'Actions only prepare the website command; the website validates it and asks the player to confirm consequential actions.',
+    'Actions trigger the requested website operation immediately. The website still validates inputs and requires payment details to be entered manually.',
     'Allowed actions: navigate (view home, wallet, profile, history, support, or chat); create_battle; join_battle; cancel_battle; deposit; withdraw; select_game; click_control; select_option; profile_name; room_code; stop_listening; unknown.',
     'For navigate use one allowed view; for select_game use LUDO, POPULAR_LUDO, LUDO_RACE, or SNAKE.',
     'For cancellation, use only OPPONENT_NOT_JOINED, ROOM_CODE_NOT_SHARED, OPPONENT_NOT_RESPONDING, WRONG_ROOM_CODE, TECHNICAL_ISSUE, or OTHER.'

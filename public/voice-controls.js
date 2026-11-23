@@ -6,22 +6,18 @@
   const controlPanel = document.getElementById('voiceControls');
   const startButton = document.getElementById('voiceStart');
   const stopButton = document.getElementById('voiceStop');
-  const confirmButton = document.getElementById('voiceConfirm');
-  const cancelButton = document.getElementById('voiceCancel');
   const status = document.getElementById('voiceStatus');
-  if (!app || !controlPanel || !startButton || !stopButton || !confirmButton || !cancelButton || !status) return;
+  if (!app || !controlPanel || !startButton || !stopButton || !status) return;
   controlPanel.addEventListener('click', event => event.stopPropagation());
   const commandHelp = controlPanel.querySelector('p.muted');
   if (commandHelp) {
-    commandHelp.textContent = 'Header ke neeche 🎤 AI Assistant दबाकर Hindi, Hinglish ya English mein bolen: “500 रुपये की बैटल लगाओ”, “wallet kholo”, “paise jama karo” या किसी दिख रहे विकल्प का नाम बोलें। जरूरी काम से पहले पुष्टि होगी।';
+    commandHelp.textContent = 'Header ke neeche 🎤 AI Assistant दबाकर Hindi, Hinglish ya English mein bolen: “500 रुपये की बैटल लगाओ”, “wallet kholo”, “paise jama karo” या किसी दिख रहे विकल्प का नाम बोलें। बोला गया command तुरंत चलेगा।';
     commandHelp.textContent += speechSynthesis && SpeechSynthesisUtterance
       ? ' जवाब हिंदी आवाज़ में सुनाई देंगे; उपलब्ध होने पर महिला voice चुनी जाएगी।'
       : ' इस browser में बोलकर जवाब उपलब्ध नहीं हैं।';
   }
   const homeAssistantSlot = document.getElementById('aiAssistantHomeSlot');
   let homeStartButton = null;
-  let homeConfirmButton = null;
-  let homeCancelButton = null;
   let homeStatus = null;
   if (homeAssistantSlot && !document.getElementById('voiceHomeToggle')) {
     homeStartButton = document.createElement('button');
@@ -30,20 +26,6 @@
     homeStartButton.className = 'btn secondary small';
     homeStartButton.textContent = '🎤 AI Assistant';
     homeAssistantSlot.append(homeStartButton);
-    homeConfirmButton = document.createElement('button');
-    homeConfirmButton.id = 'voiceHomeConfirm';
-    homeConfirmButton.type = 'button';
-    homeConfirmButton.className = 'btn green small';
-    homeConfirmButton.textContent = 'हाँ, पुष्टि';
-    homeConfirmButton.hidden = true;
-    homeAssistantSlot.append(homeConfirmButton);
-    homeCancelButton = document.createElement('button');
-    homeCancelButton.id = 'voiceHomeCancel';
-    homeCancelButton.type = 'button';
-    homeCancelButton.className = 'btn danger small';
-    homeCancelButton.textContent = 'नहीं';
-    homeCancelButton.hidden = true;
-    homeAssistantSlot.append(homeCancelButton);
     homeStatus = document.createElement('p');
     homeStatus.className = 'notice';
     homeStatus.setAttribute('role', 'status');
@@ -73,8 +55,6 @@
   let aiAssistantEnabled = false;
   let aiThinking = false;
   let restartTimer = 0;
-  let pendingAction = null;
-  let pendingTimer = 0;
 
   function chooseHindiReplyVoice() {
     if (!speechSynthesis) return null;
@@ -179,44 +159,15 @@
     return Number.isSafeInteger(amount) && amount > 0 ? amount : NaN;
   }
 
-  function clearPending(message) {
-    window.clearTimeout(pendingTimer);
-    pendingTimer = 0;
-    pendingAction = null;
-    confirmButton.hidden = true;
-    cancelButton.hidden = true;
-    if (homeConfirmButton) homeConfirmButton.hidden = true;
-    if (homeCancelButton) homeCancelButton.hidden = true;
-    if (message) setStatus(message);
-  }
-
-  function askConfirmation(label, action) {
-    clearPending();
-    pendingAction = action;
-    confirmButton.hidden = false;
-    cancelButton.hidden = false;
-    if (homeConfirmButton) homeConfirmButton.hidden = false;
-    if (homeCancelButton) homeCancelButton.hidden = false;
-    setStatus(`${label} तैयार है। जारी रखने के लिए “हाँ, पुष्टि करें” बोलें; रोकने के लिए “नहीं” बोलें।`);
-    pendingTimer = window.setTimeout(() => {
-      clearPending('पुष्टि का समय समाप्त हुआ; कोई अनुरोध नहीं भेजा गया।');
-    }, 45000);
-  }
-
-  function confirmPending() {
-    if (!pendingAction) return false;
-    const action = pendingAction;
-    clearPending('पुष्टि हो गई।');
-    Promise.resolve().then(action).catch(error => {
+  function runVoiceAction(label, action) {
+    setStatus(`${label} शुरू किया जा रहा है।`);
+    try {
+      Promise.resolve(action()).catch(error => {
+        setStatus(error?.message || 'यह काम पूरा नहीं हो पाया।', true);
+      });
+    } catch (error) {
       setStatus(error?.message || 'यह काम पूरा नहीं हो पाया।', true);
-    });
-    return true;
-  }
-
-  function cancelPending() {
-    if (!pendingAction) return false;
-    clearPending('ठीक है, अनुरोध रोक दिया गया है।');
-    return true;
+    }
   }
 
   function matchesAny(text, expressions) {
@@ -232,7 +183,7 @@
     }
     app.setView('home');
     input.value = String(amount);
-    askConfirmation(`₹${amount.toLocaleString('en-IN')} की बैटल`, () => form.requestSubmit());
+    runVoiceAction(`₹${amount.toLocaleString('en-IN')} की बैटल`, () => form.requestSubmit());
   }
 
   function prepareWithdrawal(amount) {
@@ -244,7 +195,7 @@
     }
     app.setView('wallet');
     input.value = String(amount);
-    askConfirmation(`₹${amount.toLocaleString('en-IN')} की निकासी`, () => form.requestSubmit());
+    runVoiceAction(`₹${amount.toLocaleString('en-IN')} की निकासी`, () => form.requestSubmit());
   }
 
   function prepareDeposit(amount) {
@@ -254,7 +205,7 @@
     if (amount < Number(input.min)) throw new Error(`जमा राशि कम से कम ₹${input.min} होनी चाहिए।`);
     app.setView('wallet');
     input.value = String(amount);
-    askConfirmation(`₹${amount.toLocaleString('en-IN')} का जमा QR`, () => form.requestSubmit());
+    runVoiceAction(`₹${amount.toLocaleString('en-IN')} का जमा QR`, () => form.requestSubmit());
   }
 
   async function prepareJoin(amount) {
@@ -269,7 +220,7 @@
       return;
     }
     const matchId = candidates[0].dataset.join;
-    askConfirmation(`₹${amount.toLocaleString('en-IN')} की बैटल में शामिल होना`, () => {
+    runVoiceAction(`₹${amount.toLocaleString('en-IN')} की बैटल में शामिल होना`, () => {
       const currentButton = [...document.querySelectorAll('#openMatches [data-join]')]
         .find(button => button.dataset.join === matchId);
       if (!currentButton) throw new Error('बैटल बदल गई है। सूची फिर से खोलकर कोशिश करें।');
@@ -317,7 +268,7 @@
     }
     app.setView('profile');
     input.value = name;
-    askConfirmation(`Player name “${name}” सेव करना`, () => form.requestSubmit());
+    runVoiceAction(`Player name “${name}” सेव करना`, () => form.requestSubmit());
     return true;
   }
 
@@ -366,7 +317,7 @@
         && control.getAttribute('aria-disabled') !== 'true'
         && !control.closest('[hidden],.view:not(.active),#voiceControls')
         && (!control.getClientRects || control.getClientRects().length > 0)
-        && !['voiceHomeToggle', 'voiceHomeConfirm', 'voiceHomeCancel'].includes(control.id));
+        && control.id !== 'voiceHomeToggle');
   }
 
   function clickNamedControl(text) {
@@ -391,7 +342,7 @@
     }
     if (!matches.length) return false;
     const control = matches[0];
-    askConfirmation(`“${normalize(control.innerText || control.textContent)}” विकल्प`, () => {
+    runVoiceAction(`“${normalize(control.innerText || control.textContent)}” विकल्प`, () => {
       if (!control.isConnected) throw new Error('यह विकल्प अब उपलब्ध नहीं है। स्क्रीन पर दोबारा देखें।');
       control.click();
     });
@@ -493,7 +444,7 @@
       }
       app.setView('profile');
       input.value = name;
-      askConfirmation(`Player name “${name}” सेव करना`, () => form.requestSubmit());
+      runVoiceAction(`Player name “${name}” सेव करना`, () => form.requestSubmit());
       return;
     }
     if (intent.action === 'room_code') {
@@ -570,7 +521,7 @@
         setStatus('Room code साझा हो चुका है। कारण के साथ बोलें: “cancel battle wrong room code” या “cancel battle technical issue”। Admin की मंज़ूरी के बाद ही cancellation/refund होगा।');
         return;
       }
-      askConfirmation('Admin review के लिए battle cancellation request', async () => {
+      runVoiceAction('Admin review के लिए battle cancellation request', async () => {
         const result = await app.api('/api/matches/cancel', {
           method: 'POST',
           body: JSON.stringify({ matchId, reason })
@@ -580,7 +531,7 @@
       });
       return;
     }
-    askConfirmation('आपकी एक बैटल रद्द करना', () => {
+    runVoiceAction('आपकी एक बैटल रद्द करना', () => {
       const currentButton = [...document.querySelectorAll(isOpenCancel
         ? '#openMatches [data-cancel-match]'
         : '#runningMatches [data-running-cancel]')]
@@ -594,21 +545,9 @@
     const text = normalize(transcript);
     if (!text) return;
     if (matchesAny(text, [/voice stop/, /stop voice/, /^stop$/, /^रोक दो$/, /^रोकें$/, /आवाज़ बंद/, /आवाज बंद/, /माइक बंद/, /सुनना बंद/])) {
-      cancelPending();
       stopListening();
       return;
     }
-    if (pendingAction) {
-      if (matchesAny(text, [/\bno\b/, /\bnahi\b/, /नहीं/, /मत रोक/, /रद्द/])) {
-        cancelPending();
-      } else if (matchesAny(text, [/\byes\b/, /\bconfirm\b/, /haan/, /हाँ/, /हां/, /पुष्टि/, /जारी रखें/])) {
-        confirmPending();
-      } else {
-        setStatus('काम लंबित है। “हाँ, पुष्टि करें” या “नहीं” बोलें।');
-      }
-      return;
-    }
-
     if (prepareProfileName(text)) return;
     if (fillRoomCode(text)) return;
     if (matchesAny(text, [/प्रोफाइल/, /प्रोफ़ाइल/, /profile/])
@@ -616,7 +555,7 @@
       const form = app.el('profileForm');
       if (form) {
         app.setView('profile');
-        askConfirmation('प्रोफ़ाइल विवरण सेव करना', () => form.requestSubmit());
+        runVoiceAction('प्रोफ़ाइल विवरण सेव करना', () => form.requestSubmit());
         return;
       }
     }
@@ -653,7 +592,7 @@
         app.setView('wallet');
         const submitButton = app.el('kycForm')?.querySelector('button[type="submit"]');
         if (submitButton) {
-          askConfirmation('KYC review request भेजना', () => submitButton.form.requestSubmit(submitButton));
+          runVoiceAction('KYC review request भेजना', () => submitButton.form.requestSubmit(submitButton));
           return;
         }
       }
@@ -693,7 +632,7 @@
         const form = app.el('withdrawForm');
         if (form && matchesAny(text, [/submit/, /request/, /bhejo/, /bhejein/, /भेजो/, /भेजें/])) {
           app.setView('wallet');
-          askConfirmation('निकासी अनुरोध भेजना', () => form.requestSubmit());
+          runVoiceAction('निकासी अनुरोध भेजना', () => form.requestSubmit());
           return;
         }
         app.setView('wallet');
@@ -709,7 +648,7 @@
         const form = app.el('depositForm');
         if (form && !form.hidden
             && matchesAny(text, [/submit/, /request/, /bhejo/, /bhejein/, /भेजो/, /भेजें/])) {
-          askConfirmation('जमा अनुरोध भेजना', () => form.requestSubmit());
+          runVoiceAction('जमा अनुरोध भेजना', () => form.requestSubmit());
           return;
         }
         app.setView('wallet');
@@ -771,7 +710,7 @@
         setStatus(`माइक बंद नहीं हो पाया: ${error.message}`, true);
       }
     }
-    clearPending('आवाज़ बंद है।');
+    setStatus('आवाज़ बंद है।');
     updateVoiceButtons();
   }
 
@@ -842,20 +781,10 @@
 
   startButton.addEventListener('click', startListening);
   stopButton.addEventListener('click', stopListening);
-  confirmButton.addEventListener('click', confirmPending);
-  cancelButton.addEventListener('click', cancelPending);
   homeStartButton?.addEventListener('click', event => {
     event.stopPropagation();
     if (listening) stopListening();
     else startListening();
-  });
-  homeConfirmButton?.addEventListener('click', event => {
-    event.stopPropagation();
-    confirmPending();
-  });
-  homeCancelButton?.addEventListener('click', event => {
-    event.stopPropagation();
-    cancelPending();
   });
   app.api('/api/assistant/status').then(({ enabled }) => {
     if (!enabled) return;
