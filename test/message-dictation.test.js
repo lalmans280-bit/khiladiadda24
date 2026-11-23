@@ -91,11 +91,16 @@ test('dictation appends final speech chunks into the message field without sendi
   assert.equal(harness.button['aria-pressed'], 'true');
 });
 
-test('chat and support pages provide a separate voice-typing button', () => {
-  for (const page of ['chat.html', 'support.html']) {
-    const html = fs.readFileSync(require.resolve(`../public/${page}`), 'utf8');
-    assert.match(html, /id="dictationButton"[^>]*type="button"/);
-    assert.match(html, /id="dictationStatus"[^>]*aria-live="polite"/);
-    assert.match(html, /message-dictation\.js/);
-  }
+test('support page provides voice typing and legacy chat redirects to it', () => {
+  const supportHtml = fs.readFileSync(require.resolve('../public/support.html'), 'utf8');
+  assert.match(supportHtml, /id="dictationButton"[^>]*type="button"/);
+  assert.match(supportHtml, /id="dictationStatus"[^>]*aria-live="polite"/);
+  assert.match(supportHtml, /message-dictation\.js/);
+
+  const indexHtml = fs.readFileSync(require.resolve('../public/index.html'), 'utf8');
+  assert.doesNotMatch(indexHtml, /Need Chat|chatNavButton/);
+  assert.match(indexHtml, /class="bottom-support" href="\/support\.html"/);
+
+  const legacyChatHtml = fs.readFileSync(require.resolve('../public/chat.html'), 'utf8');
+  assert.match(legacyChatHtml, /location\.replace\('\/support\.html'\)/);
 });

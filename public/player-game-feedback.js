@@ -146,7 +146,6 @@
     if (control.id === 'refreshOpen') return 'खुले बैटल की सूची ताज़ा की जा रही है।';
     if (control.id === 'gameRefreshOpen') return 'इस गेम के खुले बैटल ताज़ा किए जा रहे हैं।';
     if (control.id === 'refreshHistory') return 'गेम और वॉलेट का इतिहास ताज़ा किया जा रहा है।';
-    if (control.id === 'chatNavButton') return 'सहायता चैट का विकल्प चुना गया है।';
     if (control.id === 'backToGames') return 'गेम सूची पर वापस जा रहे हैं। यहाँ उपलब्ध गेम और बैटल चुनें।';
     if (control.id === 'copyReferral') return 'अपनी रेफ़रल ID कॉपी करके दोस्तों के साथ साझा करें।';
     if (control.id === 'copyRoom') return 'रूम कोड कॉपी करके Ludo King में जुड़ें।';

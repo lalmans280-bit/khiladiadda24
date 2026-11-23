@@ -630,7 +630,7 @@ app.post('/api/assistant/interpret', requireUser, async (req, res) => {
     'For click_control, match the spoken meaning to a visibleControls entry and return that exact label; never invent a label. If no visible label matches, return unknown.',
     'Do not request or process credentials, payment details, Aadhaar, OTP, passwords, or account numbers.',
     'Actions trigger the requested website operation immediately. The website still validates inputs and requires payment details to be entered manually.',
-    'Allowed actions: navigate (view home, wallet, profile, history, support, or chat); create_battle; join_battle; cancel_battle; deposit; withdraw; select_game; click_control; select_option; profile_name; room_code; stop_listening; unknown.',
+    'Allowed actions: navigate (view home, wallet, profile, history, or support); a request to open chat means navigate to support; create_battle; join_battle; cancel_battle; deposit; withdraw; select_game; click_control; select_option; profile_name; room_code; stop_listening; unknown.',
     'For navigate use one allowed view; for select_game use LUDO, POPULAR_LUDO, LUDO_RACE, or SNAKE.',
     'For cancellation, use only OPPONENT_NOT_JOINED, ROOM_CODE_NOT_SHARED, OPPONENT_NOT_RESPONDING, WRONG_ROOM_CODE, TECHNICAL_ISSUE, or OTHER.'
   ].join(' ');

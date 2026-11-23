@@ -59,3 +59,10 @@ test('blocks credentials and identifying numbers from AI interpretation', () => 
   assert.equal(isSensitiveAssistantText('My UPI ID is player@bank'), true);
   assert.equal(isSensitiveAssistantText('Create a battle for 500 rupees'), false);
 });
+
+test('maps chat navigation to the unified support page', () => {
+  assert.equal(normalizeAIIntent({
+    action: 'navigate',
+    view: 'chat'
+  }).view, 'support');
+});

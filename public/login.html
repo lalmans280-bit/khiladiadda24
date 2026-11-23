@@ -170,7 +170,7 @@
       if (!next) return '/index.html';
       try {
         const target = new URL(next, location.origin);
-        if (target.origin === location.origin && ['/index.html', '/support.html', '/chat.html'].includes(target.pathname)) {
+        if (target.origin === location.origin && ['/index.html', '/support.html'].includes(target.pathname)) {
           return `${target.pathname}${target.search}${target.hash}`;
         }
       } catch {}

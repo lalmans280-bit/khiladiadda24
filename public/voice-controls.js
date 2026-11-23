@@ -377,7 +377,7 @@
 
     if (intent.action === 'navigate') {
       if (intent.view === 'support') window.location.href = '/support.html';
-      else if (intent.view === 'chat') window.location.href = '/chat.html';
+      else if (intent.view === 'chat') window.location.href = '/support.html';
       else if (['home', 'wallet', 'profile', 'history'].includes(intent.view)) {
         app.setView(intent.view);
         setStatus(`${intent.view} पेज खुल गया।`);
@@ -574,7 +574,7 @@
       return;
     }
     if (matchesAny(text, [/chat/, /चैट/])) {
-      window.location.href = '/chat.html';
+      window.location.href = '/support.html';
       return;
     }
     if (matchesAny(text, [/वॉलेट/, /wallet/]) && !/निकाल|withdraw|जमा|deposit/.test(text)) {
