@@ -9,6 +9,48 @@
   const status = document.getElementById('voiceStatus');
   if (!app || !controlPanel || !startButton || !stopButton || !confirmButton || !cancelButton || !status) return;
   controlPanel.addEventListener('click', event => event.stopPropagation());
+  const commandHelp = controlPanel.querySelector('p.muted');
+  if (commandHelp) {
+    commandHelp.textContent = 'होम पर 🎤 Voice दबाकर बोलें: पेज/गेम का नाम खोलो, “500 रुपये की बैटल लगाओ”, या किसी दिख रहे बटन का नाम लेकर “दबाओ” कहें। हर submit से पहले पुष्टि होगी।';
+  }
+  const homeRefreshButton = document.getElementById('refreshOpen');
+  const homeRow = homeRefreshButton?.parentElement;
+  let homeStartButton = null;
+  let homeConfirmButton = null;
+  let homeCancelButton = null;
+  let homeStatus = null;
+  if (homeRow && !document.getElementById('voiceHomeToggle')) {
+    homeStartButton = document.createElement('button');
+    homeStartButton.id = 'voiceHomeToggle';
+    homeStartButton.type = 'button';
+    homeStartButton.className = 'btn secondary small';
+    homeStartButton.textContent = '🎤 Voice';
+    homeRefreshButton.after(homeStartButton);
+    homeConfirmButton = document.createElement('button');
+    homeConfirmButton.id = 'voiceHomeConfirm';
+    homeConfirmButton.type = 'button';
+    homeConfirmButton.className = 'btn green small';
+    homeConfirmButton.textContent = 'हाँ, पुष्टि';
+    homeConfirmButton.hidden = true;
+    homeStartButton.after(homeConfirmButton);
+    homeCancelButton = document.createElement('button');
+    homeCancelButton.id = 'voiceHomeCancel';
+    homeCancelButton.type = 'button';
+    homeCancelButton.className = 'btn danger small';
+    homeCancelButton.textContent = 'नहीं';
+    homeCancelButton.hidden = true;
+    homeConfirmButton.after(homeCancelButton);
+    homeRow.style.flexDirection = 'row';
+    homeRow.style.alignItems = 'center';
+    homeRow.style.justifyContent = 'flex-end';
+    homeRow.style.flexWrap = 'wrap';
+    homeStatus = document.createElement('p');
+    homeStatus.className = 'notice';
+    homeStatus.setAttribute('role', 'status');
+    homeStatus.setAttribute('aria-live', 'polite');
+    homeStatus.hidden = true;
+    homeRow.parentElement.insertBefore(homeStatus, homeRow.nextSibling);
+  }
 
   const hindiNumbers = new Map([
     ['शून्य', 0], ['एक', 1], ['इक', 1], ['दो', 2], ['तीन', 3], ['चार', 4],
@@ -31,12 +73,18 @@
   function setStatus(message, error = false) {
     status.textContent = message;
     status.classList.toggle('error', error);
+    if (homeStatus) {
+      homeStatus.textContent = message;
+      homeStatus.classList.toggle('error', error);
+      homeStatus.hidden = false;
+    }
   }
 
   function normalize(text) {
     return String(text || '')
       .toLowerCase()
       .replace(/[०-९]/g, digit => String('०१२३४५६७८९'.indexOf(digit)))
+      .replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27FF}]/gu, ' ')
       .replace(/[.,!?।:;₹]/g, ' ')
       .replace(/\s+/g, ' ')
       .trim();
@@ -75,6 +123,8 @@
     pendingAction = null;
     confirmButton.hidden = true;
     cancelButton.hidden = true;
+    if (homeConfirmButton) homeConfirmButton.hidden = true;
+    if (homeCancelButton) homeCancelButton.hidden = true;
     if (message) setStatus(message);
   }
 
@@ -83,6 +133,8 @@
     pendingAction = action;
     confirmButton.hidden = false;
     cancelButton.hidden = false;
+    if (homeConfirmButton) homeConfirmButton.hidden = false;
+    if (homeCancelButton) homeCancelButton.hidden = false;
     setStatus(`${label} तैयार है। जारी रखने के लिए “हाँ, पुष्टि करें” बोलें; रोकने के लिए “नहीं” बोलें।`);
     pendingTimer = window.setTimeout(() => {
       clearPending('पुष्टि का समय समाप्त हुआ; कोई अनुरोध नहीं भेजा गया।');
@@ -143,12 +195,156 @@
     askConfirmation(`₹${amount.toLocaleString('en-IN')} का जमा QR`, () => form.requestSubmit());
   }
 
-  async function prepareCancellation() {
+  async function prepareJoin(amount) {
+    app.setView('home');
+    await app.refresh();
+    const candidates = [...document.querySelectorAll('#openMatches [data-join]')]
+      .filter(button => Number(button.dataset.joinAmount) === amount);
+    if (candidates.length !== 1) {
+      setStatus(candidates.length
+        ? `₹${amount.toLocaleString('en-IN')} वाली एक से अधिक बैटल हैं। सही बैटल स्क्रीन से चुनें।`
+        : `₹${amount.toLocaleString('en-IN')} की खुली बैटल नहीं मिली।`, true);
+      return;
+    }
+    const matchId = candidates[0].dataset.join;
+    askConfirmation(`₹${amount.toLocaleString('en-IN')} की बैटल में शामिल होना`, () => {
+      const currentButton = [...document.querySelectorAll('#openMatches [data-join]')]
+        .find(button => button.dataset.join === matchId);
+      if (!currentButton) throw new Error('बैटल बदल गई है। सूची फिर से खोलकर कोशिश करें।');
+      currentButton.click();
+    });
+  }
+
+  function chooseGame(text) {
+    const games = [
+      [/लूडो रेस|ludo race/, 'LUDO_RACE'],
+      [/पॉपुलर लूडो|popular ludo/, 'POPULAR_LUDO'],
+      [/स्नेक|snake/, 'SNAKE'],
+      [/लूडो क्लासिक|ludo classic|classic ludo/, 'LUDO']
+    ];
+    const game = games.find(([pattern]) => pattern.test(text));
+    if (!game) return false;
+    const select = app.el('gameType');
+    if (!select) throw new Error('Game selection उपलब्ध नहीं है।');
+    app.setView('home');
+    select.value = game[1];
+    select.dispatchEvent(new Event('change', { bubbles: true }));
+    if (matchesAny(text, [/बैटल/, /battle/, /challenge/])
+        && matchesAny(text, [/लगाओ/, /बनाओ/, /शुरू/, /create/, /start/, /set/])) {
+      const amount = getAmount(text);
+      if (!Number.isFinite(amount)) {
+        setStatus('बैटल की राशि बोलें, जैसे “पाँच सौ रुपये की लूडो रेस बैटल लगाओ”।', true);
+        return true;
+      }
+      makeBattle(amount);
+      return true;
+    }
+    setStatus(`${select.selectedOptions?.[0]?.textContent || 'Game'} चुना गया।`);
+    return true;
+  }
+
+  function prepareProfileName(text) {
+    const match = text.match(/(?:mera naam|my name is|player name|player ka naam|मेरा नाम|मेरा खिलाड़ी नाम|खिलाड़ी का नाम|नाम)\s+(.+?)(?:\s+(?:save|सेव|सहेज|बदल|बदलो|करो|कर दें))?$/);
+    if (!match) return false;
+    const name = match[1].trim();
+    const input = app.el('username');
+    const form = app.el('profileForm');
+    if (!name || !input || !form) {
+      setStatus('Player name बोलें, जैसे “मेरा नाम Rahul सेव करो”।', true);
+      return true;
+    }
+    app.setView('profile');
+    input.value = name;
+    askConfirmation(`Player name “${name}” सेव करना`, () => form.requestSubmit());
+    return true;
+  }
+
+  function chooseVisibleOption(text) {
+    if (!matchesAny(text, [/select/, /choose/, /chuno/, /चुनो/, /चुनें/, /चुने/])) return false;
+    const selects = [...document.querySelectorAll('select')]
+      .filter(select => !select.disabled
+        && !select.closest('[hidden],.view:not(.active)')
+        && (!select.getClientRects || select.getClientRects().length > 0));
+    const matches = selects.flatMap(select => [...select.options]
+      .filter(option => !option.disabled && option.value && text.includes(normalize(option.textContent)))
+      .map(option => ({ select, option })));
+    if (matches.length !== 1) {
+      if (matches.length > 1) setStatus('यह विकल्प एक से अधिक जगह है। कृपया स्क्रीन पर चुनें।', true);
+      return matches.length > 0;
+    }
+    const { select, option } = matches[0];
+    select.value = option.value;
+    select.dispatchEvent(new Event('change', { bubbles: true }));
+    setStatus(`${option.textContent.trim()} चुना गया।`);
+    return true;
+  }
+
+  function fillRoomCode(text) {
+    const match = text.match(/(?:room code|रूम कोड)\s+(\d{4,8})/);
+    if (!match) return false;
+    const fields = [...document.querySelectorAll('#roomCode,input[data-running-room-code]')]
+      .filter(input => !input.disabled
+        && !input.closest('[hidden],.view:not(.active)')
+        && (!input.getClientRects || input.getClientRects().length > 0));
+    if (fields.length !== 1) {
+      setStatus(fields.length
+        ? 'एक से अधिक room code fields हैं। सही मैच खोलकर code बोलें।'
+        : 'Room code field पहले स्क्रीन पर खोलें।', true);
+      return true;
+    }
+    fields[0].value = match[1];
+    fields[0].dispatchEvent(new Event('input', { bubbles: true }));
+    setStatus('Room code भर दिया है। Share करने से पहले स्क्रीन पर code जाँचें।');
+    return true;
+  }
+
+  function clickNamedControl(text) {
+    const actionWords = /(?:dabao|click|press|karo|karein|bhejo|bhejein|submit|save|share|copy|kholo|open|select|chuno|start|refresh|banao|banayein|logout|log out|sign out|दबाओ|दबाएं|करो|करें|भेजो|भेजें|सेव|खोलो|खोलें|चुनो|शुरू|बनाओ|बनाएं|बनाइए)/;
+    if (!actionWords.test(text)) return false;
+    const ignoredWords = new Set(['ke', 'liye', 'ka', 'ki', 'ko', 'and', 'the', 'a', 'an', 'please', 'button', 'option', 'बटन']);
+    const getControlWords = value => normalize(value).split(/\s+/).filter(word => word && !ignoredWords.has(word));
+    const commandWords = new Set(getControlWords(text));
+    const controls = [...document.querySelectorAll('button,a,[role="button"]')]
+      .filter(control => !control.disabled
+        && control.getAttribute('aria-disabled') !== 'true'
+        && !control.closest('[hidden],.view:not(.active),#voiceControls')
+        && (!control.getClientRects || control.getClientRects().length > 0)
+        && !['voiceHomeToggle', 'voiceHomeConfirm', 'voiceHomeCancel'].includes(control.id));
+    const matches = controls.filter(control => {
+      const label = normalize(control.getAttribute('aria-label') || control.innerText || control.textContent);
+      if (label.length <= 2) return false;
+      if (text.includes(label)) return true;
+      const labelWords = getControlWords(label);
+      const identifyingWords = labelWords.filter(word => !actionWords.test(word));
+      const requiredWords = identifyingWords.length ? identifyingWords : labelWords;
+      return requiredWords.length > 0 && requiredWords.every(word => commandWords.has(word));
+    });
+    if (matches.length > 1) {
+      setStatus('यह नाम एक से अधिक विकल्पों से मिलता है। कृपया स्क्रीन पर सही विकल्प चुनें।', true);
+      return true;
+    }
+    if (!matches.length) return false;
+    const control = matches[0];
+    askConfirmation(`“${normalize(control.innerText || control.textContent)}” विकल्प`, () => {
+      if (!control.isConnected) throw new Error('यह विकल्प अब उपलब्ध नहीं है। स्क्रीन पर दोबारा देखें।');
+      control.click();
+    });
+    return true;
+  }
+
+  function cancellationReason(text) {
+    if (matchesAny(text, [/wrong room code/, /galat room code/, /गलत.*रूम कोड/, /गलत कोड/])) return 'WRONG_ROOM_CODE';
+    if (matchesAny(text, [/opponent.*(?:respond|reply|response)/, /opponent.*जवाब/, /जवाब नहीं/, /विरोधी.*जवाब/])) return 'OPPONENT_NOT_RESPONDING';
+    if (matchesAny(text, [/technical issue/, /technical problem/, /तकनीकी समस्या/])) return 'TECHNICAL_ISSUE';
+    if (matchesAny(text, [/\bother\b/, /अन्य/, /दूसरा कारण/])) return 'OTHER';
+    return '';
+  }
+
+  async function prepareCancellation(text) {
     app.setView('home');
     await app.refresh();
     const openCancels = [...document.querySelectorAll('#openMatches [data-cancel-match]')];
-    const runningCancels = [...document.querySelectorAll('#runningMatches [data-running-cancel]')]
-      .filter(button => button.dataset.roomCodeShared !== '1');
+    const runningCancels = [...document.querySelectorAll('#runningMatches [data-running-cancel]')];
     const candidates = [...openCancels, ...runningCancels];
     if (candidates.length !== 1) {
       setStatus(candidates.length
@@ -159,6 +355,22 @@
     const candidate = candidates[0];
     const isOpenCancel = candidate.hasAttribute('data-cancel-match');
     const matchId = isOpenCancel ? candidate.dataset.cancelMatch : candidate.dataset.runningCancel;
+    if (!isOpenCancel && candidate.dataset.roomCodeShared === '1') {
+      const reason = cancellationReason(text);
+      if (!reason) {
+        setStatus('Room code साझा हो चुका है। कारण के साथ बोलें: “cancel battle wrong room code” या “cancel battle technical issue”। Admin की मंज़ूरी के बाद ही cancellation/refund होगा।');
+        return;
+      }
+      askConfirmation('Admin review के लिए battle cancellation request', async () => {
+        const result = await app.api('/api/matches/cancel', {
+          method: 'POST',
+          body: JSON.stringify({ matchId, reason })
+        });
+        app.notify(result.message);
+        await app.refresh();
+      });
+      return;
+    }
     askConfirmation('आपकी एक बैटल रद्द करना', () => {
       const currentButton = [...document.querySelectorAll(isOpenCancel
         ? '#openMatches [data-cancel-match]'
@@ -172,6 +384,11 @@
   async function handleCommand(transcript) {
     const text = normalize(transcript);
     if (!text) return;
+    if (matchesAny(text, [/voice stop/, /stop voice/, /^stop$/, /^रोक दो$/, /^रोकें$/, /आवाज़ बंद/, /आवाज बंद/, /माइक बंद/, /सुनना बंद/])) {
+      cancelPending();
+      stopListening();
+      return;
+    }
     if (pendingAction) {
       if (matchesAny(text, [/\bno\b/, /\bnahi\b/, /नहीं/, /मत रोक/, /रद्द/])) {
         cancelPending();
@@ -183,6 +400,17 @@
       return;
     }
 
+    if (prepareProfileName(text)) return;
+    if (fillRoomCode(text)) return;
+    if (matchesAny(text, [/प्रोफाइल/, /प्रोफ़ाइल/, /profile/])
+        && matchesAny(text, [/save/, /सेव/, /सहेज/, /submit/, /करें/])) {
+      const form = app.el('profileForm');
+      if (form) {
+        app.setView('profile');
+        askConfirmation('प्रोफ़ाइल विवरण सेव करना', () => form.requestSubmit());
+        return;
+      }
+    }
     if (matchesAny(text, [/प्रोफाइल/, /प्रोफ़ाइल/, /profile/])) {
       app.setView('profile');
       setStatus('प्रोफ़ाइल खुल गई।');
@@ -191,6 +419,14 @@
     if (matchesAny(text, [/हिस्ट्री/, /इतिहास/, /history/])) {
       app.setView('history');
       setStatus('खाते का इतिहास खुल गया।');
+      return;
+    }
+    if (matchesAny(text, [/सहायता/, /support/])) {
+      window.location.href = '/support.html';
+      return;
+    }
+    if (matchesAny(text, [/chat/, /चैट/])) {
+      window.location.href = '/chat.html';
       return;
     }
     if (matchesAny(text, [/वॉलेट/, /wallet/]) && !/निकाल|withdraw|जमा|deposit/.test(text)) {
@@ -203,13 +439,54 @@
       setStatus('होम और बैटल सूची खुल गई।');
       return;
     }
-    if (matchesAny(text, [/cancel/, /कैंसल/, /रद्द/, /रद्द कर/]) && matchesAny(text, [/battle/, /बैटल/, /game/, /गेम/])) {
-      await prepareCancellation();
+    if (matchesAny(text, [/kyc/, /के वाई सी/, /पहचान जाँच/])) {
+      if (matchesAny(text, [/submit/, /bhejo/, /bhejein/, /भेजो/, /भेजें/])) {
+        app.setView('wallet');
+        const submitButton = app.el('kycForm')?.querySelector('button[type="submit"]');
+        if (submitButton) {
+          askConfirmation('KYC review request भेजना', () => submitButton.form.requestSubmit(submitButton));
+          return;
+        }
+      }
+      if (clickNamedControl(text)) return;
+      app.setView('wallet');
+      setStatus('KYC विकल्प खुल गया। Aadhaar number और तस्वीर सुरक्षा के लिए हाथ से भरें।');
       return;
     }
+    if (matchesAny(text, [/language/, /भाषा/]) && matchesAny(text, [/english/, /अंग्रेज़ी/, /अंग्रेजी/, /en/])) {
+      document.querySelector('[data-lang-toggle="en"]')?.click();
+      setStatus('English भाषा चुनी गई।');
+      return;
+    }
+    if (matchesAny(text, [/language/, /भाषा/]) && matchesAny(text, [/hindi/, /हिंदी/, /hi/])) {
+      document.querySelector('[data-lang-toggle="hi"]')?.click();
+      setStatus('हिंदी भाषा चुनी गई।');
+      return;
+    }
+    if (matchesAny(text, [/cancel/, /कैंसल/, /रद्द/, /रद्द कर/]) && matchesAny(text, [/battle/, /बैटल/, /game/, /गेम/])) {
+      await prepareCancellation(text);
+      return;
+    }
+    if (matchesAny(text, [/join/, /जुड़/, /शामिल/]) && matchesAny(text, [/battle/, /बैटल/, /game/, /गेम/])) {
+      const amount = getAmount(text);
+      if (!Number.isFinite(amount)) {
+        setStatus('किस राशि की बैटल join करनी है, जैसे “500 वाली बैटल में शामिल हो”।', true);
+        return;
+      }
+      await prepareJoin(amount);
+      return;
+    }
+    if (chooseGame(text)) return;
+    if (chooseVisibleOption(text)) return;
     if (matchesAny(text, [/निकाल/, /withdraw/, /निकासी/])) {
       const amount = getAmount(text);
       if (!Number.isFinite(amount)) {
+        const form = app.el('withdrawForm');
+        if (form && matchesAny(text, [/submit/, /request/, /bhejo/, /bhejein/, /भेजो/, /भेजें/])) {
+          app.setView('wallet');
+          askConfirmation('निकासी अनुरोध भेजना', () => form.requestSubmit());
+          return;
+        }
         app.setView('wallet');
         setStatus('निकासी की राशि बोलें, जैसे “पाँच सौ रुपये निकालो”।', true);
         return;
@@ -220,6 +497,12 @@
     if (matchesAny(text, [/जमा/, /deposit/, /डिपॉजिट/])) {
       const amount = getAmount(text);
       if (!Number.isFinite(amount)) {
+        const form = app.el('depositForm');
+        if (form && !form.hidden
+            && matchesAny(text, [/submit/, /request/, /bhejo/, /bhejein/, /भेजो/, /भेजें/])) {
+          askConfirmation('जमा अनुरोध भेजना', () => form.requestSubmit());
+          return;
+        }
         app.setView('wallet');
         setStatus('जमा राशि बोलें, जैसे “जमा पाँच सौ रुपये”।', true);
         return;
@@ -238,20 +521,62 @@
       makeBattle(amount);
       return;
     }
-    setStatus('यह आवाज़ कमांड समझ नहीं आया। प्रोफ़ाइल में दिए उदाहरण बोलें।', true);
+    if (matchesAny(text, [/menu/, /मेन्यू/, /मेनू/]) && matchesAny(text, [/खोल/, /open/, /show/])) {
+      document.getElementById('menuToggle')?.click();
+      setStatus('मेन्यू खुल गया।');
+      return;
+    }
+    if (clickNamedControl(text)) return;
+    setStatus('यह कमांड समझ नहीं आया। विकल्प का नाम बोलकर “दबाओ” कहें, जैसे “KYC review दबाओ”।', true);
+  }
+
+  function updateVoiceButtons() {
+    startButton.disabled = !Recognition || listening;
+    stopButton.disabled = !listening;
+    if (homeStartButton) {
+      homeStartButton.disabled = !Recognition;
+      homeStartButton.textContent = listening ? '⏹ रोकें' : '🎤 Voice';
+      homeStartButton.setAttribute('aria-pressed', String(listening));
+      homeStartButton.title = listening ? 'आवाज़ बंद करें' : 'Hindi voice control शुरू करें';
+    }
   }
 
   function stopListening() {
+    const wasListening = listening;
     listening = false;
     window.clearTimeout(restartTimer);
-    if (recognition) recognition.stop();
+    if (recognition && wasListening) {
+      try {
+        recognition.stop();
+      } catch (error) {
+        setStatus(`माइक बंद नहीं हो पाया: ${error.message}`, true);
+      }
+    }
     clearPending('आवाज़ बंद है।');
-    startButton.disabled = !Recognition;
-    stopButton.disabled = true;
+    updateVoiceButtons();
+  }
+
+  function startListening() {
+    if (!Recognition) {
+      setStatus('इस ब्राउज़र में Hindi voice recognition उपलब्ध नहीं है।', true);
+      return;
+    }
+    if (!window.isSecureContext) {
+      setStatus('माइक के लिए वेबसाइट HTTPS पर खोलें।', true);
+      return;
+    }
+    try {
+      recognition.start();
+      listening = true;
+      updateVoiceButtons();
+      setStatus('माइक चालू है। हिंदी में वेबसाइट के विकल्प बोलें।');
+    } catch (error) {
+      setStatus(`माइक शुरू नहीं हो पाया: ${error.message}`, true);
+    }
   }
 
   if (!Recognition) {
-    startButton.disabled = true;
+    updateVoiceButtons();
     setStatus('इस ब्राउज़र में Hindi voice recognition उपलब्ध नहीं है। Chrome या Android browser में HTTPS पर कोशिश करें।', true);
   } else {
     recognition = new Recognition();
@@ -268,8 +593,7 @@
     recognition.onerror = event => {
       if (event.error === 'no-speech' || event.error === 'aborted') return;
       listening = false;
-      stopButton.disabled = true;
-      startButton.disabled = false;
+      updateVoiceButtons();
       setStatus(event.error === 'not-allowed' || event.error === 'service-not-allowed'
         ? 'माइक की अनुमति नहीं मिली। Browser settings में microphone अनुमति दें।'
         : `आवाज़ पहचान में समस्या हुई: ${event.error}`, true);
@@ -283,30 +607,28 @@
           recognition.start();
         } catch (error) {
           listening = false;
-          stopButton.disabled = true;
-          startButton.disabled = false;
+          updateVoiceButtons();
           setStatus(`माइक शुरू नहीं हो पाया: ${error.message}`, true);
         }
       }, 250);
     };
-    startButton.addEventListener('click', () => {
-      if (!window.isSecureContext) {
-        setStatus('माइक के लिए वेबसाइट HTTPS पर खोलें।', true);
-        return;
-      }
-      try {
-        recognition.start();
-        listening = true;
-        startButton.disabled = true;
-        stopButton.disabled = false;
-        setStatus('माइक चालू है। हिंदी में कमांड बोलें।');
-      } catch (error) {
-        setStatus(`माइक शुरू नहीं हो पाया: ${error.message}`, true);
-      }
-    });
   }
 
+  startButton.addEventListener('click', startListening);
   stopButton.addEventListener('click', stopListening);
   confirmButton.addEventListener('click', confirmPending);
   cancelButton.addEventListener('click', cancelPending);
+  homeStartButton?.addEventListener('click', event => {
+    event.stopPropagation();
+    if (listening) stopListening();
+    else startListening();
+  });
+  homeConfirmButton?.addEventListener('click', event => {
+    event.stopPropagation();
+    confirmPending();
+  });
+  homeCancelButton?.addEventListener('click', event => {
+    event.stopPropagation();
+    cancelPending();
+  });
 })();
