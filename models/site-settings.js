@@ -9,7 +9,6 @@ const siteSettingsSchema = new mongoose.Schema({
   _id: { type: String, default: 'support-contact' },
   supportNumber: { type: String, default: '0000000000' },
   whatsappNumber: { type: String, default: '79557295' },
-  depositUpiId: { type: String, default: '' },
   brandLogoPath: { type: String, default: '' },
   appIcon192Path: { type: String, default: '' },
   appIcon512Path: { type: String, default: '' },

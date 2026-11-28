@@ -1019,38 +1019,6 @@ app.post('/api/admin/site-support', requireAdmin, async (req, res) => {
   }
 });
 
-app.get('/api/admin/deposit-upi', requireAdmin, async (req, res) => {
-  if (mongoose.connection.readyState !== 1) {
-    return res.status(503).json({ error: mongoUnavailableMessage() });
-  }
-  try {
-    const settings = await SiteSettings.findById('support-contact').select('depositUpiId').lean();
-    res.json({ depositUpiId: settings?.depositUpiId || process.env.ADMIN_UPI_ID || '' });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-app.post('/api/admin/deposit-upi', requireAdmin, async (req, res) => {
-  if (mongoose.connection.readyState !== 1) {
-    return res.status(503).json({ error: mongoUnavailableMessage() });
-  }
-  const depositUpiId = String(req.body?.depositUpiId || '').trim();
-  if (!/^[a-zA-Z0-9._-]{2,100}@[a-zA-Z0-9.-]{2,100}$/.test(depositUpiId)) {
-    return res.status(400).json({ error: 'Valid UPI ID dalein, jaise name@bank.' });
-  }
-  try {
-    await SiteSettings.findByIdAndUpdate(
-      'support-contact',
-      { $set: { depositUpiId } },
-      { new: true, upsert: true, runValidators: true, setDefaultsOnInsert: true }
-    );
-    res.json({ message: 'Deposit UPI ID save ho gaya.', depositUpiId });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
 app.get('/api/admin/sms-api-key', requireAdmin, async (req, res) => {
   if (mongoose.connection.readyState !== 1) {
     return res.status(503).json({ error: mongoUnavailableMessage() });

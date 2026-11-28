@@ -158,7 +158,6 @@
             <a href="#bonusCredit" onclick="showAdminTool(event, 'bonusCredit')">Bonus Credit</a>
             <a href="#adminSupportNumbers" onclick="showAdminTool(event, 'adminSupportNumbers')">WhatsApp &amp; Support Numbers</a>
             <a href="#depositWithdrawalSummary" onclick="showAdminTool(event, 'depositWithdrawalSummary')">Deposit &amp; Withdrawal Summary</a>
-            <a href="#depositUpiSettings" onclick="showAdminTool(event, 'depositUpiSettings')">Deposit UPI ID</a>
             <a href="#completeGameHistory" onclick="showAdminTool(event, 'completeGameHistory')">Complete Game History</a>
             <a href="#adminToolsView" onclick="showAllAdminTools(event)">Other Admin Tools</a>
           </div>
@@ -218,21 +217,6 @@
         <button id="saveSupportNumbersBtn" type="button">Save contact numbers</button>
       </div>
       <p id="supportNumbersStatus" class="muted">Loading...</p>
-    </div>
-
-    <div class="card" id="depositUpiSettings" data-admin-tool>
-      <h3>Deposit UPI ID</h3>
-      <p class="muted">Player deposit QR aur UPI app payment ke liye use hone wala UPI ID.</p>
-      <div class="form-grid">
-        <div>
-          <label for="depositUpiIdInput">UPI ID</label>
-          <input id="depositUpiIdInput" type="text" inputmode="email" autocomplete="off" maxlength="203" placeholder="name@bank">
-        </div>
-      </div>
-      <div class="toolbar" style="margin-top: 12px;">
-        <button id="saveDepositUpiIdBtn" type="button">Save deposit UPI ID</button>
-      </div>
-      <p id="depositUpiIdStatus" class="muted">Loading...</p>
     </div>
 
     <div class="card" id="depositWithdrawalSummary" data-admin-tool aria-live="polite">
@@ -797,43 +781,6 @@
         status.textContent = data.message || 'Support and WhatsApp numbers saved.';
       } catch (error) {
         status.textContent = error.message || 'Contact numbers save nahi ho sake.';
-      }
-    }
-
-    async function loadDepositUpiId() {
-      const input = document.getElementById('depositUpiIdInput');
-      const status = document.getElementById('depositUpiIdStatus');
-      try {
-        const res = await adminFetch('/api/admin/deposit-upi');
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Deposit UPI ID load nahi ho saka.');
-        input.value = data.depositUpiId || '';
-        status.textContent = data.depositUpiId ? 'Current deposit UPI ID loaded.' : 'Abhi deposit UPI ID configure nahi hai.';
-      } catch (error) {
-        status.textContent = error.message || 'Deposit UPI ID load nahi ho saka.';
-      }
-    }
-
-    async function saveDepositUpiId() {
-      const input = document.getElementById('depositUpiIdInput');
-      const status = document.getElementById('depositUpiIdStatus');
-      const depositUpiId = input.value.trim();
-      if (!/^[a-zA-Z0-9._-]{2,100}@[a-zA-Z0-9.-]{2,100}$/.test(depositUpiId)) {
-        status.textContent = 'Valid UPI ID dalein, jaise name@bank.';
-        return;
-      }
-      try {
-        const res = await adminFetch('/api/admin/deposit-upi', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ depositUpiId })
-        });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Deposit UPI ID save nahi ho saka.');
-        input.value = data.depositUpiId || depositUpiId;
-        status.textContent = data.message || 'Deposit UPI ID save ho gaya.';
-      } catch (error) {
-        status.textContent = error.message || 'Deposit UPI ID save nahi ho saka.';
       }
     }
 
@@ -1631,12 +1578,10 @@
     });
 
     document.getElementById('saveSupportNumbersBtn').addEventListener('click', saveSupportNumbers);
-    document.getElementById('saveDepositUpiIdBtn').addEventListener('click', saveDepositUpiId);
     document.getElementById('saveLeaderboardSettings').addEventListener('click', saveAdminLeaderboardSettings);
     document.getElementById('saveWithdrawTickerSettings').addEventListener('click', saveWithdrawTickerSettings);
     configureAdminRequestPage();
     loadSupportNumbers();
-    loadDepositUpiId();
     loadWithdrawTickerSettings();
     loadData();
     loadUsers();
