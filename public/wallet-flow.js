@@ -178,22 +178,6 @@
   const qrArea = el('qrArea');
   const amountInput = el('depositAmount');
   if (!qrForm || !qrArea || !amountInput) return;
-  const depositForm = el('depositForm');
-  qrForm.hidden = true;
-  qrArea.hidden = true;
-  if (depositForm) {
-    depositForm.hidden = false;
-    const amountField = document.createElement('div');
-    amountField.className = 'field';
-    amountField.innerHTML = '<label for="depositRequestAmount">Deposit amount (₹)</label><input id="depositRequestAmount" type="number" min="50" max="1000000" value="100" required>';
-    depositForm.insertBefore(amountField, depositForm.firstElementChild);
-    const depositRequestAmount = el('depositRequestAmount');
-    const syncDepositAmount = () => {
-      depositForm.dataset.amount = String(Number(depositRequestAmount.value) || 0);
-    };
-    depositRequestAmount.addEventListener('input', syncDepositAmount);
-    syncDepositAmount();
-  }
   announceEnteredAmount(amountInput, 'deposit');
   const entryAmountInput = el('entryAmount');
   let lastAnnouncedEntryAmount = '';

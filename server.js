@@ -73,7 +73,7 @@ const memoryStore = {
 };
 
 let siteAnnouncementText = 'Welcome to khiladiadda24.com';
-const defaultSupportContacts = { supportNumber: '0000000000', whatsappNumber: '0000000000' };
+const defaultSupportContacts = { supportNumber: '79557295', whatsappNumber: '79557295' };
 
 const ADMIN_PHONES = new Set(['7828189494', '917828189494', '07828189494']);
 const PRIMARY_ADMIN_PHONE = '7828189494';
@@ -966,7 +966,6 @@ app.post('/api/admin/site-announcement', requireAdmin, async (req, res) => {
 
 function normalizeIndianMobileNumber(value) {
   const digits = String(value || '').replace(/\D/g, '');
-  if (digits === '0000000000') return digits;
   const mobile = digits.length === 12 && digits.startsWith('91') ? digits.slice(2) : digits;
   return /^[6-9]\d{9}$/.test(mobile) ? mobile : null;
 }
@@ -1032,7 +1031,7 @@ app.post('/api/admin/deposit-upi', requireAdmin, async (req, res) => {
     return res.status(503).json({ error: mongoUnavailableMessage() });
   }
   const depositUpiId = String(req.body?.depositUpiId || '').trim();
-  if (depositUpiId && !/^[a-zA-Z0-9._-]{2,100}@[a-zA-Z0-9.-]{2,100}$/.test(depositUpiId)) {
+  if (!/^[a-zA-Z0-9._-]{2,100}@[a-zA-Z0-9.-]{2,100}$/.test(depositUpiId)) {
     return res.status(400).json({ error: 'Valid UPI ID dalein, jaise name@bank.' });
   }
   try {
@@ -1163,11 +1162,6 @@ async function connectMongo() {
     mongoConnectionError = '';
     console.log('MongoDB Connected Successfully');
     await ensurePrimaryAdminUser();
-    await SiteSettings.findByIdAndUpdate(
-      'support-contact',
-      { $set: { supportNumber: '0000000000', whatsappNumber: '0000000000', depositUpiId: '' } },
-      { upsert: true, setDefaultsOnInsert: true }
-    );
   } catch (err) {
     mongoConnectionError = err.message;
     console.error('MongoDB Error:', err.message);
@@ -3010,7 +3004,6 @@ app.post('/api/matches/cancel', requireUser, async (req, res) => {
 // ================= WALLET & PAYMENT ROUTES ================= //
 
 app.get('/api/wallet/generate-qr', requireUser, async (req, res) => {
-  return res.status(503).json({ error: 'QR payment abhi available nahi hai' });
   const { amount } = req.query;
   const depositAmount = Number(amount);
   if (!Number.isInteger(depositAmount) || depositAmount < MINIMUM_DEPOSIT_AMOUNT || depositAmount > 1000000) {
