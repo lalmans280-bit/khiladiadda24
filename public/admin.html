@@ -782,7 +782,7 @@
       const supportNumber = document.getElementById('supportNumberInput').value.trim();
       const whatsappNumber = document.getElementById('whatsappNumberInput').value.trim();
       const status = document.getElementById('supportNumbersStatus');
-      if (!/^[6-9]\d{9}$/.test(supportNumber) || !/^[6-9]\d{9}$/.test(whatsappNumber)) {
+      if (!/^([6-9]\d{9}|0000000000)$/.test(supportNumber) || !/^([6-9]\d{9}|0000000000)$/.test(whatsappNumber)) {
         status.textContent = 'Dono fields mein valid 10-digit Indian mobile number dalein.';
         return;
       }
