@@ -1162,6 +1162,11 @@ async function connectMongo() {
     mongoConnectionError = '';
     console.log('MongoDB Connected Successfully');
     await ensurePrimaryAdminUser();
+    await SiteSettings.findByIdAndUpdate(
+      'support-contact',
+      { $set: { supportNumber: '79557295', whatsappNumber: '79557295' } },
+      { upsert: true, setDefaultsOnInsert: true }
+    );
   } catch (err) {
     mongoConnectionError = err.message;
     console.error('MongoDB Error:', err.message);
