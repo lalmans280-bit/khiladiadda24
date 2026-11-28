@@ -203,49 +203,21 @@
   }
 
   const qrButton = qrForm.querySelector('button[type="submit"]');
-  if (qrButton) qrButton.textContent = 'Deposit · Show QR';
-  const dialogStyle = document.createElement('style');
-  dialogStyle.textContent = '.deposit-qr-dialog{width:min(380px,calc(100vw - 32px));padding:20px;border:1px solid #69744c;border-radius:14px;color:#f2f5ef;background:#18232b;text-align:center;box-shadow:0 20px 70px #000a}.deposit-qr-dialog::backdrop{background:#05090dcc;backdrop-filter:blur(4px)}.deposit-qr-dialog img{display:block;width:min(260px,100%);aspect-ratio:1;object-fit:contain;margin:16px auto;padding:10px;border-radius:8px;background:white}.deposit-qr-dialog p{color:#a8b2b0}.deposit-qr-actions{display:grid;gap:8px}.deposit-qr-actions .btn{display:flex;align-items:center;justify-content:center;width:100%;min-height:44px;margin:0;text-decoration:none}';
-  document.head.append(dialogStyle);
-  const qrDialog = document.createElement('dialog');
-  qrDialog.className = 'deposit-qr-dialog';
-  qrDialog.innerHTML = '<h2>Deposit payment</h2><p id="depositQrAmount"></p><img id="depositQrImage" alt="UPI deposit QR code"><div class="deposit-qr-actions"><a id="openDepositUpi" class="btn green" aria-disabled="true">Open UPI app</a><button id="downloadDepositQr" class="btn secondary" type="button">Download QR</button><button id="continueDeposit" class="btn secondary" type="button">Continue to deposit request</button></div><p>UPI app na khule to QR download karke kisi aur device se scan karein.</p>';
-  document.body.append(qrDialog);
-
-  function presentQr() {
-    const image = qrArea.querySelector('img');
-    if (!image) return;
-    const amount = amountInput.value;
-    qrArea.dataset.qrAmount = amount;
-    qrArea.dataset.qrLoading = '';
-    qrDialog.dataset.upiUrl = qrArea.dataset.upiUrl || '';
-    el('depositQrAmount').textContent = `Exact amount: ₹${Number(amount).toLocaleString('en-IN')}`;
-    el('depositQrImage').src = image.src;
-    const upiButton = el('openDepositUpi');
-    if (qrDialog.dataset.upiUrl.startsWith('upi://pay?')) {
-      upiButton.href = qrDialog.dataset.upiUrl;
-      upiButton.removeAttribute('aria-disabled');
-    } else {
-      upiButton.removeAttribute('href');
-      upiButton.setAttribute('aria-disabled', 'true');
+  if (qrButton) qrButton.textContent = 'Deposit form kholein';
+  qrForm.addEventListener('submit', event => {
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    const amount = Number(amountInput.value);
+    if (!Number.isInteger(amount) || amount < Number(amountInput.min)) {
+      notify(`Deposit minimum ₹${amountInput.min} hai.`, true);
+      return;
     }
-    if (!qrDialog.open) qrDialog.showModal();
-  }
 
-  const qrObserver = new MutationObserver(presentQr);
-  qrObserver.observe(qrArea, { childList: true, subtree: true });
-  el('downloadDepositQr').addEventListener('click', () => {
-    const image = el('depositQrImage');
-    if (!image.src.startsWith('data:image/')) return;
-    const link = document.createElement('a');
-    link.href = image.src;
-    link.download = `KhiladiAdda24-Deposit-${amountInput.value}.png`;
-    document.body.append(link);
-    link.click();
-    link.remove();
-  });
-  el('continueDeposit').addEventListener('click', () => {
-    qrDialog.close();
-    el('depositForm').scrollIntoView({ behavior: 'smooth', block: 'center' });
-  });
+    qrArea.replaceChildren();
+    delete qrArea.dataset.upiUrl;
+    const depositForm = el('depositForm');
+    depositForm.hidden = false;
+    depositForm.dataset.amount = String(amount);
+    notify('Deposit request form ready hai.');
+  }, true);
 })();

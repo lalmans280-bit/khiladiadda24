@@ -7,7 +7,6 @@ const os = require('os');
 const fs = require('fs');
 const crypto = require('crypto');
 const multer = require('multer');
-const QRCode = require('qrcode');
 const axios = require('axios');
 const jwt = require('jsonwebtoken');
 const { Server } = require('socket.io');
@@ -73,7 +72,7 @@ const memoryStore = {
 };
 
 let siteAnnouncementText = 'Welcome to khiladiadda24.com';
-const defaultSupportContacts = { supportNumber: '79557295', whatsappNumber: '79557295' };
+const defaultSupportContacts = { supportNumber: '0000000000', whatsappNumber: '79557295' };
 
 const ADMIN_PHONES = new Set(['7828189494', '917828189494', '07828189494']);
 const PRIMARY_ADMIN_PHONE = '7828189494';
@@ -975,7 +974,7 @@ app.get('/api/site-support', async (req, res) => {
     const settings = mongoose.connection.readyState === 1
       ? await SiteSettings.findById('support-contact').lean()
       : null;
-    res.json({ ...defaultSupportContacts, ...(settings || {}) });
+    res.json({ ...defaultSupportContacts, ...(settings || {}), supportNumber: defaultSupportContacts.supportNumber });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -987,7 +986,7 @@ app.get('/api/admin/site-support', requireAdmin, async (req, res) => {
   }
   try {
     const settings = await SiteSettings.findById('support-contact').lean();
-    res.json({ ...defaultSupportContacts, ...(settings || {}) });
+    res.json({ ...defaultSupportContacts, ...(settings || {}), supportNumber: defaultSupportContacts.supportNumber });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -997,10 +996,10 @@ app.post('/api/admin/site-support', requireAdmin, async (req, res) => {
   if (mongoose.connection.readyState !== 1) {
     return res.status(503).json({ error: mongoUnavailableMessage() });
   }
-  const supportNumber = normalizeIndianMobileNumber(req.body?.supportNumber);
+  const supportNumber = String(req.body?.supportNumber || '').trim();
   const whatsappNumber = normalizeIndianMobileNumber(req.body?.whatsappNumber);
-  if (!supportNumber || !whatsappNumber) {
-    return res.status(400).json({ error: 'Dono fields mein valid 10-digit Indian mobile number dalein.' });
+  if (supportNumber !== defaultSupportContacts.supportNumber || !whatsappNumber) {
+    return res.status(400).json({ error: 'Support number 0000000000 rakhein aur WhatsApp ke liye valid 10-digit Indian mobile number dalein.' });
   }
   try {
     const settings = await SiteSettings.findByIdAndUpdate(
@@ -3007,27 +3006,6 @@ app.post('/api/matches/cancel', requireUser, async (req, res) => {
 });
 
 // ================= WALLET & PAYMENT ROUTES ================= //
-
-app.get('/api/wallet/generate-qr', requireUser, async (req, res) => {
-  const { amount } = req.query;
-  const depositAmount = Number(amount);
-  if (!Number.isInteger(depositAmount) || depositAmount < MINIMUM_DEPOSIT_AMOUNT || depositAmount > 1000000) {
-    return res.status(400).json({ error: `Minimum deposit ₹${MINIMUM_DEPOSIT_AMOUNT} hai` });
-  }
-  try {
-    const settings = mongoose.connection.readyState === 1
-      ? await SiteSettings.findById('support-contact').select('depositUpiId').lean()
-      : null;
-    const adminUPI = String(settings?.depositUpiId || process.env.ADMIN_UPI_ID || '').trim();
-    if (!adminUPI) return res.status(503).json({ error: 'Admin UPI ID configure nahi hai' });
-    const payeeName = 'KhiladiAdda24.com';
-    const upiUrl = `upi://pay?${new URLSearchParams({ pa: adminUPI, pn: payeeName, am: String(depositAmount), cu: 'INR' })}`;
-    const qrImage = await QRCode.toDataURL(upiUrl);
-    res.json({ qrImage, upiUrl });
-  } catch (err) {
-    res.status(500).json({ error: 'QR generate fail hua' });
-  }
-});
 
 app.post('/api/wallet/submit-deposit', requireUser, persistUploads(upload.single('screenshot')), async (req, res) => {
   const { amount, utrNumber } = req.body;

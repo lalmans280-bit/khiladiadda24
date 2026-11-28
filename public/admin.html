@@ -203,11 +203,11 @@
     <a id="adminRequestBack" class="admin-request-back" href="/admin.html" hidden>← Back to Admin Notifications</a>
     <div class="card admin-section" id="adminSupportNumbers" data-admin-tool>
       <h3>WhatsApp &amp; Support Numbers</h3>
-      <p class="muted">Dono fields mein valid 10-digit Indian mobile number dalein. WhatsApp aur support ke numbers alag ho sakte hain.</p>
+      <p class="muted">Support number abhi 0000000000 par set hai. WhatsApp ke liye valid 10-digit Indian mobile number dalein.</p>
       <div class="form-grid">
         <div>
           <label for="supportNumberInput">Support phone</label>
-          <input id="supportNumberInput" type="tel" inputmode="numeric" pattern="[6-9][0-9]{9}" maxlength="10" placeholder="9876543210">
+          <input id="supportNumberInput" type="tel" inputmode="numeric" pattern="0000000000" maxlength="10" value="0000000000" readonly>
         </div>
         <div>
           <label for="whatsappNumberInput">WhatsApp phone</label>
@@ -770,7 +770,7 @@
         const res = await adminFetch('/api/admin/site-support');
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'Contact numbers load nahi ho sake.');
-        document.getElementById('supportNumberInput').value = data.supportNumber || '';
+        document.getElementById('supportNumberInput').value = '0000000000';
         document.getElementById('whatsappNumberInput').value = data.whatsappNumber || '';
         status.textContent = 'Current support and WhatsApp numbers loaded.';
       } catch (error) {
@@ -782,8 +782,8 @@
       const supportNumber = document.getElementById('supportNumberInput').value.trim();
       const whatsappNumber = document.getElementById('whatsappNumberInput').value.trim();
       const status = document.getElementById('supportNumbersStatus');
-      if (!/^[6-9]\d{9}$/.test(supportNumber) || !/^[6-9]\d{9}$/.test(whatsappNumber)) {
-        status.textContent = 'Dono fields mein valid 10-digit Indian mobile number dalein.';
+      if (supportNumber !== '0000000000' || !/^[6-9]\d{9}$/.test(whatsappNumber)) {
+        status.textContent = 'Support number 0000000000 rakhein aur WhatsApp ke liye valid 10-digit Indian mobile number dalein.';
         return;
       }
       try {
