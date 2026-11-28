@@ -972,9 +972,12 @@ function normalizeIndianMobileNumber(value) {
 app.get('/api/site-support', async (req, res) => {
   try {
     const settings = mongoose.connection.readyState === 1
-      ? await SiteSettings.findById('support-contact').lean()
+      ? await SiteSettings.findById('support-contact').select('whatsappNumber').lean()
       : null;
-    res.json({ ...defaultSupportContacts, ...(settings || {}), supportNumber: defaultSupportContacts.supportNumber });
+    res.json({
+      supportNumber: defaultSupportContacts.supportNumber,
+      whatsappNumber: settings?.whatsappNumber || defaultSupportContacts.whatsappNumber
+    });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -985,8 +988,11 @@ app.get('/api/admin/site-support', requireAdmin, async (req, res) => {
     return res.status(503).json({ error: mongoUnavailableMessage() });
   }
   try {
-    const settings = await SiteSettings.findById('support-contact').lean();
-    res.json({ ...defaultSupportContacts, ...(settings || {}), supportNumber: defaultSupportContacts.supportNumber });
+    const settings = await SiteSettings.findById('support-contact').select('whatsappNumber').lean();
+    res.json({
+      supportNumber: defaultSupportContacts.supportNumber,
+      whatsappNumber: settings?.whatsappNumber || defaultSupportContacts.whatsappNumber
+    });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
